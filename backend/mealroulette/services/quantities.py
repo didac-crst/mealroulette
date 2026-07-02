@@ -177,7 +177,7 @@ def _collapse_group(
     group: list[QuantityLine],
     conversions: list[IngredientConversion],
 ) -> AggregatedQuantity:
-    target_unit = _display_unit_for_group(group)
+    target_unit = _display_unit_for_group(group, conversions)
     total = Decimal("0")
     approximate = False
 
@@ -194,12 +194,22 @@ def _collapse_group(
     )
 
 
-def _display_unit_for_group(group: list[QuantityLine]) -> UnitInfo:
-    mass_or_volume = [
-        line.unit
-        for line in group
-        if line.unit.dimension in {UnitDimension.mass, UnitDimension.volume}
-    ]
-    if mass_or_volume:
-        return min(mass_or_volume, key=lambda unit: unit.conversion_to_base)
+def _display_unit_for_group(
+    group: list[QuantityLine],
+    conversions: list[IngredientConversion],
+) -> UnitInfo:
+    unique_units = list({line.unit.id: line.unit for line in group}.values())
+    unique_units.sort(
+        key=lambda unit: (
+            0 if unit.dimension in {UnitDimension.mass, UnitDimension.volume} else 1,
+            unit.conversion_to_base,
+            unit.symbol,
+        )
+    )
+    for candidate in unique_units:
+        if all(
+            units_mergeable(line.unit, candidate, conversions)
+            for line in group
+        ):
+            return candidate
     return group[0].unit

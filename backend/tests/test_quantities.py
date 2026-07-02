@@ -38,6 +38,13 @@ def test_convert_count_units_requires_ingredient_conversion():
     assert approximate is True
 
 
+def test_convert_count_units_via_reverse_conversion():
+    conversion = IngredientConversion(from_unit_id=UNIT.id, to_unit_id=GRAM.id, factor=Decimal("120"))
+    converted, approximate = convert_quantity(Decimal("240"), GRAM, UNIT, [conversion])
+    assert converted == Decimal("2")
+    assert approximate is True
+
+
 def test_convert_count_units_without_conversion_raises():
     with pytest.raises(UnitsNotCompatibleError):
         convert_quantity(Decimal("2"), UNIT, GRAM)

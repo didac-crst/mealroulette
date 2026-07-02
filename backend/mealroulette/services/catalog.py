@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from fastapi import HTTPException, status
 from sqlalchemy import func, or_, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
 from mealroulette.models.catalog import (
@@ -22,6 +23,7 @@ from mealroulette.schemas.catalog import (
     DishPublic,
     DishUpdateRequest,
     IngredientAliasCreateRequest,
+    IngredientConfirmAction,
     IngredientCreateRequest,
     IngredientPublic,
     IngredientResolveResponse,
@@ -105,12 +107,8 @@ class CatalogService:
 
     def update_tag(self, tag_id: int, payload: TagUpdateRequest) -> Tag:
         tag = self.get_tag(tag_id)
-        if payload.name is not None:
-            tag.name = payload.name
-        if payload.family is not None:
-            tag.family = payload.family
-        if payload.description is not None:
-            tag.description = payload.description
+        for field, value in payload.model_dump(exclude_unset=True).items():
+            setattr(tag, field, value)
         self.db.commit()
         self.db.refresh(tag)
         return tag
@@ -178,7 +176,7 @@ class CatalogService:
     def confirm_ingredient(
         self,
         *,
-        action: str,
+        action: IngredientConfirmAction,
         proposed_name: str,
         ingredient_id: int | None = None,
         display_name: str | None = None,
@@ -187,7 +185,7 @@ class CatalogService:
         language: str | None = None,
     ) -> Ingredient:
         normalized = normalize_name(proposed_name)
-        if action == "create":
+        if action == IngredientConfirmAction.create:
             if self.db.scalar(select(Ingredient).where(func.lower(Ingredient.canonical_name) == normalized)):
                 raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Ingredient already exists")
             ingredient = Ingredient(
@@ -203,7 +201,7 @@ class CatalogService:
             self.db.refresh(ingredient)
             return ingredient
 
-        if action in {"map", "alias"}:
+        if action in {IngredientConfirmAction.map, IngredientConfirmAction.alias}:
             if ingredient_id is None:
                 raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="ingredient_id is required")
             ingredient = self.get_ingredient(ingredient_id)
@@ -242,19 +240,8 @@ class CatalogService:
 
     def update_ingredient(self, ingredient_id: int, payload: IngredientUpdateRequest) -> Ingredient:
         ingredient = self.get_ingredient(ingredient_id)
-        for field in (
-            "display_name",
-            "category",
-            "default_unit_id",
-            "default_dimension",
-            "pantry_item",
-            "season_start_month",
-            "season_end_month",
-            "notes",
-        ):
-            value = getattr(payload, field)
-            if value is not None:
-                setattr(ingredient, field, value)
+        for field, value in payload.model_dump(exclude_unset=True).items():
+            setattr(ingredient, field, value)
         self.db.commit()
         self.db.refresh(ingredient)
         return ingredient
@@ -262,7 +249,14 @@ class CatalogService:
     def delete_ingredient(self, ingredient_id: int) -> None:
         ingredient = self.get_ingredient(ingredient_id)
         self.db.delete(ingredient)
-        self.db.commit()
+        try:
+            self.db.commit()
+        except IntegrityError as exc:
+            self.db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Ingredient is still referenced by one or more recipes",
+            ) from exc
 
     def list_aliases(self, ingredient_id: int) -> list[IngredientAlias]:
         self.get_ingredient(ingredient_id)
@@ -351,23 +345,12 @@ class CatalogService:
 
     def update_dish(self, dish_id: int, payload: DishUpdateRequest) -> Dish:
         dish = self.get_dish(dish_id)
-        if payload.name is not None:
-            dish.name = payload.name
-        for field in (
-            "description",
-            "default_servings",
-            "prep_time_minutes",
-            "cook_time_minutes",
-            "difficulty",
-            "active",
-            "notes",
-        ):
-            value = getattr(payload, field)
-            if value is not None:
-                setattr(dish, field, value)
-        if payload.tag_ids is not None:
-            self._apply_tags(dish, payload.tag_ids)
-        if payload.seasonality is not None:
+        updates = payload.model_dump(exclude_unset=True, exclude={"tag_ids", "seasonality"})
+        for field, value in updates.items():
+            setattr(dish, field, value)
+        if "tag_ids" in payload.model_fields_set:
+            self._apply_tags(dish, payload.tag_ids or [])
+        if "seasonality" in payload.model_fields_set:
             self._apply_seasonality(dish, payload.seasonality)
         self.db.commit()
         return self.get_dish(dish.id)

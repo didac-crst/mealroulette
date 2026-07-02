@@ -88,7 +88,7 @@ class IngredientAlias(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     ingredient_id: Mapped[int] = mapped_column(ForeignKey("ingredients.id", ondelete="CASCADE"), index=True)
-    alias: Mapped[str] = mapped_column(String(128), index=True)
+    alias: Mapped[str] = mapped_column(String(128))
     language: Mapped[str | None] = mapped_column(String(16), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
@@ -225,7 +225,7 @@ class RecipeIngredient(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     recipe_id: Mapped[int] = mapped_column(ForeignKey("recipes.id", ondelete="CASCADE"), index=True)
-    ingredient_id: Mapped[int] = mapped_column(ForeignKey("ingredients.id"), index=True)
+    ingredient_id: Mapped[int] = mapped_column(ForeignKey("ingredients.id", ondelete="RESTRICT"), index=True)
     quantity: Mapped[Decimal | None] = mapped_column(Numeric(12, 4), nullable=True)
     unit_id: Mapped[int | None] = mapped_column(ForeignKey("units.id"), nullable=True)
     optional: Mapped[bool] = mapped_column(Boolean, default=False)

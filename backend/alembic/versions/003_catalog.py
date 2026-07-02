@@ -162,7 +162,6 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("alias", name="uq_ingredient_aliases_alias"),
     )
-    op.create_index(op.f("ix_ingredient_aliases_alias"), "ingredient_aliases", ["alias"], unique=False)
     op.create_index(
         op.f("ix_ingredient_aliases_ingredient_id"), "ingredient_aliases", ["ingredient_id"], unique=False
     )
@@ -201,7 +200,7 @@ def upgrade() -> None:
         sa.Column("notes", sa.Text(), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
-        sa.ForeignKeyConstraint(["ingredient_id"], ["ingredients.id"]),
+        sa.ForeignKeyConstraint(["ingredient_id"], ["ingredients.id"], ondelete="RESTRICT"),
         sa.ForeignKeyConstraint(["recipe_id"], ["recipes.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["unit_id"], ["units.id"]),
         sa.PrimaryKeyConstraint("id"),
@@ -242,7 +241,6 @@ def downgrade() -> None:
     )
     op.drop_table("ingredient_unit_conversions")
     op.drop_index(op.f("ix_ingredient_aliases_ingredient_id"), table_name="ingredient_aliases")
-    op.drop_index(op.f("ix_ingredient_aliases_alias"), table_name="ingredient_aliases")
     op.drop_table("ingredient_aliases")
     op.drop_index(op.f("ix_recipes_dish_id"), table_name="recipes")
     op.drop_table("recipes")

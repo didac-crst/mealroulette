@@ -8,6 +8,7 @@ from pathlib import Path
 
 import yaml
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from mealroulette.models.catalog import Tag, Unit
@@ -69,6 +70,10 @@ def seed_catalog_data(db: Session) -> SeedResult:
         tags_added += 1
 
     if units_added or tags_added:
-        db.commit()
+        try:
+            db.commit()
+        except IntegrityError:
+            db.rollback()
+            return SeedResult(units_added=0, tags_added=0)
 
     return SeedResult(units_added=units_added, tags_added=tags_added)

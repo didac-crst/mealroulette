@@ -176,3 +176,30 @@ def test_full_dish_recipe_flow(client, catalog_seed, admin_headers):
     ingredients = client.get(f"/api/recipes/{recipe_id}/ingredients", headers=admin_headers)
     assert ingredients.status_code == 200
     assert len(ingredients.json()) == 1
+
+
+def test_delete_ingredient_referenced_by_recipe_returns_409(client, catalog_seed, admin_headers):
+    salmon = client.post(
+        "/api/ingredients/confirm",
+        headers=admin_headers,
+        json={"action": "create", "proposed_name": "Salmon", "display_name": "Salmon"},
+    ).json()
+    dish = client.post(
+        "/api/dishes",
+        headers=admin_headers,
+        json={"name": "Salmon Bowl"},
+    ).json()
+    recipe = client.post(
+        f"/api/dishes/{dish['id']}/recipes",
+        headers=admin_headers,
+        json={"variant_name": "default"},
+    ).json()
+    client.post(
+        f"/api/recipes/{recipe['id']}/ingredients",
+        headers=admin_headers,
+        json={"ingredient_id": salmon["id"], "quantity": "1"},
+    )
+
+    response = client.delete(f"/api/ingredients/{salmon['id']}", headers=admin_headers)
+
+    assert response.status_code == 409

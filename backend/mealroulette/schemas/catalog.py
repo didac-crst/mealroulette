@@ -1,5 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
+from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -113,14 +114,14 @@ class IngredientResolveResponse(BaseModel):
     suggestions: list[IngredientPublic] = Field(default_factory=list)
 
 
-class IngredientConfirmAction(str):
+class IngredientConfirmAction(str, Enum):
     create = "create"
-    map_existing = "map"
-    add_alias = "alias"
+    map = "map"
+    alias = "alias"
 
 
 class IngredientConfirmRequest(BaseModel):
-    action: str = Field(description="One of: create, map, alias")
+    action: IngredientConfirmAction
     proposed_name: str = Field(min_length=1, max_length=128)
     ingredient_id: int | None = None
     display_name: str | None = Field(default=None, min_length=1, max_length=128)
@@ -204,14 +205,14 @@ class RecipeIngredientPublic(BaseModel):
 class RecipeIngredientCreateRequest(BaseModel):
     ingredient_id: int | None = None
     proposed_name: str | None = Field(default=None, min_length=1, max_length=128)
-    quantity: Decimal | None = None
+    quantity: Decimal | None = Field(default=None, ge=0)
     unit_id: int | None = None
     optional: bool = False
     notes: str | None = None
 
 
 class RecipeIngredientUpdateRequest(BaseModel):
-    quantity: Decimal | None = None
+    quantity: Decimal | None = Field(default=None, ge=0)
     unit_id: int | None = None
     optional: bool | None = None
     notes: str | None = None

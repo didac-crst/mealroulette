@@ -41,8 +41,9 @@ reviews:
   auto_review:
     enabled: false
     auto_incremental_review: false
-    description_keyword: "@coderabbitai review"
 ```
+
+On public GitHub repos, CodeRabbit only applies `.coderabbit.yaml` from the **default branch** until it is merged to `main`.
 
 ## Optional: review on PR open (not recommended here)
 
