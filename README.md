@@ -75,6 +75,96 @@ pre-commit install
 
 Integration tests expect PostgreSQL at `TEST_DATABASE_URL`. The easiest local setup is `docker compose up db`.
 
+## Database migrations (Alembic)
+
+When the app data model changes (new tables like `users`, `dishes`, etc.), the PostgreSQL schema must be updated too.
+
+**Alembic** is the tool that applies those schema changes safely, step by step, using versioned migration files in `backend/alembic/versions/`.
+
+- `001_initial` — bootstrap
+- `002_users` — users and refresh tokens
+- future phases add more files
+
+With Docker Compose, the **API container runs migrations automatically** on startup (`alembic upgrade head`), so you usually do not need to run Alembic yourself.
+
+Local development without Docker:
+
+```bash
+cd backend
+alembic upgrade head
+```
+
+Bootstrap the first admin user once (after the stack is up). Omit `--password` to be prompted securely:
+
+```bash
+docker exec -it mealroulette-api python -m mealroulette.commands.bootstrap_admin \
+  --username admin --email admin@example.com
+```
+
+## Trying the API
+
+After `make up`:
+
+| Service | URL |
+| --- | --- |
+| API docs (Swagger) | http://localhost:8000/docs |
+| Health check | http://localhost:8000/api/health |
+| Frontend | http://localhost:3000 |
+
+### Login flow in Swagger (`/docs`)
+
+The API uses **two different tokens**. Mixing them up returns `401 Unauthorized`.
+
+| Token | Used for |
+| --- | --- |
+| `access_token` | `GET /api/auth/me`, `GET /api/users`, and other protected endpoints |
+| `refresh_token` | `POST /api/auth/refresh` and `POST /api/auth/logout` only |
+
+**Step by step:**
+
+1. Open http://localhost:8000/docs
+2. Call `POST /api/auth/login` with username/password
+3. Copy the `access_token` from the response (not `refresh_token`)
+4. Click the **Authorize** button (top right)
+5. Paste only the `access_token` value and confirm
+6. Now `GET /api/auth/me` should work
+
+**Refresh token:**
+
+1. Call `POST /api/auth/login` again (or use a saved `refresh_token`)
+2. Call `POST /api/auth/refresh`
+3. Put the `refresh_token` in the request body:
+
+```json
+{
+  "refresh_token": "paste-refresh-token-here"
+}
+```
+
+Do **not** put the refresh token in **Authorize**. That button is only for the access token.
+
+**Common mistakes**
+
+| Mistake | Error |
+| --- | --- |
+| Calling `/api/auth/me` without Authorize | `Not authenticated` |
+| Putting `refresh_token` in Authorize | `Invalid token type` |
+| Putting `access_token` in `/api/auth/refresh` body | `Invalid token type` |
+| Using a refresh token after logout | `Refresh token revoked or expired` |
+
+### curl example
+
+```bash
+# Login (use the password you chose during bootstrap)
+curl -s -X POST http://localhost:8000/api/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"admin","password":"YOUR_PASSWORD"}'
+
+# Me (replace TOKEN with access_token from login)
+curl -s http://localhost:8000/api/auth/me \
+  -H "Authorization: Bearer TOKEN"
+```
+
 ## Suggested Cursor Prompt
 
 ```text

@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from mealroulette.api.routes.auth import router as auth_router
 from mealroulette.api.routes.health import router as health_router
+from mealroulette.api.routes.users import router as users_router
 from mealroulette.core.config import settings
 from mealroulette.core.errors import http_exception_handler, validation_exception_handler
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -23,6 +25,8 @@ def create_app() -> FastAPI:
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
     app.include_router(health_router, prefix="/api")
+    app.include_router(auth_router, prefix="/api")
+    app.include_router(users_router, prefix="/api")
 
     return app
 

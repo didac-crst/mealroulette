@@ -1,1 +1,3 @@
-# Domain models will be added in later phases.
+from mealroulette.models.user import RefreshToken, User, UserRole
+
+__all__ = ["RefreshToken", "User", "UserRole"]

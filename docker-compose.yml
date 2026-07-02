@@ -24,6 +24,7 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-mealroulette}:${POSTGRES_PASSWORD:-mealroulette}@db:5432/${POSTGRES_DB:-mealroulette}
       DEBUG: ${DEBUG:-false}
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
     depends_on:
       db:
         condition: service_healthy
@@ -33,12 +34,15 @@ services:
   worker:
     build: ./backend
     container_name: mealroulette-worker
-    command: python -m mealroulette.worker
+    command: ["python", "-m", "mealroulette.worker"]
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-mealroulette}:${POSTGRES_PASSWORD:-mealroulette}@db:5432/${POSTGRES_DB:-mealroulette}
+      RUN_MIGRATIONS: "false"
     depends_on:
       db:
         condition: service_healthy
+      api:
+        condition: service_started
     volumes:
       - ./backups:/backups
 
