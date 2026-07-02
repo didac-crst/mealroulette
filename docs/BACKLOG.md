@@ -14,14 +14,7 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Phase 3 — Core catalog data** (branch `phase-3/catalog`, in progress)
-
-Implemented on branch; pending commit and PR:
-
-- Catalog models, `003_catalog` migration, CRUD APIs
-- Ingredient resolve / confirm flow
-- Reference data in YAML (`units.yaml`, `tags.yaml`), idempotent seed on API startup
-- `services/quantities.py` — unit compatibility and aggregation rules (foundation for Phase 6 shopping lists)
+**Phase 4 — Frontend shell and dish library**
 
 ---
 
@@ -30,7 +23,8 @@ Implemented on branch; pending commit and PR:
 Use one branch per milestone, then merge via pull request:
 
 - `phase-2/auth` — authentication and users
-- `phase-3/catalog` — core catalog (in progress)
+- `phase-3/catalog` — core catalog (merged)
+- `phase-4/frontend` — next up
 
 ---
 
@@ -135,8 +129,8 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 0 | Project bootstrap | v0.1 | Done |
 | 1 | Backend foundation | v0.1 | Done |
 | 2 | Authentication and users | v0.1 | Done |
-| 3 | Core catalog data | v0.1 | In progress |
-| 4 | Frontend shell and dish library | v0.1 | Not started |
+| 3 | Core catalog data | v0.1 | Done |
+| 4 | Frontend shell and dish library | v0.1 | **Next** |
 | 5 | Manual meal planning | v0.2 | Not started |
 | 6 | Shopping lists | v0.3 | Not started |
 | 7 | Telegram reminders | v0.4 | Not started |
@@ -181,9 +175,9 @@ Completed on branch `phase-2/auth`.
 - [x] Initial admin bootstrap command
 - [x] Auth unit and integration tests
 
-### Phase 3 — Core catalog data 🚧
+### Phase 3 — Core catalog data ✅
 
-In progress on branch `phase-3/catalog`.
+Merged in `815d67b` (PR #2).
 
 - [x] Catalog models and `003_catalog` migration
 - [x] Units, tags, ingredients, aliases, dishes, recipes, steps, seasonality
@@ -253,6 +247,6 @@ Cross-reference for [docs/MVP.md](MVP.md). Checked items are done; the rest trac
 ## How to update this file
 
 1. When starting work, set **Current focus** to the active phase.
-2. When a phase completes, mark it done, check off related version items, and add the commit hash.
-3. When a product version (v0.1, v0.2, …) is fully shipped, update its row in the product roadmap table.
+2. When a phase completes, mark it done, check off related version items, add the merge commit hash, and tag the milestone — see [docs/RELEASES.md](RELEASES.md).
+3. When a product version (v0.1, v0.2, …) is fully shipped, update its row in the product roadmap table and create a `vX.Y.Z` tag.
 4. Do not duplicate spec detail here — link to `SPECS.md` and `CURSOR_ROADMAP.md` instead.
