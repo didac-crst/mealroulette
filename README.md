@@ -101,6 +101,70 @@ docker exec mealroulette-api python -m mealroulette.commands.bootstrap_admin \
   --username admin --email admin@example.com --password your-secure-password
 ```
 
+## Trying the API
+
+After `make up`:
+
+| Service | URL |
+| --- | --- |
+| API docs (Swagger) | http://localhost:8000/docs |
+| Health check | http://localhost:8000/api/health |
+| Frontend | http://localhost:3000 |
+
+### Login flow in Swagger (`/docs`)
+
+The API uses **two different tokens**. Mixing them up returns `401 Unauthorized`.
+
+| Token | Used for |
+| --- | --- |
+| `access_token` | `GET /api/auth/me`, `GET /api/users`, and other protected endpoints |
+| `refresh_token` | `POST /api/auth/refresh` and `POST /api/auth/logout` only |
+
+**Step by step:**
+
+1. Open http://localhost:8000/docs
+2. Call `POST /api/auth/login` with username/password
+3. Copy the `access_token` from the response (not `refresh_token`)
+4. Click the **Authorize** button (top right)
+5. Paste only the `access_token` value and confirm
+6. Now `GET /api/auth/me` should work
+
+**Refresh token:**
+
+1. Call `POST /api/auth/login` again (or use a saved `refresh_token`)
+2. Call `POST /api/auth/refresh`
+3. Put the `refresh_token` in the request body:
+
+```json
+{
+  "refresh_token": "paste-refresh-token-here"
+}
+```
+
+Do **not** put the refresh token in **Authorize**. That button is only for the access token.
+
+**Common mistakes**
+
+| Mistake | Error |
+| --- | --- |
+| Calling `/api/auth/me` without Authorize | `Not authenticated` |
+| Putting `refresh_token` in Authorize | `Invalid token type` |
+| Putting `access_token` in `/api/auth/refresh` body | `Invalid token type` |
+| Using a refresh token after logout | `Refresh token revoked or expired` |
+
+### curl example
+
+```bash
+# Login
+curl -s -X POST http://localhost:8000/api/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"admin","password":"adminpassword"}'
+
+# Me (replace TOKEN with access_token from login)
+curl -s http://localhost:8000/api/auth/me \
+  -H "Authorization: Bearer TOKEN"
+```
+
 ## Suggested Cursor Prompt
 
 ```text

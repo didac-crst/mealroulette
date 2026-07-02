@@ -26,6 +26,7 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse
 
 @router.post("/refresh", response_model=TokenResponse)
 def refresh(payload: RefreshRequest, db: Session = Depends(get_db)) -> TokenResponse:
+    """Exchange a refresh_token from /login for a new token pair. Do not send the access_token here."""
     service = AuthService(db)
     access_token, refresh_token = service.refresh(payload.refresh_token)
     return TokenResponse(access_token=access_token, refresh_token=refresh_token)
@@ -38,4 +39,5 @@ def logout(payload: LogoutRequest, db: Session = Depends(get_db)) -> None:
 
 @router.get("/me", response_model=UserPublic)
 def me(current_user: User = Depends(get_current_user)) -> UserPublic:
+    """Return the current user. Requires Authorization: Bearer <access_token> from /login."""
     return UserService.to_public(current_user)

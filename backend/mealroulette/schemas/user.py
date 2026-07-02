@@ -17,7 +17,9 @@ class LoginRequest(BaseModel):
 
 
 class RefreshRequest(BaseModel):
-    refresh_token: str
+    refresh_token: str = Field(
+        description="Use refresh_token from /login, not access_token.",
+    )
 
 
 class LogoutRequest(BaseModel):
