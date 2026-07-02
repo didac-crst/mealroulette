@@ -1,4 +1,4 @@
-.PHONY: test test-unit test-integration test-backend test-frontend up down test-db-setup
+.PHONY: test test-unit test-integration test-backend test-frontend up down test-db-setup free-ports
 
 test: test-db-setup test-backend test-frontend
 
@@ -15,12 +15,15 @@ test-backend: test-db-setup
 test-frontend:
 	cd frontend && npm test -- --run
 
-test-db-setup:
+free-ports:
+	./scripts/free-ports.sh
+
+test-db-setup: free-ports
 	docker compose up -d db
 	@sleep 2
 	@docker exec mealroulette-db psql -U mealroulette -d mealroulette -tc "SELECT 1 FROM pg_database WHERE datname = 'mealroulette_test'" | grep -q 1 || docker exec mealroulette-db psql -U mealroulette -d mealroulette -c "CREATE DATABASE mealroulette_test;"
 
-up:
+up: free-ports
 	docker compose up --build
 
 down:

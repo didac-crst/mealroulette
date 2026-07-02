@@ -40,9 +40,12 @@ Use the roadmap as the implementation guide:
 
 ```bash
 cp .env.example .env
-docker compose up --build
+make free-ports    # stop containers using ports 3000, 8000, 5432
+make up            # free ports, then start the stack
 make test
 ```
+
+`make up` and `make test` already call `make free-ports` first. Run it manually if you start Docker Compose directly.
 
 Backend only:
 
