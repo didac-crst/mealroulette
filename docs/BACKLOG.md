@@ -14,7 +14,7 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**v0.1 release** — Phase 4 is complete on branch `phase-4/frontend`. Merge, then tag `v0.1.0` per [RELEASES.md](RELEASES.md).
+**v0.1 released** — tagged [`v0.1.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.1.0) on merge commit `b41cdae` ([PR #3](https://github.com/didac-crst/mealroulette/pull/3)).
 
 **Next:** Phase 5 — manual meal planning (v0.2).
 
@@ -26,7 +26,7 @@ Use one branch per milestone, then merge via pull request:
 
 - `phase-2/auth` — authentication and users (merged)
 - `phase-3/catalog` — core catalog (merged)
-- `phase-4/frontend` — dish library UI (**ready to merge**)
+- `phase-4/frontend` — dish library UI (merged in PR #3, `v0.1.0`)
 
 ---
 
@@ -36,7 +36,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 
 | Version | Theme | Status |
 | --- | --- | --- |
-| **v0.1** | Foundation — platform, auth, catalog (API + UI), basic frontend | **Ready to release** (Phase 4 done; tag after merge) |
+| **v0.1** | Foundation — platform, auth, catalog (API + UI), basic frontend | **Done** ([`v0.1.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.1.0), merge `b41cdae`, PR #3) |
 | **v0.2** | Manual planning — weekly plan, meal actions, ratings, history | Not started |
 | **v0.3** | Shopping list — generation, aggregation, pantry filter, UI | Not started |
 | **v0.4** | Telegram reminders — settings, scheduled and manual send | Not started |
@@ -44,7 +44,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.6** | LLM-assisted entry — draft enrichment, review before save | Not started |
 | **v1.0** | Stable home version — mobile UI, backups, auth, scheduler, cooking mode | Not started |
 
-> **v0.1 is ready to tag** after `phase-4/frontend` merges. The dish library UI is functional for household recipe entry. Tag `v0.1.0` on the merge commit — see [RELEASES.md](RELEASES.md).
+> **v0.1 shipped** as [`v0.1.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.1.0). The dish library UI is functional for household recipe entry. Release notes: [docs/releases/v0.1.0.md](releases/v0.1.0.md).
 
 ### v0.1 — Foundation
 
@@ -150,7 +150,7 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 1 | Backend foundation | v0.1 | Done |
 | 2 | Authentication and users | v0.1 | Done |
 | 3 | Core catalog data | v0.1 | Done |
-| 4 | Frontend shell and dish library | v0.1 | **Done** (branch `phase-4/frontend`) |
+| 4 | Frontend shell and dish library | v0.1 | Done (PR #3, `v0.1.0`) |
 | 5 | Manual meal planning | v0.2 | **Next** |
 | 6 | Shopping lists | v0.3 | Not started |
 | 7 | Telegram reminders | v0.4 | Not started |
