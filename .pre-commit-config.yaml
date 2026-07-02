@@ -1,0 +1,13 @@
+repos:
+  - repo: local
+    hooks:
+      - id: backend-tests
+        name: backend tests
+        entry: bash -c 'cd backend && python3.12 -m pytest'
+        language: system
+        pass_filenames: false
+      - id: frontend-tests
+        name: frontend tests
+        entry: bash -c 'cd frontend && npm test -- --run'
+        language: system
+        pass_filenames: false

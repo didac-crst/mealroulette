@@ -36,6 +36,41 @@ Use the roadmap as the implementation guide:
 3. Start with Phase 0 and Phase 1.
 4. Keep schema migrations, unit tests, integration tests, pre-commit checks, and Docker Compose working at each phase.
 
+## Developer Commands
+
+```bash
+cp .env.example .env
+docker compose up --build
+make test
+```
+
+Backend only:
+
+```bash
+cd backend
+pip install ".[dev]"
+pytest
+alembic upgrade head
+```
+
+Frontend only:
+
+```bash
+cd frontend
+npm install
+npm run dev
+npm test -- --run
+```
+
+Install pre-commit hooks:
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+Integration tests expect PostgreSQL at `TEST_DATABASE_URL`. The easiest local setup is `docker compose up db`.
+
 ## Suggested Cursor Prompt
 
 ```text

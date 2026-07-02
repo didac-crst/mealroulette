@@ -1,0 +1,28 @@
+:root {
+  color: #1f2933;
+  background: #f8fafc;
+  font-family: Inter, system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+body {
+  margin: 0;
+}
+
+.app-shell {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+header h1 {
+  margin-bottom: 0.25rem;
+}
+
+section {
+  margin-top: 2rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid #d9e2ec;
+  border-radius: 0.75rem;
+  background: white;
+}
