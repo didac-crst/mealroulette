@@ -1,11 +1,12 @@
 from datetime import UTC, datetime
 
 from fastapi import HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from mealroulette.auth.dependencies import utcnow
+from mealroulette.auth.dependencies import parse_token_user_id, utcnow
 from mealroulette.auth.security import (
+    DUMMY_PASSWORD_HASH,
     create_access_token,
     create_refresh_token,
     decode_token,
@@ -22,7 +23,13 @@ class AuthService:
 
     def authenticate(self, username: str, password: str) -> User:
         user = self.db.scalar(select(User).where(User.username == username))
-        if user is None or not verify_password(password, user.password_hash):
+        if user is None:
+            verify_password(password, DUMMY_PASSWORD_HASH)
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid username or password",
+            )
+        if not verify_password(password, user.password_hash):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid username or password",
@@ -57,12 +64,13 @@ class AuthService:
             )
 
         jti = payload.get("jti")
-        user_id = payload.get("sub")
-        if not jti or not user_id:
+        if not jti:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid refresh token",
             )
+
+        user_id = parse_token_user_id(payload.get("sub"))
 
         stored_token = self.db.scalar(select(RefreshToken).where(RefreshToken.token_jti == jti))
         if stored_token is None or stored_token.expires_at < utcnow():
@@ -71,7 +79,7 @@ class AuthService:
                 detail="Refresh token revoked or expired",
             )
 
-        user = self.db.get(User, int(user_id))
+        user = self.db.get(User, user_id)
         if user is None or not user.active:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -101,6 +109,20 @@ class AuthService:
 class UserService:
     def __init__(self, db: Session):
         self.db = db
+
+    def _active_admin_count(self) -> int:
+        return self.db.scalar(
+            select(func.count())
+            .select_from(User)
+            .where(User.role == UserRole.admin, User.active.is_(True))
+        ) or 0
+
+    def _ensure_not_last_active_admin(self, user: User) -> None:
+        if user.role == UserRole.admin and user.active and self._active_admin_count() <= 1:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Cannot remove or demote the last active admin",
+            )
 
     def list_users(self) -> list[User]:
         return list(self.db.scalars(select(User).order_by(User.id)))
@@ -132,6 +154,13 @@ class UserService:
     def update_user(self, user_id: int, payload: UserUpdateRequest) -> User:
         user = self.get_user(user_id)
 
+        demoting_admin = user.role == UserRole.admin and user.active and (
+            (payload.role is not None and payload.role != UserRole.admin)
+            or (payload.active is not None and not payload.active)
+        )
+        if demoting_admin:
+            self._ensure_not_last_active_admin(user)
+
         if payload.email is not None:
             existing = self.db.scalar(select(User).where(User.email == payload.email, User.id != user_id))
             if existing is not None:
@@ -151,6 +180,7 @@ class UserService:
 
     def delete_user(self, user_id: int) -> None:
         user = self.get_user(user_id)
+        self._ensure_not_last_active_admin(user)
         self.db.delete(user)
         self.db.commit()
 

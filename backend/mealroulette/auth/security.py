@@ -7,6 +7,9 @@ import jwt
 from mealroulette.core.config import settings
 
 
+DUMMY_PASSWORD_HASH = bcrypt.hashpw(b"dummy-timing-mitigation", bcrypt.gensalt()).decode("utf-8")
+
+
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 

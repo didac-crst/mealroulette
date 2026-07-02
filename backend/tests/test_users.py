@@ -70,3 +70,24 @@ def test_created_user_can_log_in(client, admin_token):
     )
 
     assert response.status_code == 200
+
+
+def test_cannot_delete_last_active_admin(client, admin_token, admin_user):
+    response = client.delete(
+        f"/api/users/{admin_user.id}",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+
+    assert response.status_code == 409
+    assert response.json()["error"]["message"] == "Cannot remove or demote the last active admin"
+
+
+def test_cannot_demote_last_active_admin(client, admin_token, admin_user):
+    response = client.put(
+        f"/api/users/{admin_user.id}",
+        headers={"Authorization": f"Bearer {admin_token}"},
+        json={"role": "user"},
+    )
+
+    assert response.status_code == 409
+    assert response.json()["error"]["message"] == "Cannot remove or demote the last active admin"

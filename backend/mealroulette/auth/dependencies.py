@@ -12,6 +12,21 @@ from mealroulette.models.user import User, UserRole
 bearer_scheme = HTTPBearer(auto_error=False)
 
 
+def parse_token_user_id(subject: str | int | None) -> int:
+    if subject is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token subject",
+        )
+    try:
+        return int(subject)
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token subject",
+        ) from exc
+
+
 def get_current_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
     db: Session = Depends(get_db),
@@ -36,14 +51,9 @@ def get_current_user(
             detail="Invalid token type",
         )
 
-    user_id = payload.get("sub")
-    if user_id is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token subject",
-        )
+    user_id = parse_token_user_id(payload.get("sub"))
 
-    user = db.get(User, int(user_id))
+    user = db.get(User, user_id)
     if user is None or not user.active:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

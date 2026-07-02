@@ -94,11 +94,11 @@ cd backend
 alembic upgrade head
 ```
 
-Bootstrap the first admin user once (after the stack is up):
+Bootstrap the first admin user once (after the stack is up). Omit `--password` to be prompted securely:
 
 ```bash
-docker exec mealroulette-api python -m mealroulette.commands.bootstrap_admin \
-  --username admin --email admin@example.com --password your-secure-password
+docker exec -it mealroulette-api python -m mealroulette.commands.bootstrap_admin \
+  --username admin --email admin@example.com
 ```
 
 ## Trying the API
@@ -155,10 +155,10 @@ Do **not** put the refresh token in **Authorize**. That button is only for the a
 ### curl example
 
 ```bash
-# Login
+# Login (use the password you chose during bootstrap)
 curl -s -X POST http://localhost:8000/api/auth/login \
   -H 'Content-Type: application/json' \
-  -d '{"username":"admin","password":"adminpassword"}'
+  -d '{"username":"admin","password":"YOUR_PASSWORD"}'
 
 # Me (replace TOKEN with access_token from login)
 curl -s http://localhost:8000/api/auth/me \

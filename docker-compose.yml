@@ -37,6 +37,7 @@ services:
     command: ["python", "-m", "mealroulette.worker"]
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-mealroulette}:${POSTGRES_PASSWORD:-mealroulette}@db:5432/${POSTGRES_DB:-mealroulette}
+      RUN_MIGRATIONS: "false"
     depends_on:
       db:
         condition: service_healthy

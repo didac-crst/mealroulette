@@ -1,4 +1,5 @@
 import argparse
+import getpass
 import sys
 
 from sqlalchemy import create_engine, select
@@ -34,9 +35,25 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Create the initial MealRoulette admin user.")
     parser.add_argument("--username", required=True)
     parser.add_argument("--email", required=True)
-    parser.add_argument("--password", required=True)
+    parser.add_argument(
+        "--password",
+        help="Admin password. If omitted, you will be prompted securely.",
+    )
     args = parser.parse_args()
-    bootstrap_admin(args.username, args.email, args.password)
+
+    password = args.password
+    if password is None:
+        password = getpass.getpass("Admin password: ")
+        confirm = getpass.getpass("Confirm password: ")
+        if password != confirm:
+            print("Passwords do not match.", file=sys.stderr)
+            sys.exit(1)
+
+    if len(password) < 8:
+        print("Password must be at least 8 characters.", file=sys.stderr)
+        sys.exit(1)
+
+    bootstrap_admin(args.username, args.email, password)
 
 
 if __name__ == "__main__":
