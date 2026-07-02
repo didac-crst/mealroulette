@@ -221,6 +221,11 @@ Acceptance criteria:
 - Unknown ingredient insertion follows the confirm/create/map flow at the API level.
 - Seed data includes base units and starter tag families.
 
+Implementation notes:
+
+- Reference units and tags live in `backend/mealroulette/data/reference/*.yaml` and are loaded idempotently after migrations (`seed_reference_data` CLI / API entrypoint).
+- Unit compatibility and aggregation rules are implemented in `mealroulette.services.quantities` (consumed by Phase 6 shopping lists).
+
 ### Phase 4 - Frontend Shell and Dish Library
 
 Deliverables:
@@ -269,7 +274,7 @@ Deliverables:
 - Dynamic shopping list generation
 - Optional persisted shopping lists
 - Shopping list items
-- Unit aggregation service
+- Shopping list generator calling `mealroulette.services.quantities` for aggregation
 - Pantry filtering
 - Category grouping
 - Source meal references

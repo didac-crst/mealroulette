@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from mealroulette.api.routes.auth import router as auth_router
+from mealroulette.api.routes.catalog import router as catalog_router
 from mealroulette.api.routes.health import router as health_router
 from mealroulette.api.routes.users import router as users_router
 from mealroulette.core.config import settings
@@ -26,6 +27,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health_router, prefix="/api")
     app.include_router(auth_router, prefix="/api")
+    app.include_router(catalog_router, prefix="/api")
     app.include_router(users_router, prefix="/api")
 
     return app

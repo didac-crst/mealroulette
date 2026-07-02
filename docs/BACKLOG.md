@@ -14,14 +14,14 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Phase 3 — Core catalog data**
+**Phase 3 — Core catalog data** (branch `phase-3/catalog`, in progress)
 
-Next deliverables:
+Implemented on branch; pending commit and PR:
 
-- Dishes, recipes, recipe steps
-- Ingredients, aliases, units, tags, dish tags, seasonality
-- Catalog CRUD APIs and normalization flow
-- Seed data for base units and starter tag families
+- Catalog models, `003_catalog` migration, CRUD APIs
+- Ingredient resolve / confirm flow
+- Reference data in YAML (`units.yaml`, `tags.yaml`), idempotent seed on API startup
+- `services/quantities.py` — unit compatibility and aggregation rules (foundation for Phase 6 shopping lists)
 
 ---
 
@@ -30,7 +30,7 @@ Next deliverables:
 Use one branch per milestone, then merge via pull request:
 
 - `phase-2/auth` — authentication and users
-- `phase-3/catalog` — next up
+- `phase-3/catalog` — core catalog (in progress)
 
 ---
 
@@ -57,14 +57,14 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). Versions describe *what the pr
 - [x] Pre-commit hook and CI test workflow
 - [x] Basic frontend shell
 - [x] Users / auth
-- [ ] Dishes
-- [ ] Recipes
-- [ ] Recipe steps
-- [ ] Ingredients
-- [ ] Ingredient aliases
-- [ ] Units
-- [ ] Tags
-- [ ] Dish tags
+- [x] Dishes
+- [x] Recipes
+- [x] Recipe steps
+- [x] Ingredients
+- [x] Ingredient aliases
+- [x] Units
+- [x] Tags
+- [x] Dish tags
 
 ### v0.2 — Manual Planning
 
@@ -135,7 +135,7 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 0 | Project bootstrap | v0.1 | Done |
 | 1 | Backend foundation | v0.1 | Done |
 | 2 | Authentication and users | v0.1 | Done |
-| 3 | Core catalog data | v0.1 | **Next** |
+| 3 | Core catalog data | v0.1 | In progress |
 | 4 | Frontend shell and dish library | v0.1 | Not started |
 | 5 | Manual meal planning | v0.2 | Not started |
 | 6 | Shopping lists | v0.3 | Not started |
@@ -181,7 +181,25 @@ Completed on branch `phase-2/auth`.
 - [x] Initial admin bootstrap command
 - [x] Auth unit and integration tests
 
-### Phases 3–12
+### Phase 3 — Core catalog data 🚧
+
+In progress on branch `phase-3/catalog`.
+
+- [x] Catalog models and `003_catalog` migration
+- [x] Units, tags, ingredients, aliases, dishes, recipes, steps, seasonality
+- [x] Catalog CRUD APIs (reads: any user; writes: admin)
+- [x] Ingredient resolve / confirm flow (`create`, `map`, `alias`)
+- [x] Reference data in YAML (`data/reference/units.yaml`, `tags.yaml`)
+- [x] Idempotent seed CLI (`seed_reference_data`) on API startup after migrations
+- [x] `services/quantities.py` — unit compatibility and aggregation rules (used by Phase 6)
+- [x] Catalog integration tests
+
+Design notes:
+
+- **Reference data** lives in YAML, not Alembic data migrations. Re-running the seed only inserts missing rows.
+- **Unit guardrails** are enforced in `services/quantities.py`, not in the spec. Shopping lists (Phase 6) must call `aggregate_by_ingredient()` rather than ad-hoc math.
+
+### Phases 4–12
 
 See [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) for full deliverables and acceptance criteria per phase.
 
@@ -218,8 +236,8 @@ Cross-reference for [docs/MVP.md](MVP.md). Checked items are done; the rest trac
 - [x] React + Vite frontend (shell only)
 - [x] Username / password login
 - [x] Admin and user roles
-- [ ] Dishes, recipes, ingredients, units, tags
-- [ ] Ingredient normalization flow
+- [x] Dishes, recipes, ingredients, units, tags
+- [x] Ingredient normalization flow
 - [ ] Weekly meal plan and manual assignment
 - [ ] Meal actions (lock, cooked, skip, leftovers, reroll)
 - [ ] Ratings

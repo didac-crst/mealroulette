@@ -83,16 +83,21 @@ When the app data model changes (new tables like `users`, `dishes`, etc.), the P
 
 - `001_initial` — bootstrap
 - `002_users` — users and refresh tokens
-- future phases add more files
+- `003_catalog` — dishes, recipes, ingredients, units, tags
 
-With Docker Compose, the **API container runs migrations automatically** on startup (`alembic upgrade head`), so you usually do not need to run Alembic yourself.
+With Docker Compose, the **API container runs migrations automatically** on startup (`alembic upgrade head`), then loads **reference catalog data** (standard units and starter tags) from YAML if those rows are not already present.
 
 Local development without Docker:
 
 ```bash
 cd backend
 alembic upgrade head
+python -m mealroulette.commands.seed_reference_data
 ```
+
+Reference data lives in `backend/mealroulette/data/reference/` (`units.yaml`, `tags.yaml`). The loader is idempotent: re-running it only inserts missing rows, so it is safe after upgrades or when adding new defaults to the YAML files.
+
+Unit compatibility and aggregation rules (when to merge g + kg, when to keep "2 onions" and "200 g onion" separate) live in `mealroulette.services.quantities`. Shopping lists and exports must use that module — see SPECS §9.
 
 Bootstrap the first admin user once (after the stack is up). Omit `--password` to be prompted securely:
 

@@ -1,0 +1,43 @@
+# Standard measurement units loaded on fresh database setup.
+# Safe to extend; the seed loader only inserts rows that are not already present.
+units:
+  - name: gram
+    symbol: g
+    dimension: mass
+    conversion_to_base: "1"
+  - name: kilogram
+    symbol: kg
+    dimension: mass
+    conversion_to_base: "1000"
+  - name: milliliter
+    symbol: ml
+    dimension: volume
+    conversion_to_base: "1"
+  - name: liter
+    symbol: l
+    dimension: volume
+    conversion_to_base: "1000"
+  - name: teaspoon
+    symbol: tsp
+    dimension: volume
+    conversion_to_base: "5"
+  - name: tablespoon
+    symbol: tbsp
+    dimension: volume
+    conversion_to_base: "15"
+  - name: unit
+    symbol: unit
+    dimension: count
+    conversion_to_base: "1"
+  - name: clove
+    symbol: clove
+    dimension: count
+    conversion_to_base: "1"
+  - name: can
+    symbol: can
+    dimension: count
+    conversion_to_base: "1"
+  - name: bunch
+    symbol: bunch
+    dimension: count
+    conversion_to_base: "1"
