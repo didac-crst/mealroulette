@@ -7,6 +7,8 @@ This roadmap is the architectural boilerplate for implementing MealRoulette in C
 - Build API-first. Every frontend feature should map to a documented backend endpoint.
 - Keep the data model normalized from the first migration. Ingredient cleanup later will be expensive.
 - Prefer boring, testable service objects over hidden magic.
+- Every phase must ship with unit tests for services and integration tests for the API endpoints introduced in that phase.
+- Commits must not bypass the automated test gate unless explicitly documented as an emergency exception.
 - Do not use embeddings, vector databases, online scraping, nutrition tracking, or complex optimization algorithms in v1.
 - LLM output is always draft data and must go through user confirmation before persistence.
 - All write endpoints must require authentication.
@@ -111,6 +113,29 @@ mealroulette/
 - Keep `.env.example` complete and safe to commit.
 - Do not commit real secrets.
 
+### Testing
+
+- Backend: `pytest`, `pytest-asyncio`, `httpx`.
+- Frontend: `Vitest`, React Testing Library.
+- Keep service logic testable without HTTP where possible.
+- Use a dedicated test database or rollback fixtures for integration tests.
+- Add a root `Makefile` or documented npm/poetry scripts for `test`, `test-unit`, and `test-integration`.
+
+### Quality Gates
+
+Run tests automatically at these points:
+
+- pre-commit: fast backend and frontend test suites
+- CI on push and pull request: full test suite
+- manual: during development before opening a PR
+
+Recommended tooling:
+
+- `pre-commit` for local commit hooks
+- GitHub Actions for CI
+
+The default commit hook should fail if tests fail. Lint/format hooks may run in the same pre-commit configuration.
+
 ## Implementation Phases
 
 ### Phase 0 - Project Bootstrap
@@ -124,12 +149,20 @@ Deliverables:
 - `frontend` Vite app with a minimal shell
 - PostgreSQL service
 - Basic developer commands documented
+- `pre-commit` configuration
+- GitHub Actions workflow for tests
+- Initial backend health-check integration test
+- Initial frontend smoke test
 
 Acceptance criteria:
 
 - `docker compose up --build` starts all services.
 - API health endpoint returns `{"status":"ok"}`.
 - Frontend can call the API health endpoint.
+- `pytest` passes for the backend bootstrap tests.
+- Frontend test command passes for the initial shell test.
+- Pre-commit runs the test suite before allowing a commit.
+- CI runs the same test suite on push and pull request.
 
 ### Phase 1 - Backend Foundation
 
@@ -140,7 +173,8 @@ Deliverables:
 - Config management
 - Database session dependency
 - Error handling conventions
-- Test harness
+- Backend unit and integration test harness
+- Test database fixture strategy
 - First migration
 
 Acceptance criteria:
@@ -148,6 +182,7 @@ Acceptance criteria:
 - Alembic can create and upgrade the schema.
 - Tests can run against an isolated test database or transaction fixture.
 - API responses use predictable error payloads.
+- At least one integration test exercises database connectivity through the API layer.
 
 ### Phase 2 - Authentication and Users
 
@@ -360,10 +395,11 @@ When asking Cursor to implement work:
 
 1. Point it to `SPECS.md` and this roadmap.
 2. Ask for one phase or one vertical slice at a time.
-3. Require tests for service logic before moving to the next phase.
+3. Require unit tests for service logic and integration tests for API endpoints before moving to the next phase.
 4. Require migrations for every schema change.
-5. Reject schema shortcuts that duplicate ingredient names, hardcode food categories as columns, or bypass aliases.
-6. Keep generated code aligned with existing repository patterns.
+5. Require the pre-commit and CI test workflows to stay green.
+6. Reject schema shortcuts that duplicate ingredient names, hardcode food categories as columns, or bypass aliases.
+7. Keep generated code aligned with existing repository patterns.
 
 ## Suggested First Cursor Prompt
 
@@ -386,6 +422,8 @@ Keep the repository structure aligned with docs/CURSOR_ROADMAP.md.
 
 ## Definition of Done for v1
 
+- Unit and integration tests cover core services and write endpoints.
+- Pre-commit and CI both run the project test suites successfully.
 - Authenticated household users can manage dishes, recipes, ingredients, aliases, tags, ratings, and meal plans.
 - Weekly lunch and dinner plans can be created manually and generated automatically.
 - Shopping lists aggregate ingredients correctly without fake precision.

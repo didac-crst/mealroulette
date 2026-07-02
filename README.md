@@ -34,7 +34,7 @@ Use the roadmap as the implementation guide:
 1. Read `SPECS.md`.
 2. Follow `docs/CURSOR_ROADMAP.md` phase by phase.
 3. Start with Phase 0 and Phase 1.
-4. Keep schema migrations, tests, and Docker Compose working at each phase.
+4. Keep schema migrations, unit tests, integration tests, pre-commit checks, and Docker Compose working at each phase.
 
 ## Suggested Cursor Prompt
 
@@ -49,7 +49,8 @@ Implement Phase 0 and Phase 1 only:
 - Docker Compose with api, worker placeholder, frontend placeholder, and db
 - React + Vite frontend shell that can display API health status
 - .env.example
-- basic backend tests
+- basic backend unit and integration tests
+- pre-commit hook and CI workflow that run tests on commit and push
 
 Do not implement domain models yet except what is necessary for Alembic/bootstrap.
 Keep the repository structure aligned with docs/CURSOR_ROADMAP.md.

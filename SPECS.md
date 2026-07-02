@@ -372,6 +372,60 @@ Required services:
 - frontend
 - db
 
+### 4.6 Testing
+
+The project must include automated unit and integration tests from the first implementation phase onward.
+
+#### Backend
+
+- Use `pytest` as the test runner.
+- Use `pytest-asyncio` for async FastAPI code.
+- Use `httpx` for API integration tests against the FastAPI app.
+- Use an isolated test database or transactional fixtures so tests do not mutate developer data.
+
+Unit tests should cover:
+
+- service-layer business logic
+- ingredient normalization
+- unit aggregation
+- meal similarity scoring
+- seasonality scoring
+- scheduler constraints and scoring
+- shopping-list generation
+- backup/import validation
+
+Integration tests should cover:
+
+- API route behavior for endpoints added in each phase
+- authentication and role enforcement on write endpoints
+- database persistence for critical flows
+- worker job entry points where practical
+
+#### Frontend
+
+- Use `Vitest` and React Testing Library for component and feature tests.
+- Add smoke tests for authenticated navigation and critical forms.
+- End-to-end browser tests are optional in MVP, but API integration tests are required.
+
+#### Quality Gates
+
+Tests must run automatically in these situations:
+
+- on every commit through a pre-commit hook
+- on every push through CI
+- before merging feature work into the main branch
+- manually during development through documented commands
+
+The pre-commit hook should run the fast test subset by default:
+
+- backend unit tests
+- backend API integration tests
+- frontend unit/smoke tests
+
+CI may additionally run slower checks such as Docker Compose smoke tests and migration verification.
+
+A phase is not complete until the tests for that phase pass locally and in CI.
+
 ## 5. High-Level Architecture
 
 ```text
@@ -1642,6 +1696,8 @@ Backup settings:
 - FastAPI backend
 - PostgreSQL
 - Docker Compose
+- unit and integration test harness
+- pre-commit hook and CI test workflow
 - users/auth
 - dishes
 - recipes

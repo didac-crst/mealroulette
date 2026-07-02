@@ -11,6 +11,10 @@ Build a self-hosted app that lets a household enter recipes, manually plan lunch
 ### Must Have
 
 - Docker Compose deployment with `api`, `worker`, `frontend`, and `db`.
+- Automated unit tests for backend business logic.
+- Automated integration tests for backend API endpoints.
+- Pre-commit hook that runs the test suite before commits.
+- CI workflow that runs the test suite on push and pull request.
 - FastAPI backend with PostgreSQL.
 - React + Vite frontend.
 - Username/password login.
@@ -49,7 +53,7 @@ Build a self-hosted app that lets a household enter recipes, manually plan lunch
 
 ## First Build Slice
 
-1. Bootstrap backend, frontend, database, and Docker Compose.
+1. Bootstrap backend, frontend, database, Docker Compose, test harness, pre-commit, and CI.
 2. Add auth and users.
 3. Add catalog models and CRUD.
 4. Add meal plan models and manual planning.
