@@ -1,12 +1,12 @@
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from mealroulette.models.enums import (
     ConversionConfidence,
+    DifficultyLevel,
     DishCourse,
     DishStatus,
     RecipeType,
@@ -16,8 +16,6 @@ from mealroulette.models.enums import (
     UnitDimension,
     VegetableLevel,
 )
-
-DifficultyLevel = Literal["easy", "medium", "hard"]
 
 
 class UnitPublic(BaseModel):

@@ -56,3 +56,9 @@ class RecipeType(str, enum.Enum):
     standard = "standard"
     thermomix = "thermomix"
     other_appliance = "other_appliance"
+
+
+class DifficultyLevel(str, enum.Enum):
+    easy = "easy"
+    medium = "medium"
+    hard = "hard"
