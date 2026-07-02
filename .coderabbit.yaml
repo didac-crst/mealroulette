@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit: auto-review on PR open only (not on every push).
+# Manual commands and full options: docs/CODERABBIT.md
+language: "en-US"
+reviews:
+  auto_review:
+    enabled: true
+    auto_incremental_review: false
