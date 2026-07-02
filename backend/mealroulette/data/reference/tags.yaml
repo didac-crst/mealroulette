@@ -1,0 +1,39 @@
+# Starter tag families for dish classification.
+# Users can add more tags via the API; this file only bootstraps common defaults.
+tags:
+  - family: protein
+    name: fish
+  - family: protein
+    name: chicken
+  - family: protein
+    name: vegetarian
+  - family: protein
+    name: legumes
+  - family: carb
+    name: pasta
+  - family: carb
+    name: rice
+  - family: carb
+    name: potato
+  - family: style
+    name: soup
+  - family: style
+    name: salad
+  - family: style
+    name: oven
+  - family: temperature
+    name: hot
+  - family: temperature
+    name: cold
+  - family: cuisine
+    name: spanish
+  - family: cuisine
+    name: italian
+  - family: effort
+    name: quick
+  - family: family
+    name: kids-friendly
+  - family: meal_slot
+    name: lunch
+  - family: meal_slot
+    name: dinner

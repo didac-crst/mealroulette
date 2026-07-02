@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from mealroulette.auth.security import hash_password
 from mealroulette.core.config import Settings, get_settings
+from mealroulette.data.seed_catalog import seed_catalog_data
 from mealroulette.db.base import Base
 from mealroulette.db.session import get_db
 from mealroulette.main import create_app
@@ -115,6 +116,22 @@ def user_token(client: TestClient, regular_user: User) -> str:
     )
     assert response.status_code == 200
     return response.json()["access_token"]
+
+
+@pytest.fixture
+def catalog_seed(db_session: Session):
+    seed_catalog_data(db_session)
+    return db_session
+
+
+@pytest.fixture
+def admin_headers(admin_token: str) -> dict[str, str]:
+    return {"Authorization": f"Bearer {admin_token}"}
+
+
+@pytest.fixture
+def user_headers(user_token: str) -> dict[str, str]:
+    return {"Authorization": f"Bearer {user_token}"}
 
 
 @pytest.fixture(autouse=True)
