@@ -1,15 +1,23 @@
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from mealroulette.models.enums import (
     ConversionConfidence,
+    DishCourse,
+    DishStatus,
+    RecipeType,
     SeasonalityMode,
     SeasonalityStrength,
+    ServingTemperature,
     UnitDimension,
+    VegetableLevel,
 )
+
+DifficultyLevel = Literal["easy", "medium", "hard"]
 
 
 class UnitPublic(BaseModel):
@@ -225,11 +233,15 @@ class RecipePublic(BaseModel):
     dish_id: int
     variant_name: str
     description: str | None
+    recipe_type: RecipeType
+    is_main: bool
     is_thermomix: bool
+    thermomix_model: str | None
     source_url: str | None
     servings: int | None
     prep_time_minutes: int | None
     cook_time_minutes: int | None
+    difficulty: DifficultyLevel | None
     notes: str | None
     created_at: datetime
     updated_at: datetime
@@ -238,22 +250,30 @@ class RecipePublic(BaseModel):
 class RecipeCreateRequest(BaseModel):
     variant_name: str = Field(min_length=1, max_length=128)
     description: str | None = None
-    is_thermomix: bool = False
+    recipe_type: RecipeType = RecipeType.standard
+    is_main: bool | None = None
+    is_thermomix: bool | None = None
+    thermomix_model: str | None = Field(default=None, max_length=32)
     source_url: str | None = Field(default=None, max_length=512)
     servings: int | None = Field(default=None, ge=1)
     prep_time_minutes: int | None = Field(default=None, ge=0)
     cook_time_minutes: int | None = Field(default=None, ge=0)
+    difficulty: DifficultyLevel | None = None
     notes: str | None = None
 
 
 class RecipeUpdateRequest(BaseModel):
     variant_name: str | None = Field(default=None, min_length=1, max_length=128)
     description: str | None = None
+    recipe_type: RecipeType | None = None
+    is_main: bool | None = None
     is_thermomix: bool | None = None
+    thermomix_model: str | None = Field(default=None, max_length=32)
     source_url: str | None = Field(default=None, max_length=512)
     servings: int | None = Field(default=None, ge=1)
     prep_time_minutes: int | None = Field(default=None, ge=0)
     cook_time_minutes: int | None = Field(default=None, ge=0)
+    difficulty: DifficultyLevel | None = None
     notes: str | None = None
 
 
@@ -264,9 +284,23 @@ class DishPublic(BaseModel):
     name: str
     description: str | None
     default_servings: int | None
-    prep_time_minutes: int | None
-    cook_time_minutes: int | None
-    difficulty: str | None
+    default_prep_time_minutes: int | None
+    default_cook_time_minutes: int | None
+    default_difficulty: DifficultyLevel | None
+    course: DishCourse | None
+    status: DishStatus
+    image_url: str | None
+    vegetable_level: VegetableLevel | None
+    dominant_protein: str | None
+    dominant_carb: str | None
+    suitable_for_lunch: bool | None
+    suitable_for_dinner: bool | None
+    weekday_friendly: bool | None
+    leftovers_possible: bool | None
+    freezer_friendly: bool | None
+    kids_friendly: bool | None
+    serving_temperature: ServingTemperature | None
+    thermomix_possible: bool | None
     active: bool
     notes: str | None
     created_at: datetime
@@ -283,9 +317,23 @@ class DishCreateRequest(BaseModel):
     name: str = Field(min_length=1, max_length=255)
     description: str | None = None
     default_servings: int | None = Field(default=None, ge=1)
-    prep_time_minutes: int | None = Field(default=None, ge=0)
-    cook_time_minutes: int | None = Field(default=None, ge=0)
-    difficulty: str | None = Field(default=None, max_length=32)
+    default_prep_time_minutes: int | None = Field(default=None, ge=0)
+    default_cook_time_minutes: int | None = Field(default=None, ge=0)
+    default_difficulty: DifficultyLevel | None = None
+    course: DishCourse | None = None
+    status: DishStatus = DishStatus.active
+    image_url: str | None = Field(default=None, max_length=512)
+    vegetable_level: VegetableLevel | None = None
+    dominant_protein: str | None = Field(default=None, max_length=64)
+    dominant_carb: str | None = Field(default=None, max_length=64)
+    suitable_for_lunch: bool | None = None
+    suitable_for_dinner: bool | None = None
+    weekday_friendly: bool | None = None
+    leftovers_possible: bool | None = None
+    freezer_friendly: bool | None = None
+    kids_friendly: bool | None = None
+    serving_temperature: ServingTemperature | None = None
+    thermomix_possible: bool | None = None
     active: bool = True
     notes: str | None = None
     tag_ids: list[int] = Field(default_factory=list)
@@ -296,9 +344,23 @@ class DishUpdateRequest(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=255)
     description: str | None = None
     default_servings: int | None = Field(default=None, ge=1)
-    prep_time_minutes: int | None = Field(default=None, ge=0)
-    cook_time_minutes: int | None = Field(default=None, ge=0)
-    difficulty: str | None = Field(default=None, max_length=32)
+    default_prep_time_minutes: int | None = Field(default=None, ge=0)
+    default_cook_time_minutes: int | None = Field(default=None, ge=0)
+    default_difficulty: DifficultyLevel | None = None
+    course: DishCourse | None = None
+    status: DishStatus | None = None
+    image_url: str | None = Field(default=None, max_length=512)
+    vegetable_level: VegetableLevel | None = None
+    dominant_protein: str | None = Field(default=None, max_length=64)
+    dominant_carb: str | None = Field(default=None, max_length=64)
+    suitable_for_lunch: bool | None = None
+    suitable_for_dinner: bool | None = None
+    weekday_friendly: bool | None = None
+    leftovers_possible: bool | None = None
+    freezer_friendly: bool | None = None
+    kids_friendly: bool | None = None
+    serving_temperature: ServingTemperature | None = None
+    thermomix_possible: bool | None = None
     active: bool | None = None
     notes: str | None = None
     tag_ids: list[int] | None = None

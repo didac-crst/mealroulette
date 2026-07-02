@@ -53,14 +53,15 @@ Build a self-hosted app that lets a household enter recipes, manually plan lunch
 
 ## First Build Slice
 
-1. Bootstrap backend, frontend, database, Docker Compose, test harness, pre-commit, and CI.
-2. Add auth and users.
-3. Add catalog models and CRUD.
-4. Add meal plan models and manual planning.
-5. Add shopping list generation.
-6. Add Telegram reminders.
-7. Add backups.
-8. Add cooking mode.
+1. Bootstrap backend, frontend, database, Docker Compose, test harness, pre-commit, and CI. ✅
+2. Add auth and users. ✅
+3. Add catalog models and CRUD. ✅
+4. Add dish library UI (login, dishes, recipes, steps, ingredients). ✅
+5. Add meal plan models and manual planning.
+6. Add shopping list generation.
+7. Add Telegram reminders.
+8. Add backups.
+9. Add cooking mode.
 
 ## MVP Acceptance Test
 

@@ -1,9 +1,10 @@
-import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import { fetchDishes, type Dish } from "../../api/catalog";
+import { ButtonLink } from "../../components/ButtonLink";
 import { ApiError } from "../../api/client";
 import { useAuth } from "../auth/AuthContext";
+import { DishCard } from "./DishCard";
 
 export function DishListPage() {
   const { accessToken, isAdmin } = useAuth();
@@ -40,14 +41,10 @@ export function DishListPage() {
   }, [accessToken]);
 
   return (
-    <section className="card">
+    <section className="card dish-library">
       <div className="row-between">
         <h2>Dish library</h2>
-        {isAdmin ? (
-          <Link to="/dishes/new" className="button">
-            Add dish
-          </Link>
-        ) : null}
+        {isAdmin ? <ButtonLink to="/dishes/new">Add dish</ButtonLink> : null}
       </div>
       {loading ? <p className="muted">Loading dishes…</p> : null}
       {error ? (
@@ -58,16 +55,11 @@ export function DishListPage() {
       {!loading && !error && dishes.length === 0 ? (
         <p className="muted">No dishes yet.{isAdmin ? " Add your first one." : ""}</p>
       ) : null}
-      <ul className="dish-list">
+      <div className="dish-card-grid">
         {dishes.map((dish) => (
-          <li key={dish.id}>
-            <Link to={`/dishes/${dish.id}`}>
-              <strong>{dish.name}</strong>
-              {dish.description ? <span className="muted"> — {dish.description}</span> : null}
-            </Link>
-          </li>
+          <DishCard key={dish.id} dish={dish} />
         ))}
-      </ul>
+      </div>
     </section>
   );
 }

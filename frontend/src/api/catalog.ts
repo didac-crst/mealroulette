@@ -17,15 +17,34 @@ export type Dish = {
   name: string;
   description: string | null;
   default_servings: number | null;
-  prep_time_minutes: number | null;
-  cook_time_minutes: number | null;
-  difficulty: string | null;
+  default_prep_time_minutes: number | null;
+  default_cook_time_minutes: number | null;
+  default_difficulty: "easy" | "medium" | "hard" | null;
+  course: "starter" | "main" | "dessert" | null;
+  status: "draft" | "active" | "archived";
+  image_url: string | null;
+  suitable_for_lunch: boolean | null;
+  suitable_for_dinner: boolean | null;
+  weekday_friendly: boolean | null;
+  leftovers_possible: boolean | null;
+  freezer_friendly: boolean | null;
+  kids_friendly: boolean | null;
+  serving_temperature: "hot" | "cold" | "room" | "either" | null;
+  thermomix_possible: boolean | null;
   active: boolean;
   notes: string | null;
   created_at: string;
   updated_at: string;
   tag_ids: number[];
   seasonality: SeasonalityPublic | null;
+};
+
+export type SeasonalityInput = {
+  seasonality_mode?: string;
+  preferred_months?: number[];
+  allowed_months?: number[];
+  excluded_months?: number[];
+  seasonality_strength?: string;
 };
 
 export type Tag = {
@@ -40,10 +59,15 @@ export type Recipe = {
   dish_id: number;
   variant_name: string;
   description: string | null;
+  recipe_type: "standard" | "thermomix" | "other_appliance";
+  is_main: boolean;
   is_thermomix: boolean;
+  thermomix_model: string | null;
+  source_url: string | null;
   servings: number | null;
   prep_time_minutes: number | null;
   cook_time_minutes: number | null;
+  difficulty: "easy" | "medium" | "hard" | null;
   notes: string | null;
 };
 
@@ -84,13 +108,18 @@ export type Unit = {
 export type DishInput = {
   name: string;
   description?: string | null;
-  default_servings?: number | null;
-  prep_time_minutes?: number | null;
-  cook_time_minutes?: number | null;
-  difficulty?: string | null;
-  active?: boolean;
+  image_url?: string | null;
+  course?: Dish["course"];
+  status?: Dish["status"];
+  suitable_for_lunch?: boolean | null;
+  suitable_for_dinner?: boolean | null;
+  weekday_friendly?: boolean | null;
+  leftovers_possible?: boolean | null;
+  freezer_friendly?: boolean | null;
+  kids_friendly?: boolean | null;
   notes?: string | null;
   tag_ids?: number[];
+  seasonality?: SeasonalityInput | null;
 };
 
 export type IngredientResolveResponse = {
@@ -146,11 +175,56 @@ export async function fetchRecipes(token: string, dishId: number): Promise<Recip
 export async function createRecipe(
   token: string,
   dishId: number,
-  payload: { variant_name: string; description?: string | null },
+  payload: {
+    variant_name: string;
+    description?: string | null;
+    recipe_type?: Recipe["recipe_type"];
+    is_main?: boolean;
+    servings?: number | null;
+    prep_time_minutes?: number | null;
+    cook_time_minutes?: number | null;
+    difficulty?: Recipe["difficulty"];
+    source_url?: string | null;
+    notes?: string | null;
+  },
 ): Promise<Recipe> {
   return apiRequest<Recipe>(`/api/dishes/${dishId}/recipes`, {
     method: "POST",
     body: JSON.stringify(payload),
+    ...withToken(token),
+  });
+}
+
+export async function updateRecipe(
+  token: string,
+  recipeId: number,
+  payload: {
+    variant_name?: string;
+    description?: string | null;
+    recipe_type?: Recipe["recipe_type"];
+    is_main?: boolean;
+    servings?: number | null;
+    prep_time_minutes?: number | null;
+    cook_time_minutes?: number | null;
+    difficulty?: Recipe["difficulty"];
+    source_url?: string | null;
+    notes?: string | null;
+  },
+): Promise<Recipe> {
+  return apiRequest<Recipe>(`/api/recipes/${recipeId}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+    ...withToken(token),
+  });
+}
+
+export async function fetchRecipe(token: string, recipeId: number): Promise<Recipe> {
+  return apiRequest<Recipe>(`/api/recipes/${recipeId}`, withToken(token));
+}
+
+export async function deleteRecipe(token: string, recipeId: number): Promise<void> {
+  return apiRequest<void>(`/api/recipes/${recipeId}`, {
+    method: "DELETE",
     ...withToken(token),
   });
 }
@@ -167,6 +241,25 @@ export async function createRecipeStep(
   return apiRequest<RecipeStep>(`/api/recipes/${recipeId}/steps`, {
     method: "POST",
     body: JSON.stringify(payload),
+    ...withToken(token),
+  });
+}
+
+export async function updateRecipeStep(
+  token: string,
+  stepId: number,
+  payload: { step_number?: number; instruction?: string },
+): Promise<RecipeStep> {
+  return apiRequest<RecipeStep>(`/api/recipe-steps/${stepId}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+    ...withToken(token),
+  });
+}
+
+export async function deleteRecipeStep(token: string, stepId: number): Promise<void> {
+  return apiRequest<void>(`/api/recipe-steps/${stepId}`, {
+    method: "DELETE",
     ...withToken(token),
   });
 }
@@ -189,6 +282,30 @@ export async function addRecipeIngredient(
   return apiRequest<RecipeIngredient>(`/api/recipes/${recipeId}/ingredients`, {
     method: "POST",
     body: JSON.stringify(payload),
+    ...withToken(token),
+  });
+}
+
+export async function updateRecipeIngredient(
+  token: string,
+  itemId: number,
+  payload: {
+    quantity?: string | null;
+    unit_id?: number | null;
+    optional?: boolean;
+    notes?: string | null;
+  },
+): Promise<RecipeIngredient> {
+  return apiRequest<RecipeIngredient>(`/api/recipe-ingredients/${itemId}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+    ...withToken(token),
+  });
+}
+
+export async function deleteRecipeIngredient(token: string, itemId: number): Promise<void> {
+  return apiRequest<void>(`/api/recipe-ingredients/${itemId}`, {
+    method: "DELETE",
     ...withToken(token),
   });
 }

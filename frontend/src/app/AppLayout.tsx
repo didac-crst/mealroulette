@@ -1,5 +1,6 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
+import { NavButtonLink } from "../components/ButtonLink";
 import { useAuth } from "../features/auth/AuthContext";
 
 export function AppLayout() {
@@ -16,10 +17,8 @@ export function AppLayout() {
           </p>
         </div>
         <nav className="app-nav" aria-label="Main">
-          <NavLink to="/dishes" className={({ isActive }) => (isActive ? "active" : undefined)}>
-            Dishes
-          </NavLink>
-          <button type="button" className="link-button" onClick={() => void logout()}>
+          <NavButtonLink to="/dishes">Dishes</NavButtonLink>
+          <button type="button" className="button button-secondary" onClick={() => void logout()}>
             Sign out
           </button>
         </nav>

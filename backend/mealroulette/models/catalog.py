@@ -19,9 +19,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from mealroulette.db.base import Base
 from mealroulette.models.enums import (
     ConversionConfidence,
+    DishCourse,
+    DishStatus,
+    RecipeType,
     SeasonalityMode,
     SeasonalityStrength,
+    ServingTemperature,
     UnitDimension,
+    VegetableLevel,
 )
 
 
@@ -127,9 +132,27 @@ class Dish(Base):
     name: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     default_servings: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    prep_time_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    cook_time_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    difficulty: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    default_prep_time_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    default_cook_time_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    default_difficulty: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    course: Mapped[DishCourse | None] = mapped_column(Enum(DishCourse, name="dish_course"), nullable=True)
+    status: Mapped[DishStatus] = mapped_column(Enum(DishStatus, name="dish_status"), default=DishStatus.active)
+    image_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    vegetable_level: Mapped[VegetableLevel | None] = mapped_column(
+        Enum(VegetableLevel, name="vegetable_level"), nullable=True
+    )
+    dominant_protein: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    dominant_carb: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    suitable_for_lunch: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    suitable_for_dinner: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    weekday_friendly: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    leftovers_possible: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    freezer_friendly: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    kids_friendly: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    serving_temperature: Mapped[ServingTemperature | None] = mapped_column(
+        Enum(ServingTemperature, name="serving_temperature"), nullable=True
+    )
+    thermomix_possible: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
     active: Mapped[bool] = mapped_column(Boolean, default=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -181,11 +204,17 @@ class Recipe(Base):
     dish_id: Mapped[int] = mapped_column(ForeignKey("dishes.id", ondelete="CASCADE"), index=True)
     variant_name: Mapped[str] = mapped_column(String(128))
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    recipe_type: Mapped[RecipeType] = mapped_column(
+        Enum(RecipeType, name="recipe_type"), default=RecipeType.standard
+    )
+    is_main: Mapped[bool] = mapped_column(Boolean, default=False)
     is_thermomix: Mapped[bool] = mapped_column(Boolean, default=False)
+    thermomix_model: Mapped[str | None] = mapped_column(String(32), nullable=True)
     source_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
     servings: Mapped[int | None] = mapped_column(Integer, nullable=True)
     prep_time_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
     cook_time_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    difficulty: Mapped[str | None] = mapped_column(String(32), nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(

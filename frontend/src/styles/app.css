@@ -14,7 +14,7 @@ a {
 }
 
 .app-shell {
-  max-width: 720px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 1.25rem 1rem 2rem;
 }
@@ -36,15 +36,6 @@ a {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-}
-
-.app-nav a {
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.app-nav a.active {
-  text-decoration: underline;
 }
 
 .card,
@@ -78,6 +69,8 @@ section.card {
 
 .row-actions {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 0.75rem;
 }
 
@@ -127,12 +120,133 @@ button:disabled {
   cursor: not-allowed;
 }
 
-.link-button {
-  border: none;
-  background: none;
-  color: #0f609b;
-  padding: 0;
-  text-decoration: underline;
+.button-danger {
+  border-color: #9b1c1c;
+  background: #9b1c1c;
+}
+
+.button-secondary {
+  border-color: #bcccdc;
+  background: white;
+  color: #1f2933;
+}
+
+.confirm-panel {
+  padding: 0.75rem 1rem;
+  border: 1px solid #f0b4b4;
+  border-radius: 0.5rem;
+  background: #fff5f5;
+}
+
+.dish-list-button {
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+
+.dish-library {
+  margin-top: 0.5rem;
+}
+
+.dish-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.dish-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid #d9e2ec;
+  border-radius: 0.75rem;
+  background: white;
+  color: inherit;
+  text-decoration: none;
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dish-card:hover {
+  border-color: #9fb3c8;
+  box-shadow: 0 4px 14px rgba(31, 41, 51, 0.08);
+}
+
+.dish-card-media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(180deg, #f0f4f8 0%, #e4ebf3 100%);
+}
+
+.dish-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dish-card-emoji {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.dish-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.85rem 0.95rem 1rem;
+}
+
+.dish-card-title {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+.dish-card-description {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.dish-card-meta {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.dish-detail-header {
+  align-items: center;
+}
+
+.dish-detail-intro {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.dish-detail-media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(180deg, #f0f4f8 0%, #e4ebf3 100%);
+  overflow: hidden;
+}
+
+.dish-detail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dish-detail-emoji {
+  font-size: 2.5rem;
+  line-height: 1;
 }
 
 .muted {
@@ -158,10 +272,116 @@ button:disabled {
   border-bottom: none;
 }
 
+.editable-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.editable-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e4e7eb;
+}
+
+.editable-list li:last-child {
+  border-bottom: none;
+}
+
+.editable-list ol,
+.editable-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.list-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.list-item-row > span {
+  flex: 1;
+}
+
+.recipe-meta-fields {
+  min-width: min(100%,  240px);
+}
+
+.section-title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.classification-summary {
+  padding: 0.75rem 1rem;
+  border: 1px solid #e4e7eb;
+  border-radius: 0.5rem;
+  background: #fbfdff;
+}
+
+.recipe-card-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.recipe-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e4e7eb;
+}
+
+.recipe-card:last-child {
+  border-bottom: none;
+}
+
+.recipe-meta-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.ingredient-row {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e4e7eb;
+}
+
+.ingredient-table .ingredient-row:last-child {
+  border-bottom: none;
+}
+
+.inherited-context {
+  padding: 0.75rem 1rem;
+  border: 1px solid #d9e2ec;
+  border-radius: 0.5rem;
+  background: #f8fafc;
+}
+
 .tag-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+}
+
+.tag-families {
+  margin-top: 0.25rem;
+}
+
+.tag-family + .tag-family {
+  padding-top: 0.75rem;
+  border-top: 1px solid #e4e7eb;
+}
+
+.tag-family-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #486581;
 }
 
 .checkbox-pill {

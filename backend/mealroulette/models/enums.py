@@ -24,3 +24,35 @@ class SeasonalityStrength(str, enum.Enum):
 class ConversionConfidence(str, enum.Enum):
     approximate = "approximate"
     measured = "measured"
+
+
+class DishCourse(str, enum.Enum):
+    starter = "starter"
+    main = "main"
+    dessert = "dessert"
+
+
+class DishStatus(str, enum.Enum):
+    draft = "draft"
+    active = "active"
+    archived = "archived"
+
+
+class VegetableLevel(str, enum.Enum):
+    low = "low"
+    medium = "medium"
+    high = "high"
+    vegetable_main = "vegetable_main"
+
+
+class ServingTemperature(str, enum.Enum):
+    hot = "hot"
+    cold = "cold"
+    room = "room"
+    either = "either"
+
+
+class RecipeType(str, enum.Enum):
+    standard = "standard"
+    thermomix = "thermomix"
+    other_appliance = "other_appliance"
