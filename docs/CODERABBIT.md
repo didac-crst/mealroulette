@@ -1,17 +1,16 @@
 # CodeRabbit
 
-This repo uses [CodeRabbit](https://coderabbit.ai/) for optional PR reviews. Configuration lives in [`.coderabbit.yaml`](../.coderabbit.yaml) at the repo root.
+This repo uses [CodeRabbit](https://coderabbit.ai/) for PR reviews **on demand only**. Configuration lives in [`.coderabbit.yaml`](../.coderabbit.yaml) at the repo root.
 
-## Default behavior
+## Why manual-only
 
-| Setting | Value | Effect |
-| --- | --- | --- |
-| `auto_review.enabled` | `true` | Reviews when a PR is opened |
-| `auto_review.auto_incremental_review` | `false` | Does **not** re-review every push (saves quota) |
+Reviews are triggered by you, not on PR open or push. That way a failed CI run does not consume a CodeRabbit review before the code is ready.
+
+**Typical flow:** open PR → fix until CI is green → comment `@coderabbitai review`.
 
 ## Commands (comment on the PR)
 
-When you push fixes and want another review:
+Request a review when CI passes and you are ready:
 
 ```text
 @coderabbitai review
@@ -29,15 +28,13 @@ Pause reviews on one PR while you work:
 @coderabbitai pause
 ```
 
-Resume automatic behavior on that PR:
+Resume:
 
 ```text
 @coderabbitai resume
 ```
 
-## Stricter option (manual-only)
-
-If you want zero automatic reviews and only review when you ask, change `.coderabbit.yaml` to:
+## Current config
 
 ```yaml
 reviews:
@@ -45,6 +42,17 @@ reviews:
     enabled: false
     auto_incremental_review: false
     description_keyword: "@coderabbitai review"
+```
+
+## Optional: review on PR open (not recommended here)
+
+If you prefer one automatic review when opening a PR but no re-review on every push:
+
+```yaml
+reviews:
+  auto_review:
+    enabled: true
+    auto_incremental_review: false
 ```
 
 ## Links

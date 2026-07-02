@@ -1,8 +1,9 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
-# CodeRabbit: auto-review on PR open only (not on every push).
-# Manual commands and full options: docs/CODERABBIT.md
+# CodeRabbit: manual reviews only (comment @coderabbitai review on the PR).
+# Avoids burning a review when CI is still failing. See docs/CODERABBIT.md
 language: "en-US"
 reviews:
   auto_review:
-    enabled: true
+    enabled: false
     auto_incremental_review: false
+    description_keyword: "@coderabbitai review"

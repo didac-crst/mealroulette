@@ -10,7 +10,7 @@ This repository currently contains the project specification and implementation 
 - [Cursor implementation roadmap](docs/CURSOR_ROADMAP.md)
 - [MVP scope](docs/MVP.md)
 - [Development backlog and progress](docs/BACKLOG.md)
-- [CodeRabbit PR reviews](docs/CODERABBIT.md) — when to use `@coderabbitai review`, pause, etc.
+- [CodeRabbit PR reviews](docs/CODERABBIT.md) — manual `@coderabbitai review` after CI is green
 
 ## Target Stack
 
