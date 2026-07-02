@@ -10,7 +10,7 @@ This repository currently contains the project specification and implementation 
 - [Cursor implementation roadmap](docs/CURSOR_ROADMAP.md)
 - [MVP scope](docs/MVP.md)
 - [Development backlog and progress](docs/BACKLOG.md)
-- [Releases and git tags](docs/RELEASES.md) — phase milestones (`phase-3`, …)
+- [Releases and git tags](docs/RELEASES.md) — product version tags (`v0.1.0`, …)
 - [CodeRabbit PR reviews](docs/CODERABBIT.md) — manual `@coderabbitai review` after CI is green
 
 ## Target Stack

@@ -261,6 +261,6 @@ Cross-reference for [docs/MVP.md](MVP.md). Checked items are done; the rest trac
 ## How to update this file
 
 1. When starting work, set **Current focus** to the active phase.
-2. When a phase completes, mark it done, check off related version items, add the merge commit hash, and tag the milestone — see [docs/RELEASES.md](RELEASES.md).
-3. When a product version (v0.1, v0.2, …) is fully shipped, update its row in the product roadmap table and create a `vX.Y.Z` tag.
+2. When a phase completes, mark it done, check off related version items, and add the merge commit hash.
+3. When a **product version** (v0.1, v0.2, …) is fully shipped, update its row in the product roadmap table and create a `vX.Y.Z` tag — see [docs/RELEASES.md](RELEASES.md).
 4. Do not duplicate spec detail here — link to `SPECS.md` and `CURSOR_ROADMAP.md` instead.
