@@ -1,22 +1,37 @@
 # Releases and tags
 
-Git tags mark **merge milestones** in this repo. They make it easy to check out exactly what shipped after a phase PR lands.
+Git tags mark milestones in this repo. **Phase tags are development checkpoints**, not product releases.
 
 ## Tag types
 
-| Prefix | When to create | Example |
+| Tag | When | User-facing? | Example |
+| --- | --- | --- | --- |
+| `phase-N` | After an implementation phase PR merges | No — engineers only | `phase-3` |
+| `vX.Y.Z` | When a **product version** is fully shipped | Yes | `v0.1.0` (after Phase 4) |
+
+### Phase tags (`phase-N`)
+
+Use after each phase in [CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) merges to `main`. Good for:
+
+- Checking out a known-good milestone
+- Comparing what changed between phases
+- CI or docs references
+
+**Not** a semver release. Do not treat `phase-3` as “MealRoulette v0.1”.
+
+### Version tags (`vX.Y.Z`)
+
+Use only when a row in the [product roadmap](BACKLOG.md#product-roadmap-long-term) is complete.
+
+| Version | Tag when | Current state |
 | --- | --- | --- |
-| `phase-N` | After a **implementation phase** PR merges to `main` | `phase-3` |
-| `vX.Y.Z` | When a **product version** from [SPECS.md §17](../SPECS.md#17-mvp-roadmap) is fully shipped | `v0.1.0` (not yet) |
-
-**Phase tags** track development milestones (Phase 0–12 in [CURSOR_ROADMAP.md](CURSOR_ROADMAP.md)).
-
-**Version tags** track user-facing releases. v0.1 is not complete until Phase 4 (frontend shell) and remaining v0.1 scope land — do not tag `v0.1.0` after backend-only phases.
+| v0.1 Foundation | Phase 4 merges (login + dish library UI) | **Not ready** — backend catalog done, UI pending |
+| v0.2+ | Respective version scope complete | Not started |
 
 ## Workflow (after merging a phase PR)
 
 1. Update [BACKLOG.md](BACKLOG.md) — mark the phase done, note merge commit and PR number.
-2. Create an **annotated** tag on the **merge commit** (not a later docs-only commit):
+2. Create an **annotated** tag on the **merge commit**:
 
 ```bash
 git fetch origin main
@@ -25,14 +40,15 @@ git push origin phase-3
 ```
 
 3. Add a row to the table below.
+4. If that was the **last phase** for a product version, also tag `vX.Y.Z` on the same merge commit and update the roadmap status.
 
 ## Tagged milestones
 
-| Tag | Commit | Date | Notes |
+| Tag | Commit | Date | What shipped |
 | --- | --- | --- | --- |
-| `phase-3` | `815d67b` | 2026-07-02 | Core catalog data — dishes, recipes, ingredients, YAML seed, quantities service (PR #2) |
+| `phase-3` | `815d67b` | 2026-07-02 | **Backend catalog** — dishes, recipes, ingredients, units, tags, YAML reference seed, quantity aggregation rules, catalog APIs (PR #2). Frontend dish UI not included. |
 
-Phases 0–2 were merged before this tagging convention existed; tags were not applied retroactively.
+Phases 0–2 merged before this convention; no retroactive tags.
 
 ## Check out a milestone
 

@@ -30,11 +30,11 @@ Use one branch per milestone, then merge via pull request:
 
 ## Product roadmap (long term)
 
-From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). Versions describe *what the product can do*. Implementation phases below map to these releases.
+From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what users can do. **Phases** (below) are how we build them. A version is only *released* when all its phases are done — then tag `vX.Y.Z` per [RELEASES.md](RELEASES.md).
 
 | Version | Theme | Status |
 | --- | --- | --- |
-| **v0.1** | Foundation — backend, auth, catalog data, basic frontend | In progress |
+| **v0.1** | Foundation — platform, auth, catalog (API + UI), basic frontend | **In progress** (Phases 0–3 done, Phase 4 remaining) |
 | **v0.2** | Manual planning — weekly plan, meal actions, ratings, history | Not started |
 | **v0.3** | Shopping list — generation, aggregation, pantry filter, UI | Not started |
 | **v0.4** | Telegram reminders — settings, scheduled and manual send | Not started |
@@ -42,23 +42,37 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). Versions describe *what the pr
 | **v0.6** | LLM-assisted entry — draft enrichment, review before save | Not started |
 | **v1.0** | Stable home version — mobile UI, backups, auth, scheduler, cooking mode | Not started |
 
+> **v0.1 is not released yet.** Backend catalog APIs exist, but households cannot manage dishes from the UI until Phase 4 lands. Tag `v0.1.0` only after Phase 4 merges.
+
 ### v0.1 — Foundation
+
+**Platform & tooling**
 
 - [x] FastAPI backend
 - [x] PostgreSQL
 - [x] Docker Compose
 - [x] Unit and integration test harness
 - [x] Pre-commit hook and CI test workflow
-- [x] Basic frontend shell
+
+**Auth (API)**
+
 - [x] Users / auth
-- [x] Dishes
-- [x] Recipes
-- [x] Recipe steps
-- [x] Ingredients
-- [x] Ingredient aliases
-- [x] Units
-- [x] Tags
-- [x] Dish tags
+- [x] Admin and user roles
+
+**Catalog (API — Phase 3)**
+
+- [x] Dishes, recipes, recipe steps
+- [x] Ingredients and ingredient aliases
+- [x] Units and tags, dish tags
+- [x] Ingredient normalization flow (resolve / confirm)
+
+**Frontend (Phase 4 — not done)**
+
+- [x] Dev shell (health check page only)
+- [ ] Login screen
+- [ ] Authenticated app layout
+- [ ] Dish list, detail, and add/edit forms
+- [ ] Recipe, step, tag, and ingredient selection in UI
 
 ### v0.2 — Manual Planning
 
@@ -227,11 +241,11 @@ Cross-reference for [docs/MVP.md](MVP.md). Checked items are done; the rest trac
 - [x] Automated unit and integration tests
 - [x] Pre-commit and CI
 - [x] FastAPI + PostgreSQL
-- [x] React + Vite frontend (shell only)
-- [x] Username / password login
+- [x] React + Vite frontend (dev shell only — not the dish library)
+- [x] Username / password login (API)
 - [x] Admin and user roles
-- [x] Dishes, recipes, ingredients, units, tags
-- [x] Ingredient normalization flow
+- [x] Dishes, recipes, ingredients, units, tags (API)
+- [x] Ingredient normalization flow (API)
 - [ ] Weekly meal plan and manual assignment
 - [ ] Meal actions (lock, cooked, skip, leftovers, reroll)
 - [ ] Ratings
