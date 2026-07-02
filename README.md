@@ -9,6 +9,7 @@ This repository currently contains the project specification and implementation 
 - [Full specification](SPECS.md)
 - [Cursor implementation roadmap](docs/CURSOR_ROADMAP.md)
 - [MVP scope](docs/MVP.md)
+- [Development backlog and progress](docs/BACKLOG.md)
 
 ## Target Stack
 
@@ -33,7 +34,7 @@ Use the roadmap as the implementation guide:
 
 1. Read `SPECS.md`.
 2. Follow `docs/CURSOR_ROADMAP.md` phase by phase.
-3. Start with Phase 0 and Phase 1.
+3. Track progress in `docs/BACKLOG.md`.
 4. Keep schema migrations, unit tests, integration tests, pre-commit checks, and Docker Compose working at each phase.
 
 ## Developer Commands
