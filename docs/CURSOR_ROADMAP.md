@@ -1,0 +1,396 @@
+# MealRoulette - Cursor Implementation Roadmap
+
+This roadmap is the architectural boilerplate for implementing MealRoulette in Cursor. Treat `SPECS.md` as the product source of truth and this file as the build sequence.
+
+## Guiding Constraints
+
+- Build API-first. Every frontend feature should map to a documented backend endpoint.
+- Keep the data model normalized from the first migration. Ingredient cleanup later will be expensive.
+- Prefer boring, testable service objects over hidden magic.
+- Do not use embeddings, vector databases, online scraping, nutrition tracking, or complex optimization algorithms in v1.
+- LLM output is always draft data and must go through user confirmation before persistence.
+- All write endpoints must require authentication.
+- Secrets such as Telegram bot tokens must never be returned in normal API responses.
+- The app must run locally with Docker Compose and be suitable for Raspberry Pi deployment.
+
+## Recommended Repository Layout
+
+```text
+mealroulette/
+  backend/
+    alembic/
+    mealroulette/
+      api/
+        routes/
+        dependencies.py
+      auth/
+      core/
+        config.py
+        security.py
+      db/
+        base.py
+        session.py
+      models/
+      schemas/
+      services/
+        ingredients/
+        planning/
+        shopping/
+        telegram/
+        backups/
+        llm/
+      worker.py
+      main.py
+    tests/
+    Dockerfile
+    pyproject.toml
+  frontend/
+    src/
+      api/
+      app/
+      components/
+      features/
+        auth/
+        dishes/
+        planning/
+        shopping/
+        cooking/
+        settings/
+      routes/
+      styles/
+    Dockerfile
+    package.json
+  docs/
+    CURSOR_ROADMAP.md
+    MVP.md
+  SPECS.md
+  backups/
+    .gitkeep
+  docker-compose.yml
+  .env.example
+  README.md
+```
+
+## Architecture Decisions
+
+### Backend
+
+- Use Python 3.12+, FastAPI, Pydantic, SQLAlchemy 2.x, Alembic, PostgreSQL, and psycopg.
+- Use layered modules:
+  - `models`: SQLAlchemy tables and relationships.
+  - `schemas`: Pydantic request and response contracts.
+  - `api/routes`: thin HTTP handlers.
+  - `services`: business logic, validation, aggregation, scheduling, and integrations.
+  - `db`: engine, sessions, and migration glue.
+- Keep route handlers thin. Validation and write orchestration belong in services.
+- Use UUID or integer primary keys consistently. Integer IDs are acceptable for a self-hosted app.
+- Use timezone-aware timestamps.
+- Use enum types for role, meal slot, item status, plan status, backup status, backup type, unit dimension, seasonality mode, and seasonality strength.
+
+### Frontend
+
+- Use React + Vite unless intentionally switching to SvelteKit.
+- Use a mobile-first shell with authenticated routes.
+- Keep feature modules separated by domain: auth, dishes, planning, shopping, cooking, settings.
+- Use generated or hand-maintained API client functions under `src/api`.
+- Avoid landing-page style UI. The first authenticated screen should be the Today view.
+
+### Worker
+
+- Use APScheduler in `backend/mealroulette/worker.py`.
+- The worker should share backend configuration and services.
+- Jobs:
+  - daily Telegram reminder
+  - scheduled backups
+  - optional automatic plan generation
+
+### Deployment
+
+- Use Docker Compose with `api`, `worker`, `frontend`, and `db`.
+- Mount `./backups:/backups`.
+- Keep `.env.example` complete and safe to commit.
+- Do not commit real secrets.
+
+## Implementation Phases
+
+### Phase 0 - Project Bootstrap
+
+Deliverables:
+
+- Root `README.md`
+- `docker-compose.yml`
+- `.env.example`
+- `backend` FastAPI project with `/health`
+- `frontend` Vite app with a minimal shell
+- PostgreSQL service
+- Basic developer commands documented
+
+Acceptance criteria:
+
+- `docker compose up --build` starts all services.
+- API health endpoint returns `{"status":"ok"}`.
+- Frontend can call the API health endpoint.
+
+### Phase 1 - Backend Foundation
+
+Deliverables:
+
+- SQLAlchemy setup
+- Alembic setup
+- Config management
+- Database session dependency
+- Error handling conventions
+- Test harness
+- First migration
+
+Acceptance criteria:
+
+- Alembic can create and upgrade the schema.
+- Tests can run against an isolated test database or transaction fixture.
+- API responses use predictable error payloads.
+
+### Phase 2 - Authentication and Users
+
+Deliverables:
+
+- User model
+- Password hashing
+- Login/logout/refresh/me endpoints
+- Role-based dependencies
+- Initial admin creation command or bootstrap flow
+
+Acceptance criteria:
+
+- Unauthenticated users cannot access protected endpoints.
+- Admin-only endpoints reject normal users.
+- Password hashes are never returned.
+
+### Phase 3 - Core Catalog Data
+
+Deliverables:
+
+- Dishes
+- Recipes
+- Recipe steps
+- Ingredients
+- Ingredient aliases
+- Units
+- Ingredient-specific unit conversions
+- Tags
+- Dish tags
+- Seasonality
+
+Acceptance criteria:
+
+- A user can create a dish with at least one recipe, structured steps, ingredients, tags, and seasonality.
+- Unknown ingredient insertion follows the confirm/create/map flow at the API level.
+- Seed data includes base units and starter tag families.
+
+### Phase 4 - Frontend Shell and Dish Library
+
+Deliverables:
+
+- Login screen
+- Authenticated app layout
+- Dish list
+- Dish detail
+- Add/edit dish form
+- Recipe variant editing
+- Step editing
+- Tag and ingredient selection
+
+Acceptance criteria:
+
+- A household can manually enter realistic recipes from the UI.
+- Mobile layout remains usable for dish creation and viewing.
+
+### Phase 5 - Manual Meal Planning
+
+Deliverables:
+
+- Meal plans
+- Meal plan items
+- Weekly plan API
+- Current plan API
+- Manual assignment
+- Lock/unlock
+- Mark cooked
+- Skip
+- Use leftovers
+- Ratings
+- Meal history events derived from item status changes
+
+Acceptance criteria:
+
+- User can plan lunch and dinner for a week manually.
+- Locked items remain locked.
+- Cooked/skipped/leftover state is stored and visible.
+- Ratings affect stored dish/user rating records.
+
+### Phase 6 - Shopping Lists
+
+Deliverables:
+
+- Dynamic shopping list generation
+- Optional persisted shopping lists
+- Shopping list items
+- Unit aggregation service
+- Pantry filtering
+- Category grouping
+- Source meal references
+- Shopping list UI
+
+Acceptance criteria:
+
+- Compatible units aggregate through base units.
+- Incompatible units remain separate unless an ingredient-specific conversion exists.
+- Shopping items show which planned meals require them.
+
+### Phase 7 - Telegram Reminders
+
+Deliverables:
+
+- Telegram settings API
+- Secret-safe response schema
+- Test message endpoint
+- Daily reminder service
+- APScheduler job
+- Manual send endpoint
+
+Acceptance criteria:
+
+- Admin can configure Telegram without exposing the token afterward.
+- Manual send uses the same formatting and aggregation as the scheduled job.
+- Disabled settings prevent sends.
+
+### Phase 8 - Explainable Scheduler
+
+Deliverables:
+
+- Planning rules
+- Rule-based meal similarity
+- Seasonality scoring
+- Rating scoring
+- Recent dish avoidance
+- Weekly target scoring
+- 50-attempt candidate plan generation
+- Reroll one meal
+- Selection reasons persisted on meal plan items
+
+Acceptance criteria:
+
+- Scheduler never modifies locked meals.
+- Scheduler respects hard constraints.
+- Each automatic item stores human-readable selection reasons.
+- Reroll replaces only the selected item.
+
+### Phase 9 - Cooking Mode
+
+Deliverables:
+
+- Step-by-step recipe viewer
+- Previous/next controls
+- Optional timer
+- Thermomix metadata display
+- Ingredient reference panel
+- Mobile-readable layout
+
+Acceptance criteria:
+
+- User can cook a recipe from a phone without editing data.
+- Timers can be started from steps that define timer metadata.
+
+### Phase 10 - Backup, Export, and Import
+
+Deliverables:
+
+- Full JSON export
+- Full JSON import
+- Backup run tracking
+- Optional `pg_dump` backup
+- Scheduled backup job
+- Retention cleanup
+- Restore documentation
+
+Acceptance criteria:
+
+- JSON export includes all required domain data.
+- Import validates shape before writing.
+- Backup files are written under `/backups`.
+- Old backups are removed according to retention settings.
+
+### Phase 11 - LLM-Assisted Entry
+
+Deliverables:
+
+- Provider abstraction
+- LLM settings
+- Enrich dish endpoint
+- Suggest ingredients endpoint
+- Suggest tags endpoint
+- Normalize ingredients endpoint
+- Draft review UI
+
+Acceptance criteria:
+
+- LLM endpoints require authentication.
+- LLM output is saved only after explicit user confirmation.
+- Ingredient suggestions still pass through normalization flow.
+
+### Phase 12 - v1 Hardening
+
+Deliverables:
+
+- End-to-end happy path tests
+- API tests for all write endpoints
+- Frontend smoke tests
+- Raspberry Pi deployment notes
+- Security review of settings and auth flows
+- Error and empty-state polish
+
+Acceptance criteria:
+
+- A household can use the app for real weekly planning.
+- Backup and restore are documented and tested.
+- Scheduler is explainable enough to debug bad plans.
+
+## Cursor Task Rules
+
+When asking Cursor to implement work:
+
+1. Point it to `SPECS.md` and this roadmap.
+2. Ask for one phase or one vertical slice at a time.
+3. Require tests for service logic before moving to the next phase.
+4. Require migrations for every schema change.
+5. Reject schema shortcuts that duplicate ingredient names, hardcode food categories as columns, or bypass aliases.
+6. Keep generated code aligned with existing repository patterns.
+
+## Suggested First Cursor Prompt
+
+```text
+Read SPECS.md and docs/CURSOR_ROADMAP.md.
+
+Implement Phase 0 and Phase 1 only:
+- FastAPI backend with /health
+- SQLAlchemy 2.x database setup
+- Alembic setup
+- PostgreSQL connection through DATABASE_URL
+- Docker Compose with api, worker placeholder, frontend placeholder, and db
+- React + Vite frontend shell that can display API health status
+- .env.example
+- basic backend tests
+
+Do not implement domain models yet except what is necessary for Alembic/bootstrap.
+Keep the repository structure aligned with docs/CURSOR_ROADMAP.md.
+```
+
+## Definition of Done for v1
+
+- Authenticated household users can manage dishes, recipes, ingredients, aliases, tags, ratings, and meal plans.
+- Weekly lunch and dinner plans can be created manually and generated automatically.
+- Shopping lists aggregate ingredients correctly without fake precision.
+- Telegram reminders work from the same shopping-list logic.
+- Cooking mode works on mobile.
+- Backups can be exported, imported, scheduled, retained, and restored.
+- Scheduler selections are explainable.
+- LLM-assisted entry is optional and draft-only.
