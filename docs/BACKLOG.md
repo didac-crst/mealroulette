@@ -14,16 +14,23 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Phase 2 — Authentication and users**
+**Phase 3 — Core catalog data**
 
 Next deliverables:
 
-- User model and migration
-- Password hashing
-- `POST /api/auth/login`, `logout`, `refresh`, `GET /api/auth/me`
-- Role-based dependencies (`admin`, `user`)
-- Initial admin bootstrap flow
-- Unit and integration tests for auth
+- Dishes, recipes, recipe steps
+- Ingredients, aliases, units, tags, dish tags, seasonality
+- Catalog CRUD APIs and normalization flow
+- Seed data for base units and starter tag families
+
+---
+
+## Branch workflow
+
+Use one branch per milestone, then merge via pull request:
+
+- `phase-2/auth` — authentication and users
+- `phase-3/catalog` — next up
 
 ---
 
@@ -49,7 +56,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). Versions describe *what the pr
 - [x] Unit and integration test harness
 - [x] Pre-commit hook and CI test workflow
 - [x] Basic frontend shell
-- [ ] Users / auth
+- [x] Users / auth
 - [ ] Dishes
 - [ ] Recipes
 - [ ] Recipe steps
@@ -127,8 +134,8 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | --- | --- | --- | --- |
 | 0 | Project bootstrap | v0.1 | Done |
 | 1 | Backend foundation | v0.1 | Done |
-| 2 | Authentication and users | v0.1 | **Next** |
-| 3 | Core catalog data | v0.1 | Not started |
+| 2 | Authentication and users | v0.1 | Done |
+| 3 | Core catalog data | v0.1 | **Next** |
 | 4 | Frontend shell and dish library | v0.1 | Not started |
 | 5 | Manual meal planning | v0.2 | Not started |
 | 6 | Shopping lists | v0.3 | Not started |
@@ -162,14 +169,17 @@ Completed in `9f88c54`.
 - [x] Test database fixture strategy
 - [x] `/api/health/ready` database connectivity check
 
-### Phase 2 — Authentication and users
+### Phase 2 — Authentication and users ✅
 
-- [ ] User model
-- [ ] Password hashing
-- [ ] Login / logout / refresh / me endpoints
-- [ ] Role-based dependencies
-- [ ] Initial admin bootstrap flow
-- [ ] Auth unit and integration tests
+Completed on branch `phase-2/auth`.
+
+- [x] User model and `002_users` migration
+- [x] Password hashing (bcrypt) and JWT access/refresh tokens
+- [x] Login / logout / refresh / me endpoints
+- [x] Role-based dependencies (`admin`, `user`)
+- [x] Admin user CRUD endpoints
+- [x] Initial admin bootstrap command
+- [x] Auth unit and integration tests
 
 ### Phases 3–12
 
@@ -194,8 +204,8 @@ Cross-reference for [docs/MVP.md](MVP.md). Checked items are done; the rest trac
 - [x] Pre-commit and CI
 - [x] FastAPI + PostgreSQL
 - [x] React + Vite frontend (shell only)
-- [ ] Username / password login
-- [ ] Admin and user roles
+- [x] Username / password login
+- [x] Admin and user roles
 - [ ] Dishes, recipes, ingredients, units, tags
 - [ ] Ingredient normalization flow
 - [ ] Weekly meal plan and manual assignment

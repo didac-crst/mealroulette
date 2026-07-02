@@ -5,6 +5,7 @@ from sqlalchemy import engine_from_config, pool
 
 from mealroulette.core.config import settings
 from mealroulette.db.base import Base
+import mealroulette.models  # noqa: F401
 
 config = context.config
 

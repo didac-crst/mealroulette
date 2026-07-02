@@ -75,6 +75,14 @@ pre-commit install
 
 Integration tests expect PostgreSQL at `TEST_DATABASE_URL`. The easiest local setup is `docker compose up db`.
 
+Bootstrap the first admin user after migrations:
+
+```bash
+cd backend
+alembic upgrade head
+python -m mealroulette.commands.bootstrap_admin --username admin --email admin@example.com --password your-secure-password
+```
+
 ## Suggested Cursor Prompt
 
 ```text

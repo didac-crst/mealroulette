@@ -39,6 +39,7 @@ jobs:
         env:
           TEST_DATABASE_URL: postgresql+psycopg://mealroulette:mealroulette@localhost:5432/mealroulette_test
           DATABASE_URL: postgresql+psycopg://mealroulette:mealroulette@localhost:5432/mealroulette_test
+          SECRET_KEY: test-secret-key-that-is-long-enough-for-hs256
         run: |
           cd backend
           pytest
