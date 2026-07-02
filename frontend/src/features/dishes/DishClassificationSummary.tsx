@@ -4,10 +4,10 @@ import {
   COURSE_OPTIONS,
   MONTH_OPTIONS,
   PROTEIN_OPTIONS,
+  SEASONALITY_MODE_OPTIONS,
   STYLE_OPTIONS,
   TEMPERATURE_OPTIONS,
   formatOptionLabel,
-  formatTagName,
   selectedTagNames,
 } from "./classification";
 import { formatDifficulty } from "./constants";
@@ -146,7 +146,7 @@ export function DishClassificationSummary({ dish, tags }: Props) {
           <h3 className="section-title">Seasonality</h3>
           <p>
             <span className="muted">Mode: </span>
-            {formatTagName(dish.seasonality.seasonality_mode)}
+            {formatOptionLabel(SEASONALITY_MODE_OPTIONS, dish.seasonality.seasonality_mode)}
           </p>
           {dish.seasonality.seasonality_mode === "seasonal" && dish.seasonality.preferred_months.length > 0 ? (
             <p>

@@ -225,7 +225,7 @@ Implementation notes:
 
 - Reference units and tags live in `backend/mealroulette/data/reference/*.yaml` and are loaded idempotently after migrations (`seed_reference_data` CLI / API entrypoint).
 - Unit compatibility and aggregation rules are implemented in `mealroulette.services.quantities` (consumed by Phase 6 shopping lists).
-- Alembic revisions `004`–`010` add recipe difficulty, dish classification, recipe ownership, `is_main`, `image_url`, and simplified course enum — see root [README.md](../README.md#database-migrations-alembic).
+- Alembic revisions `005`–`010` extend catalog classification, recipe ownership, main recipe, image URL, and simplified course enum (`004` is a no-op placeholder) — see root [README.md](../README.md#database-migrations-alembic).
 
 ### Phase 4 - Frontend Shell and Dish Library
 

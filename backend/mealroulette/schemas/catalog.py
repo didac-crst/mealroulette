@@ -250,7 +250,7 @@ class RecipePublic(BaseModel):
 class RecipeCreateRequest(BaseModel):
     variant_name: str = Field(min_length=1, max_length=128)
     description: str | None = None
-    recipe_type: RecipeType = RecipeType.standard
+    recipe_type: RecipeType | None = None
     is_main: bool | None = None
     is_thermomix: bool | None = None
     thermomix_model: str | None = Field(default=None, max_length=32)
@@ -290,16 +290,12 @@ class DishPublic(BaseModel):
     course: DishCourse | None
     status: DishStatus
     image_url: str | None
-    vegetable_level: VegetableLevel | None
-    dominant_protein: str | None
-    dominant_carb: str | None
     suitable_for_lunch: bool | None
     suitable_for_dinner: bool | None
     weekday_friendly: bool | None
     leftovers_possible: bool | None
     freezer_friendly: bool | None
     kids_friendly: bool | None
-    serving_temperature: ServingTemperature | None
     thermomix_possible: bool | None
     active: bool
     notes: str | None
@@ -323,17 +319,12 @@ class DishCreateRequest(BaseModel):
     course: DishCourse | None = None
     status: DishStatus = DishStatus.active
     image_url: str | None = Field(default=None, max_length=512)
-    vegetable_level: VegetableLevel | None = None
-    dominant_protein: str | None = Field(default=None, max_length=64)
-    dominant_carb: str | None = Field(default=None, max_length=64)
     suitable_for_lunch: bool | None = None
     suitable_for_dinner: bool | None = None
     weekday_friendly: bool | None = None
     leftovers_possible: bool | None = None
     freezer_friendly: bool | None = None
     kids_friendly: bool | None = None
-    serving_temperature: ServingTemperature | None = None
-    thermomix_possible: bool | None = None
     active: bool = True
     notes: str | None = None
     tag_ids: list[int] = Field(default_factory=list)
@@ -350,17 +341,12 @@ class DishUpdateRequest(BaseModel):
     course: DishCourse | None = None
     status: DishStatus | None = None
     image_url: str | None = Field(default=None, max_length=512)
-    vegetable_level: VegetableLevel | None = None
-    dominant_protein: str | None = Field(default=None, max_length=64)
-    dominant_carb: str | None = Field(default=None, max_length=64)
     suitable_for_lunch: bool | None = None
     suitable_for_dinner: bool | None = None
     weekday_friendly: bool | None = None
     leftovers_possible: bool | None = None
     freezer_friendly: bool | None = None
     kids_friendly: bool | None = None
-    serving_temperature: ServingTemperature | None = None
-    thermomix_possible: bool | None = None
     active: bool | None = None
     notes: str | None = None
     tag_ids: list[int] | None = None

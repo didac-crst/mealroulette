@@ -139,9 +139,11 @@ export function RecipeEditPage() {
           setForm((current) => ({ ...current, is_main: true }));
         }
       })
-      .catch(() => {
+      .catch((err) => {
         setDish(null);
         setTags([]);
+        setExistingRecipeCount(0);
+        setError(err instanceof ApiError ? err.message : "Failed to load dish");
       });
   }, [accessToken, dishIdNum, isNew]);
 
@@ -768,6 +770,9 @@ function AddIngredientEditor({
       });
       onAdded();
     } catch (err) {
+      if (err instanceof Error && err.message === "Ingredient selection cancelled") {
+        return;
+      }
       setMessage(err instanceof ApiError ? err.message : err instanceof Error ? err.message : "Failed to add ingredient");
     } finally {
       setSubmitting(false);

@@ -212,7 +212,7 @@ Design notes:
 
 - **Reference data** lives in YAML, not Alembic data migrations. Re-running the seed only inserts missing rows.
 - **Unit guardrails** are enforced in `services/quantities.py`, not in the spec. Shopping lists (Phase 6) must call `aggregate_by_ingredient()` rather than ad-hoc math.
-- **Migrations `004`–`010`** extend catalog classification, recipe ownership, main recipe, image URL, and course enum — see [README.md](../README.md#database-migrations-alembic).
+- **Migrations `005`–`010`** extend catalog classification, recipe ownership, main recipe, image URL, and course enum (`004` is a no-op placeholder) — see [README.md](../README.md#database-migrations-alembic).
 
 ### Phase 4 — Frontend shell and dish library ✅
 

@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           clearSession();
         }
       } else {
-        clearSession();
+        // Keep stored tokens on transient errors; session restore can retry on reload.
       }
     } finally {
       setLoading(false);

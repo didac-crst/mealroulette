@@ -29,7 +29,6 @@ export type Dish = {
   leftovers_possible: boolean | null;
   freezer_friendly: boolean | null;
   kids_friendly: boolean | null;
-  serving_temperature: "hot" | "cold" | "room" | "either" | null;
   thermomix_possible: boolean | null;
   active: boolean;
   notes: string | null;

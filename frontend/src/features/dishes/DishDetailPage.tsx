@@ -28,6 +28,7 @@ type RecipeSummary = {
 export function DishDetailPage() {
   const { dishId } = useParams();
   const id = Number(dishId);
+  const hasValidId = dishId !== undefined && Number.isFinite(id) && id > 0;
   const navigate = useNavigate();
   const { accessToken, isAdmin } = useAuth();
   const [dish, setDish] = useState<Dish | null>(null);
@@ -39,7 +40,7 @@ export function DishDetailPage() {
   const [deleting, setDeleting] = useState(false);
 
   const load = useCallback(async () => {
-    if (!accessToken || !id) {
+    if (!accessToken || !hasValidId) {
       return;
     }
     setLoading(true);
@@ -67,11 +68,19 @@ export function DishDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [accessToken, id]);
+  }, [accessToken, hasValidId, id]);
 
   useEffect(() => {
+    if (!accessToken) {
+      return;
+    }
+    if (!hasValidId) {
+      setError("Invalid dish");
+      setLoading(false);
+      return;
+    }
     void load();
-  }, [load]);
+  }, [accessToken, hasValidId, load]);
 
   async function handleDelete() {
     if (!accessToken) {
