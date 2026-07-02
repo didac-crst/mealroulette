@@ -510,6 +510,37 @@ volumes:
 
 ## 7. Data Model
 
+### 7.0 Catalog implementation (v0.1)
+
+This subsection describes what is **implemented today**. Later sections may describe planned behaviour for scheduling and future versions.
+
+**Dish vs recipe**
+
+| Layer | Owns |
+| --- | --- |
+| **Dish** | Meal concept: name, description, optional `image_url`, course (`starter` \| `main` \| `dessert`), status, food-profile tags, planning flags, seasonality, notes |
+| **Recipe** | Preparation variant: variant name, servings, `recipe_type`, difficulty, prep/cook times, ingredients, steps, source URL, notes |
+
+**Computed dish fields (API read, not edited on dish)**
+
+- `default_prep_time_minutes`, `default_cook_time_minutes`, `default_difficulty` — from the **main** recipe (`is_main`; first recipe by default).
+- `thermomix_possible` — `true` if any recipe has `recipe_type = thermomix`.
+
+**Seasonality (UI and API write)**
+
+- `seasonality_mode`: `all_year` or `seasonal`
+- `preferred_months`: month numbers when mode is `seasonal`
+- Legacy DB columns (`allowed_months`, `excluded_months`, `seasonality_strength`) exist but are cleared on save and not shown in the UI.
+
+**Tags (seeded)**
+
+See `backend/mealroulette/data/reference/tags.yaml` — families: `protein`, `carb`, `style`, `temperature`. No cuisine or dietary tags on dishes in v0.1 (dietary inference from ingredients is planned).
+
+**Frontend (v0.1)**
+
+- Login, dish card library, dish detail, dish edit, recipe view/edit with ingredients and steps.
+- Not yet: dish search/filters, meal planning screens, shopping list, cooking mode, Telegram.
+
 ### 7.1 Users
 
 Stores application users.
@@ -540,35 +571,45 @@ Examples:
 - Chicken curry
 - Lentil soup
 
-Fields:
+Fields (v0.1):
 
 - id
 - name
 - description
-- default_servings
-- prep_time_minutes
-- cook_time_minutes
-- difficulty
-- active
+- image_url (optional; card/detail show emoji placeholder by course if unset)
+- course (`starter`, `main`, `dessert`)
+- status (`draft`, `active`, `archived`)
+- suitable_for_lunch, suitable_for_dinner, weekday_friendly, leftovers_possible, freezer_friendly, kids_friendly (nullable booleans)
 - notes
-- created_at
-- updated_at
+- tag_ids (via dish_tags)
+- seasonality (optional; see §7.12)
+- created_at, updated_at
+
+Computed on read (from recipes):
+
+- default_prep_time_minutes, default_cook_time_minutes, default_difficulty (main recipe)
+- thermomix_possible (any thermomix recipe)
+
+Legacy columns remain in the database but are not used in v0.1 UI/API writes: `default_servings`, `vegetable_level`, `dominant_protein`, `dominant_carb`, `serving_temperature`, stored default time/difficulty columns.
 
 ### 7.3 Recipes
 
 A recipe is a concrete preparation variant of a dish.
 
-Fields:
+Fields (v0.1):
 
 - id
 - dish_id
 - variant_name
 - description
-- is_thermomix
+- recipe_type (`standard`, `thermomix`, `other_appliance`)
+- is_main (boolean; one per dish; first recipe defaults to main)
+- is_thermomix (derived from recipe_type)
 - source_url
 - servings
 - prep_time_minutes
 - cook_time_minutes
+- difficulty (`easy`, `medium`, `hard`)
 - notes
 - created_at
 - updated_at
@@ -774,67 +815,56 @@ Fields:
 - created_at
 - updated_at
 
-Recommended tag families:
+Recommended tag families (v0.1 seed — see `backend/mealroulette/data/reference/tags.yaml`):
 
 ```yaml
 protein:
-  - fish
-  - seafood
-  - beef
-  - pork
+  - none_vegetables
   - chicken
   - turkey
+  - beef
+  - pork
+  - lamb
+  - duck
+  - fish
+  - seafood
   - eggs
+  - cheese_dairy
   - legumes
-  - cheese
-  - vegetarian
-  - vegan
+  - tofu_soy
+  - mixed
+  - other
 carb:
   - pasta
   - rice
   - potato
-  - bread
-  - couscous
+  - sweet_potato
+  - bread_dough_pastry
+  - couscous_semolina
   - quinoa
-  - none
+  - noodles
+  - legumes
+  - other
 style:
   - soup
   - stew
-  - salad
   - oven
-  - grilled
-  - fried
-  - curry
-  - wok
   - gratin
-  - sandwich
-  - tortilla
-  - quiche
+  - curry
+  - salad
+  - tart_quiche
+  - pasta_dish
+  - rice_dish
+  - bowl
+  - wok
+  - fried
+  - dip_spread
 temperature:
   - hot
   - cold
-cuisine:
-  - french
-  - spanish
-  - catalan
-  - italian
-  - asian
-  - indian
-  - mexican
-  - german
-effort:
-  - quick
-  - batch-cooking
-  - lazy
-  - weekend
-family:
-  - kids-friendly
-  - leftovers
-  - freezer-friendly
-meal_slot:
-  - lunch
-  - dinner
 ```
+
+Planned for later (not in v0.1 seed): `dietary` (infer from recipe ingredients), `cuisine`, `effort`, `meal_slot` as tags.
 
 ### 7.11 Dish Tags
 
@@ -849,42 +879,22 @@ Fields:
 
 Seasonality should not be represented only as tags.
 
-Use structured fields.
+Use structured fields in `dish_seasonality`.
 
-Fields may be stored directly on dishes or in a separate dish_seasonality table.
-
-Recommended fields:
+Fields (v0.1 UI and API):
 
 - dish_id
-- seasonality_mode
-- preferred_months
-- allowed_months
-- excluded_months
-- seasonality_strength
+- seasonality_mode (`all_year` or `seasonal`)
+- preferred_months (used when mode is `seasonal`)
 
-Allowed seasonality_mode values:
-
-- all_year
-- seasonal
-- avoid
-- strict
-
-Allowed seasonality_strength values:
-
-- neutral
-- low
-- medium
-- strong
+Legacy columns (`allowed_months`, `excluded_months`, `seasonality_strength`, modes `avoid` / `strict`) remain in the database for migration compatibility but are not used in v0.1.
 
 Example all-year dish:
 
 ```json
 {
   "seasonality_mode": "all_year",
-  "preferred_months": [],
-  "allowed_months": [1,2,3,4,5,6,7,8,9,10,11,12],
-  "excluded_months": [],
-  "seasonality_strength": "neutral"
+  "preferred_months": []
 }
 ```
 
@@ -893,22 +903,7 @@ Example summer dish:
 ```json
 {
   "seasonality_mode": "seasonal",
-  "preferred_months": [6,7,8,9],
-  "allowed_months": [5,6,7,8,9],
-  "excluded_months": [11,12,1,2],
-  "seasonality_strength": "strong"
-}
-```
-
-Example winter soup:
-
-```json
-{
-  "seasonality_mode": "seasonal",
-  "preferred_months": [10,11,12,1,2,3],
-  "allowed_months": [9,10,11,12,1,2,3,4],
-  "excluded_months": [6,7,8],
-  "seasonality_strength": "medium"
+  "preferred_months": [6, 7, 8, 9]
 }
 ```
 
@@ -917,6 +912,8 @@ Important rule:
 All-year does not mean "similar to all seasons".
 
 All-year means seasonally neutral.
+
+Planned scheduler behaviour (v0.5+): score by preferred months; `all_year` dishes score neutrally.
 
 ### 7.13 Ratings
 
@@ -1177,19 +1174,17 @@ Similarity should be based on:
 - shared protein tags
 - shared carb tags
 - shared style tags
-- shared cuisine tags
 - ingredient overlap
 - seasonality similarity as a small component
 
-Example formula:
+Example formula (v0.5+ scheduler; cuisine removed — not used in v0.1 tags):
 
 ```text
 similarity =
-  0.35 * protein_similarity
-+ 0.25 * carb_similarity
+  0.40 * protein_similarity
++ 0.30 * carb_similarity
 + 0.20 * style_similarity
-+ 0.10 * ingredient_similarity
-+ 0.05 * cuisine_similarity
++ 0.05 * ingredient_similarity
 + 0.05 * seasonality_similarity
 ```
 
@@ -1221,30 +1216,27 @@ Examples:
 
 ## 11. Seasonality Planning Logic
 
-For a target month, the scheduler should score dishes based on seasonality.
+For a target month, the scheduler should score dishes based on seasonality (planned v0.5+).
 
-Example scoring:
+Example scoring (v0.1 seasonality model):
 
 ```text
-if month in preferred_months:
-    add strong positive score
-elif month in allowed_months:
-    add small positive score
-elif month in excluded_months:
-    penalize or block
-elif seasonality_mode == all_year:
+if seasonality_mode == all_year:
     add small neutral score
+elif month in preferred_months:
+    add strong positive score
+else:
+    add small penalty or neutral score
 ```
 
 Example July scores:
 
 | Dish | Seasonality | July score |
 | --- | --- | --- |
-| Gazpacho | strong summer | high |
-| Pasta salad | summer/autumn | good |
-| Carbonara | all-year | neutral |
-| Lentil soup | winter | bad |
-| Raclette | winter strict | blocked |
+| Gazpacho | seasonal (summer months) | high |
+| Pasta salad | seasonal (summer/autumn) | good |
+| Carbonara | all_year | neutral |
+| Lentil soup | seasonal (winter months) | low |
 
 ## 12. Scheduler Design
 
@@ -1537,9 +1529,11 @@ Actions:
 
 #### Dish Library
 
-Searchable and filterable dish list.
+Searchable and filterable dish list (filters — planned; v0.1 has card grid only).
 
-Filters:
+**Implemented in v0.1:** card grid with optional `image_url` or course emoji, course and difficulty from main recipe, link to dish detail.
+
+Filters (planned):
 
 - fish
 - meat
@@ -1563,38 +1557,51 @@ Shows:
 
 - dish name
 - description
-- rating
-- tags
-- ingredients
+- image or emoji
+- classification summary (course, food profile tags, planning profile, seasonality)
 - recipe variants
-- seasonality
-- last cooked date
 - notes
 
-Actions:
+**Implemented in v0.1.** Not yet: rating, last cooked date, start cooking.
 
-- edit
-- rate
+Actions (v0.1):
+
+- edit dish
 - add recipe variant
+- view/edit recipes
+
+Actions (planned):
+
+- rate
 - start cooking
 
 #### Add / Edit Dish
 
-Two modes:
+**Implemented in v0.1 (manual mode only):**
 
-- manual mode
-- LLM-assisted mode
+- name, description, optional image URL
+- course (starter, main, dessert)
+- status
+- food profile tags (protein, carb, style, temperature)
+- planning profile (lunch/dinner suitability, weekday-friendly, kids-friendly, leftovers, freezer-friendly)
+- seasonality (all year or seasonal + preferred months)
+- notes
 
-Manual mode:
+Recipe variants are edited on separate recipe routes after the dish exists.
+
+Two modes (full spec):
+
+- manual mode ✅ (v0.1)
+- LLM-assisted mode (v0.6+)
+
+Manual mode (legacy spec list — preparation lives on recipes in v0.1):
 
 - name
 - description
-- ingredients
 - tags
 - seasonality
-- recipe steps
-- Thermomix metadata
 - notes
+- recipe variants (ingredients, steps, times on recipe editor)
 
 LLM-assisted mode:
 
@@ -1713,15 +1720,9 @@ Backup settings:
 - unit and integration test harness
 - pre-commit hook and CI test workflow
 - users/auth
-- dishes
-- recipes
-- recipe steps
-- ingredients
-- ingredient aliases
-- units
-- tags
-- dish tags
-- basic frontend shell
+- dishes, recipes, recipe steps, ingredients, ingredient aliases, units, tags, dish tags, seasonality
+- dish library UI (login, card list, dish/recipe CRUD, ingredients, steps, tags)
+- Alembic migrations through `010_dish_course_simplify`
 
 ### v0.2 - Manual Planning
 

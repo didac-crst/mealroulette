@@ -1,0 +1,36 @@
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+
+import { AppLayout } from "../app/AppLayout";
+import { AuthProvider } from "../features/auth/AuthContext";
+import { LoginPage } from "../features/auth/LoginPage";
+import { DishDetailPage } from "../features/dishes/DishDetailPage";
+import { DishEditPage } from "../features/dishes/DishEditPage";
+import { DishListPage } from "../features/dishes/DishListPage";
+import { RecipeDetailPage } from "../features/dishes/RecipeDetailPage";
+import { RecipeEditPage } from "../features/dishes/RecipeEditPage";
+import { ProtectedRoute } from "./ProtectedRoute";
+
+export function AppRouter() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route element={<AppLayout />}>
+              <Route index element={<Navigate to="/dishes" replace />} />
+              <Route path="dishes" element={<DishListPage />} />
+              <Route path="dishes/new" element={<DishEditPage />} />
+              <Route path="dishes/:dishId" element={<DishDetailPage />} />
+              <Route path="dishes/:dishId/edit" element={<DishEditPage />} />
+              <Route path="dishes/:dishId/recipes/new" element={<RecipeEditPage />} />
+              <Route path="dishes/:dishId/recipes/:recipeId" element={<RecipeDetailPage />} />
+              <Route path="dishes/:dishId/recipes/:recipeId/edit" element={<RecipeEditPage />} />
+            </Route>
+          </Route>
+          <Route path="*" element={<Navigate to="/dishes" replace />} />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}

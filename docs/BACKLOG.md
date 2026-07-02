@@ -14,7 +14,9 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Phase 4 — Frontend shell and dish library**
+**v0.1 release** — Phase 4 is complete on branch `phase-4/frontend`. Merge, then tag `v0.1.0` per [RELEASES.md](RELEASES.md).
+
+**Next:** Phase 5 — manual meal planning (v0.2).
 
 ---
 
@@ -22,9 +24,9 @@ Update this file when a phase or version milestone lands.
 
 Use one branch per milestone, then merge via pull request:
 
-- `phase-2/auth` — authentication and users
+- `phase-2/auth` — authentication and users (merged)
 - `phase-3/catalog` — core catalog (merged)
-- `phase-4/frontend` — next up
+- `phase-4/frontend` — dish library UI (**ready to merge**)
 
 ---
 
@@ -34,7 +36,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 
 | Version | Theme | Status |
 | --- | --- | --- |
-| **v0.1** | Foundation — platform, auth, catalog (API + UI), basic frontend | **In progress** (Phases 0–3 done, Phase 4 remaining) |
+| **v0.1** | Foundation — platform, auth, catalog (API + UI), basic frontend | **Ready to release** (Phase 4 done; tag after merge) |
 | **v0.2** | Manual planning — weekly plan, meal actions, ratings, history | Not started |
 | **v0.3** | Shopping list — generation, aggregation, pantry filter, UI | Not started |
 | **v0.4** | Telegram reminders — settings, scheduled and manual send | Not started |
@@ -42,7 +44,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.6** | LLM-assisted entry — draft enrichment, review before save | Not started |
 | **v1.0** | Stable home version — mobile UI, backups, auth, scheduler, cooking mode | Not started |
 
-> **v0.1 is not released yet.** Backend catalog APIs exist, but households cannot manage dishes from the UI until Phase 4 lands. Tag `v0.1.0` only after Phase 4 merges.
+> **v0.1 is ready to tag** after `phase-4/frontend` merges. The dish library UI is functional for household recipe entry. Tag `v0.1.0` on the merge commit — see [RELEASES.md](RELEASES.md).
 
 ### v0.1 — Foundation
 
@@ -66,13 +68,17 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [x] Units and tags, dish tags
 - [x] Ingredient normalization flow (resolve / confirm)
 
-**Frontend (Phase 4 — not done)**
+**Frontend (Phase 4)**
 
-- [x] Dev shell (health check page only)
-- [ ] Login screen
-- [ ] Authenticated app layout
-- [ ] Dish list, detail, and add/edit forms
-- [ ] Recipe, step, tag, and ingredient selection in UI
+- [x] Login screen
+- [x] Authenticated app layout (nav, protected routes)
+- [x] Dish library (card grid, image URL or emoji placeholder)
+- [x] Dish detail (read-only classification, recipe variant cards)
+- [x] Dish add/edit (basic info, food profile tags, planning profile, seasonality)
+- [x] Recipe variant add/edit (basics, ingredients, steps, main-recipe flag)
+- [x] Ingredient resolve/confirm flow in recipe editor
+- [x] Tag selection (protein, carb, style, temperature families)
+- [ ] Dish library search and filters (spec filters — future polish)
 
 ### v0.2 — Manual Planning
 
@@ -144,8 +150,8 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 1 | Backend foundation | v0.1 | Done |
 | 2 | Authentication and users | v0.1 | Done |
 | 3 | Core catalog data | v0.1 | Done |
-| 4 | Frontend shell and dish library | v0.1 | **Next** |
-| 5 | Manual meal planning | v0.2 | Not started |
+| 4 | Frontend shell and dish library | v0.1 | **Done** (branch `phase-4/frontend`) |
+| 5 | Manual meal planning | v0.2 | **Next** |
 | 6 | Shopping lists | v0.3 | Not started |
 | 7 | Telegram reminders | v0.4 | Not started |
 | 8 | Explainable scheduler | v0.5 | Not started |
@@ -206,8 +212,23 @@ Design notes:
 
 - **Reference data** lives in YAML, not Alembic data migrations. Re-running the seed only inserts missing rows.
 - **Unit guardrails** are enforced in `services/quantities.py`, not in the spec. Shopping lists (Phase 6) must call `aggregate_by_ingredient()` rather than ad-hoc math.
+- **Migrations `005`–`010`** extend catalog classification, recipe ownership, main recipe, image URL, and course enum (`004` is a no-op placeholder) — see [README.md](../README.md#database-migrations-alembic).
 
-### Phases 4–12
+### Phase 4 — Frontend shell and dish library ✅
+
+On branch `phase-4/frontend` (ready to merge).
+
+- [x] Login, auth context, protected routes
+- [x] Dish card library, detail, structured edit form
+- [x] Separate recipe routes (view/edit), ingredients and steps
+- [x] Dish vs recipe boundary: dish owns classification/planning; recipe owns preparation and times
+- [x] Main recipe (`is_main`) drives displayed dish difficulty and prep/cook times
+- [x] `thermomix_possible` derived from recipe variants (not edited on dish)
+- [x] Seasonality: `all_year` or `seasonal` + preferred months only
+- [x] Food profile tags: protein, carb, style, temperature (no cuisine, dietary, or dominant fields in UI)
+- [x] Course: starter, main, or dessert
+
+### Phases 5–12
 
 See [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) for full deliverables and acceptance criteria per phase.
 
@@ -241,7 +262,8 @@ Cross-reference for [docs/MVP.md](MVP.md). Checked items are done; the rest trac
 - [x] Automated unit and integration tests
 - [x] Pre-commit and CI
 - [x] FastAPI + PostgreSQL
-- [x] React + Vite frontend (dev shell only — not the dish library)
+- [x] React + Vite frontend with login and dish library
+- [x] Dish list, detail, edit, recipe variants, steps, and ingredients (UI)
 - [x] Username / password login (API)
 - [x] Admin and user roles
 - [x] Dishes, recipes, ingredients, units, tags (API)

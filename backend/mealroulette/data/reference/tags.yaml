@@ -1,39 +1,83 @@
 # Starter tag families for dish classification.
-# Users can add more tags via the API; this file only bootstraps common defaults.
+# Structured UI maps these families to household-friendly sections.
 tags:
   - family: protein
-    name: fish
+    name: none_vegetables
   - family: protein
     name: chicken
   - family: protein
-    name: vegetarian
+    name: turkey
+  - family: protein
+    name: beef
+  - family: protein
+    name: pork
+  - family: protein
+    name: lamb
+  - family: protein
+    name: duck
+  - family: protein
+    name: fish
+  - family: protein
+    name: seafood
+  - family: protein
+    name: eggs
+  - family: protein
+    name: cheese_dairy
   - family: protein
     name: legumes
+  - family: protein
+    name: tofu_soy
+  - family: protein
+    name: mixed
+  - family: protein
+    name: other
   - family: carb
     name: pasta
   - family: carb
     name: rice
   - family: carb
     name: potato
+  - family: carb
+    name: sweet_potato
+  - family: carb
+    name: bread_dough_pastry
+  - family: carb
+    name: couscous_semolina
+  - family: carb
+    name: quinoa
+  - family: carb
+    name: noodles
+  - family: carb
+    name: legumes
+  - family: carb
+    name: other
   - family: style
     name: soup
   - family: style
-    name: salad
+    name: stew
   - family: style
     name: oven
+  - family: style
+    name: gratin
+  - family: style
+    name: curry
+  - family: style
+    name: salad
+  - family: style
+    name: tart_quiche
+  - family: style
+    name: pasta_dish
+  - family: style
+    name: rice_dish
+  - family: style
+    name: bowl
+  - family: style
+    name: wok
+  - family: style
+    name: fried
+  - family: style
+    name: dip_spread
   - family: temperature
     name: hot
   - family: temperature
     name: cold
-  - family: cuisine
-    name: spanish
-  - family: cuisine
-    name: italian
-  - family: effort
-    name: quick
-  - family: family
-    name: kids-friendly
-  - family: meal_slot
-    name: lunch
-  - family: meal_slot
-    name: dinner

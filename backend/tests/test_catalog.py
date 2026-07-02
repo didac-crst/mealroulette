@@ -108,15 +108,10 @@ def test_full_dish_recipe_flow(client, catalog_seed, admin_headers):
         json={
             "name": "Baked Salmon",
             "description": "Simple oven salmon",
-            "default_servings": 2,
-            "prep_time_minutes": 10,
-            "cook_time_minutes": 20,
-            "difficulty": "easy",
             "tag_ids": [fish_tag["id"]],
             "seasonality": {
                 "seasonality_mode": "seasonal",
                 "preferred_months": [3, 4, 5, 9, 10],
-                "seasonality_strength": "medium",
             },
         },
     )
@@ -126,14 +121,24 @@ def test_full_dish_recipe_flow(client, catalog_seed, admin_headers):
     assert fish_tag["id"] in dish_body["tag_ids"]
     assert dish_body["seasonality"]["seasonality_mode"] == "seasonal"
     assert dish_body["seasonality"]["preferred_months"] == [3, 4, 5, 9, 10]
+    assert dish_body["default_prep_time_minutes"] is None
 
     recipe = client.post(
         f"/api/dishes/{dish_body['id']}/recipes",
         headers=admin_headers,
-        json={"variant_name": "default", "servings": 2, "is_thermomix": False},
+        json={
+            "variant_name": "default",
+            "servings": 2,
+            "prep_time_minutes": 10,
+            "cook_time_minutes": 20,
+            "difficulty": "easy",
+            "is_thermomix": False,
+        },
     )
     assert recipe.status_code == 201
-    recipe_id = recipe.json()["id"]
+    recipe_body = recipe.json()
+    assert recipe_body["is_main"] is True
+    recipe_id = recipe_body["id"]
 
     step = client.post(
         f"/api/recipes/{recipe_id}/steps",
@@ -167,7 +172,12 @@ def test_full_dish_recipe_flow(client, catalog_seed, admin_headers):
 
     detail = client.get(f"/api/dishes/{dish_body['id']}", headers=admin_headers)
     assert detail.status_code == 200
-    assert detail.json()["name"] == "Baked Salmon"
+    detail_body = detail.json()
+    assert detail_body["name"] == "Baked Salmon"
+    assert detail_body["default_prep_time_minutes"] == 10
+    assert detail_body["default_cook_time_minutes"] == 20
+    assert detail_body["default_difficulty"] == "easy"
+    assert detail_body["thermomix_possible"] is False
 
     steps = client.get(f"/api/recipes/{recipe_id}/steps", headers=admin_headers)
     assert steps.status_code == 200

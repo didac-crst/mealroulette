@@ -17,7 +17,7 @@ from mealroulette.models.catalog import (
     Tag,
     Unit,
 )
-from mealroulette.models.enums import SeasonalityMode, SeasonalityStrength
+from mealroulette.models.enums import DishStatus, RecipeType, SeasonalityMode, SeasonalityStrength
 from mealroulette.schemas.catalog import (
     DishCreateRequest,
     DishPublic,
@@ -50,30 +50,95 @@ def normalize_name(value: str) -> str:
 
 
 class CatalogService:
+    _INHERITED_DISH_FIELDS = frozenset(
+        {
+            "default_prep_time_minutes",
+            "default_cook_time_minutes",
+            "default_difficulty",
+            "serving_temperature",
+            "thermomix_possible",
+            "vegetable_level",
+            "dominant_protein",
+            "dominant_carb",
+        }
+    )
+
     def __init__(self, db: Session):
         self.db = db
 
     @staticmethod
-    def to_ingredient_public(ingredient: Ingredient) -> IngredientPublic:
-        return IngredientPublic.model_validate(ingredient)
+    def _main_recipe(dish: Dish) -> Recipe | None:
+        if not dish.recipes:
+            return None
+        mains = [recipe for recipe in dish.recipes if recipe.is_main]
+        if len(mains) == 1:
+            return mains[0]
+        if len(mains) > 1:
+            return min(mains, key=lambda recipe: recipe.id)
+        return min(dish.recipes, key=lambda recipe: recipe.id)
 
     @staticmethod
-    def to_dish_public(dish: Dish) -> DishPublic:
+    def _thermomix_possible_from_recipes(recipes: list[Recipe]) -> bool | None:
+        if not recipes:
+            return None
+        return any(recipe.recipe_type == RecipeType.thermomix or recipe.is_thermomix for recipe in recipes)
+
+    @classmethod
+    def to_dish_public(cls, dish: Dish) -> DishPublic:
+        main_recipe = cls._main_recipe(dish)
         return DishPublic(
             id=dish.id,
             name=dish.name,
             description=dish.description,
             default_servings=dish.default_servings,
-            prep_time_minutes=dish.prep_time_minutes,
-            cook_time_minutes=dish.cook_time_minutes,
-            difficulty=dish.difficulty,
-            active=dish.active,
+            default_prep_time_minutes=main_recipe.prep_time_minutes if main_recipe else None,
+            default_cook_time_minutes=main_recipe.cook_time_minutes if main_recipe else None,
+            default_difficulty=main_recipe.difficulty if main_recipe else None,
+            course=dish.course,
+            status=dish.status,
+            image_url=dish.image_url,
+            suitable_for_lunch=dish.suitable_for_lunch,
+            suitable_for_dinner=dish.suitable_for_dinner,
+            weekday_friendly=dish.weekday_friendly,
+            leftovers_possible=dish.leftovers_possible,
+            freezer_friendly=dish.freezer_friendly,
+            kids_friendly=dish.kids_friendly,
+            thermomix_possible=cls._thermomix_possible_from_recipes(dish.recipes),
+            active=dish.status == DishStatus.active,
             notes=dish.notes,
             created_at=dish.created_at,
             updated_at=dish.updated_at,
             tag_ids=[tag.id for tag in dish.tags],
             seasonality=SeasonalityPublic.model_validate(dish.seasonality) if dish.seasonality else None,
         )
+
+    @staticmethod
+    def to_ingredient_public(ingredient: Ingredient) -> IngredientPublic:
+        return IngredientPublic.model_validate(ingredient)
+
+    def _set_main_recipe(self, dish_id: int, recipe_id: int) -> None:
+        recipes = list(self.db.scalars(select(Recipe).where(Recipe.dish_id == dish_id)))
+        for recipe in recipes:
+            recipe.is_main = recipe.id == recipe_id
+
+    @staticmethod
+    def _resolve_recipe_type(
+        recipe_type: RecipeType | None,
+        is_thermomix: bool | None,
+        current: RecipeType = RecipeType.standard,
+    ) -> RecipeType:
+        if recipe_type is not None:
+            return recipe_type
+        if is_thermomix is True:
+            return RecipeType.thermomix
+        if is_thermomix is False and current == RecipeType.thermomix:
+            return RecipeType.standard
+        return current
+
+    @staticmethod
+    def _apply_recipe_type(recipe: Recipe, recipe_type: RecipeType) -> None:
+        recipe.recipe_type = recipe_type
+        recipe.is_thermomix = recipe_type == RecipeType.thermomix
 
     def list_units(self) -> list[Unit]:
         return list(self.db.scalars(select(Unit).order_by(Unit.dimension, Unit.name)))
@@ -301,15 +366,22 @@ class CatalogService:
         if dish.seasonality is None:
             dish.seasonality = DishSeasonality(dish_id=dish.id)
         dish.seasonality.seasonality_mode = payload.seasonality_mode
-        dish.seasonality.preferred_months = payload.preferred_months
-        dish.seasonality.allowed_months = payload.allowed_months
-        dish.seasonality.excluded_months = payload.excluded_months
-        dish.seasonality.seasonality_strength = payload.seasonality_strength
+        if payload.seasonality_mode == SeasonalityMode.all_year:
+            dish.seasonality.preferred_months = []
+        else:
+            dish.seasonality.preferred_months = payload.preferred_months
+        dish.seasonality.allowed_months = []
+        dish.seasonality.excluded_months = []
+        dish.seasonality.seasonality_strength = SeasonalityStrength.neutral
 
     def list_dishes(self, active_only: bool = False) -> list[Dish]:
-        query = select(Dish).options(selectinload(Dish.tags), selectinload(Dish.seasonality)).order_by(Dish.name)
+        query = (
+            select(Dish)
+            .options(selectinload(Dish.tags), selectinload(Dish.seasonality), selectinload(Dish.recipes))
+            .order_by(Dish.name)
+        )
         if active_only:
-            query = query.where(Dish.active.is_(True))
+            query = query.where(Dish.status == DishStatus.active)
         return list(self.db.scalars(query))
 
     def get_dish(self, dish_id: int) -> Dish:
@@ -329,10 +401,16 @@ class CatalogService:
             name=payload.name,
             description=payload.description,
             default_servings=payload.default_servings,
-            prep_time_minutes=payload.prep_time_minutes,
-            cook_time_minutes=payload.cook_time_minutes,
-            difficulty=payload.difficulty,
-            active=payload.active,
+            course=payload.course,
+            status=payload.status,
+            image_url=payload.image_url,
+            suitable_for_lunch=payload.suitable_for_lunch,
+            suitable_for_dinner=payload.suitable_for_dinner,
+            weekday_friendly=payload.weekday_friendly,
+            leftovers_possible=payload.leftovers_possible,
+            freezer_friendly=payload.freezer_friendly,
+            kids_friendly=payload.kids_friendly,
+            active=payload.status == DishStatus.active,
             notes=payload.notes,
         )
         self.db.add(dish)
@@ -345,9 +423,17 @@ class CatalogService:
 
     def update_dish(self, dish_id: int, payload: DishUpdateRequest) -> Dish:
         dish = self.get_dish(dish_id)
-        updates = payload.model_dump(exclude_unset=True, exclude={"tag_ids", "seasonality"})
+        updates = payload.model_dump(
+            exclude_unset=True,
+            exclude={"tag_ids", "seasonality", "active", *self._INHERITED_DISH_FIELDS},
+        )
         for field, value in updates.items():
             setattr(dish, field, value)
+        if "status" in payload.model_fields_set:
+            dish.active = dish.status == DishStatus.active
+        if "active" in payload.model_fields_set and payload.active is not None:
+            dish.status = DishStatus.active if payload.active else DishStatus.archived
+            dish.active = payload.active
         if "tag_ids" in payload.model_fields_set:
             self._apply_tags(dish, payload.tag_ids or [])
         if "seasonality" in payload.model_fields_set:
@@ -362,7 +448,13 @@ class CatalogService:
 
     def list_recipes(self, dish_id: int) -> list[Recipe]:
         self.get_dish(dish_id)
-        return list(self.db.scalars(select(Recipe).where(Recipe.dish_id == dish_id).order_by(Recipe.variant_name)))
+        return list(
+            self.db.scalars(
+                select(Recipe)
+                .where(Recipe.dish_id == dish_id)
+                .order_by(Recipe.is_main.desc(), Recipe.id)
+            )
+        )
 
     def get_recipe(self, recipe_id: int) -> Recipe:
         recipe = self.db.get(Recipe, recipe_id)
@@ -371,12 +463,19 @@ class CatalogService:
         return recipe
 
     def create_recipe(self, dish_id: int, payload: RecipeCreateRequest) -> Recipe:
-        self.get_dish(dish_id)
+        dish = self.get_dish(dish_id)
         if self.db.scalar(
             select(Recipe).where(Recipe.dish_id == dish_id, Recipe.variant_name == payload.variant_name)
         ):
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Recipe variant already exists")
-        recipe = Recipe(dish_id=dish_id, **payload.model_dump())
+        is_main = payload.is_main if payload.is_main is not None else len(dish.recipes) == 0
+        if is_main:
+            for existing in dish.recipes:
+                existing.is_main = False
+        data = payload.model_dump(exclude={"is_thermomix", "is_main"})
+        recipe_type = self._resolve_recipe_type(payload.recipe_type, payload.is_thermomix)
+        recipe = Recipe(dish_id=dish_id, is_main=is_main, **data)
+        self._apply_recipe_type(recipe, recipe_type)
         self.db.add(recipe)
         self.db.commit()
         self.db.refresh(recipe)
@@ -384,15 +483,50 @@ class CatalogService:
 
     def update_recipe(self, recipe_id: int, payload: RecipeUpdateRequest) -> Recipe:
         recipe = self.get_recipe(recipe_id)
-        for field, value in payload.model_dump(exclude_unset=True).items():
+        updates = payload.model_dump(exclude_unset=True, exclude={"is_thermomix", "recipe_type", "is_main"})
+        for field, value in updates.items():
             setattr(recipe, field, value)
+        if "recipe_type" in payload.model_fields_set or "is_thermomix" in payload.model_fields_set:
+            recipe_type = self._resolve_recipe_type(
+                payload.recipe_type if "recipe_type" in payload.model_fields_set else None,
+                payload.is_thermomix if "is_thermomix" in payload.model_fields_set else None,
+                recipe.recipe_type,
+            )
+            self._apply_recipe_type(recipe, recipe_type)
+        if "is_main" in payload.model_fields_set:
+            if payload.is_main:
+                self._set_main_recipe(recipe.dish_id, recipe.id)
+            elif recipe.is_main:
+                others = list(
+                    self.db.scalars(
+                        select(Recipe)
+                        .where(Recipe.dish_id == recipe.dish_id, Recipe.id != recipe.id)
+                        .order_by(Recipe.id)
+                    )
+                )
+                if not others:
+                    raise HTTPException(
+                        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                        detail="Cannot unset main recipe when it is the only variant",
+                    )
+                recipe.is_main = False
+                others[0].is_main = True
         self.db.commit()
         self.db.refresh(recipe)
         return recipe
 
     def delete_recipe(self, recipe_id: int) -> None:
         recipe = self.get_recipe(recipe_id)
+        dish_id = recipe.dish_id
+        was_main = recipe.is_main
         self.db.delete(recipe)
+        self.db.flush()
+        if was_main:
+            next_main = self.db.scalar(
+                select(Recipe).where(Recipe.dish_id == dish_id).order_by(Recipe.id).limit(1)
+            )
+            if next_main is not None:
+                next_main.is_main = True
         self.db.commit()
 
     def list_steps(self, recipe_id: int) -> list[RecipeStep]:

@@ -6,7 +6,7 @@ Git tags mark **product versions** users can run. We do not tag individual imple
 
 | Tag | When |
 | --- | --- |
-| `v0.1.0` | Phase 4 merges — foundation complete (platform, auth, catalog API + dish UI) |
+| `v0.1.0` | Phase 4 merges — foundation complete (platform, auth, catalog API + dish UI) — **ready to tag** |
 | `v0.2.0`, … | Each subsequent product version when its roadmap scope is fully shipped |
 
 Use [semantic versioning](https://semver.org/) at the product-version level: `vMAJOR.MINOR.PATCH`. Patch bumps are for fixes on an already-released version line.
@@ -30,7 +30,7 @@ git push origin v0.1.0
 
 | Tag | Commit | Date | What shipped |
 | --- | --- | --- | --- |
-| *(none yet)* | — | — | First tag will be `v0.1.0` after Phase 4 |
+| *(pending)* | `phase-4/frontend` merge | — | Tag `v0.1.0` after merge: platform, auth, catalog API, dish library UI |
 
 ## Check out a release
 

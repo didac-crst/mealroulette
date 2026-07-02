@@ -225,24 +225,36 @@ Implementation notes:
 
 - Reference units and tags live in `backend/mealroulette/data/reference/*.yaml` and are loaded idempotently after migrations (`seed_reference_data` CLI / API entrypoint).
 - Unit compatibility and aggregation rules are implemented in `mealroulette.services.quantities` (consumed by Phase 6 shopping lists).
+- Alembic revisions `005`–`010` extend catalog classification, recipe ownership, main recipe, image URL, and simplified course enum (`004` is a no-op placeholder) — see root [README.md](../README.md#database-migrations-alembic).
 
 ### Phase 4 - Frontend Shell and Dish Library
+
+**Status:** Done on branch `phase-4/frontend` (ready to merge for v0.1).
 
 Deliverables:
 
 - Login screen
 - Authenticated app layout
-- Dish list
+- Dish list (card grid with image URL or emoji placeholder)
 - Dish detail
-- Add/edit dish form
-- Recipe variant editing
-- Step editing
+- Add/edit dish form (structured food profile, planning profile, seasonality)
+- Recipe variant editing (separate routes; ingredients and steps)
 - Tag and ingredient selection
 
 Acceptance criteria:
 
 - A household can manually enter realistic recipes from the UI.
 - Mobile layout remains usable for dish creation and viewing.
+
+Implementation notes (v0.1):
+
+- **Dish vs recipe:** dishes hold name, course, tags, planning flags, seasonality, optional `image_url`; recipes hold variant name, servings, type, difficulty, prep/cook times, ingredients, and steps.
+- **Main recipe:** exactly one recipe per dish is `is_main` (first recipe by default). Dish-level difficulty and prep/cook shown in the UI come from the main recipe.
+- **`thermomix_possible`:** computed when any recipe has `recipe_type = thermomix` (read-only on dish).
+- **Course:** `starter`, `main`, or `dessert` only.
+- **Seasonality:** `all_year` or `seasonal` with `preferred_months` only (no strength / allowed / excluded modes in UI).
+- **Tags:** seeded families are `protein`, `carb`, `style`, `temperature` — see `backend/mealroulette/data/reference/tags.yaml`.
+- **Not in v0.1 UI:** dish library search/filters, dietary flags (planned: infer from recipe ingredients later), cuisine tags.
 
 ### Phase 5 - Manual Meal Planning
 

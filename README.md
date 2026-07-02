@@ -2,7 +2,7 @@
 
 MealRoulette is a self-hosted household meal planning app for deciding what to eat, planning lunch and dinner, generating shopping lists, sending Telegram reminders, and cooking from structured recipe steps.
 
-This repository currently contains the project specification and implementation roadmap intended for iterative development in Cursor.
+**v0.1 foundation** is implemented: auth, catalog API, and a dish library UI (login, dish cards, dish/recipe CRUD, ingredients, steps, tags, seasonality). Meal planning, shopping lists, Telegram, and the scheduler are not built yet — see [docs/BACKLOG.md](docs/BACKLOG.md).
 
 ## Documentation
 
@@ -86,6 +86,13 @@ When the app data model changes (new tables like `users`, `dishes`, etc.), the P
 - `001_initial` — bootstrap
 - `002_users` — users and refresh tokens
 - `003_catalog` — dishes, recipes, ingredients, units, tags
+- `004_seed_units_tags` — no-op (seed moved to startup CLI)
+- `005_recipe_difficulty` — recipe difficulty
+- `006_dish_classification` — dish course, status, planning fields
+- `007_dish_recipe_ownership` — dish defaults vs recipe overrides, recipe type
+- `008_recipe_is_main` — main recipe flag per dish
+- `009_dish_image_url` — optional dish image URL
+- `010_dish_course_simplify` — course limited to starter, main, dessert
 
 With Docker Compose, the **API container runs migrations automatically** on startup (`alembic upgrade head`), then loads **reference catalog data** (standard units and starter tags) from YAML if those rows are not already present.
 
