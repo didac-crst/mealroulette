@@ -278,6 +278,20 @@ Optional extra protection can be provided through:
 - reverse proxy authentication
 - VPN-only access
 
+#### Future: Passkeys (WebAuthn)
+
+After the username/password login flow and mobile UI are stable, the app may add optional passkey sign-in for iPhone and other devices.
+
+Requirements and constraints:
+
+- implement as an additional sign-in method, not a replacement for password login in v1
+- use standard WebAuthn in the React web UI (`navigator.credentials`) so Safari on iPhone can use Face ID / Touch ID
+- backend should verify challenges with a WebAuthn library and then issue the same JWT session model used today
+- requires HTTPS and a stable domain name for `rpId`; raw local IP access is usually not suitable for passkeys
+- self-hosted deployment should use TLS plus a real hostname, Tailscale hostname, or similar
+
+This is a post-MVP security enhancement, not part of the initial MVP.
+
 ### 3.10 Backup, Export and Import
 
 The app must support backup from the beginning.

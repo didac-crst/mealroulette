@@ -193,6 +193,18 @@ See [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) for full deliverables and accept
 | --- | --- | --- |
 | Free ports before Docker Compose startup | Done | `31a84b0` |
 
+## Future enhancements
+
+Tracked ideas that are intentionally not in the current milestone plan:
+
+### Passkeys (WebAuthn)
+
+- **Goal:** optional passwordless sign-in from iPhone Safari using Face ID / Touch ID
+- **When:** after login UI, HTTPS/domain setup, and normal mobile usage are working
+- **Complexity:** medium — standard libraries exist (`py_webauthn`, `@simplewebauthn/browser`), but deployment needs TLS and a stable hostname
+- **Approach:** add passkeys alongside username/password, not as the only auth method
+- **Spec reference:** [SPECS.md §3.9](../SPECS.md#39-access-control)
+
 ---
 
 ## MVP checklist
