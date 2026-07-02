@@ -75,12 +75,30 @@ pre-commit install
 
 Integration tests expect PostgreSQL at `TEST_DATABASE_URL`. The easiest local setup is `docker compose up db`.
 
-Bootstrap the first admin user after migrations:
+## Database migrations (Alembic)
+
+When the app data model changes (new tables like `users`, `dishes`, etc.), the PostgreSQL schema must be updated too.
+
+**Alembic** is the tool that applies those schema changes safely, step by step, using versioned migration files in `backend/alembic/versions/`.
+
+- `001_initial` — bootstrap
+- `002_users` — users and refresh tokens
+- future phases add more files
+
+With Docker Compose, the **API container runs migrations automatically** on startup (`alembic upgrade head`), so you usually do not need to run Alembic yourself.
+
+Local development without Docker:
 
 ```bash
 cd backend
 alembic upgrade head
-python -m mealroulette.commands.bootstrap_admin --username admin --email admin@example.com --password your-secure-password
+```
+
+Bootstrap the first admin user once (after the stack is up):
+
+```bash
+docker exec mealroulette-api python -m mealroulette.commands.bootstrap_admin \
+  --username admin --email admin@example.com --password your-secure-password
 ```
 
 ## Suggested Cursor Prompt
