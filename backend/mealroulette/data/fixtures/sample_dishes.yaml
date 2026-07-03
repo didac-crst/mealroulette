@@ -1,0 +1,2092 @@
+---
+version: 1
+dishes:
+- name: Mushroom Risotto
+  description: Creamy arborio rice with mushrooms, parmesan, and parsley.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: cheese_dairy
+  - carb: rice
+  - style: rice_dish
+  - temperature: hot
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: Classic
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 30
+    difficulty: medium
+    description: Stovetop mushroom risotto based on the saved Risotto recipe.
+    source_url: 
+    notes: Use mixed mushrooms when available.
+    steps:
+    - step_number: 1
+      instruction: Clean and slice the mushrooms, then saute them with minced garlic, butter, parsley, salt, and pepper until tender.
+    - step_number: 2
+      instruction: Warm the vegetable stock in a saucepan and keep it at a gentle simmer.
+    - step_number: 3
+      instruction: Soften the onion in olive oil, add the arborio rice, and stir for 2 minutes until the grains look slightly translucent.
+    - step_number: 4
+      instruction: Add white wine and let it absorb, then add hot stock one ladle at a time, stirring until the rice is creamy and just tender.
+      timer_seconds: 1200
+    - step_number: 5
+      instruction: Fold in the mushrooms, cream, and parmesan, rest for 2 minutes, then serve hot.
+    ingredients:
+    - name: arborio rice
+      quantity: 250
+      unit: g
+    - name: mixed mushrooms
+      quantity: 300
+      unit: g
+    - name: vegetable stock
+      quantity: 1
+      unit: l
+    - name: onion
+      quantity: 1
+      unit: unit
+    - name: white wine
+      quantity: 130
+      unit: ml
+    - name: cream
+      quantity: 150
+      unit: ml
+    - name: parmesan
+      quantity: 100
+      unit: g
+    - name: garlic
+      quantity: 1
+      unit: clove
+    - name: parsley
+      quantity: 1
+      unit: bunch
+- name: Fideua
+  description: Catalan noodle paella with seafood, sofregit, and allioli.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: false
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: seafood
+  - carb: noodles
+  - style: rice_dish
+  - temperature: hot
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+  recipes:
+  - variant_name: Seafood paella pan
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 25
+    cook_time_minutes: 45
+    difficulty: medium
+    description: Seafood fideua from the saved Fideua recipe.
+    source_url: 
+    notes: The sofregit can be made the day before.
+    steps:
+    - step_number: 1
+      instruction: Cook onion, bell pepper, garlic, calamari, and olive oil slowly until softened and lightly caramelized.
+    - step_number: 2
+      instruction: Add chopped tomatoes, fish stock base, salt, pepper, and paprika, then simmer until reduced into a thick sofregit.
+    - step_number: 3
+      instruction: Fry prawns separately with olive oil and garlic, then keep the prawns aside and add the flavored oil to the sofregit.
+    - step_number: 4
+      instruction: Toast the fideua noodles in the paella pan with olive oil and garlic until golden.
+    - step_number: 5
+      instruction: Add sofregit, prawns, mussels, and hot fish stock, then simmer until the noodles absorb the liquid.
+      timer_seconds: 600
+    - step_number: 6
+      instruction: Rest briefly and serve with allioli.
+    ingredients:
+    - name: fideua noodles
+      quantity: 400
+      unit: g
+    - name: prawns
+      quantity: 300
+      unit: g
+    - name: calamari
+      quantity: 250
+      unit: g
+    - name: mussels
+      quantity: 500
+      unit: g
+    - name: bell pepper
+      quantity: 2
+      unit: unit
+    - name: onion
+      quantity: 1
+      unit: unit
+    - name: tomato
+      quantity: 4
+      unit: unit
+    - name: garlic
+      quantity: 3
+      unit: clove
+    - name: fish stock
+      quantity: 600
+      unit: ml
+    - name: allioli
+      quantity: 4
+      unit: tbsp
+      optional: true
+- name: Spaghetti Puttanesca
+  description: Quick pasta with capers, olives, tomato, chili, and basil.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: false
+  tags:
+  - protein: cheese_dairy
+  - carb: pasta
+  - style: pasta_dish
+  - temperature: hot
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: Weeknight
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 25
+    difficulty: easy
+    description: Hello Fresh style puttanesca with dried tomatoes and basil paste.
+    source_url: 
+    notes: Rinse capers for a milder flavor.
+    steps:
+    - step_number: 1
+      instruction: Rinse the capers, chop dried tomatoes and olives, and mince the garlic.
+    - step_number: 2
+      instruction: Saute dried tomatoes, olives, capers, and garlic in olive oil for 2 minutes.
+    - step_number: 3
+      instruction: Add chopped tomatoes, chili, and Mediterranean seasoning, then simmer until the sauce thickens.
+      timer_seconds: 720
+    - step_number: 4
+      instruction: Boil spaghetti until al dente, reserving a little pasta water.
+    - step_number: 5
+      instruction: Toss spaghetti with the sauce, lemon juice, parmesan, basil paste, salt, and pepper.
+    ingredients:
+    - name: spaghetti
+      quantity: 500
+      unit: g
+    - name: capers
+      quantity: 50
+      unit: g
+    - name: dried tomatoes
+      quantity: 200
+      unit: g
+    - name: black olives
+      quantity: 120
+      unit: g
+    - name: canned chopped tomatoes
+      quantity: 2
+      unit: can
+    - name: garlic
+      quantity: 2
+      unit: clove
+    - name: parmesan
+      quantity: 40
+      unit: g
+    - name: lemon
+      quantity: 1
+      unit: unit
+    - name: basil paste
+      quantity: 24
+      unit: ml
+    - name: chili flakes
+      quantity: 1
+      unit: tsp
+- name: Pan-Fried Hake with Lentils and Leeks
+  description: Hake fillets served on creamy leek, carrot, celery, and brown lentils.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: false
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: fish
+  - carb: legumes
+  - style: fried
+  - temperature: hot
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: Creamy leek lentils
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 15
+    cook_time_minutes: 20
+    difficulty: easy
+    description: Based on the saved Hello Fresh hake recipe.
+    source_url: 
+    notes: Reduce chili for kids.
+    steps:
+    - step_number: 1
+      instruction: Dice carrot and celery, slice leek into rings, and finely chop chili, thyme, and sage.
+    - step_number: 2
+      instruction: Saute carrot, celery, leek, chili, thyme, and sage in oil until the vegetables soften.
+      timer_seconds: 600
+    - step_number: 3
+      instruction: Salt the hake fillets and pan-fry them in a second pan until cooked through and lightly golden.
+      timer_seconds: 480
+    - step_number: 4
+      instruction: Rinse lentils, add them to the vegetables with vegetable stock and cream, then simmer briefly.
+    - step_number: 5
+      instruction: Season the creamy lentils and serve the hake on top.
+    ingredients:
+    - name: hake fillet
+      quantity: 500
+      unit: g
+    - name: brown lentils
+      quantity: 2
+      unit: can
+    - name: leek
+      quantity: 1
+      unit: unit
+    - name: carrot
+      quantity: 2
+      unit: unit
+    - name: celery stalk
+      quantity: 2
+      unit: unit
+    - name: cream
+      quantity: 300
+      unit: ml
+    - name: vegetable stock
+      quantity: 150
+      unit: ml
+    - name: red chili
+      quantity: 1
+      unit: unit
+      optional: true
+    - name: fresh thyme
+      quantity: 1
+      unit: bunch
+    - name: fresh sage
+      quantity: 1
+      unit: bunch
+- name: Sweet Potato Coconut Stew
+  description: Caribbean-style sweet potato, black bean, tomato, pepper, and coconut stew.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: true
+  kids_friendly: true
+  tags:
+  - protein: legumes
+  - carb: sweet_potato
+  - style: stew
+  - temperature: hot
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 10
+    - 11
+    - 12
+    - 1
+    - 2
+    - 3
+  recipes:
+  - variant_name: Coconut black bean
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 15
+    cook_time_minutes: 30
+    difficulty: easy
+    description: Inspired by the saved Caribbean sweet potato coconut stew.
+    source_url: 
+    notes: Serve with flatbread or banana pancakes if desired.
+    steps:
+    - step_number: 1
+      instruction: Dice onion, garlic, sweet potato, tomatoes, and red pepper.
+    - step_number: 2
+      instruction: Saute onion, garlic, and sweet potato in oil until the onion softens.
+    - step_number: 3
+      instruction: Add tomatoes and cook for a few minutes until they start to collapse.
+    - step_number: 4
+      instruction: Add black beans, red pepper, coconut milk, vegetable stock, and spice mix, then simmer until the sweet potato is tender.
+      timer_seconds: 1200
+    - step_number: 5
+      instruction: Season with salt, pepper, chili, and parsley before serving.
+    ingredients:
+    - name: sweet potato
+      quantity: 800
+      unit: g
+    - name: black beans
+      quantity: 2
+      unit: can
+    - name: coconut milk
+      quantity: 300
+      unit: ml
+    - name: onion
+      quantity: 2
+      unit: unit
+    - name: garlic
+      quantity: 2
+      unit: clove
+    - name: tomato
+      quantity: 4
+      unit: unit
+    - name: red bell pepper
+      quantity: 2
+      unit: unit
+    - name: vegetable stock
+      quantity: 300
+      unit: ml
+    - name: parsley
+      quantity: 1
+      unit: bunch
+    - name: red chili
+      quantity: 1
+      unit: unit
+      optional: true
+- name: Coconut Vegetable Curry with Jasmine Rice
+  description: Mild curry with mushrooms, carrots, green beans, coconut milk, lime, and rice.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: true
+  kids_friendly: true
+  tags:
+  - protein: none_vegetables
+  - carb: rice
+  - style: curry
+  - temperature: hot
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: Panang-style
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 15
+    cook_time_minutes: 25
+    difficulty: easy
+    description: Based on the saved Hello Fresh coconut vegetable curry.
+    source_url: 
+    notes: Add chili at the table for a kid-friendly version.
+    steps:
+    - step_number: 1
+      instruction: Slice mushrooms, carrots, green beans, and spring onions, keeping the green onion tops aside.
+    - step_number: 2
+      instruction: Cook jasmine rice in salted water, then let it steam covered off the heat.
+      timer_seconds: 1200
+    - step_number: 3
+      instruction: Fry the white spring onion slices with curry paste, then add coconut milk and vegetable stock.
+    - step_number: 4
+      instruction: Add carrots, beans, mushrooms, and a little sugar, then simmer until the vegetables are tender.
+      timer_seconds: 720
+    - step_number: 5
+      instruction: Season with lime juice, salt, and pepper, then serve over rice with green spring onion and chili.
+    ingredients:
+    - name: jasmine rice
+      quantity: 300
+      unit: g
+    - name: brown mushrooms
+      quantity: 400
+      unit: g
+    - name: carrot
+      quantity: 2
+      unit: unit
+    - name: green beans
+      quantity: 400
+      unit: g
+    - name: spring onion
+      quantity: 4
+      unit: unit
+    - name: coconut milk
+      quantity: 500
+      unit: ml
+    - name: curry paste
+      quantity: 40
+      unit: ml
+    - name: vegetable stock
+      quantity: 100
+      unit: ml
+    - name: lime
+      quantity: 1
+      unit: unit
+    - name: red chili
+      quantity: 1
+      unit: unit
+      optional: true
+- name: Shakshuka with Chickpeas and Feta
+  description: Tomato and pepper shakshuka with chickpeas, aubergine, avocado, feta, and wraps.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: cheese_dairy
+  - carb: bread_dough_pastry
+  - style: stew
+  - temperature: hot
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: Chickpea and feta
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 15
+    cook_time_minutes: 25
+    difficulty: easy
+    description: Based on the saved Hello Fresh shakshuka recipe.
+    source_url: 
+    notes: Add eggs to the tomato sauce if desired.
+    steps:
+    - step_number: 1
+      instruction: Dice aubergine, season with olive oil and dukkah, then roast until browned.
+      timer_seconds: 1200
+    - step_number: 2
+      instruction: Saute sliced red pepper and parsley stems, then add chopped tomatoes, shakshuka spices, salt, pepper, and a pinch of sugar.
+    - step_number: 3
+      instruction: Rinse chickpeas, blend half with water and parsley into a quick chickpea cream, and warm the rest with the aubergine.
+    - step_number: 4
+      instruction: Crumble feta with chopped parsley and slice the avocado.
+    - step_number: 5
+      instruction: Serve tomato pepper sauce with aubergine, chickpeas, feta, avocado, chickpea cream, and warm tortilla wraps.
+    ingredients:
+    - name: aubergine
+      quantity: 2
+      unit: unit
+    - name: red bell pepper
+      quantity: 2
+      unit: unit
+    - name: canned chopped tomatoes
+      quantity: 2
+      unit: can
+    - name: chickpeas
+      quantity: 2
+      unit: can
+    - name: feta
+      quantity: 300
+      unit: g
+    - name: avocado
+      quantity: 2
+      unit: unit
+    - name: tortilla wraps
+      quantity: 8
+      unit: unit
+    - name: parsley
+      quantity: 1
+      unit: bunch
+    - name: dukkah spice
+      quantity: 2
+      unit: tbsp
+- name: Black Bean Quesadillas
+  description: Oven-baked black bean, corn, and cheese quesadillas with lime yogurt and red cabbage salad.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: legumes
+  - carb: bread_dough_pastry
+  - style: oven
+  - temperature: hot
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: Oven baked
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 15
+    cook_time_minutes: 15
+    difficulty: easy
+    description: Based on the saved Hello Fresh black bean quesadilla recipe.
+    source_url: 
+    notes: Keep sambal or chili optional for kids.
+    steps:
+    - step_number: 1
+      instruction: Soak shredded red cabbage briefly in hot salted water with vinegar, then drain and cool.
+    - step_number: 2
+      instruction: Mix yogurt with lime zest, salt, and pepper to make the dip.
+    - step_number: 3
+      instruction: Saute onion and garlic, then add corn, black beans, Tex-Mex seasoning, and sambal, crushing the beans slightly.
+    - step_number: 4
+      instruction: Fill tortillas with bean mixture and cheese, cover with a second tortilla, and bake until crisp and melted.
+      timer_seconds: 420
+    - step_number: 5
+      instruction: Toss red cabbage with lime juice, olive oil, chili, salt, and pepper, then serve with quesadilla wedges and dip.
+    ingredients:
+    - name: tortilla wraps
+      quantity: 8
+      unit: unit
+    - name: black beans
+      quantity: 2
+      unit: can
+    - name: sweetcorn
+      quantity: 1
+      unit: can
+    - name: grated cheese
+      quantity: 300
+      unit: g
+    - name: red cabbage
+      quantity: 400
+      unit: g
+    - name: red onion
+      quantity: 2
+      unit: unit
+    - name: garlic
+      quantity: 2
+      unit: clove
+    - name: lime
+      quantity: 2
+      unit: unit
+    - name: greek yogurt
+      quantity: 300
+      unit: g
+    - name: green chili
+      quantity: 1
+      unit: unit
+      optional: true
+- name: Creamy Chicken Potato Stew
+  description: Chicken, potato, carrot, and leek stew with a creamy broth.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: true
+  kids_friendly: true
+  tags:
+  - protein: chicken
+  - carb: potato
+  - style: stew
+  - temperature: hot
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 10
+    - 11
+    - 12
+    - 1
+    - 2
+    - 3
+  recipes:
+  - variant_name: Creamy pot
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 15
+    cook_time_minutes: 30
+    difficulty: easy
+    description: Inspired by the saved creamy chicken potato stew.
+    source_url: 
+    notes: Add more stock if reheating leftovers.
+    steps:
+    - step_number: 1
+      instruction: Dice chicken, potatoes, carrots, onion, and leek.
+    - step_number: 2
+      instruction: Brown the chicken in olive oil, season with salt and pepper, and remove it from the pot.
+    - step_number: 3
+      instruction: Saute onion, carrot, leek, and potatoes until the vegetables start to soften.
+    - step_number: 4
+      instruction: Add chicken, vegetable stock, thyme, and cream, then simmer until the potatoes are tender.
+      timer_seconds: 1500
+    - step_number: 5
+      instruction: Adjust seasoning and finish with parsley before serving.
+    ingredients:
+    - name: chicken breast
+      quantity: 500
+      unit: g
+    - name: potato
+      quantity: 700
+      unit: g
+    - name: carrot
+      quantity: 3
+      unit: unit
+    - name: leek
+      quantity: 1
+      unit: unit
+    - name: onion
+      quantity: 1
+      unit: unit
+    - name: vegetable stock
+      quantity: 800
+      unit: ml
+    - name: cream
+      quantity: 150
+      unit: ml
+    - name: parsley
+      quantity: 1
+      unit: bunch
+- name: Lentil Mushroom Bake
+  description: Brown lentil and mushroom oven bake with tomato and cheese.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: true
+  kids_friendly: true
+  tags:
+  - protein: legumes
+  - carb: legumes
+  - style: oven
+  - temperature: hot
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: Tomato mushroom
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 15
+    cook_time_minutes: 35
+    difficulty: easy
+    description: Inspired by the saved lentil bake with brown mushrooms.
+    source_url: 
+    notes: Good make-ahead dish.
+    steps:
+    - step_number: 1
+      instruction: Slice mushrooms and dice onion, carrot, and garlic.
+    - step_number: 2
+      instruction: Saute onion, carrot, garlic, and mushrooms until the mushrooms release their moisture.
+    - step_number: 3
+      instruction: Stir in lentils, chopped tomatoes, vegetable stock, oregano, salt, and pepper.
+    - step_number: 4
+      instruction: Transfer to a baking dish, top with grated cheese, and bake until bubbling.
+      timer_seconds: 1500
+    - step_number: 5
+      instruction: Rest for 5 minutes and serve with a green salad.
+    ingredients:
+    - name: brown lentils
+      quantity: 2
+      unit: can
+    - name: brown mushrooms
+      quantity: 400
+      unit: g
+    - name: canned chopped tomatoes
+      quantity: 2
+      unit: can
+    - name: grated cheese
+      quantity: 150
+      unit: g
+    - name: onion
+      quantity: 1
+      unit: unit
+    - name: carrot
+      quantity: 2
+      unit: unit
+    - name: garlic
+      quantity: 2
+      unit: clove
+    - name: vegetable stock
+      quantity: 250
+      unit: ml
+- name: Banh Mi Sandwiches
+  description: Vietnamese-style sandwiches with marinated vegetables, cucumber, herbs, and spicy mayo.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: false
+  freezer_friendly: false
+  kids_friendly: false
+  tags:
+  - protein: tofu_soy
+  - carb: bread_dough_pastry
+  - style: bowl
+  - temperature: cold
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: Tofu
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 25
+    cook_time_minutes: 10
+    difficulty: easy
+    description: Inspired by the saved Banh Mi recipe.
+    source_url: 
+    notes: Keep chili sauce separate for children.
+    steps:
+    - step_number: 1
+      instruction: Slice carrot, cucumber, and radish, then toss carrot and radish with vinegar, sugar, and salt.
+    - step_number: 2
+      instruction: Slice tofu and marinate it with soy sauce, lime juice, and garlic.
+    - step_number: 3
+      instruction: Pan-fry tofu until golden on both sides.
+      timer_seconds: 600
+    - step_number: 4
+      instruction: Mix mayonnaise with chili sauce and lime zest.
+    - step_number: 5
+      instruction: Fill baguettes with chili mayo, tofu, pickled vegetables, cucumber, and coriander.
+    ingredients:
+    - name: baguette
+      quantity: 4
+      unit: unit
+    - name: firm tofu
+      quantity: 400
+      unit: g
+    - name: carrot
+      quantity: 2
+      unit: unit
+    - name: cucumber
+      quantity: 1
+      unit: unit
+    - name: radish
+      quantity: 1
+      unit: bunch
+    - name: lime
+      quantity: 1
+      unit: unit
+    - name: garlic
+      quantity: 1
+      unit: clove
+    - name: mayonnaise
+      quantity: 4
+      unit: tbsp
+    - name: coriander
+      quantity: 1
+      unit: bunch
+- name: Roasted Cauliflower with Citrus Butter Crumbs
+  description: Oven cauliflower with lemon butter crumbs, potatoes, and yogurt sauce.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: cheese_dairy
+  - carb: potato
+  - style: oven
+  - temperature: hot
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 3
+    - 4
+    - 5
+    - 6
+  recipes:
+  - variant_name: Lemon crumbs
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 15
+    cook_time_minutes: 35
+    difficulty: easy
+    description: Inspired by the saved cauliflower with citrus butter crumbs.
+    source_url: 
+    notes: Add chickpeas for a more filling vegetarian dinner.
+    steps:
+    - step_number: 1
+      instruction: Cut cauliflower into florets and potatoes into wedges.
+    - step_number: 2
+      instruction: Roast cauliflower and potatoes with olive oil, salt, and pepper until browned.
+      timer_seconds: 1800
+    - step_number: 3
+      instruction: Melt butter with lemon zest, garlic, and breadcrumbs until crisp.
+    - step_number: 4
+      instruction: Mix yogurt with lemon juice, herbs, salt, and pepper.
+    - step_number: 5
+      instruction: Serve roasted vegetables with citrus crumbs and yogurt sauce.
+    ingredients:
+    - name: cauliflower
+      quantity: 1
+      unit: unit
+    - name: potato
+      quantity: 800
+      unit: g
+    - name: breadcrumbs
+      quantity: 80
+      unit: g
+    - name: butter
+      quantity: 50
+      unit: g
+    - name: lemon
+      quantity: 1
+      unit: unit
+    - name: garlic
+      quantity: 1
+      unit: clove
+    - name: greek yogurt
+      quantity: 250
+      unit: g
+    - name: parsley
+      quantity: 1
+      unit: bunch
+- name: Roasted Vegetables with Halloumi
+  description: Sheet-pan vegetables and halloumi with herbs and lemon.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: cheese_dairy
+  - carb: potato
+  - style: oven
+  - temperature: hot
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: Sheet pan
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 15
+    cook_time_minutes: 30
+    difficulty: easy
+    description: Inspired by the saved colorful oven vegetables with halloumi.
+    source_url: 
+    notes: Good with leftover cooked grains.
+    steps:
+    - step_number: 1
+      instruction: Cut potatoes, zucchini, bell pepper, red onion, and halloumi into bite-size pieces.
+    - step_number: 2
+      instruction: Toss potatoes with olive oil, oregano, salt, and pepper and start roasting.
+    - step_number: 3
+      instruction: Add zucchini, bell pepper, onion, and halloumi to the tray and roast until golden.
+      timer_seconds: 1500
+    - step_number: 4
+      instruction: Mix yogurt with lemon juice and chopped herbs.
+    - step_number: 5
+      instruction: Serve vegetables and halloumi with lemon yogurt.
+    ingredients:
+    - name: halloumi
+      quantity: 400
+      unit: g
+    - name: potato
+      quantity: 700
+      unit: g
+    - name: zucchini
+      quantity: 2
+      unit: unit
+    - name: red bell pepper
+      quantity: 2
+      unit: unit
+    - name: red onion
+      quantity: 1
+      unit: unit
+    - name: greek yogurt
+      quantity: 200
+      unit: g
+    - name: lemon
+      quantity: 1
+      unit: unit
+    - name: oregano
+      quantity: 1
+      unit: tsp
+- name: Tomato Quinoa Burrito Bowl
+  description: Quinoa bowl with tomato, beans, corn, avocado, lime, and yogurt.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: legumes
+  - carb: quinoa
+  - style: bowl
+  - temperature: hot
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: Tomato quinoa
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 15
+    cook_time_minutes: 20
+    difficulty: easy
+    description: Inspired by the saved burrito bowl with tomato quinoa.
+    source_url: 
+    notes: Pack leftovers without avocado to avoid browning.
+    steps:
+    - step_number: 1
+      instruction: Rinse quinoa and cook it with chopped tomatoes, vegetable stock, and Tex-Mex seasoning.
+      timer_seconds: 900
+    - step_number: 2
+      instruction: Rinse beans and corn, then warm them in a pan with olive oil and a pinch of salt.
+    - step_number: 3
+      instruction: Dice avocado, tomato, and spring onion.
+    - step_number: 4
+      instruction: Mix yogurt with lime juice, salt, and pepper.
+    - step_number: 5
+      instruction: Serve tomato quinoa with beans, corn, avocado, spring onion, and lime yogurt.
+    ingredients:
+    - name: quinoa
+      quantity: 300
+      unit: g
+    - name: canned chopped tomatoes
+      quantity: 1
+      unit: can
+    - name: black beans
+      quantity: 1
+      unit: can
+    - name: sweetcorn
+      quantity: 1
+      unit: can
+    - name: avocado
+      quantity: 2
+      unit: unit
+    - name: tomato
+      quantity: 2
+      unit: unit
+    - name: spring onion
+      quantity: 4
+      unit: unit
+    - name: lime
+      quantity: 1
+      unit: unit
+    - name: greek yogurt
+      quantity: 200
+      unit: g
+- name: Creamy Pumpkin Stew
+  description: Pumpkin, potato, carrot, and coconut stew with warming spices.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: true
+  kids_friendly: true
+  tags:
+  - protein: none_vegetables
+  - carb: potato
+  - style: stew
+  - temperature: hot
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 9
+    - 10
+    - 11
+    - 12
+  recipes:
+  - variant_name: Coconut pumpkin
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 15
+    cook_time_minutes: 30
+    difficulty: easy
+    description: Inspired by the saved creamy pumpkin stew.
+    source_url: 
+    notes: Blend half the stew for a creamier texture.
+    steps:
+    - step_number: 1
+      instruction: Dice pumpkin, potatoes, carrots, onion, and garlic.
+    - step_number: 2
+      instruction: Saute onion and garlic with curry powder until fragrant.
+    - step_number: 3
+      instruction: Add pumpkin, potatoes, carrots, vegetable stock, and coconut milk.
+    - step_number: 4
+      instruction: Simmer until the vegetables are tender.
+      timer_seconds: 1500
+    - step_number: 5
+      instruction: Mash lightly, season with lime juice, salt, and pepper, and serve with parsley.
+    ingredients:
+    - name: pumpkin
+      quantity: 800
+      unit: g
+    - name: potato
+      quantity: 400
+      unit: g
+    - name: carrot
+      quantity: 3
+      unit: unit
+    - name: onion
+      quantity: 1
+      unit: unit
+    - name: garlic
+      quantity: 2
+      unit: clove
+    - name: coconut milk
+      quantity: 300
+      unit: ml
+    - name: vegetable stock
+      quantity: 600
+      unit: ml
+    - name: lime
+      quantity: 1
+      unit: unit
+- name: Dukkah Carrot Strudel
+  description: Savory pastry strudel with roasted carrots, feta, dukkah, and herbs.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: false
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: cheese_dairy
+  - carb: bread_dough_pastry
+  - style: oven
+  - temperature: hot
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: Feta carrot
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 20
+    cook_time_minutes: 30
+    difficulty: medium
+    description: Inspired by the saved dukkah carrot strudel.
+    source_url: 
+    notes: Let the filling cool slightly before wrapping.
+    steps:
+    - step_number: 1
+      instruction: Grate carrots and chop onion, parsley, and garlic.
+    - step_number: 2
+      instruction: Saute onion, garlic, and carrots with dukkah until softened.
+    - step_number: 3
+      instruction: Mix the carrot filling with crumbled feta and parsley.
+    - step_number: 4
+      instruction: Spoon filling onto pastry, roll into a strudel, brush with oil, and bake until crisp.
+      timer_seconds: 1800
+    - step_number: 5
+      instruction: Slice and serve with yogurt lemon sauce.
+    ingredients:
+    - name: puff pastry
+      quantity: 1
+      unit: unit
+    - name: carrot
+      quantity: 700
+      unit: g
+    - name: feta
+      quantity: 250
+      unit: g
+    - name: onion
+      quantity: 1
+      unit: unit
+    - name: garlic
+      quantity: 1
+      unit: clove
+    - name: dukkah spice
+      quantity: 2
+      unit: tbsp
+    - name: greek yogurt
+      quantity: 200
+      unit: g
+    - name: lemon
+      quantity: 1
+      unit: unit
+- name: Oven Risotto with Peas and Mushrooms
+  description: Low-stir oven risotto with mushrooms, peas, parmesan, and herbs.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: cheese_dairy
+  - carb: rice
+  - style: oven
+  - temperature: hot
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: Baked
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 35
+    difficulty: easy
+    description: Inspired by the saved easy oven risotto.
+    source_url: 
+    notes: Stir once halfway through baking if possible.
+    steps:
+    - step_number: 1
+      instruction: Slice mushrooms and finely dice onion and garlic.
+    - step_number: 2
+      instruction: Saute onion, garlic, mushrooms, and rice in an ovenproof pot.
+    - step_number: 3
+      instruction: Add hot vegetable stock, cover, and bake until the rice absorbs most of the liquid.
+      timer_seconds: 1500
+    - step_number: 4
+      instruction: Stir in peas, parmesan, butter, salt, and pepper.
+    - step_number: 5
+      instruction: Rest covered for 5 minutes, then serve with parsley.
+    ingredients:
+    - name: arborio rice
+      quantity: 300
+      unit: g
+    - name: brown mushrooms
+      quantity: 300
+      unit: g
+    - name: frozen peas
+      quantity: 200
+      unit: g
+    - name: vegetable stock
+      quantity: 900
+      unit: ml
+    - name: parmesan
+      quantity: 80
+      unit: g
+    - name: onion
+      quantity: 1
+      unit: unit
+    - name: garlic
+      quantity: 2
+      unit: clove
+    - name: butter
+      quantity: 30
+      unit: g
+- name: Halloumi with Spiced Couscous
+  description: Pan-fried halloumi with couscous, vegetables, herbs, and lemon yogurt.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: cheese_dairy
+  - carb: couscous_semolina
+  - style: bowl
+  - temperature: hot
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: Spiced couscous
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 15
+    cook_time_minutes: 20
+    difficulty: easy
+    description: Inspired by the saved spiced halloumi recipe.
+    source_url: 
+    notes: Halloumi is best cooked right before serving.
+    steps:
+    - step_number: 1
+      instruction: Pour hot vegetable stock over couscous, cover, and let it steam.
+      timer_seconds: 600
+    - step_number: 2
+      instruction: Dice cucumber, tomato, and bell pepper, then chop parsley.
+    - step_number: 3
+      instruction: Pan-fry halloumi slices until golden on both sides.
+    - step_number: 4
+      instruction: Fluff couscous and mix with vegetables, olive oil, lemon juice, parsley, salt, and pepper.
+    - step_number: 5
+      instruction: Serve couscous with halloumi and yogurt sauce.
+    ingredients:
+    - name: halloumi
+      quantity: 400
+      unit: g
+    - name: couscous
+      quantity: 300
+      unit: g
+    - name: vegetable stock
+      quantity: 350
+      unit: ml
+    - name: cucumber
+      quantity: 1
+      unit: unit
+    - name: tomato
+      quantity: 3
+      unit: unit
+    - name: red bell pepper
+      quantity: 1
+      unit: unit
+    - name: lemon
+      quantity: 1
+      unit: unit
+    - name: greek yogurt
+      quantity: 200
+      unit: g
+    - name: parsley
+      quantity: 1
+      unit: bunch
+- name: Mushroom Fiorelli with Cream Sauce
+  description: Stuffed pasta with mushrooms, spinach, cream, and parmesan.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: cheese_dairy
+  - carb: pasta
+  - style: pasta_dish
+  - temperature: hot
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: Creamy mushroom
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 15
+    difficulty: easy
+    description: Inspired by the saved fiorelli pasta recipe.
+    source_url: 
+    notes: Use tortellini or ravioli if fiorelli is unavailable.
+    steps:
+    - step_number: 1
+      instruction: Slice mushrooms, mince garlic, and wash spinach.
+    - step_number: 2
+      instruction: Cook stuffed pasta in salted water until tender.
+    - step_number: 3
+      instruction: Saute mushrooms and garlic in olive oil until browned.
+    - step_number: 4
+      instruction: Add cream, spinach, parmesan, salt, and pepper, then simmer until the spinach wilts.
+    - step_number: 5
+      instruction: Toss pasta with the sauce and loosen with pasta water if needed.
+    ingredients:
+    - name: stuffed pasta
+      quantity: 600
+      unit: g
+    - name: brown mushrooms
+      quantity: 300
+      unit: g
+    - name: spinach
+      quantity: 150
+      unit: g
+    - name: cream
+      quantity: 200
+      unit: ml
+    - name: parmesan
+      quantity: 60
+      unit: g
+    - name: garlic
+      quantity: 2
+      unit: clove
+    - name: lemon
+      quantity: 1
+      unit: unit
+      optional: true
+- name: Greek Stuffed Peppers
+  description: Bell peppers filled with rice, tomato, herbs, and feta.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: true
+  kids_friendly: true
+  tags:
+  - protein: cheese_dairy
+  - carb: rice
+  - style: oven
+  - temperature: hot
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 6
+    - 7
+    - 8
+    - 9
+  recipes:
+  - variant_name: Feta rice
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 20
+    cook_time_minutes: 35
+    difficulty: medium
+    description: Inspired by the saved Greek-style stuffed peppers.
+    source_url: 
+    notes: Works well with leftover cooked rice.
+    steps:
+    - step_number: 1
+      instruction: Halve bell peppers and remove seeds.
+    - step_number: 2
+      instruction: Cook rice until just tender and drain.
+    - step_number: 3
+      instruction: Saute onion, garlic, zucchini, and tomatoes, then mix with rice, feta, oregano, salt, and pepper.
+    - step_number: 4
+      instruction: Fill peppers with the rice mixture and bake with a little tomato sauce until soft.
+      timer_seconds: 2100
+    - step_number: 5
+      instruction: Serve with yogurt and parsley.
+    ingredients:
+    - name: bell pepper
+      quantity: 4
+      unit: unit
+    - name: rice
+      quantity: 250
+      unit: g
+    - name: feta
+      quantity: 200
+      unit: g
+    - name: zucchini
+      quantity: 1
+      unit: unit
+    - name: tomato
+      quantity: 3
+      unit: unit
+    - name: onion
+      quantity: 1
+      unit: unit
+    - name: garlic
+      quantity: 2
+      unit: clove
+    - name: greek yogurt
+      quantity: 200
+      unit: g
+- name: Portobello Three-Cheese Bake
+  description: Stuffed portobello mushrooms with three cheeses and roasted potatoes.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: cheese_dairy
+  - carb: potato
+  - style: oven
+  - temperature: hot
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: Stuffed mushrooms
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 15
+    cook_time_minutes: 30
+    difficulty: easy
+    description: Inspired by the saved stuffed portobello recipe.
+    source_url: 
+    notes: Serve with salad for a lighter meal.
+    steps:
+    - step_number: 1
+      instruction: Cut potatoes into wedges and roast with olive oil, salt, and pepper.
+    - step_number: 2
+      instruction: Remove portobello stems and chop the stems finely.
+    - step_number: 3
+      instruction: Mix chopped stems with cream cheese, grated cheese, feta, garlic, and parsley.
+    - step_number: 4
+      instruction: Fill portobello caps and bake until the mushrooms are tender and the topping is golden.
+      timer_seconds: 1200
+    - step_number: 5
+      instruction: Serve stuffed mushrooms with roasted potatoes.
+    ingredients:
+    - name: portobello mushroom
+      quantity: 8
+      unit: unit
+    - name: potato
+      quantity: 800
+      unit: g
+    - name: cream cheese
+      quantity: 150
+      unit: g
+    - name: grated cheese
+      quantity: 120
+      unit: g
+    - name: feta
+      quantity: 100
+      unit: g
+    - name: garlic
+      quantity: 1
+      unit: clove
+    - name: parsley
+      quantity: 1
+      unit: bunch
+- name: Yellow Curry with Roasted Vegetables
+  description: Coconut yellow curry with roasted vegetables and rice.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: true
+  kids_friendly: true
+  tags:
+  - protein: none_vegetables
+  - carb: rice
+  - style: curry
+  - temperature: hot
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: Roasted veg
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 15
+    cook_time_minutes: 30
+    difficulty: easy
+    description: Inspired by the saved yellow curry with oven vegetables.
+    source_url: 
+    notes: Roast vegetables while the rice cooks.
+    steps:
+    - step_number: 1
+      instruction: Cut cauliflower, carrot, zucchini, and onion into bite-size pieces.
+    - step_number: 2
+      instruction: Roast vegetables with oil, salt, and pepper until browned.
+      timer_seconds: 1500
+    - step_number: 3
+      instruction: Cook rice in salted water.
+    - step_number: 4
+      instruction: Simmer curry paste with coconut milk and vegetable stock.
+    - step_number: 5
+      instruction: Add roasted vegetables to the sauce and serve over rice with lime.
+    ingredients:
+    - name: rice
+      quantity: 300
+      unit: g
+    - name: cauliflower
+      quantity: 1
+      unit: unit
+    - name: carrot
+      quantity: 3
+      unit: unit
+    - name: zucchini
+      quantity: 2
+      unit: unit
+    - name: onion
+      quantity: 1
+      unit: unit
+    - name: coconut milk
+      quantity: 400
+      unit: ml
+    - name: curry paste
+      quantity: 40
+      unit: ml
+    - name: vegetable stock
+      quantity: 250
+      unit: ml
+    - name: lime
+      quantity: 1
+      unit: unit
+- name: Vegetable Wholegrain Pasta Skillet
+  description: Wholegrain pasta with zucchini, bell pepper, tomato, spinach, and cheese.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: cheese_dairy
+  - carb: pasta
+  - style: pasta_dish
+  - temperature: hot
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: One pan vegetables
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 15
+    cook_time_minutes: 20
+    difficulty: easy
+    description: Inspired by the saved vegetable wholegrain pasta pan.
+    source_url: 
+    notes: Use any short pasta shape.
+    steps:
+    - step_number: 1
+      instruction: Dice zucchini, bell pepper, onion, and garlic.
+    - step_number: 2
+      instruction: Cook pasta in salted water until al dente.
+    - step_number: 3
+      instruction: Saute onion, garlic, zucchini, and bell pepper until softened.
+    - step_number: 4
+      instruction: Add chopped tomatoes and spinach, then simmer until the spinach wilts.
+    - step_number: 5
+      instruction: Toss with pasta and cheese, seasoning with salt and pepper.
+    ingredients:
+    - name: wholegrain pasta
+      quantity: 400
+      unit: g
+    - name: zucchini
+      quantity: 2
+      unit: unit
+    - name: red bell pepper
+      quantity: 2
+      unit: unit
+    - name: canned chopped tomatoes
+      quantity: 1
+      unit: can
+    - name: spinach
+      quantity: 150
+      unit: g
+    - name: onion
+      quantity: 1
+      unit: unit
+    - name: garlic
+      quantity: 2
+      unit: clove
+    - name: grated cheese
+      quantity: 100
+      unit: g
+- name: Vegetable Skewers with Peanut Satay
+  description: Grilled vegetable skewers with rice and peanut coconut sauce.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: false
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: legumes
+  - carb: rice
+  - style: bowl
+  - temperature: hot
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+  recipes:
+  - variant_name: Peanut satay
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 25
+    cook_time_minutes: 20
+    difficulty: medium
+    description: Inspired by the saved vegetable skewers with peanut satay sauce.
+    source_url: 
+    notes: Cook skewers on a grill pan or in the oven.
+    steps:
+    - step_number: 1
+      instruction: Cut zucchini, bell pepper, mushrooms, and red onion into large pieces.
+    - step_number: 2
+      instruction: Thread vegetables onto skewers and brush with oil, salt, and pepper.
+    - step_number: 3
+      instruction: Cook rice in salted water.
+    - step_number: 4
+      instruction: Simmer peanut butter, coconut milk, soy sauce, lime juice, and garlic into a smooth sauce.
+    - step_number: 5
+      instruction: Grill or roast skewers until browned and serve with rice and satay sauce.
+      timer_seconds: 900
+    ingredients:
+    - name: rice
+      quantity: 300
+      unit: g
+    - name: zucchini
+      quantity: 2
+      unit: unit
+    - name: red bell pepper
+      quantity: 2
+      unit: unit
+    - name: brown mushrooms
+      quantity: 250
+      unit: g
+    - name: red onion
+      quantity: 2
+      unit: unit
+    - name: peanut butter
+      quantity: 120
+      unit: g
+    - name: coconut milk
+      quantity: 200
+      unit: ml
+    - name: lime
+      quantity: 1
+      unit: unit
+    - name: garlic
+      quantity: 1
+      unit: clove
+- name: Kale Spaetzle Skillet
+  description: Autumn skillet with kale, spaetzle, mushrooms, cream, and cheese.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: cheese_dairy
+  - carb: pasta
+  - style: pasta_dish
+  - temperature: hot
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 9
+    - 10
+    - 11
+    - 12
+    - 1
+    - 2
+  recipes:
+  - variant_name: Creamy kale
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 15
+    cook_time_minutes: 20
+    difficulty: easy
+    description: Inspired by the saved autumn kale spaetzle pan.
+    source_url: 
+    notes: Substitute spinach outside kale season.
+    steps:
+    - step_number: 1
+      instruction: Slice mushrooms and onion, and chop kale into bite-size pieces.
+    - step_number: 2
+      instruction: Pan-fry spaetzle in butter until lightly golden.
+    - step_number: 3
+      instruction: Saute onion, mushrooms, and kale until the kale softens.
+    - step_number: 4
+      instruction: Add cream, vegetable stock, nutmeg, salt, and pepper.
+    - step_number: 5
+      instruction: Fold in spaetzle and cheese, then cook until creamy.
+    ingredients:
+    - name: spaetzle
+      quantity: 600
+      unit: g
+    - name: kale
+      quantity: 300
+      unit: g
+    - name: brown mushrooms
+      quantity: 250
+      unit: g
+    - name: onion
+      quantity: 1
+      unit: unit
+    - name: cream
+      quantity: 200
+      unit: ml
+    - name: vegetable stock
+      quantity: 100
+      unit: ml
+    - name: grated cheese
+      quantity: 120
+      unit: g
+    - name: butter
+      quantity: 30
+      unit: g
+- name: Kohlrabi Leek Flammkuchen
+  description: Crisp flatbread with kohlrabi, leek, creme fraiche, and cheese.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: cheese_dairy
+  - carb: bread_dough_pastry
+  - style: oven
+  - temperature: hot
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 3
+    - 4
+    - 5
+    - 6
+  recipes:
+  - variant_name: Crispy flatbread
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 15
+    cook_time_minutes: 20
+    difficulty: easy
+    description: Inspired by the saved crispy kohlrabi leek flammkuchen.
+    source_url: 
+    notes: Slice vegetables thinly so they cook quickly.
+    steps:
+    - step_number: 1
+      instruction: Thinly slice kohlrabi and leek.
+    - step_number: 2
+      instruction: Mix creme fraiche with salt, pepper, nutmeg, and lemon zest.
+    - step_number: 3
+      instruction: Spread creme fraiche over flatbread bases.
+    - step_number: 4
+      instruction: Top with kohlrabi, leek, and cheese, then bake until crisp and golden.
+      timer_seconds: 900
+    - step_number: 5
+      instruction: Finish with parsley and serve hot.
+    ingredients:
+    - name: flatbread base
+      quantity: 2
+      unit: unit
+    - name: kohlrabi
+      quantity: 2
+      unit: unit
+    - name: leek
+      quantity: 1
+      unit: unit
+    - name: creme fraiche
+      quantity: 200
+      unit: g
+    - name: grated cheese
+      quantity: 120
+      unit: g
+    - name: lemon
+      quantity: 1
+      unit: unit
+    - name: parsley
+      quantity: 1
+      unit: bunch
+- name: Cuban Quinoa Bowl
+  description: Quinoa bowl with black beans, sweetcorn, tomato salsa, lime, and avocado.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: legumes
+  - carb: quinoa
+  - style: bowl
+  - temperature: hot
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: Black bean quinoa
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 15
+    cook_time_minutes: 20
+    difficulty: easy
+    description: Inspired by the saved Cuban quinoa bowl.
+    source_url: 
+    notes: Serve salsa cold over warm quinoa.
+    steps:
+    - step_number: 1
+      instruction: Cook quinoa in vegetable stock until fluffy.
+      timer_seconds: 900
+    - step_number: 2
+      instruction: Warm black beans and corn with cumin, paprika, salt, and pepper.
+    - step_number: 3
+      instruction: Dice tomatoes, avocado, red onion, and coriander.
+    - step_number: 4
+      instruction: Toss tomato and onion with lime juice, olive oil, salt, and coriander.
+    - step_number: 5
+      instruction: Serve quinoa with beans, corn, salsa, avocado, and yogurt.
+    ingredients:
+    - name: quinoa
+      quantity: 300
+      unit: g
+    - name: black beans
+      quantity: 2
+      unit: can
+    - name: sweetcorn
+      quantity: 1
+      unit: can
+    - name: vegetable stock
+      quantity: 600
+      unit: ml
+    - name: tomato
+      quantity: 4
+      unit: unit
+    - name: avocado
+      quantity: 2
+      unit: unit
+    - name: red onion
+      quantity: 1
+      unit: unit
+    - name: lime
+      quantity: 2
+      unit: unit
+    - name: coriander
+      quantity: 1
+      unit: bunch
+- name: Pumpkin Curry Quiche
+  description: Savory quiche with pumpkin, curry spices, eggs, cream, and cheese.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: false
+  leftovers_possible: true
+  freezer_friendly: true
+  kids_friendly: true
+  tags:
+  - protein: eggs
+  - carb: bread_dough_pastry
+  - style: tart_quiche
+  - temperature: hot
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 9
+    - 10
+    - 11
+    - 12
+  recipes:
+  - variant_name: Curry pumpkin
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 20
+    cook_time_minutes: 40
+    difficulty: medium
+    description: Inspired by the saved pumpkin curry quiche.
+    source_url: 
+    notes: Serve warm or room temperature.
+    steps:
+    - step_number: 1
+      instruction: Dice pumpkin and roast with oil, salt, and curry powder until just tender.
+    - step_number: 2
+      instruction: Line a tart tin with pastry and prick the base.
+    - step_number: 3
+      instruction: Whisk eggs, cream, grated cheese, salt, pepper, and a little curry powder.
+    - step_number: 4
+      instruction: Add pumpkin to the pastry shell, pour over the egg mixture, and bake until set.
+      timer_seconds: 2100
+    - step_number: 5
+      instruction: Rest for 10 minutes before slicing.
+    ingredients:
+    - name: shortcrust pastry
+      quantity: 1
+      unit: unit
+    - name: pumpkin
+      quantity: 600
+      unit: g
+    - name: eggs
+      quantity: 4
+      unit: unit
+    - name: cream
+      quantity: 200
+      unit: ml
+    - name: grated cheese
+      quantity: 120
+      unit: g
+    - name: curry powder
+      quantity: 2
+      unit: tsp
+    - name: onion
+      quantity: 1
+      unit: unit
+- name: Laugen Parsley Dumpling Bake
+  description: Pretzel bread dumpling bake with parsley, mushrooms, eggs, and cheese.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: false
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: eggs
+  - carb: bread_dough_pastry
+  - style: oven
+  - temperature: hot
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: Oven bake
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 20
+    cook_time_minutes: 35
+    difficulty: medium
+    description: Inspired by the saved laugen parsley dumplings from the oven.
+    source_url: 
+    notes: Best with day-old pretzel bread.
+    steps:
+    - step_number: 1
+      instruction: Dice pretzel bread and soak it with warm milk.
+    - step_number: 2
+      instruction: Saute onion and mushrooms in butter until browned.
+    - step_number: 3
+      instruction: Mix soaked bread with eggs, parsley, mushrooms, cheese, salt, pepper, and nutmeg.
+    - step_number: 4
+      instruction: Spoon into a baking dish and bake until set and golden.
+      timer_seconds: 1800
+    - step_number: 5
+      instruction: Rest briefly and serve with salad.
+    ingredients:
+    - name: pretzel bread
+      quantity: 500
+      unit: g
+    - name: milk
+      quantity: 250
+      unit: ml
+    - name: eggs
+      quantity: 3
+      unit: unit
+    - name: brown mushrooms
+      quantity: 300
+      unit: g
+    - name: onion
+      quantity: 1
+      unit: unit
+    - name: grated cheese
+      quantity: 120
+      unit: g
+    - name: parsley
+      quantity: 1
+      unit: bunch
+    - name: butter
+      quantity: 30
+      unit: g
+- name: Paneer Mild Curry
+  description: Mild Indian-style paneer curry with vegetables, tomato, and rice.
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: cheese_dairy
+  - carb: rice
+  - style: curry
+  - temperature: hot
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: Mild tomato
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 15
+    cook_time_minutes: 25
+    difficulty: easy
+    description: Inspired by the saved mild curry with Indian paneer.
+    source_url: 
+    notes: Pan-fry paneer first for better texture.
+    steps:
+    - step_number: 1
+      instruction: Cook rice in salted water.
+    - step_number: 2
+      instruction: Cube paneer and pan-fry until golden.
+    - step_number: 3
+      instruction: Saute onion, garlic, ginger, carrot, and bell pepper with curry powder.
+    - step_number: 4
+      instruction: Add chopped tomatoes, cream, and vegetable stock, then simmer until the vegetables are tender.
+      timer_seconds: 900
+    - step_number: 5
+      instruction: Fold in paneer and serve over rice with coriander.
+    ingredients:
+    - name: paneer
+      quantity: 400
+      unit: g
+    - name: rice
+      quantity: 300
+      unit: g
+    - name: canned chopped tomatoes
+      quantity: 1
+      unit: can
+    - name: cream
+      quantity: 150
+      unit: ml
+    - name: vegetable stock
+      quantity: 250
+      unit: ml
+    - name: onion
+      quantity: 1
+      unit: unit
+    - name: garlic
+      quantity: 2
+      unit: clove
+    - name: carrot
+      quantity: 2
+      unit: unit
+    - name: red bell pepper
+      quantity: 1
+      unit: unit
+    - name: coriander
+      quantity: 1
+      unit: bunch

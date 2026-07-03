@@ -119,6 +119,14 @@ docker exec -it mealroulette-api python -m mealroulette.commands.bootstrap_admin
   --username admin --email admin@example.com
 ```
 
+Load sample dishes for testing (idempotent — skips dishes that already exist by name):
+
+```bash
+docker exec -it mealroulette-api python -m mealroulette.commands.import_sample_dishes
+```
+
+Fixture file: `backend/mealroulette/data/fixtures/sample_dishes.yaml` (inside the container: `/app/mealroulette/data/fixtures/sample_dishes.yaml`). Use `--file` only with a path that exists **inside the container**, or omit `--file` for the default. After editing the fixture locally, rebuild the API image: `docker compose up -d --build api`.
+
 ## Trying the API
 
 After `make up`:
