@@ -43,6 +43,7 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.PrimaryKeyConstraint("id"),
+        sa.CheckConstraint("from_date <= to_date", name="ck_shopping_lists_date_range"),
     )
     op.create_index("ix_shopping_lists_from_date", "shopping_lists", ["from_date"])
 
@@ -65,6 +66,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["shopping_list_id"], ["shopping_lists.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["unit_id"], ["units.id"], ondelete="RESTRICT"),
         sa.PrimaryKeyConstraint("id"),
+        sa.CheckConstraint("quantity > 0", name="ck_shopping_list_items_quantity_positive"),
     )
     op.create_index(
         "ix_shopping_list_items_shopping_list_id",

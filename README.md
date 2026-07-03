@@ -99,6 +99,8 @@ When the app data model changes (new tables like `users`, `dishes`, etc.), the P
 - `014_review_saved_at` — review_saved_at on meal plan items
 - `015_shopping_lists` — shopping lists and shopping list items
 - `016_shopping_contributions` — per-meal ingredient breakdown on list items
+- `017_ingredient_unit_behavior` — ingredient families, shopping units, conversion approval
+- `018_ingredient_conversion_unique` — unique constraint on ingredient conversion triplets
 
 With Docker Compose, the **API container runs migrations automatically** on startup (`alembic upgrade head`), then loads **reference catalog data** (standard units and starter tags) from YAML if those rows are not already present.
 
@@ -110,9 +112,9 @@ alembic upgrade head
 python -m mealroulette.commands.seed_reference_data
 ```
 
-Reference data lives in `backend/mealroulette/data/reference/` (`units.yaml`, `tags.yaml`). The loader is idempotent: re-running it only inserts missing rows, so it is safe after upgrades or when adding new defaults to the YAML files.
+Reference data lives in `backend/mealroulette/data/reference/` (`units.yaml`, `tags.yaml`). Ingredient unit conversions are defined in `backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml` (the legacy `reference/ingredient_conversions.yaml` is deprecated). The loaders are idempotent: re-running them only inserts missing rows, so it is safe after upgrades or when adding new defaults to the YAML files.
 
-Unit compatibility and aggregation rules (when to merge g + kg, when to keep "2 onions" and "200 g onion" separate) live in `mealroulette.services.quantities`. Shopping lists and exports must use that module — see SPECS §9.
+Unit compatibility and aggregation rules (when to merge g + kg, when to keep "2 onions" and "200 g onion" separate, when to use approved ingredient conversions) live in `mealroulette.services.quantities`. Shopping lists and exports must use that module — see SPECS §9.
 
 Bootstrap the first admin user once (after the stack is up). Omit `--password` to be prompted securely:
 
@@ -121,13 +123,26 @@ docker exec -it mealroulette-api python -m mealroulette.commands.bootstrap_admin
   --username admin --email admin@example.com
 ```
 
-Load sample dishes for testing (idempotent — skips dishes that already exist by name):
+Load catalog data for development (idempotent — run in this order):
 
 ```bash
+# 1. Canonical ingredients, aliases, and unit conversions
+docker exec -it mealroulette-api python -m mealroulette.commands.import_ingredient_seed
+
+# 2. Sample dishes and recipes (requires ingredients from step 1)
 docker exec -it mealroulette-api python -m mealroulette.commands.import_sample_dishes
 ```
 
-Fixture file: `backend/mealroulette/data/fixtures/sample_dishes.yaml` (inside the container: `/app/mealroulette/data/fixtures/sample_dishes.yaml`). Use `--file` only with a path that exists **inside the container**, or omit `--file` for the default. After editing the fixture locally, rebuild the API image: `docker compose up -d --build api`.
+Without Docker, from `backend/` after `alembic upgrade head` and `seed_reference_data`:
+
+```bash
+python -m mealroulette.commands.import_ingredient_seed
+python -m mealroulette.commands.import_sample_dishes
+```
+
+**Ingredient seed:** `backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml`. Use `--no-bootstrap-approve` to import conversion suggestions without auto-approving them for shopping aggregation.
+
+**Dish fixtures:** `backend/mealroulette/data/fixtures/sample_dishes.yaml` (inside the container: `/app/mealroulette/data/fixtures/sample_dishes.yaml`). Use `--file` only with a path that exists **inside the container**, or omit `--file` for the default. After editing fixtures locally, rebuild the API image: `docker compose up -d --build api`.
 
 ## Trying the API
 

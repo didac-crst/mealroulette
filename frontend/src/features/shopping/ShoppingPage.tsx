@@ -82,17 +82,39 @@ export function ShoppingPage() {
         days,
         exclude_pantry: excludePantry,
       });
-      setList(preview);
+      return preview;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load shopping list");
-    } finally {
-      setLoading(false);
+      throw err instanceof Error ? err : new Error("Failed to load shopping list");
     }
   }, [accessToken, days, excludePantry, fromDate]);
 
   useEffect(() => {
-    void loadPreview();
-  }, [loadPreview]);
+    if (!accessToken) {
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    void loadPreview()
+      .then((preview) => {
+        if (!cancelled && preview) {
+          setList(preview);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Failed to load shopping list");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [accessToken, loadPreview]);
 
   const grouped = useMemo(() => groupByCategory(list?.items ?? []), [list]);
 
@@ -212,7 +234,7 @@ export function ShoppingPage() {
       {list && list.planned_meals.length > 0 ? (
         <section className="card stack">
           <h3>Planned meals in window</h3>
-          <ul className="shopping-planned-meals shopping-bulleted-list">
+          <ul className="shopping-planned-meals bulleted-list">
             {list.planned_meals.map((meal) => (
               <li key={meal.meal_plan_item_id}>{formatPlannedMealLabel(meal)}</li>
             ))}
@@ -251,9 +273,9 @@ export function ShoppingPage() {
                       {item.optional ? <span className="muted"> (optional)</span> : null}
                     </span>
                   </label>
-                  {includesLine ? <p className="muted shopping-item-includes">includes: {includesLine}</p> : null}
+                  {includesLine ? <p className="muted shopping-item-detail">includes: {includesLine}</p> : null}
                   {item.source_contributions.length > 0 ? (
-                    <ul className="shopping-item-breakdown shopping-bulleted-list">
+                    <ul className="shopping-item-breakdown bulleted-list">
                       {item.source_contributions.map((contribution) => (
                         <li key={`${contribution.meal_plan_item_id}-${contribution.quantity}-${contribution.unit_symbol}`}>
                           {formatContributionLabel(contribution)}

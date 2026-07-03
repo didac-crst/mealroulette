@@ -51,6 +51,8 @@ def main() -> None:
     )
     if result.ingredients_skipped:
         print(f"Skipped {result.ingredients_skipped} existing ingredient(s); added missing aliases/conversions.")
+    if result.unknown_unit_skips:
+        print(f"Skipped {result.unknown_unit_skips} conversion(s) with unknown unit symbols.")
 
 
 if __name__ == "__main__":

@@ -17,7 +17,9 @@ Update this file when a phase or version milestone lands.
 
 **Phase 6 in progress** — branch `phase-6/shopping` (v0.3 shopping lists).
 
-First landed slice: YAML fixture import for sample dishes (`import_sample_dishes` CLI) so the catalog has realistic data for shopping-list testing. Not the Phase 10 full JSON export/import.
+Scope on this branch: shopping list generation and UI, ingredient seed catalog (`import_ingredient_seed`), per-ingredient unit behavior and approved conversions, and an admin ingredient dashboard. YAML dish fixture import (`import_sample_dishes`) provides realistic recipes for testing. Not the Phase 10 full JSON export/import.
+
+Recommended bootstrap after migrations: `import_ingredient_seed` → `import_sample_dishes` (see [README.md](../README.md)).
 
 ---
 
@@ -29,7 +31,7 @@ Use one branch per milestone, then merge via pull request:
 - `phase-3/catalog` — core catalog (merged)
 - `phase-4/frontend` — dish library UI (merged in PR #3, `v0.1.0`)
 - `phase-5/planning` — manual meal planning (merged in PR #4, `v0.2.0`)
-- `phase-6/shopping` — shopping lists + fixture import tooling (**in progress**)
+- `phase-6/shopping` — shopping lists, ingredient catalog seed, ingredient admin UI (**in progress**)
 
 ---
 
@@ -101,10 +103,14 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 ### v0.3 — Shopping List
 
 - [x] Generate shopping list for next X days
-- [x] Aggregate compatible units
+- [x] Aggregate compatible units (including approved ingredient-specific conversions)
 - [x] Group by category
 - [x] Exclude pantry items
-- [x] Basic shopping list UI
+- [x] Basic shopping list UI (planned meals, `~` approximate totals, per-meal breakdown)
+- [x] Ingredient seed catalog (`mealroulette_ingredients_seed.yaml` + `import_ingredient_seed`)
+- [x] Per-ingredient unit behavior (family, preferred shopping unit, aggregation strategy)
+- [x] Ingredient unit conversions with approval workflow (API + admin UI)
+- [x] Ingredient admin dashboard (`/ingredients` list + edit)
 
 ### v0.4 — Telegram Reminders
 
@@ -247,22 +253,30 @@ Merged in `fb20858` (PR #4, `v0.2.0`).
 - [x] Swagger OAuth2 token endpoint for `/docs`
 - [x] Planning integration and unit tests
 
-### Dev tooling — YAML dish fixtures
+### Dev tooling — YAML fixtures
 
 Supports local testing; distinct from Phase 10 full JSON export/import.
 
 - [x] `sample_dishes.yaml` fixture format (symbolic tags, units, ingredient names)
 - [x] `import_sample_dishes` CLI — idempotent import via catalog service
+- [x] `mealroulette_ingredients_seed.yaml` — canonical ingredients, aliases, unit conversions
+- [x] `import_ingredient_seed` CLI — idempotent ingredient catalog import (`--no-bootstrap-approve` to keep seed suggestions unapproved)
 
 ### Phase 6 — Shopping lists (in progress)
 
 Branch: `phase-6/shopping`.
 
-- [x] Shopping list models and migration
+- [x] Shopping list models and migrations (`015`–`016`)
 - [x] Dynamic list generation from meal plans (date window)
-- [x] Unit aggregation via `services/quantities`
+- [x] Unit aggregation via `services/quantities` (strategy-aware, approved conversions only)
 - [x] Pantry filtering and category grouping
-- [x] Shopping list API and UI
+- [x] Per-meal source contributions on list items
+- [x] Shopping list API and UI (`/shopping`, nav tab **List**)
+- [x] Ingredient unit behavior migration (`017`) — family, preferred shopping unit, aggregation unit/strategy
+- [x] Ingredient seed import and conversion approval bootstrap
+- [x] Ingredient conversions CRUD API (unique triplet constraint, migration `018`)
+- [x] Ingredient admin UI — catalog list, edit aliases/conversions/unit behavior
+- [x] Localization design documented ([LOCALIZATION.md](LOCALIZATION.md)); implementation deferred to Phase 11
 
 ### Phases 7–12
 

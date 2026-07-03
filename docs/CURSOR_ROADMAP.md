@@ -322,24 +322,41 @@ Implementation notes (v0.2):
 
 **Status:** In progress on branch `phase-6/shopping` (v0.3).
 
-**Prerequisite tooling (done on this branch):** YAML dish fixture import (`import_sample_dishes`) loads `data/fixtures/sample_dishes.yaml` for realistic catalog data during development. Idempotent by dish name. Not the Phase 10 JSON backup format.
+**Prerequisite tooling (done on this branch):**
+
+- YAML dish fixture import (`import_sample_dishes`) loads `data/fixtures/sample_dishes.yaml` for realistic catalog data during development. Idempotent by dish name. Not the Phase 10 JSON backup format.
+- YAML ingredient seed import (`import_ingredient_seed`) loads `data/fixtures/mealroulette_ingredients_seed.yaml` — canonical ingredients, aliases, units, and unit conversions. Idempotent; bootstrap-approves medium-or-better conversions for `allow_approximate_conversion` ingredients unless `approved: false` is set explicitly. Replaces the legacy `reference/ingredient_conversions.yaml` file (now deprecated).
+
+**Recommended bootstrap order** (after `alembic upgrade head`):
+
+1. `python -m mealroulette.commands.import_ingredient_seed`
+2. `python -m mealroulette.commands.import_sample_dishes`
 
 Deliverables:
 
 - Dynamic shopping list generation
 - Optional persisted shopping lists
-- Shopping list items
+- Shopping list items with per-meal source contributions
 - Shopping list generator calling `mealroulette.services.quantities` for aggregation
 - Pantry filtering
 - Category grouping
-- Source meal references
-- Shopping list UI
+- Source meal references and planned-meals summary in UI
+- Shopping list UI (`/shopping`)
+- Ingredient unit behavior fields (family, preferred shopping unit, aggregation unit/strategy)
+- Ingredient unit conversions with `approved` / `source` / `confidence` metadata
+- Ingredient conversions CRUD API
+- Ingredient admin dashboard (`/ingredients` list + edit: aliases, conversions, unit behavior)
+- Ingredient seed catalog for household-relevant units and approximate conversions
 
 Acceptance criteria:
 
 - Compatible units aggregate through base units.
-- Incompatible units remain separate unless an ingredient-specific conversion exists.
+- Incompatible units remain separate unless an approved ingredient-specific conversion exists.
+- Cross-dimension aggregation respects per-ingredient `aggregation_strategy` (e.g. carrot mass + count → `~860 g`).
 - Shopping items show which planned meals require them.
+- Admins can review and approve conversion suggestions from the ingredient dashboard.
+
+**Deferred to Phase 11:** multilingual content translations — design in [LOCALIZATION.md](LOCALIZATION.md).
 
 ### Later — Leftover inventory (after shopping lists)
 

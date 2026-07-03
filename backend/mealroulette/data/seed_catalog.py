@@ -11,6 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from mealroulette.data.conversion_approval import resolve_conversion_approved
 from mealroulette.models.catalog import Ingredient, IngredientUnitConversion, Tag, Unit
 from mealroulette.models.enums import ConversionConfidence, ConversionSource, UnitDimension
 from mealroulette.services.catalog import normalize_name
@@ -44,7 +45,26 @@ def load_reference_tags() -> list[dict]:
 
 
 def load_reference_ingredient_conversions() -> list[dict]:
-    return _load_yaml("ingredient_conversions.yaml")["conversions"]
+    """Flatten approved conversions from the canonical ingredient seed file."""
+    from mealroulette.data.import_ingredients import DEFAULT_INGREDIENT_SEED_PATH, load_ingredient_seed
+
+    data = load_ingredient_seed(DEFAULT_INGREDIENT_SEED_PATH)
+    rows: list[dict] = []
+    for ingredient_row in data["ingredients"]:
+        canonical = normalize_name(ingredient_row["canonical_name"])
+        for conversion_row in ingredient_row.get("unit_conversions") or []:
+            if not resolve_conversion_approved(conversion_row, ingredient_row, bootstrap_approve=True):
+                continue
+            rows.append(
+                {
+                    "ingredient": canonical,
+                    "from_unit": conversion_row["from_unit"],
+                    "to_unit": conversion_row["to_unit"],
+                    "factor": str(conversion_row["factor"]),
+                    "notes": conversion_row.get("basis"),
+                }
+            )
+    return rows
 
 
 def seed_reference_units(db: Session, rows: list[dict] | None = None) -> int:

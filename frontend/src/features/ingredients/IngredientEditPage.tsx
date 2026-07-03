@@ -89,6 +89,9 @@ export function IngredientEditPage() {
   });
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
+  const [aliasBusy, setAliasBusy] = useState(false);
+  const [conversionBusy, setConversionBusy] = useState(false);
+  const [conversionActionId, setConversionActionId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -192,7 +195,7 @@ export function IngredientEditPage() {
   };
 
   const handleAddAlias = async () => {
-    if (!accessToken || isNew || !ingredientId) {
+    if (!accessToken || isNew || !ingredientId || aliasBusy) {
       return;
     }
     const alias = newAliases
@@ -202,6 +205,8 @@ export function IngredientEditPage() {
     if (!alias) {
       return;
     }
+    setAliasBusy(true);
+    setError(null);
     try {
       await createIngredientAlias(accessToken, Number(ingredientId), {
         alias,
@@ -212,16 +217,29 @@ export function IngredientEditPage() {
       await reloadDetail();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Failed to add alias");
+    } finally {
+      setAliasBusy(false);
     }
   };
 
   const handleAddConversion = async () => {
-    if (!accessToken || isNew || !ingredientId) {
+    if (!accessToken || isNew || !ingredientId || conversionBusy) {
       return;
     }
     if (!conversionForm.from_unit_id || !conversionForm.to_unit_id || !conversionForm.factor) {
       return;
     }
+    if (conversionForm.from_unit_id === conversionForm.to_unit_id) {
+      setError("From and to units must differ");
+      return;
+    }
+    const factor = Number(conversionForm.factor);
+    if (!Number.isFinite(factor) || factor <= 0) {
+      setError("Factor must be a positive number");
+      return;
+    }
+    setConversionBusy(true);
+    setError(null);
     try {
       await createIngredientConversion(accessToken, Number(ingredientId), {
         from_unit_id: Number(conversionForm.from_unit_id),
@@ -243,6 +261,8 @@ export function IngredientEditPage() {
       await reloadDetail();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Failed to add conversion");
+    } finally {
+      setConversionBusy(false);
     }
   };
 
@@ -471,7 +491,7 @@ export function IngredientEditPage() {
         <>
           <fieldset>
             <legend>Aliases</legend>
-            <ul className="shopping-bulleted-list">
+            <ul className="bulleted-list">
               {detail.aliases.map((alias) => (
                 <li key={alias.id} className="row-between ingredient-alias-row">
                   <span>
@@ -481,13 +501,19 @@ export function IngredientEditPage() {
                   <button
                     type="button"
                     className="button button-secondary"
-                    onClick={() =>
+                    disabled={aliasBusy}
+                    onClick={() => {
+                      if (aliasBusy) {
+                        return;
+                      }
+                      setAliasBusy(true);
                       void deleteIngredientAlias(accessToken!, alias.id)
                         .then(() => reloadDetail())
                         .catch((err) =>
                           setError(err instanceof ApiError ? err.message : "Failed to delete alias"),
                         )
-                    }
+                        .finally(() => setAliasBusy(false));
+                    }}
                   >
                     Remove
                   </button>
@@ -507,8 +533,8 @@ export function IngredientEditPage() {
                   placeholder="fr, en, es…"
                 />
               </label>
-              <button type="button" className="button button-secondary" onClick={() => void handleAddAlias()}>
-                Add alias
+              <button type="button" className="button button-secondary" disabled={aliasBusy} onClick={() => void handleAddAlias()}>
+                {aliasBusy ? "Adding…" : "Add alias"}
               </button>
             </div>
           </fieldset>
@@ -529,7 +555,12 @@ export function IngredientEditPage() {
                       <input
                         type="checkbox"
                         checked={conversion.approved}
-                        onChange={(event) =>
+                        disabled={conversionActionId === conversion.id}
+                        onChange={(event) => {
+                          if (conversionActionId !== null) {
+                            return;
+                          }
+                          setConversionActionId(conversion.id);
                           void updateIngredientConversion(accessToken!, conversion.id, {
                             approved: event.target.checked,
                           })
@@ -537,7 +568,8 @@ export function IngredientEditPage() {
                             .catch((err) =>
                               setError(err instanceof ApiError ? err.message : "Failed to update conversion"),
                             )
-                        }
+                            .finally(() => setConversionActionId(null));
+                        }}
                       />
                       Approved
                     </label>
@@ -550,13 +582,19 @@ export function IngredientEditPage() {
                   <button
                     type="button"
                     className="button button-secondary"
-                    onClick={() =>
+                    disabled={conversionActionId === conversion.id}
+                    onClick={() => {
+                      if (conversionActionId !== null) {
+                        return;
+                      }
+                      setConversionActionId(conversion.id);
                       void deleteIngredientConversion(accessToken!, conversion.id)
                         .then(() => reloadDetail())
                         .catch((err) =>
                           setError(err instanceof ApiError ? err.message : "Failed to delete conversion"),
                         )
-                    }
+                        .finally(() => setConversionActionId(null));
+                    }}
                   >
                     Delete conversion
                   </button>
@@ -633,8 +671,13 @@ export function IngredientEditPage() {
                 />
                 Approved for shopping aggregation
               </label>
-              <button type="button" className="button button-secondary" onClick={() => void handleAddConversion()}>
-                Add conversion
+              <button
+                type="button"
+                className="button button-secondary"
+                disabled={conversionBusy}
+                onClick={() => void handleAddConversion()}
+              >
+                {conversionBusy ? "Adding…" : "Add conversion"}
               </button>
             </div>
           </fieldset>

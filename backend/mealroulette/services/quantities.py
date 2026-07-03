@@ -10,7 +10,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from decimal import Decimal
 
+from collections.abc import Callable
+from typing import TypeVar
+
 from mealroulette.models.enums import AggregationStrategy, UnitDimension
+
+T = TypeVar("T")
 
 
 class UnitsNotCompatibleError(ValueError):
@@ -94,6 +99,32 @@ def convert_quantity(
     )
 
 
+def partition_merge_groups(items: list[T], mergeable: Callable[[T, T], bool]) -> list[list[T]]:
+    """Group items transitively when any pair satisfies mergeable."""
+    groups: list[list[T]] = [[item] for item in items]
+    merged = True
+    while merged:
+        merged = False
+        next_groups: list[list[T]] = []
+        consumed: set[int] = set()
+
+        for index, group in enumerate(groups):
+            if index in consumed:
+                continue
+            combined = list(group)
+            for other_index, other_group in enumerate(groups):
+                if other_index <= index or other_index in consumed:
+                    continue
+                if any(mergeable(left, right) for left in combined for right in other_group):
+                    combined.extend(other_group)
+                    consumed.add(other_index)
+                    merged = True
+            consumed.add(index)
+            next_groups.append(combined)
+        groups = next_groups
+    return groups
+
+
 def cross_dimension_mergeable(
     left: UnitInfo,
     right: UnitInfo,
@@ -103,12 +134,22 @@ def cross_dimension_mergeable(
     """Whether two quantities may be summed when dimensions differ."""
     if left.dimension == right.dimension:
         return units_mergeable(left, right, conversions)
-    if strategy in {
-        AggregationStrategy.strict_same_dimension,
-        AggregationStrategy.prefer_count,
-        AggregationStrategy.never_convert_count,
-    }:
+    if strategy == AggregationStrategy.strict_same_dimension:
         return False
+    if strategy == AggregationStrategy.never_convert_count:
+        if UnitDimension.count in {left.dimension, right.dimension}:
+            return False
+        return units_mergeable(left, right, conversions)
+    if strategy == AggregationStrategy.prefer_count:
+        return False
+    if strategy == AggregationStrategy.prefer_mass:
+        if UnitDimension.mass not in {left.dimension, right.dimension}:
+            return False
+        return units_mergeable(left, right, conversions)
+    if strategy == AggregationStrategy.prefer_volume:
+        if UnitDimension.volume not in {left.dimension, right.dimension}:
+            return False
+        return units_mergeable(left, right, conversions)
     return units_mergeable(left, right, conversions)
 
 
@@ -128,27 +169,10 @@ def aggregate_quantities(
     if any(line.ingredient_id != ingredient_id for line in lines):
         raise ValueError("aggregate_quantities expects lines for a single ingredient")
 
-    groups: list[list[QuantityLine]] = [[line] for line in lines]
-    merged = True
-    while merged:
-        merged = False
-        next_groups: list[list[QuantityLine]] = []
-        consumed: set[int] = set()
-
-        for index, group in enumerate(groups):
-            if index in consumed:
-                continue
-            combined = list(group)
-            for other_index, other_group in enumerate(groups):
-                if other_index <= index or other_index in consumed:
-                    continue
-                if _groups_mergeable(combined, other_group, conversions, aggregation_strategy):
-                    combined.extend(other_group)
-                    consumed.add(other_index)
-                    merged = True
-            consumed.add(index)
-            next_groups.append(combined)
-        groups = next_groups
+    groups = partition_merge_groups(
+        lines,
+        lambda left, right: _groups_mergeable([left], [right], conversions, aggregation_strategy),
+    )
 
     return [_collapse_group(ingredient_id, group, conversions, aggregation_strategy, preferred_display_unit) for group in groups]
 
@@ -236,22 +260,45 @@ def _display_unit_for_group(
     aggregation_strategy: AggregationStrategy | None = None,
     preferred_display_unit: UnitInfo | None = None,
 ) -> UnitInfo:
-    if preferred_display_unit is not None and all(
-        cross_dimension_mergeable(line.unit, preferred_display_unit, aggregation_strategy, conversions)
-        for line in group
-    ):
-        return preferred_display_unit
+    def validated(candidates: list[UnitInfo]) -> UnitInfo | None:
+        for candidate in candidates:
+            if all(
+                cross_dimension_mergeable(line.unit, candidate, aggregation_strategy, conversions)
+                for line in group
+            ):
+                return candidate
+        return None
+
+    if preferred_display_unit is not None:
+        candidate = validated([preferred_display_unit])
+        if candidate is not None:
+            return candidate
 
     unique_units = list({line.unit.id: line.unit for line in group}.values())
     if aggregation_strategy == AggregationStrategy.prefer_count:
-        count_units = [unit for unit in unique_units if unit.dimension == UnitDimension.count]
-        if count_units:
-            return sorted(count_units, key=lambda unit: unit.symbol)[0]
+        count_units = sorted(
+            (unit for unit in unique_units if unit.dimension == UnitDimension.count),
+            key=lambda unit: unit.symbol,
+        )
+        candidate = validated(count_units)
+        if candidate is not None:
+            return candidate
+    if aggregation_strategy == AggregationStrategy.prefer_mass:
+        mass_units = sorted(
+            (unit for unit in unique_units if unit.dimension == UnitDimension.mass),
+            key=lambda unit: (unit.conversion_to_base, unit.symbol),
+        )
+        candidate = validated(mass_units)
+        if candidate is not None:
+            return candidate
     if aggregation_strategy == AggregationStrategy.prefer_volume:
-        volume_units = [unit for unit in unique_units if unit.dimension == UnitDimension.volume]
-        if volume_units:
-            volume_units.sort(key=lambda unit: (unit.conversion_to_base, unit.symbol))
-            return volume_units[0]
+        volume_units = sorted(
+            (unit for unit in unique_units if unit.dimension == UnitDimension.volume),
+            key=lambda unit: (unit.conversion_to_base, unit.symbol),
+        )
+        candidate = validated(volume_units)
+        if candidate is not None:
+            return candidate
 
     unique_units.sort(
         key=lambda unit: (
@@ -260,10 +307,7 @@ def _display_unit_for_group(
             unit.symbol,
         )
     )
-    for candidate in unique_units:
-        if all(
-            cross_dimension_mergeable(line.unit, candidate, aggregation_strategy, conversions)
-            for line in group
-        ):
-            return candidate
+    candidate = validated(unique_units)
+    if candidate is not None:
+        return candidate
     return group[0].unit

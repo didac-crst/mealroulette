@@ -15,7 +15,10 @@ export function IngredientDetailPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!accessToken || !ingredientId) {
+    if (!accessToken || !ingredientId || isAdmin) {
+      if (isAdmin) {
+        setLoading(false);
+      }
       return;
     }
     let cancelled = false;
@@ -39,7 +42,7 @@ export function IngredientDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [accessToken, ingredientId]);
+  }, [accessToken, ingredientId, isAdmin]);
 
   useEffect(() => {
     if (isAdmin && ingredientId) {
@@ -79,7 +82,7 @@ export function IngredientDetailPage() {
         {detail.aggregation_strategy ?? "—"}
       </p>
       <h3>Aliases</h3>
-      <ul className="shopping-bulleted-list">
+      <ul className="bulleted-list">
         {detail.aliases.map((alias) => (
           <li key={alias.id}>{alias.alias}</li>
         ))}

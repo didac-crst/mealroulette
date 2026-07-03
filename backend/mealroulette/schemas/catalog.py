@@ -2,7 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from mealroulette.models.enums import (
     AggregationStrategy,
@@ -147,6 +147,16 @@ class IngredientUnitConversionUpdateRequest(BaseModel):
     notes: str | None = None
     approved: bool | None = None
     source: ConversionSource | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def reject_null_non_nullable_fields(cls, data: object) -> object:
+        if not isinstance(data, dict):
+            return data
+        for field in ("factor", "confidence", "approved"):
+            if field in data and data[field] is None:
+                raise ValueError(f"{field} cannot be null")
+        return data
 
 
 class IngredientAliasPublic(BaseModel):

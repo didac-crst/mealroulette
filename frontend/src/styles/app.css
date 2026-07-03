@@ -239,6 +239,11 @@ button:disabled {
 .button-danger {
   border-color: #9b1c1c;
   background: #9b1c1c;
+  color: #fff;
+}
+
+.button-danger:hover {
+  background: #9b1d1d;
 }
 
 .button-secondary {
@@ -894,7 +899,7 @@ legend {
   gap: 0.75rem;
 }
 
-.shopping-bulleted-list {
+.bulleted-list {
   list-style: disc;
   padding-left: 1.25rem;
 }
@@ -906,11 +911,6 @@ legend {
   gap: 0.5rem;
 }
 
-.shopping-item-includes {
-  margin: 0.25rem 0 0 1.75rem;
-  font-size: 0.875rem;
-}
-
 .shopping-item-label {
   display: flex;
   align-items: flex-start;
@@ -918,7 +918,7 @@ legend {
   cursor: pointer;
 }
 
-.shopping-item-sources {
+.shopping-item-detail {
   margin: 0.25rem 0 0 1.75rem;
   font-size: 0.875rem;
 }
@@ -995,13 +995,4 @@ legend {
 
 .ingredient-conversion-row {
   padding: 0.75rem;
-}
-
-.button-danger {
-  background: #ba2525;
-  color: #fff;
-}
-
-.button-danger:hover {
-  background: #9b1d1d;
 }

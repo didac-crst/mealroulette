@@ -129,7 +129,6 @@ ingredients:
     basis: one medium fresh tomato
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: cherry_tomato
   display_name: Cherry tomato
   description: Small fresh tomatoes, typically used whole in salads or roasted dishes.
@@ -159,7 +158,6 @@ ingredients:
     basis: one cherry tomato
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: coeur_de_boeuf_tomato
   display_name: Coeur de boeuf tomato
   description: Large ribbed beefsteak-style tomato, useful when recipe specifically needs large meaty tomatoes.
@@ -188,7 +186,6 @@ ingredients:
     basis: one medium-large coeur de boeuf tomato
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: canned_chopped_tomatoes
   display_name: Canned chopped tomatoes
   description: Canned diced/chopped tomatoes in juice. Not the same as fresh tomato for shopping.
@@ -212,7 +209,6 @@ ingredients:
     basis: standard EU can gross contents
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: tomato_passata
   display_name: Tomato passata
   description: Smooth tomato puree/passata, usually sold in bottles or cartons.
@@ -302,7 +298,6 @@ ingredients:
     basis: one medium onion
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: red_onion
   display_name: Red onion
   description: Red/purple onion, common raw or lightly cooked.
@@ -324,7 +319,6 @@ ingredients:
     basis: one medium red onion
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: spring_onion
   display_name: Spring onion
   description: Green onion/scallion, sold by bunch or individual stems.
@@ -348,14 +342,12 @@ ingredients:
     basis: one spring onion stem
     confidence: low
     source: seed_suggestion
-    approved: false
   - from_unit: bunch
     to_unit: g
     factor: 100
     basis: one bunch of spring onions
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: shallot
   display_name: Shallot
   description: Small mild allium, not equivalent to onion when counted.
@@ -377,7 +369,6 @@ ingredients:
     basis: one medium shallot
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: garlic
   display_name: Garlic
   description: Fresh garlic cloves. Store recipes as cloves when possible.
@@ -400,14 +391,12 @@ ingredients:
     basis: one medium garlic clove
     confidence: medium
     source: seed_suggestion
-    approved: false
   - from_unit: head
     to_unit: clove
     factor: 10
     basis: one garlic head average cloves
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: carrot
   display_name: Carrot
   description: Fresh carrot. Recipes often use unit or grams; shopping can aggregate approximately to grams.
@@ -447,7 +436,6 @@ ingredients:
     basis: one medium carrot
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: celery_stalk
   display_name: Celery stalk
   description: Individual celery stalk/rib, not a whole celery head.
@@ -470,7 +458,6 @@ ingredients:
     basis: one celery stalk/rib
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: leek
   display_name: Leek
   description: Fresh leek, often counted by unit.
@@ -501,7 +488,6 @@ ingredients:
     basis: one medium leek trimmed
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: potato
   display_name: Potato
   description: Generic potato. Use specific varieties only when cooking behavior matters.
@@ -524,7 +510,6 @@ ingredients:
     basis: one medium potato
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: sweet_potato
   display_name: Sweet potato
   description: Sweet potato, distinct from regular potato.
@@ -556,7 +541,6 @@ ingredients:
     basis: one medium sweet potato
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: pumpkin
   display_name: Pumpkin
   description: Pumpkin or squash flesh for soups, stews and quiches.
@@ -589,7 +573,6 @@ ingredients:
     basis: one small pumpkin/squash usable flesh, very approximate
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: zucchini
   display_name: Zucchini
   description: Fresh zucchini/courgette.
@@ -618,7 +601,6 @@ ingredients:
     basis: one medium zucchini
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: aubergine
   display_name: Aubergine
   description: Eggplant/aubergine, often counted by unit.
@@ -648,7 +630,6 @@ ingredients:
     basis: one medium aubergine
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: bell_pepper
   display_name: Bell pepper
   description: Generic sweet bell pepper. Use color-specific entries if the recipe needs red/green/yellow.
@@ -678,7 +659,6 @@ ingredients:
     basis: one medium bell pepper
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: red_bell_pepper
   display_name: Red bell pepper
   description: Red sweet bell pepper; separate when color matters for recipe or shopping.
@@ -707,7 +687,6 @@ ingredients:
     basis: one medium red bell pepper
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: green_beans
   display_name: Green beans
   description: Fresh or frozen green beans; use frozen_green_beans if you want separate shopping behavior.
@@ -757,7 +736,6 @@ ingredients:
     basis: one medium cucumber
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: radish
   display_name: Radish
   description: Fresh radishes, often sold by bunch.
@@ -785,7 +763,6 @@ ingredients:
     basis: one bunch of radishes
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: cauliflower
   display_name: Cauliflower
   description: Whole cauliflower or florets.
@@ -817,7 +794,6 @@ ingredients:
     basis: one medium cauliflower trimmed florets
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: kale
   display_name: Kale
   description: Fresh kale leaves.
@@ -870,7 +846,6 @@ ingredients:
     basis: one medium kohlrabi bulb
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: red_cabbage
   display_name: Red cabbage
   description: Red cabbage, whole or shredded.
@@ -901,7 +876,6 @@ ingredients:
     basis: one small red cabbage
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: spinach
   display_name: Spinach
   description: Fresh or frozen spinach. Consider separate frozen_spinach if needed.
@@ -976,7 +950,6 @@ ingredients:
     basis: one portobello cap
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: rice
   display_name: Rice
   description: Generic dry rice. Use specific rice types when cooking behavior matters.
@@ -1172,7 +1145,6 @@ ingredients:
     basis: one 400 g can drained weight
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: black_beans
   display_name: Black beans
   description: Black beans, often canned for quick recipes.
@@ -1193,7 +1165,6 @@ ingredients:
     basis: one 400 g can drained weight
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: white_beans
   display_name: White beans
   description: White beans such as cannellini/haricots blancs.
@@ -1214,7 +1185,6 @@ ingredients:
     basis: one 400 g can drained weight
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: brown_lentils
   display_name: Brown lentils
   description: Brown/green lentils, dry or canned depending recipe.
@@ -1237,7 +1207,6 @@ ingredients:
     basis: one 400 g can drained weight
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: red_lentils
   display_name: Red lentils
   description: Split red lentils/lentilles corail, usually dry and fast-cooking.
@@ -1287,7 +1256,6 @@ ingredients:
     basis: one standard can drained weight
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: eggs
   display_name: Eggs
   description: Chicken eggs. Keep count for shopping; gram conversion is only for baking normalization.
@@ -1312,7 +1280,6 @@ ingredients:
     basis: one medium egg without shell
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: milk
   display_name: Milk
   description: Cow milk or generic milk unless recipe needs specific type.
@@ -1382,7 +1349,6 @@ ingredients:
     basis: one tablespoon yogurt approximate
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: butter
   display_name: Butter
   description: Butter, salted or unsalted unless specified.
@@ -1402,7 +1368,6 @@ ingredients:
     basis: one tablespoon butter
     confidence: high
     source: seed_suggestion
-    approved: false
 - canonical_name: parmesan
   display_name: Parmesan
   description: Hard Italian cheese, grated or block.
@@ -1503,7 +1468,6 @@ ingredients:
     basis: one chicken breast fillet
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: minced_beef
   display_name: Minced beef
   description: Ground/minced beef.
@@ -1554,7 +1518,6 @@ ingredients:
     basis: one fish fillet
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: salmon_fillet
   display_name: Salmon fillet
   description: Salmon fillet or portion.
@@ -1576,7 +1539,6 @@ ingredients:
     basis: one salmon portion
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: tuna
   display_name: Tuna
   description: Fresh tuna, not canned tuna.
@@ -1611,7 +1573,6 @@ ingredients:
     basis: one medium can drained tuna
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: prawns
   display_name: Prawns
   description: Raw or cooked prawns/shrimp.
@@ -1671,7 +1632,6 @@ ingredients:
     basis: one common tofu block
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: baguette
   display_name: Baguette
   description: French baguette or demi-baguette depending recipe.
@@ -1691,7 +1651,6 @@ ingredients:
     basis: one standard baguette
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: tortilla_wraps
   display_name: Tortilla wraps
   description: Soft wheat/corn tortilla wraps.
@@ -1713,7 +1672,6 @@ ingredients:
     basis: one common pack of wraps
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: flatbread_base
   display_name: Flatbread base
   description: Prepared flatbread/flammkuchen/pizza-style base.
@@ -1748,7 +1706,6 @@ ingredients:
     basis: one ready-rolled pastry sheet
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: shortcrust_pastry
   display_name: Shortcrust pastry
   description: Ready-rolled shortcrust pastry sheet.
@@ -1769,7 +1726,6 @@ ingredients:
     basis: one ready-rolled shortcrust pastry sheet
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: pretzel_bread
   display_name: Pretzel bread
   description: Laugen/pretzel bread used for dumpling bakes.
@@ -1817,14 +1773,12 @@ ingredients:
     basis: juice from one medium lemon
     confidence: low
     source: seed_suggestion
-    approved: false
   - from_unit: unit
     to_unit: g
     factor: 120
     basis: one medium lemon whole
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: lime
   display_name: Lime
   description: Fresh lime.
@@ -1845,14 +1799,12 @@ ingredients:
     basis: juice from one medium lime
     confidence: low
     source: seed_suggestion
-    approved: false
   - from_unit: unit
     to_unit: g
     factor: 70
     basis: one medium lime whole
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: avocado
   display_name: Avocado
   description: Fresh avocado.
@@ -1873,7 +1825,6 @@ ingredients:
     basis: edible flesh of one medium avocado
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: parsley
   display_name: Parsley
   description: Fresh parsley bunch.
@@ -1895,7 +1846,6 @@ ingredients:
     basis: one small bunch parsley
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: coriander
   display_name: Coriander
   description: Fresh coriander/cilantro bunch.
@@ -1916,7 +1866,6 @@ ingredients:
     basis: one small bunch coriander
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: fresh_thyme
   display_name: Fresh thyme
   description: Fresh thyme bunch/sprigs.
@@ -1937,7 +1886,6 @@ ingredients:
     basis: one small bunch thyme
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: fresh_sage
   display_name: Fresh sage
   description: Fresh sage bunch/leaves.
@@ -1958,7 +1906,6 @@ ingredients:
     basis: one small bunch sage
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: basil_paste
   display_name: Basil paste
   description: Prepared basil paste, distinct from fresh basil.
@@ -2020,7 +1967,6 @@ ingredients:
     basis: one standard coconut milk can
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: curry_paste
   display_name: Curry paste
   description: Prepared curry paste, e.g. panang/yellow/red curry paste.
@@ -2062,14 +2008,12 @@ ingredients:
     basis: one teaspoon curry powder
     confidence: low
     source: seed_suggestion
-    approved: false
   - from_unit: tbsp
     to_unit: g
     factor: 7.5
     basis: one tablespoon curry powder
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: dukkah_spice
   display_name: Dukkah spice
   description: Dukkah nut/spice blend.
@@ -2090,7 +2034,6 @@ ingredients:
     basis: one tablespoon dukkah, approximate
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: oregano
   display_name: Oregano
   description: Dried oregano.
@@ -2110,7 +2053,6 @@ ingredients:
     basis: one teaspoon dried oregano
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: chili_flakes
   display_name: Chili flakes
   description: Dried chili flakes.
@@ -2132,7 +2074,6 @@ ingredients:
     basis: one teaspoon chili flakes
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: red_chili
   display_name: Red chili
   description: Fresh red chili pepper.
@@ -2153,7 +2094,6 @@ ingredients:
     basis: one fresh chili
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: green_chili
   display_name: Green chili
   description: Fresh green chili pepper.
@@ -2174,7 +2114,6 @@ ingredients:
     basis: one fresh chili
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: mayonnaise
   display_name: Mayonnaise
   description: Prepared mayonnaise.
@@ -2195,7 +2134,6 @@ ingredients:
     basis: one tablespoon mayonnaise
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: peanut_butter
   display_name: Peanut butter
   description: Peanut butter/paste.
@@ -2216,7 +2154,6 @@ ingredients:
     basis: one tablespoon peanut butter
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: allioli
   display_name: Allioli
   description: Garlic mayonnaise/allioli sauce.
@@ -2238,7 +2175,6 @@ ingredients:
     basis: one tablespoon allioli
     confidence: medium
     source: seed_suggestion
-    approved: false
 - canonical_name: capers
   display_name: Capers
   description: Capers in brine.
@@ -2259,7 +2195,6 @@ ingredients:
     basis: one tablespoon drained capers
     confidence: low
     source: seed_suggestion
-    approved: false
 - canonical_name: black_olives
   display_name: Black olives
   description: Pitted black olives.

@@ -30,12 +30,7 @@ class ShoppingSourceMeal(BaseModel):
     recipe_variant_name: str | None = None
 
 
-class ShoppingPlannedMeal(BaseModel):
-    meal_plan_item_id: int
-    date: date
-    meal_slot: MealSlot
-    dish_name: str
-    recipe_variant_name: str | None = None
+ShoppingPlannedMeal = ShoppingSourceMeal
 
 
 class ShoppingListItemPublic(BaseModel):

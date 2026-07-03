@@ -115,6 +115,14 @@ class IngredientAlias(Base):
 
 class IngredientUnitConversion(Base):
     __tablename__ = "ingredient_unit_conversions"
+    __table_args__ = (
+        UniqueConstraint(
+            "ingredient_id",
+            "from_unit_id",
+            "to_unit_id",
+            name="uq_ingredient_unit_conversions_triplet",
+        ),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     ingredient_id: Mapped[int] = mapped_column(ForeignKey("ingredients.id", ondelete="CASCADE"), index=True)

@@ -30,7 +30,7 @@ from mealroulette.services.quantities import (
     UnitInfo,
     aggregate_quantities,
     cross_dimension_mergeable,
-    units_mergeable,
+    partition_merge_groups,
 )
 
 
@@ -188,36 +188,15 @@ class ShoppingListService:
         conversions: list[IngredientConversion],
         aggregation_strategy: AggregationStrategy | None,
     ) -> list[list[_SourcedLine]]:
-        groups: list[list[_SourcedLine]] = [[entry] for entry in ingredient_lines]
-        merged = True
-        while merged:
-            merged = False
-            next_groups: list[list[_SourcedLine]] = []
-            consumed: set[int] = set()
-            for index, group in enumerate(groups):
-                if index in consumed:
-                    continue
-                combined = list(group)
-                for other_index, other_group in enumerate(groups):
-                    if other_index <= index or other_index in consumed:
-                        continue
-                    if any(
-                        cross_dimension_mergeable(
-                            left.line.unit,
-                            right.line.unit,
-                            aggregation_strategy,
-                            conversions,
-                        )
-                        for left in combined
-                        for right in other_group
-                    ):
-                        combined.extend(other_group)
-                        consumed.add(other_index)
-                        merged = True
-                consumed.add(index)
-                next_groups.append(combined)
-            groups = next_groups
-        return groups
+        return partition_merge_groups(
+            ingredient_lines,
+            lambda left, right: cross_dimension_mergeable(
+                left.line.unit,
+                right.line.unit,
+                aggregation_strategy,
+                conversions,
+            ),
+        )
 
     def _aggregate_sourced_lines(
         self,

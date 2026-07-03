@@ -443,7 +443,11 @@ class CatalogService:
             source=payload.source,
         )
         self.db.add(conversion)
-        self.db.commit()
+        try:
+            self.db.commit()
+        except IntegrityError:
+            self.db.rollback()
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Conversion already exists") from None
         self.db.refresh(conversion)
         loaded = self.db.scalar(
             select(IngredientUnitConversion)
@@ -453,7 +457,11 @@ class CatalogService:
             )
             .where(IngredientUnitConversion.id == conversion.id)
         )
-        assert loaded is not None
+        if loaded is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to load conversion after create",
+            )
         return loaded
 
     def update_conversion(

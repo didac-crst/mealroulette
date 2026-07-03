@@ -10,6 +10,7 @@ import yaml
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from mealroulette.data.conversion_approval import resolve_conversion_approved
 from mealroulette.data.seed_catalog import seed_reference_units
 from mealroulette.models.catalog import Ingredient, IngredientAlias, IngredientUnitConversion, Unit
 from mealroulette.models.enums import (
@@ -47,6 +48,7 @@ class IngredientImportResult:
     ingredients_skipped: int
     aliases_added: int
     conversions_added: int
+    unknown_unit_skips: int
 
 
 def load_ingredient_seed(path: Path | str = DEFAULT_INGREDIENT_SEED_PATH) -> dict:
@@ -91,17 +93,11 @@ def _resolve_approved(
     *,
     bootstrap_approve: bool,
 ) -> bool:
-    if conversion_row.get("approved") is True:
-        return True
-    if conversion_row.get("approved") is False and not bootstrap_approve:
-        return False
-    if not bootstrap_approve:
-        return bool(conversion_row.get("approved"))
-    strategy = ingredient_row.get("aggregation_strategy")
-    confidence = conversion_row.get("confidence", "medium")
-    if strategy == "allow_approximate_conversion" and confidence in {"exact", "high", "medium"}:
-        return True
-    return bool(conversion_row.get("approved"))
+    return resolve_conversion_approved(
+        conversion_row,
+        ingredient_row,
+        bootstrap_approve=bootstrap_approve,
+    )
 
 
 def _unit_id(units_by_symbol: dict[str, Unit], symbol: str | None) -> int | None:
@@ -141,9 +137,10 @@ def import_ingredient_seed(
     ingredients_skipped = 0
     aliases_added = 0
     conversions_added = 0
+    unknown_unit_skips = 0
 
     for row in data["ingredients"]:
-        canonical = row["canonical_name"].strip().lower()
+        canonical = normalize_name(row["canonical_name"])
         ingredient = ingredients_by_canonical.get(canonical)
         default_unit_id = _unit_id(units_by_symbol, row.get("default_recipe_unit"))
         preferred_shopping_unit_id = _unit_id(units_by_symbol, row.get("preferred_shopping_unit"))
@@ -190,6 +187,7 @@ def import_ingredient_seed(
             from_unit = units_by_symbol.get(conversion_row["from_unit"])
             to_unit = units_by_symbol.get(conversion_row["to_unit"])
             if from_unit is None or to_unit is None:
+                unknown_unit_skips += 1
                 continue
             key = (ingredient.id, from_unit.id, to_unit.id)
             if key in existing_conversions:
@@ -216,4 +214,5 @@ def import_ingredient_seed(
         ingredients_skipped=ingredients_skipped,
         aliases_added=aliases_added,
         conversions_added=conversions_added,
+        unknown_unit_skips=unknown_unit_skips,
     )
