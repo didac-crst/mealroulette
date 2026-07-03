@@ -14,7 +14,11 @@ export function AppLayout() {
   const { user, logout, isAdmin } = useAuth();
 
   const tabRoutes = isAdmin
-    ? [...TAB_ROUTES, { to: "/ingredients", label: "Ingredients" } as const]
+    ? [
+        ...TAB_ROUTES,
+        { to: "/ingredients", label: "Ingredients" } as const,
+        { to: "/settings/telegram", label: "Telegram" } as const,
+      ]
     : TAB_ROUTES;
 
   return (
@@ -39,11 +43,6 @@ export function AppLayout() {
               {label}
             </NavButtonLink>
           ))}
-          {isAdmin ? (
-            <NavButtonLink to="/settings/telegram" inactiveVariant="secondary">
-              Telegram
-            </NavButtonLink>
-          ) : null}
           <button type="button" className="button button-secondary" onClick={() => void logout()}>
             Sign out
           </button>
@@ -67,14 +66,6 @@ export function AppLayout() {
             {label}
           </NavLink>
         ))}
-        {isAdmin ? (
-          <NavLink
-            to="/settings/telegram"
-            className={({ isActive }) => `app-tab${isActive ? " app-tab-active" : ""}`}
-          >
-            Telegram
-          </NavLink>
-        ) : null}
       </nav>
     </div>
   );
