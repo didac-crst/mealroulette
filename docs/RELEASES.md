@@ -34,7 +34,7 @@ git push origin v0.1.0
 | --- | --- | --- | --- |
 | [`v0.1.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.1.0) | [`b41cdae`](https://github.com/didac-crst/mealroulette/commit/b41cdae) | 2026-07-02 | Foundation: platform, auth, catalog API, dish library UI — [release notes](releases/v0.1.0.md) |
 | [`v0.2.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.2.0) | [`fb20858`](https://github.com/didac-crst/mealroulette/commit/fb20858) | 2026-07-03 | Manual planning: weekly plan, review flow, meal actions, ratings, lightweight leftovers — [release notes](releases/v0.2.0.md) |
-| [`v0.3.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.3.0) | _merge commit_ | 2026-07-03 | Shopping lists, ingredient catalog, unit aggregation — [release notes](releases/v0.3.0.md) |
+| [`v0.3.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.3.0) | [`88d2675`](https://github.com/didac-crst/mealroulette/commit/88d2675) | 2026-07-03 | Shopping lists, ingredient catalog, unit aggregation — [release notes](releases/v0.3.0.md) |
 
 ## Check out a release
 

@@ -41,7 +41,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | --- | --- | --- |
 | **v0.1** | Foundation — platform, auth, catalog (API + UI), basic frontend | **Done** ([`v0.1.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.1.0), merge `b41cdae`, PR #3) |
 | **v0.2** | Manual planning — weekly plan, review flow, meal actions, ratings, lightweight leftovers | **Done** ([`v0.2.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.2.0), merge `fb20858`, PR #4) |
-| **v0.3** | Shopping list — generation, aggregation, pantry filter, UI, ingredient catalog | **Done** ([`v0.3.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.3.0), PR #5) |
+| **v0.3** | Shopping list — generation, aggregation, pantry filter, UI, ingredient catalog | **Done** ([`v0.3.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.3.0), merge `88d2675`, PR #5) |
 | **v0.4** | Telegram reminders — settings, scheduled and manual send | Not started |
 | **v0.5** | Automatic scheduler — explainable weekly generation, reroll | Not started |
 | **v0.6** | LLM-assisted entry — draft enrichment, review before save | Not started |
@@ -262,7 +262,7 @@ Supports local testing; distinct from Phase 10 full JSON export/import.
 
 ### Phase 6 — Shopping lists ✅
 
-Merged in PR #5 (`v0.3.0`).
+Merged in PR #5 (`v0.3.0`, commit `88d2675`).
 
 Branch: `phase-6/shopping`.
 

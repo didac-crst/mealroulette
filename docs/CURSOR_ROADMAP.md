@@ -320,7 +320,7 @@ Implementation notes (v0.2):
 
 ### Phase 6 - Shopping Lists
 
-**Status:** Done — merged in PR #5 (`v0.3.0`).
+**Status:** Done — merged in PR #5 (`v0.3.0`, commit `88d2675`).
 
 **Prerequisite tooling (done on this branch):**
 
