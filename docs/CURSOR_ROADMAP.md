@@ -380,7 +380,7 @@ Deliverables:
 
 ### Phase 7 - Telegram Reminders
 
-**Status:** Done on branch `phase-7/telegram` (v0.4.0 — pending merge).
+**Status:** Released as [`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0) (merge `a560e7a`, PR #7).
 
 Deliverables:
 
@@ -466,7 +466,7 @@ Acceptance criteria:
 
 - `README.md` — BotFather setup, `/subscribe`, recipe links.
 - `.env.example` — `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME`.
-- On merge: tag `v0.4.0`, [docs/releases/v0.4.0.md](releases/v0.4.0.md).
+- Tagged [`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0), [docs/releases/v0.4.0.md](releases/v0.4.0.md).
 
 **Suggested commit slices**
 

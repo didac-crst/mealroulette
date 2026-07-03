@@ -59,7 +59,7 @@ Build a self-hosted app that lets a household enter recipes, manually plan lunch
 4. Add dish library UI (login, dishes, recipes, steps, ingredients). ✅
 5. Add meal plan models and manual planning. ✅
 6. Add shopping list generation. ✅
-7. Add Telegram reminders. ✅ (branch `phase-7/telegram`)
+7. Add Telegram reminders. ✅ ([`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0), PR #7)
 8. Add backups.
 9. Add cooking mode.
 
