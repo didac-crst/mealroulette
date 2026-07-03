@@ -135,9 +135,7 @@ def user_headers(user_token: str) -> dict[str, str]:
 
 
 @pytest.fixture(autouse=True)
-def clear_settings_cache(monkeypatch):
-    monkeypatch.setenv("SECRET_KEY", "test-secret-key-that-is-long-enough-for-hs256")
-    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "123456:TEST-BOT-TOKEN")
+def clear_settings_cache():
     get_settings.cache_clear()
     yield
     get_settings.cache_clear()

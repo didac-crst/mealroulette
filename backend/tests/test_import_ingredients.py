@@ -28,52 +28,10 @@ def test_import_ingredient_seed_creates_carrot_with_approved_conversion(db_sessi
 
 
 @pytest.mark.integration
-def test_import_ingredient_seed_updates_dish_created_ingredient(db_session, catalog_seed):
-    from mealroulette.models.catalog import Ingredient
-
-    dish_style = Ingredient(
-        canonical_name="arborio rice",
-        display_name="arborio rice",
-        category=None,
-    )
-    db_session.add(dish_style)
-    db_session.commit()
-
-    result = import_ingredient_seed(db_session, DEFAULT_INGREDIENT_SEED_PATH)
-
-    assert result.ingredients_updated >= 1
-    refreshed = db_session.scalar(
-        select(Ingredient).where(Ingredient.canonical_name.in_(["arborio_rice", "arborio rice"]))
-    )
-    assert refreshed is not None
-    assert refreshed.category == "grain"
-
-
-@pytest.mark.integration
-def test_import_ingredient_seed_backfills_uncategorized_alias_name(db_session, catalog_seed):
-    dish_style = Ingredient(
-        canonical_name="dried tomatoes",
-        display_name="dried tomatoes",
-        category=None,
-    )
-    db_session.add(dish_style)
-    db_session.commit()
-    ingredient_id = dish_style.id
-
-    result = import_ingredient_seed(db_session, DEFAULT_INGREDIENT_SEED_PATH)
-
-    assert result.ingredients_updated >= 1
-    refreshed = db_session.get(Ingredient, ingredient_id)
-    assert refreshed is not None
-    assert refreshed.category == "preserved"
-
-
-@pytest.mark.integration
 def test_import_ingredient_seed_is_idempotent(db_session, catalog_seed):
     first = import_ingredient_seed(db_session, DEFAULT_INGREDIENT_SEED_PATH)
     second = import_ingredient_seed(db_session, DEFAULT_INGREDIENT_SEED_PATH)
     assert first.ingredients_added > 0
     assert second.ingredients_added == 0
-    assert second.ingredients_updated == 0
     assert second.aliases_added == 0
     assert second.conversions_added == 0

@@ -16,8 +16,6 @@ class MealPlanItemPublic(BaseModel):
     recipe_id: int | None
     dish_name: str | None = None
     recipe_variant_name: str | None = None
-    prep_time_minutes: int | None = None
-    cook_time_minutes: int | None = None
     status: MealPlanItemStatus
     is_locked: bool
     manually_selected: bool

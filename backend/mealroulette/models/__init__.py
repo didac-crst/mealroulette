@@ -23,7 +23,6 @@ from mealroulette.models.enums import (
 )
 from mealroulette.models.planning import MealPlan, MealPlanItem, MealRating
 from mealroulette.models.shopping import ShoppingList, ShoppingListItem
-from mealroulette.models.telegram import TelegramSettings, TelegramSubscriber
 from mealroulette.models.user import RefreshToken, User, UserRole
 
 __all__ = [
@@ -49,8 +48,6 @@ __all__ = [
     "ShoppingListItem",
     "ShoppingListStatus",
     "Tag",
-    "TelegramSettings",
-    "TelegramSubscriber",
     "Unit",
     "UnitDimension",
     "User",

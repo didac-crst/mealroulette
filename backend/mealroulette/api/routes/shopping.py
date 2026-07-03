@@ -3,7 +3,7 @@ from datetime import date
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from mealroulette.auth.dependencies import get_current_admin, get_current_user
+from mealroulette.auth.dependencies import get_current_user
 from mealroulette.db.session import get_db
 from mealroulette.models.user import User
 from mealroulette.schemas.shopping import (
@@ -12,9 +12,7 @@ from mealroulette.schemas.shopping import (
     ShoppingListItemUpdateRequest,
     ShoppingListPublic,
 )
-from mealroulette.schemas.telegram import TelegramSendResult
 from mealroulette.services.shopping import ShoppingListService
-from mealroulette.services.telegram_reminder import TelegramReminderService
 
 router = APIRouter(tags=["shopping"])
 
@@ -56,12 +54,3 @@ def update_shopping_list_item(
     db: Session = Depends(get_db),
 ) -> ShoppingListItemPublic:
     return ShoppingListService(db).update_item(item_id, payload)
-
-
-@router.post("/shopping-lists/{shopping_list_id}/send-telegram", response_model=TelegramSendResult)
-def send_shopping_list_telegram(
-    shopping_list_id: int,
-    _admin: User = Depends(get_current_admin),
-    db: Session = Depends(get_db),
-) -> TelegramSendResult:
-    return TelegramReminderService(db).send_shopping_list(shopping_list_id)

@@ -55,11 +55,6 @@ class TagUpdateRequest(BaseModel):
     description: str | None = None
 
 
-class IngredientCategoryPublic(BaseModel):
-    id: str
-    label: str
-
-
 class IngredientPublic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

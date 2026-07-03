@@ -144,7 +144,6 @@ ingredients:
   - tomate cerise
   - cherry tomatoes
   - tomatitos
-  - cherry tomato
   seasonality:
     preferred_months:
     - 6
@@ -173,7 +172,6 @@ ingredients:
   - coeur de boeuf
   - cœur de bœuf
   - beefsteak tomato
-  - coeur de boeuf tomato
   seasonality:
     preferred_months:
     - 6
@@ -225,7 +223,6 @@ ingredients:
   - passata
   - coulis de tomate
   - tomato puree smooth
-  - tomato passata
   unit_conversions:
   - from_unit: l
     to_unit: ml
@@ -248,7 +245,6 @@ ingredients:
   - concentré de tomate
   - tomato concentrate
   - double concentrated tomato paste
-  - tomato paste
 - canonical_name: sun_dried_tomatoes
   display_name: Sun-dried tomatoes
   description: Dried or oil-preserved tomatoes, strong flavor; distinct from fresh/canned tomatoes.
@@ -264,7 +260,6 @@ ingredients:
   - tomates séchées
   - tomates confites
   - sun dried tomatoes
-  - Sun-dried tomatoes
 - canonical_name: onion
   display_name: Onion
   description: Generic yellow/brown cooking onion.
@@ -317,7 +312,6 @@ ingredients:
   - oignon rouge
   - red onions
   - cebolla morada
-  - red onion
   unit_conversions:
   - from_unit: unit
     to_unit: g
@@ -341,7 +335,6 @@ ingredients:
   - green onion
   - scallion
   - spring onions
-  - spring onion
   unit_conversions:
   - from_unit: unit
     to_unit: g
@@ -458,7 +451,6 @@ ingredients:
   - branche de céleri
   - céleri branche
   - celery stalks
-  - celery stalk
   unit_conversions:
   - from_unit: unit
     to_unit: g
@@ -532,7 +524,6 @@ ingredients:
   - patate douce
   - sweet potatoes
   - boniato
-  - sweet potato
   seasonality:
     preferred_months:
     - 9
@@ -654,7 +645,6 @@ ingredients:
   - poivrons
   - sweet pepper
   - pepper
-  - bell pepper
   seasonality:
     preferred_months:
     - 6
@@ -683,7 +673,6 @@ ingredients:
   - poivron rouge
   - red pepper
   - red sweet pepper
-  - red bell pepper
   seasonality:
     preferred_months:
     - 6
@@ -711,7 +700,6 @@ ingredients:
   aliases:
   - haricots verts
   - green bean
-  - green beans
   seasonality:
     preferred_months:
     - 6
@@ -871,7 +859,6 @@ ingredients:
   aliases:
   - chou rouge
   - red cabbage shredded
-  - red cabbage
   seasonality:
     preferred_months:
     - 9
@@ -916,7 +903,6 @@ ingredients:
   - champignons bruns
   - cremini mushrooms
   - brown button mushrooms
-  - brown mushrooms
 - canonical_name: white_mushrooms
   display_name: White mushrooms
   description: White button mushrooms.
@@ -930,7 +916,6 @@ ingredients:
   aliases:
   - champignons de paris
   - white button mushrooms
-  - white mushrooms
 - canonical_name: mixed_mushrooms
   display_name: Mixed mushrooms
   description: Mixed mushrooms, useful when exact variety is flexible.
@@ -944,7 +929,6 @@ ingredients:
   aliases:
   - mélange de champignons
   - assorted mushrooms
-  - mixed mushrooms
 - canonical_name: portobello_mushroom
   display_name: Portobello mushroom
   description: Large portobello mushroom caps, often counted by unit.
@@ -959,7 +943,6 @@ ingredients:
   - portobello
   - portobello mushrooms
   - portobello caps
-  - portobello mushroom
   unit_conversions:
   - from_unit: unit
     to_unit: g
@@ -995,7 +978,6 @@ ingredients:
   - riz jasmin
   - thai rice
   - riz thaï
-  - jasmine rice
 - canonical_name: basmati_rice
   display_name: Basmati rice
   description: Long-grain aromatic rice, common for Indian curries.
@@ -1008,7 +990,6 @@ ingredients:
   aggregation_strategy: prefer_mass
   aliases:
   - riz basmati
-  - basmati rice
 - canonical_name: arborio_rice
   display_name: Arborio rice
   description: Short-grain risotto rice. Do not merge with generic rice.
@@ -1023,7 +1004,6 @@ ingredients:
   - riz arborio
   - risotto rice
   - riz à risotto
-  - arborio rice
 - canonical_name: sushi_rice
   display_name: Sushi rice
   description: Short-grain sticky rice for sushi/onigiri style recipes.
@@ -1037,7 +1017,6 @@ ingredients:
   aliases:
   - riz sushi
   - japanese rice
-  - sushi rice
 - canonical_name: quinoa
   display_name: Quinoa
   description: Dry quinoa grain/pseudocereal.
@@ -1089,7 +1068,6 @@ ingredients:
   - pâtes complètes
   - whole wheat pasta
   - wholemeal pasta
-  - wholegrain pasta
 - canonical_name: stuffed_pasta
   display_name: Stuffed pasta
   description: Fresh stuffed pasta such as ravioli/tortellini/fiorelli.
@@ -1105,7 +1083,6 @@ ingredients:
   - ravioli
   - tortellini
   - pâtes farcies
-  - stuffed pasta
 - canonical_name: fideua_noodles
   display_name: Fideua noodles
   description: Short thin noodles for Catalan fideuà.
@@ -1121,7 +1098,6 @@ ingredients:
   - fideos
   - fideua pasta
   - fideuà noodles
-  - fideua noodles
 - canonical_name: rice_noodles
   display_name: Rice noodles
   description: Dry rice noodles for Thai/Vietnamese recipes.
@@ -1135,7 +1111,6 @@ ingredients:
   aliases:
   - nouilles de riz
   - pad thai noodles
-  - rice noodles
 - canonical_name: spaetzle
   display_name: Spaetzle
   description: Fresh or packaged German egg noodles/dumplings.
@@ -1183,7 +1158,6 @@ ingredients:
   aliases:
   - haricots noirs
   - frijoles negros
-  - black beans
   unit_conversions:
   - from_unit: can
     to_unit: g
@@ -1204,7 +1178,6 @@ ingredients:
   aliases:
   - haricots blancs
   - cannellini beans
-  - white beans
   unit_conversions:
   - from_unit: can
     to_unit: g
@@ -1227,7 +1200,6 @@ ingredients:
   - lentilles vertes
   - green lentils
   - lentils can
-  - brown lentils
   unit_conversions:
   - from_unit: can
     to_unit: g
@@ -1250,7 +1222,6 @@ ingredients:
   - red split lentils
   - lentejas rojas
   - llenties vermelles
-  - red lentils
 - canonical_name: frozen_peas
   display_name: Frozen peas
   description: Frozen green peas.
@@ -1264,7 +1235,6 @@ ingredients:
   aliases:
   - petits pois surgelés
   - peas frozen
-  - frozen peas
 - canonical_name: sweetcorn
   display_name: Sweetcorn
   description: Corn kernels, usually canned or frozen.
@@ -1372,7 +1342,6 @@ ingredients:
   - yaourt grec
   - greek-style yogurt
   - yogourt grec
-  - greek yogurt
   unit_conversions:
   - from_unit: tbsp
     to_unit: g
@@ -1427,7 +1396,6 @@ ingredients:
   - fromage râpé
   - emmental râpé
   - shredded cheese
-  - grated cheese
 - canonical_name: feta
   display_name: Feta
   description: Feta cheese.
@@ -1479,7 +1447,6 @@ ingredients:
   - fromage frais
   - philadelphia
   - cream cheese spread
-  - cream cheese
 - canonical_name: chicken_breast
   display_name: Chicken breast
   description: Boneless chicken breast fillet.
@@ -1494,7 +1461,6 @@ ingredients:
   - blanc de poulet
   - chicken fillet
   - filet de poulet
-  - chicken breast
   unit_conversions:
   - from_unit: unit
     to_unit: g
@@ -1516,7 +1482,6 @@ ingredients:
   - boeuf haché
   - bœuf haché
   - ground beef
-  - minced beef
 - canonical_name: bacon
   display_name: Bacon/lardons
   description: Bacon strips or lardons.
@@ -1531,7 +1496,6 @@ ingredients:
   - lardons
   - bacon bits
   - lardon
-  - Bacon/lardons
 - canonical_name: hake_fillet
   display_name: Hake fillet
   description: White fish fillet, hake/merlu.
@@ -1547,7 +1511,6 @@ ingredients:
   - merlu
   - hake
   - hake fillets
-  - hake fillet
   unit_conversions:
   - from_unit: unit
     to_unit: g
@@ -1569,7 +1532,6 @@ ingredients:
   - saumon
   - filet de saumon
   - salmon
-  - salmon fillet
   unit_conversions:
   - from_unit: unit
     to_unit: g
@@ -1663,7 +1625,6 @@ ingredients:
   aliases:
   - tofu ferme
   - tofu
-  - firm tofu
   unit_conversions:
   - from_unit: block
     to_unit: g
@@ -1704,7 +1665,6 @@ ingredients:
   - wraps
   - tortillas
   - galettes wraps
-  - tortilla wraps
   unit_conversions:
   - from_unit: pack
     to_unit: unit
@@ -1726,7 +1686,6 @@ ingredients:
   - flammkuchen base
   - flatbread
   - base flammekueche
-  - flatbread base
 - canonical_name: puff_pastry
   display_name: Puff pastry
   description: Ready-rolled puff pastry sheet.
@@ -1740,7 +1699,6 @@ ingredients:
   aliases:
   - pâte feuilletée
   - puff pastry sheet
-  - puff pastry
   unit_conversions:
   - from_unit: unit
     to_unit: g
@@ -1761,7 +1719,6 @@ ingredients:
   aliases:
   - pâte brisée
   - shortcrust pastry sheet
-  - shortcrust pastry
   unit_conversions:
   - from_unit: unit
     to_unit: g
@@ -1783,7 +1740,6 @@ ingredients:
   - laugen bread
   - pain bretzel
   - bretzel bread
-  - pretzel bread
 - canonical_name: breadcrumbs
   display_name: Breadcrumbs
   description: Dry breadcrumbs/chapelure.
@@ -1923,7 +1879,6 @@ ingredients:
   aliases:
   - thym frais
   - thyme
-  - fresh thyme
   unit_conversions:
   - from_unit: bunch
     to_unit: g
@@ -1944,7 +1899,6 @@ ingredients:
   aliases:
   - sauge fraîche
   - sage
-  - fresh sage
   unit_conversions:
   - from_unit: bunch
     to_unit: g
@@ -1965,7 +1919,6 @@ ingredients:
   aliases:
   - pâte de basilic
   - basil puree
-  - basil paste
 - canonical_name: vegetable_stock
   display_name: Vegetable stock
   description: Prepared vegetable stock, broth or reconstituted stock cube.
@@ -1980,7 +1933,6 @@ ingredients:
   - bouillon de légumes
   - vegetable broth
   - veg stock
-  - vegetable stock
 - canonical_name: fish_stock
   display_name: Fish stock
   description: Prepared fish stock/fumet.
@@ -1994,7 +1946,6 @@ ingredients:
   aliases:
   - fumet de poisson
   - bouillon de poisson
-  - fish stock
 - canonical_name: coconut_milk
   display_name: Coconut milk
   description: Canned/carton coconut milk for curries and stews.
@@ -2009,7 +1960,6 @@ ingredients:
   - lait de coco
   - leche de coco
   - llet de coco
-  - coconut milk
   unit_conversions:
   - from_unit: can
     to_unit: ml
@@ -2030,7 +1980,6 @@ ingredients:
   aliases:
   - pâte de curry
   - thai curry paste
-  - curry paste
   unit_conversions:
   - from_unit: tbsp
     to_unit: ml
@@ -2052,7 +2001,6 @@ ingredients:
   aliases:
   - poudre de curry
   - curry spice
-  - curry powder
   unit_conversions:
   - from_unit: tsp
     to_unit: g
@@ -2079,7 +2027,6 @@ ingredients:
   aliases:
   - dukkah
   - duqqa
-  - dukkah spice
   unit_conversions:
   - from_unit: tbsp
     to_unit: g
@@ -2120,7 +2067,6 @@ ingredients:
   - flocons de piment
   - chilli flakes
   - piment concassé
-  - chili flakes
   unit_conversions:
   - from_unit: tsp
     to_unit: g
@@ -2141,7 +2087,6 @@ ingredients:
   aliases:
   - piment rouge
   - red chilli
-  - red chili
   unit_conversions:
   - from_unit: unit
     to_unit: g
@@ -2162,7 +2107,6 @@ ingredients:
   aliases:
   - piment vert
   - green chilli
-  - green chili
   unit_conversions:
   - from_unit: unit
     to_unit: g
@@ -2203,7 +2147,6 @@ ingredients:
   aliases:
   - beurre de cacahuète
   - peanut paste
-  - peanut butter
   unit_conversions:
   - from_unit: tbsp
     to_unit: g
@@ -2265,7 +2208,6 @@ ingredients:
   aliases:
   - olives noires
   - black pitted olives
-  - black olives
 - canonical_name: white_wine
   display_name: White wine
   description: Dry white wine for cooking.
@@ -2279,4 +2221,3 @@ ingredients:
   aliases:
   - vin blanc
   - dry white wine
-  - white wine

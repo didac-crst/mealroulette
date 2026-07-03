@@ -59,10 +59,10 @@ Build a self-hosted app that lets a household enter recipes, manually plan lunch
 4. Add dish library UI (login, dishes, recipes, steps, ingredients). ✅
 5. Add meal plan models and manual planning. ✅
 6. Add shopping list generation. ✅
-7. Add Telegram reminders. ✅ (branch `phase-7/telegram`)
+7. Add Telegram reminders.
 8. Add backups.
 9. Add cooking mode.
 
 ## MVP Acceptance Test
 
-A user can log in from a phone, create several dishes with normalized ingredients, plan lunch and dinner for the next three days, generate a shopping list, receive or manually send the list through Telegram, mark meals as eaten, and rate them. **Backup export** remains Phase 10.
+A user can log in from a phone, create several dishes with normalized ingredients, plan lunch and dinner for the next three days, generate a shopping list, receive or manually send the list through Telegram, mark meals as eaten, rate them, and export a backup.

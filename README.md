@@ -2,7 +2,7 @@
 
 MealRoulette is a self-hosted household meal planning app for deciding what to eat, planning lunch and dinner, generating shopping lists, sending Telegram reminders, and cooking from structured recipe steps.
 
-**v0.4 Telegram reminders** are released ([`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0)): bot commands, scheduled HTML reminders, and tap-to-open recipes. The automatic scheduler is not built yet — see [docs/BACKLOG.md](docs/BACKLOG.md).
+**v0.2 manual planning** is implemented: weekly plan and review flows for lunch/dinner, meal actions (lock, eaten, skip, ate leftovers), star ratings, and lightweight leftover tracking. Shopping lists, Telegram, and the scheduler are not built yet — see [docs/BACKLOG.md](docs/BACKLOG.md).
 
 ## Documentation
 
@@ -101,7 +101,6 @@ When the app data model changes (new tables like `users`, `dishes`, etc.), the P
 - `016_shopping_contributions` — per-meal ingredient breakdown on list items
 - `017_ingredient_unit_behavior` — ingredient families, shopping units, conversion approval
 - `018_ingredient_conversion_unique` — unique constraint on ingredient conversion triplets
-- `019_telegram_settings` — Telegram reminder settings and subscribers
 
 With Docker Compose, the **API container runs migrations automatically** on startup (`alembic upgrade head`), then loads **reference catalog data** (standard units and starter tags) from YAML if those rows are not already present.
 
@@ -144,100 +143,6 @@ python -m mealroulette.commands.import_sample_dishes
 **Ingredient seed:** `backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml`. Use `--no-bootstrap-approve` to import conversion suggestions without auto-approving them for shopping aggregation.
 
 **Dish fixtures:** `backend/mealroulette/data/fixtures/sample_dishes.yaml` (inside the container: `/app/mealroulette/data/fixtures/sample_dishes.yaml`). Use `--file` only with a path that exists **inside the container**, or omit `--file` for the default. After editing fixtures locally, rebuild the API image: `docker compose up -d --build api`.
-
-### Telegram
-
-MealRoulette uses a Telegram bot for household reminders and on-demand meal/shopping messages. The **worker** polls bot commands and sends the daily reminder; the **API** exposes admin settings and manual send endpoints.
-
-#### Quick start
-
-1. Create a bot with [@BotFather](https://t.me/BotFather) and add to `.env`:
-
-   ```bash
-   TELEGRAM_BOT_TOKEN=your-token-here
-   TELEGRAM_BOT_USERNAME=your_bot_username   # optional, see below
-   ```
-
-2. Restart **api** and **worker**:
-
-   ```bash
-   docker compose up -d --build api worker
-   ```
-
-3. In Telegram, message your bot: **`/subscribe`**
-4. As admin, open **Telegram** in the app header (`/settings/telegram`), enable reminders, and use **Send test**.
-
-**Security note:** anyone who discovers your bot can `/subscribe` today. A pairing code may be added later.
-
-#### Environment variables
-
-| Variable | Required | Used by | Description |
-| --- | --- | --- | --- |
-| `TELEGRAM_BOT_TOKEN` | Yes (for bot features) | `api`, `worker` | Bot token from BotFather. Not stored in the database. |
-| `TELEGRAM_BOT_USERNAME` | No | `api`, `worker` | Bot username **without** `@`. Enables clickable dish links in HTML planning/reminder messages (`t.me/username?start=recipe_<id>`). If omitted, the worker tries to resolve it via Telegram `getMe`. |
-
-Without `TELEGRAM_BOT_TOKEN`, bot commands and reminders are disabled (the worker logs a warning).
-
-#### Admin settings (database)
-
-Configured at **`/settings/telegram`** or `PUT /api/telegram/settings`. Read-only fields come from `GET /api/telegram/settings`.
-
-| Setting | Type | Default | What it does |
-| --- | --- | --- | --- |
-| `enabled` | bool | `false` | When `true`, the worker may send the daily reminder and **Send reminder now** is allowed. |
-| `daily_reminder_time` | time | `08:00` | Local time (see `timezone`) to send the daily reminder once per day. |
-| `timezone` | string | `Europe/Paris` | IANA timezone for `daily_reminder_time` and on-demand date windows. |
-| `shopping_window_days` | int (1–14) | `3` | Length of the reminder window. Daily job and **Send reminder now** send the same HTML as **`/reminder N`**. |
-| `group_by_category` | bool | `true` | Group ingredients by category when sending a **saved shopping list** via `POST /api/shopping-lists/{id}/send-telegram` (plain text). Does not affect `/reminder` or the daily job. |
-| `has_bot_token` | bool | — | Read-only: whether `TELEGRAM_BOT_TOKEN` is set in the environment. |
-| `subscriber_count` | int | — | Read-only: number of chats that sent `/subscribe`. |
-| `last_sent_at` | datetime | — | Read-only: last successful broadcast to subscribers. |
-| `last_error` | string | — | Read-only: last send failure message, if any. |
-
-`include_today` and `include_pantry_items` remain in the API schema for compatibility but are **not used** in v0.4 — the daily reminder and `/reminder` always use today → N−1 days in `timezone` with pantry items included.
-
-Subscribers are stored separately (`GET /api/telegram/subscribers`). Each person must **`/subscribe`** in Telegram; there is no fixed chat ID in settings.
-
-#### Bot commands
-
-All commands are handled by the worker via long polling. On-demand messages use **HTML** unless noted.
-
-| Command | Description |
-| --- | --- |
-| `/subscribe` or `/start` | Join the reminder list (broadcast target for daily job). |
-| `/unsubscribe` or `/stop` | Leave the reminder list. |
-| `/planning [days]` | Meal plan for the next `days` (default **3**, max **14**). Shows lunch/dinner, prep/cook times, dish names as links when `TELEGRAM_BOT_USERNAME` is set. |
-| `/reminder [days]` | Same window as `/planning`, plus **Ingredients list::** with per-dish breakdown. Pantry items included. |
-| `/shopping [days]` | Category-grouped shopping totals only (no per-meal breakdown). Pantry items included. |
-| `/start recipe_<id>` | Open full recipe (ingredients + steps). Used when tapping a dish link in planning/reminder. |
-| `/recipe <id>` | Same as above, by recipe id (fallback). |
-| `/help` | Command summary. |
-
-On-demand windows always start **today** in the household `timezone` and run through the next `days − 1` calendar days.
-
-#### Scheduled vs manual sends
-
-| Trigger | Message | Format |
-| --- | --- | --- |
-| Daily job (worker, at `daily_reminder_time`) | Same as **`/reminder`** with `shopping_window_days` | HTML |
-| **Send reminder now** (admin UI / `POST /api/telegram/send-daily-reminder`) | Same as daily job | HTML |
-| **Send test** (`POST /api/telegram/test`) | Short connectivity check | Plain text |
-| Saved shopping list (`POST /api/shopping-lists/{id}/send-telegram`) | Shopping list for that saved list | Plain text; respects `group_by_category` |
-
-Broadcasts go to **all subscribers**, not only the admin.
-
-#### Admin API
-
-| Method | Path | Purpose |
-| --- | --- | --- |
-| `GET` | `/api/telegram/settings` | Read settings (no secrets). |
-| `PUT` | `/api/telegram/settings` | Update schedule and flags. |
-| `GET` | `/api/telegram/subscribers` | List subscribed chats. |
-| `POST` | `/api/telegram/test` | Send test message. |
-| `POST` | `/api/telegram/send-daily-reminder` | Send reminder now (same as daily job). |
-| `POST` | `/api/shopping-lists/{id}/send-telegram` | Send a saved shopping list. |
-
-All Telegram admin routes require an **admin** JWT.
 
 ## Trying the API
 

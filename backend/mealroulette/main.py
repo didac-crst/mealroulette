@@ -6,7 +6,6 @@ from mealroulette.api.routes.catalog import router as catalog_router
 from mealroulette.api.routes.health import router as health_router
 from mealroulette.api.routes.planning import router as planning_router
 from mealroulette.api.routes.shopping import router as shopping_router
-from mealroulette.api.routes.telegram import router as telegram_router
 from mealroulette.api.routes.users import router as users_router
 from mealroulette.core.config import settings
 from mealroulette.core.errors import http_exception_handler, validation_exception_handler
@@ -47,7 +46,6 @@ def create_app() -> FastAPI:
     app.include_router(catalog_router, prefix="/api")
     app.include_router(planning_router, prefix="/api")
     app.include_router(shopping_router, prefix="/api")
-    app.include_router(telegram_router, prefix="/api")
     app.include_router(users_router, prefix="/api")
 
     return app
