@@ -14,9 +14,9 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**v0.2 released** — tagged `v0.2.0` on merge commit `fb20858` ([PR #4](https://github.com/didac-crst/mealroulette/pull/4)).
+**Phase 6 in progress** — branch `phase-6/shopping` (v0.3 shopping lists).
 
-**Next:** Phase 6 — shopping lists (v0.3).
+First landed slice: YAML fixture import for sample dishes (`import_sample_dishes` CLI) so the catalog has realistic data for shopping-list testing. Not the Phase 10 full JSON export/import.
 
 ---
 
@@ -28,6 +28,7 @@ Use one branch per milestone, then merge via pull request:
 - `phase-3/catalog` — core catalog (merged)
 - `phase-4/frontend` — dish library UI (merged in PR #3, `v0.1.0`)
 - `phase-5/planning` — manual meal planning (merged in PR #4, `v0.2.0`)
+- `phase-6/shopping` — shopping lists + fixture import tooling (**in progress**)
 
 ---
 
@@ -39,7 +40,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | --- | --- | --- |
 | **v0.1** | Foundation — platform, auth, catalog (API + UI), basic frontend | **Done** ([`v0.1.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.1.0), merge `b41cdae`, PR #3) |
 | **v0.2** | Manual planning — weekly plan, review flow, meal actions, ratings, lightweight leftovers | **Done** ([`v0.2.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.2.0), merge `fb20858`, PR #4) |
-| **v0.3** | Shopping list — generation, aggregation, pantry filter, UI | Not started |
+| **v0.3** | Shopping list — generation, aggregation, pantry filter, UI | In progress (`phase-6/shopping`) |
 | **v0.4** | Telegram reminders — settings, scheduled and manual send | Not started |
 | **v0.5** | Automatic scheduler — explainable weekly generation, reroll | Not started |
 | **v0.6** | LLM-assisted entry — draft enrichment, review before save | Not started |
@@ -156,7 +157,7 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 3 | Core catalog data | v0.1 | Done |
 | 4 | Frontend shell and dish library | v0.1 | Done (PR #3, `v0.1.0`) |
 | 5 | Manual meal planning | v0.2 | Done (PR #4, `v0.2.0`) |
-| 6 | Shopping lists | v0.3 | **Next** |
+| 6 | Shopping lists | v0.3 | **In progress** (`phase-6/shopping`) |
 | 7 | Telegram reminders | v0.4 | Not started |
 | 8 | Explainable scheduler | v0.5 | Not started |
 | 9 | Cooking mode | v1.0 | Not started |
@@ -245,7 +246,24 @@ Merged in `fb20858` (PR #4, `v0.2.0`).
 - [x] Swagger OAuth2 token endpoint for `/docs`
 - [x] Planning integration and unit tests
 
-### Phases 6–12
+### Dev tooling — YAML dish fixtures
+
+Supports local testing; distinct from Phase 10 full JSON export/import.
+
+- [x] `sample_dishes.yaml` fixture format (symbolic tags, units, ingredient names)
+- [x] `import_sample_dishes` CLI — idempotent import via catalog service
+
+### Phase 6 — Shopping lists (in progress)
+
+Branch: `phase-6/shopping`.
+
+- [ ] Shopping list models and migration
+- [ ] Dynamic list generation from meal plans (date window)
+- [ ] Unit aggregation via `services/quantities`
+- [ ] Pantry filtering and category grouping
+- [ ] Shopping list API and UI
+
+### Phases 7–12
 
 See [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) for full deliverables and acceptance criteria per phase.
 

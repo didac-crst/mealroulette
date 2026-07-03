@@ -319,6 +319,10 @@ Implementation notes (v0.2):
 
 ### Phase 6 - Shopping Lists
 
+**Status:** In progress on branch `phase-6/shopping` (v0.3).
+
+**Prerequisite tooling (done on this branch):** YAML dish fixture import (`import_sample_dishes`) loads `data/fixtures/sample_dishes.yaml` for realistic catalog data during development. Idempotent by dish name. Not the Phase 10 JSON backup format.
+
 Deliverables:
 
 - Dynamic shopping list generation
