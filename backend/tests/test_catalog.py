@@ -15,6 +15,17 @@ def test_list_units_returns_seed_data(client, catalog_seed, admin_headers):
     assert {"g", "kg", "ml", "l", "tsp", "tbsp", "unit"}.issubset(symbols)
 
 
+def test_list_ingredient_categories_returns_reference_data(client, catalog_seed, user_headers):
+    response = client.get("/api/ingredient-categories", headers=user_headers)
+    assert response.status_code == 200
+    categories = response.json()
+    assert len(categories) >= 20
+    ids = {category["id"] for category in categories}
+    assert {"vegetable", "dairy", "grain", "preserved"}.issubset(ids)
+    labels = {category["label"] for category in categories}
+    assert "Vegetable" in labels
+
+
 def test_regular_user_can_read_catalog(client, catalog_seed, user_headers):
     response = client.get("/api/tags", headers=user_headers)
     assert response.status_code == 200

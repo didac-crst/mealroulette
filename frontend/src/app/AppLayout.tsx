@@ -21,11 +21,17 @@ export function AppLayout() {
     <div className="app-frame">
       <header className="app-header">
         <div className="app-header-brand">
-          <h1>MealRoulette</h1>
-          <p className="muted app-header-meta">
+          <picture>
+            <source srcSet="/logo-header.webp" type="image/webp" />
+            <img src="/logo-header.png" alt="" width={40} height={40} className="app-header-logo" />
+          </picture>
+          <div>
+            <h1>MealRoulette</h1>
+            <p className="muted app-header-meta">
             {user?.username}
             {isAdmin ? " · admin" : ""}
-          </p>
+            </p>
+          </div>
         </div>
         <nav className="app-header-nav-desktop" aria-label="Primary navigation">
           {tabRoutes.map(({ to, label }) => (
@@ -33,6 +39,11 @@ export function AppLayout() {
               {label}
             </NavButtonLink>
           ))}
+          {isAdmin ? (
+            <NavButtonLink to="/settings/telegram" inactiveVariant="secondary">
+              Telegram
+            </NavButtonLink>
+          ) : null}
           <button type="button" className="button button-secondary" onClick={() => void logout()}>
             Sign out
           </button>
