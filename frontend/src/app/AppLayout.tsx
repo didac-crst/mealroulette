@@ -22,7 +22,7 @@ export function AppLayout() {
             {isAdmin ? " · admin" : ""}
           </p>
         </div>
-        <nav className="app-header-nav-desktop" aria-label="Main">
+        <nav className="app-header-nav-desktop" aria-label="Primary navigation">
           {TAB_ROUTES.map(({ to, label }) => (
             <NavButtonLink key={to} to={to}>
               {label}
@@ -45,7 +45,7 @@ export function AppLayout() {
         <Outlet />
       </main>
 
-      <nav className="app-tab-bar" aria-label="Main">
+      <nav className="app-tab-bar" aria-label="Primary navigation (mobile)">
         {TAB_ROUTES.map(({ to, label }) => (
           <NavLink key={to} to={to} className={({ isActive }) => `app-tab${isActive ? " app-tab-active" : ""}`}>
             {label}

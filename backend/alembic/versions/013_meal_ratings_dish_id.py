@@ -16,7 +16,9 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.alter_column("meal_plan_items", "planned_dish_id", new_column_name="dish_id")
+    # Legacy ratings were dish+user scoped and cannot map to meal_plan_item_id.
+    # Preserve rows for manual recovery before replacing the table.
+    op.execute("CREATE TABLE ratings_legacy AS TABLE ratings")
 
     op.drop_index("ix_ratings_user_id", table_name="ratings")
     op.drop_index("ix_ratings_dish_id", table_name="ratings")
@@ -63,4 +65,4 @@ def downgrade() -> None:
     op.create_index("ix_ratings_dish_id", "ratings", ["dish_id"])
     op.create_index("ix_ratings_user_id", "ratings", ["user_id"])
 
-    op.alter_column("meal_plan_items", "dish_id", new_column_name="planned_dish_id")
+    op.drop_table("ratings_legacy")

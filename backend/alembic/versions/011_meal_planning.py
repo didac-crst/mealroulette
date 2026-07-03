@@ -71,6 +71,13 @@ def upgrade() -> None:
         sa.UniqueConstraint("meal_plan_id", "date", "meal_slot", name="uq_meal_plan_items_slot"),
     )
     op.create_index("ix_meal_plan_items_meal_plan_id", "meal_plan_items", ["meal_plan_id"])
+    op.create_index("ix_meal_plan_items_dish_id", "meal_plan_items", ["dish_id"])
+    op.create_index("ix_meal_plan_items_recipe_id", "meal_plan_items", ["recipe_id"])
+    op.create_index(
+        "ix_meal_plan_items_leftover_source_item_id",
+        "meal_plan_items",
+        ["leftover_source_item_id"],
+    )
 
     op.create_table(
         "ratings",
@@ -94,6 +101,9 @@ def downgrade() -> None:
     op.drop_index("ix_ratings_user_id", table_name="ratings")
     op.drop_index("ix_ratings_dish_id", table_name="ratings")
     op.drop_table("ratings")
+    op.drop_index("ix_meal_plan_items_leftover_source_item_id", table_name="meal_plan_items")
+    op.drop_index("ix_meal_plan_items_recipe_id", table_name="meal_plan_items")
+    op.drop_index("ix_meal_plan_items_dish_id", table_name="meal_plan_items")
     op.drop_index("ix_meal_plan_items_meal_plan_id", table_name="meal_plan_items")
     op.drop_table("meal_plan_items")
     op.drop_index("ix_meal_plans_week_start_date", table_name="meal_plans")

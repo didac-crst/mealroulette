@@ -37,6 +37,7 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 markers = [
   "integration: tests that require a database connection",
+  "unit: pure unit tests with no external dependencies",
 ]
 testpaths = ["tests"]
 

@@ -44,6 +44,20 @@ def _future_item(plan):
     pytest.fail("expected at least one future meal slot")
 
 
+def _other_past_dinner(plan, exclude_id: int):
+    today = date.today()
+    candidates = [
+        item
+        for item in plan["items"]
+        if item["meal_slot"] == "dinner"
+        and item["id"] != exclude_id
+        and date.fromisoformat(item["date"]) <= today
+    ]
+    if not candidates:
+        pytest.skip("need another past or today dinner slot")
+    return candidates[0]
+
+
 def test_assign_dish_sets_main_recipe_and_mark_eaten(client, catalog_seed, admin_headers, user_headers):
     dish = client.post(
         "/api/dishes",
@@ -184,11 +198,9 @@ def test_skip_lock_and_ate_leftovers(client, catalog_seed, admin_headers, user_h
     week_start = date.fromisoformat(plan["week_start_date"])
     monday_dinner = _item_on_date(plan, week_start, "dinner")
     tuesday_lunch = _item_on_date(plan, week_start + timedelta(days=1), "lunch")
-    other_dinner = next(
-        item for item in plan["items"]
-        if item["meal_slot"] == "dinner" and item["id"] != monday_dinner["id"]
-        and date.fromisoformat(item["date"]) <= date.today()
-    )
+    if date.fromisoformat(tuesday_lunch["date"]) > date.today():
+        pytest.skip("need tuesday lunch on or before today")
+    other_dinner = _other_past_dinner(plan, monday_dinner["id"])
 
     client.put(
         f"/api/meal-plan-items/{monday_dinner['id']}",
@@ -198,16 +210,15 @@ def test_skip_lock_and_ate_leftovers(client, catalog_seed, admin_headers, user_h
     eaten = client.post(f"/api/meal-plan-items/{monday_dinner['id']}/mark-eaten", headers=user_headers)
     assert eaten.status_code == 200
 
-    if date.fromisoformat(tuesday_lunch["date"]) <= date.today():
-        ate_leftovers = client.post(
-            f"/api/meal-plan-items/{tuesday_lunch['id']}/ate-leftovers",
-            headers=user_headers,
-            json={"leftover_source_item_id": monday_dinner["id"]},
-        )
-        assert ate_leftovers.status_code == 200
-        assert ate_leftovers.json()["status"] == "ate_leftovers"
-        assert ate_leftovers.json()["dish_name"] == "Soup"
-        assert ate_leftovers.json()["review_saved_at"] is None
+    ate_leftovers = client.post(
+        f"/api/meal-plan-items/{tuesday_lunch['id']}/ate-leftovers",
+        headers=user_headers,
+        json={"leftover_source_item_id": monday_dinner["id"]},
+    )
+    assert ate_leftovers.status_code == 200
+    assert ate_leftovers.json()["status"] == "ate_leftovers"
+    assert ate_leftovers.json()["dish_name"] == "Soup"
+    assert ate_leftovers.json()["review_saved_at"] is None
 
     skipped = client.post(
         f"/api/meal-plan-items/{other_dinner['id']}/skip",
@@ -218,13 +229,12 @@ def test_skip_lock_and_ate_leftovers(client, catalog_seed, admin_headers, user_h
     assert skipped.json()["status"] == "skipped"
     assert skipped.json()["review_saved_at"] is not None
 
-    if date.fromisoformat(tuesday_lunch["date"]) <= date.today():
-        invalid_leftovers = client.post(
-            f"/api/meal-plan-items/{tuesday_lunch['id']}/ate-leftovers",
-            headers=user_headers,
-            json={"leftover_source_item_id": other_dinner["id"]},
-        )
-        assert invalid_leftovers.status_code == 400
+    invalid_leftovers = client.post(
+        f"/api/meal-plan-items/{tuesday_lunch['id']}/ate-leftovers",
+        headers=user_headers,
+        json={"leftover_source_item_id": other_dinner["id"]},
+    )
+    assert invalid_leftovers.status_code == 400
 
 
 def test_ate_leftovers_meal_not_valid_as_leftover_source(client, catalog_seed, admin_headers, user_headers):
@@ -262,6 +272,8 @@ def test_ate_leftovers_meal_not_valid_as_leftover_source(client, catalog_seed, a
     assert chain.status_code == 400
     assert "eaten" in chain.json()["error"]["message"].lower()
 
+
+def test_meal_rating_upsert(client, catalog_seed, admin_headers, user_headers):
     dish = client.post(
         "/api/dishes",
         headers=admin_headers,
@@ -304,6 +316,28 @@ def test_ate_leftovers_meal_not_valid_as_leftover_source(client, catalog_seed, a
     listed = client.get(f"/api/meal-plan-items/{item['id']}/rating", headers=user_headers)
     assert listed.status_code == 200
     assert listed.json()["rating"] == 5
+
+
+def test_update_item_rejects_status_change(client, catalog_seed, admin_headers, user_headers):
+    dish = client.post(
+        "/api/dishes",
+        headers=admin_headers,
+        json={"name": "Status Guard Dish", "status": "active"},
+    ).json()
+    plan = client.get("/api/meal-plans/current", headers=user_headers).json()
+    item = _past_or_today_item(plan)
+    client.put(
+        f"/api/meal-plan-items/{item['id']}",
+        headers=user_headers,
+        json={"dish_id": dish["id"]},
+    )
+
+    response = client.put(
+        f"/api/meal-plan-items/{item['id']}",
+        headers=user_headers,
+        json={"status": "eaten"},
+    )
+    assert response.status_code == 400
 
 
 def test_reset_status_to_planned(client, catalog_seed, admin_headers, user_headers):

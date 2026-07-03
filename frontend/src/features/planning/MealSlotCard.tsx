@@ -62,6 +62,7 @@ export function MealSlotCard({
   const [skipComment, setSkipComment] = useState(item.skip_comment ?? "");
   const [skipFormOpen, setSkipFormOpen] = useState(false);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [recipesLoading, setRecipesLoading] = useState(false);
   const [leftoverSourceId, setLeftoverSourceId] = useState(
     item.leftover_source_item_id ? String(item.leftover_source_item_id) : "",
   );
@@ -75,11 +76,13 @@ export function MealSlotCard({
   const showUndo = mode === "review" && showUndoStatus(item);
 
   useEffect(() => {
-    if (!item.dish_id) {
+    if (mode !== "plan" || !item.dish_id) {
       setRecipes([]);
+      setRecipesLoading(false);
       return;
     }
     let cancelled = false;
+    setRecipesLoading(true);
     fetchRecipes(accessToken, item.dish_id)
       .then((data) => {
         if (!cancelled) {
@@ -90,11 +93,16 @@ export function MealSlotCard({
         if (!cancelled) {
           setRecipes([]);
         }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setRecipesLoading(false);
+        }
       });
     return () => {
       cancelled = true;
     };
-  }, [accessToken, item.dish_id]);
+  }, [accessToken, item.dish_id, mode]);
 
   useEffect(() => {
     if (!showReviewRating(item)) {
@@ -129,6 +137,23 @@ export function MealSlotCard({
   useEffect(() => {
     setSkipFormOpen(false);
   }, [item.status]);
+
+  async function saveLeftoverSource(value: string) {
+    const previous = leftoverSourceId;
+    setLeftoverSourceId(value);
+    setBusy(true);
+    try {
+      const updated = await updateMealPlanItem(accessToken, item.id, {
+        leftover_source_item_id: value ? Number(value) : null,
+      });
+      onChanged(updated);
+    } catch (err) {
+      setLeftoverSourceId(previous);
+      onError(err instanceof ApiError ? err.message : "Failed to save leftover source");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function run(action: () => Promise<MealPlanItem>) {
     setBusy(true);
@@ -227,6 +252,7 @@ export function MealSlotCard({
                 disabled={busy || item.is_locked}
                 onChange={(event) => void handleRecipeChange(event.target.value)}
               >
+                <option value="">—</option>
                 {recipes.map((recipe) => (
                   <option key={recipe.id} value={recipe.id}>
                     {recipe.variant_name}
@@ -235,6 +261,8 @@ export function MealSlotCard({
                 ))}
               </select>
             </label>
+          ) : item.dish_id && recipes.length === 0 && recipesLoading ? (
+            <p className="muted meal-slot-recipe">Loading recipes…</p>
           ) : item.dish_id && recipes.length === 0 && !busy ? (
             <p className="muted meal-slot-recipe">No recipe for this dish yet.</p>
           ) : null}
@@ -347,13 +375,7 @@ export function MealSlotCard({
                   value={leftoverSourceId}
                   disabled={busy}
                   onChange={(event) => {
-                    const value = event.target.value;
-                    setLeftoverSourceId(value);
-                    void run(() =>
-                      updateMealPlanItem(accessToken, item.id, {
-                        leftover_source_item_id: value ? Number(value) : null,
-                      }),
-                    );
+                    void saveLeftoverSource(event.target.value);
                   }}
                 >
                   <option value="">Unknown / same dish</option>
@@ -372,13 +394,7 @@ export function MealSlotCard({
                 type="button"
                 className="button"
                 disabled={busy}
-                onClick={() =>
-                  void run(() =>
-                    updateMealPlanItem(accessToken, item.id, {
-                      leftover_source_item_id: leftoverSourceId ? Number(leftoverSourceId) : null,
-                    }),
-                  )
-                }
+                onClick={() => void saveLeftoverSource(leftoverSourceId)}
               >
                 Done
               </button>

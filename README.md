@@ -94,6 +94,9 @@ When the app data model changes (new tables like `users`, `dishes`, etc.), the P
 - `009_dish_image_url` — optional dish image URL
 - `010_dish_course_simplify` — course limited to starter, main, dessert
 - `011_meal_planning` — meal plans, plan items, ratings
+- `012_meal_item_eaten_status` — eaten/ate_leftovers statuses, is_locked, skip_comment
+- `013_meal_ratings_dish_id` — meal_ratings table (replaces ratings)
+- `014_review_saved_at` — review_saved_at on meal plan items
 
 With Docker Compose, the **API container runs migrations automatically** on startup (`alembic upgrade head`), then loads **reference catalog data** (standard units and starter tags) from YAML if those rows are not already present.
 
@@ -148,7 +151,7 @@ The API uses **two different tokens**. Mixing them up returns `401 Unauthorized`
 **Manual token paste (alternative):**
 
 1. Call `POST /api/auth/login` and copy `access_token`
-2. Click **Authorize** and paste only the token (no `Bearer ` prefix)
+2. Click **Authorize** and paste only the token (no `Bearer` prefix)
 
 **Refresh token:**
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { MealPlanItem } from "../../api/planning";
 import { fetchMealHistory } from "../../api/planning";
@@ -18,9 +18,10 @@ import { WeekPlanShell, weekNavigationHandlers } from "./WeekPlanShell";
 
 export function ReviewWeekPage() {
   const { accessToken } = useAuth();
-  const { plan, dishes, error, loading, load, setPlan, setError } = useWeekPlan(accessToken);
+  const { plan, dishes, error, loading, load, setError, replaceItem } = useWeekPlan(accessToken);
   const [reviewFilter, setReviewFilter] = useState<ReviewFilter>("needs_review");
   const [sourceCandidates, setSourceCandidates] = useState<MealPlanItem[]>([]);
+  const sourceRequestIdRef = useRef(0);
   const nav = weekNavigationHandlers(plan?.week_start_date ?? null, load);
 
   const loadSourceCandidates = useCallback(async () => {
@@ -28,7 +29,11 @@ export function ReviewWeekPage() {
       setSourceCandidates([]);
       return;
     }
+    const requestId = ++sourceRequestIdRef.current;
     const history = await fetchMealHistory(accessToken, 50);
+    if (requestId !== sourceRequestIdRef.current) {
+      return;
+    }
     const byId = new Map<number, MealPlanItem>();
     for (const item of [...plan.items, ...history]) {
       byId.set(item.id, item);
@@ -37,7 +42,16 @@ export function ReviewWeekPage() {
   }, [accessToken, plan]);
 
   useEffect(() => {
-    void loadSourceCandidates().catch(() => setSourceCandidates(plan?.items ?? []));
+    let cancelled = false;
+    loadSourceCandidates().catch(() => {
+      if (!cancelled) {
+        setSourceCandidates(plan?.items ?? []);
+      }
+    });
+    return () => {
+      cancelled = true;
+      sourceRequestIdRef.current += 1;
+    };
   }, [loadSourceCandidates, plan?.items]);
 
   const visibleItems = useMemo(
@@ -61,12 +75,8 @@ export function ReviewWeekPage() {
     [plan],
   );
 
-  function replaceItem(updated: MealPlanItem) {
-    setPlan((current) =>
-      current
-        ? { ...current, items: current.items.map((item) => (item.id === updated.id ? updated : item)) }
-        : current,
-    );
+  function handleItemChanged(updated: MealPlanItem) {
+    replaceItem(updated);
     setSourceCandidates((current) => {
       const byId = new Map(current.map((item) => [item.id, item]));
       byId.set(updated.id, updated);
@@ -97,6 +107,7 @@ export function ReviewWeekPage() {
             <button
               type="button"
               className={`segmented-control-option${reviewFilter === "needs_review" ? " segmented-control-option-active" : ""}`}
+              aria-pressed={reviewFilter === "needs_review"}
               onClick={() => setReviewFilter("needs_review")}
             >
               Needs review
@@ -105,6 +116,7 @@ export function ReviewWeekPage() {
             <button
               type="button"
               className={`segmented-control-option${reviewFilter === "all" ? " segmented-control-option-active" : ""}`}
+              aria-pressed={reviewFilter === "all"}
               onClick={() => setReviewFilter("all")}
             >
               All meals
@@ -146,7 +158,7 @@ export function ReviewWeekPage() {
                         sourceLookupItems={sourceCandidates}
                         accessToken={accessToken!}
                         mode="review"
-                        onChanged={replaceItem}
+                        onChanged={handleItemChanged}
                         onError={setError}
                       />
                     ))}

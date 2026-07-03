@@ -2,6 +2,7 @@ from datetime import date, datetime, timedelta, timezone
 
 from fastapi import HTTPException, status
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
 from mealroulette.models.catalog import Dish, Recipe
@@ -123,16 +124,19 @@ class PlanningService:
                     )
                 )
 
-    def get_or_create_plan(self, week_start: date, *, status: MealPlanStatus = MealPlanStatus.active) -> MealPlan:
-        normalized = self.week_start_for(week_start)
-        plan = self.db.scalar(
+    def _load_plan_by_week_start(self, week_start: date) -> MealPlan | None:
+        return self.db.scalar(
             select(MealPlan)
-            .where(MealPlan.week_start_date == normalized)
+            .where(MealPlan.week_start_date == week_start)
             .options(
                 selectinload(MealPlan.items).selectinload(MealPlanItem.dish),
                 selectinload(MealPlan.items).selectinload(MealPlanItem.recipe),
             )
         )
+
+    def get_or_create_plan(self, week_start: date, *, status: MealPlanStatus = MealPlanStatus.active) -> MealPlan:
+        normalized = self.week_start_for(week_start)
+        plan = self._load_plan_by_week_start(normalized)
         if plan is not None:
             return plan
 
@@ -140,7 +144,14 @@ class PlanningService:
         self.db.add(plan)
         self.db.flush()
         self._scaffold_items(plan, normalized)
-        self.db.commit()
+        try:
+            self.db.commit()
+        except IntegrityError:
+            self.db.rollback()
+            existing = self._load_plan_by_week_start(normalized)
+            if existing is None:
+                raise
+            return existing
         return self._load_plan(plan.id)
 
     def get_current_plan(self) -> MealPlanPublic:
@@ -160,7 +171,14 @@ class PlanningService:
         self.db.add(plan)
         self.db.flush()
         self._scaffold_items(plan, normalized)
-        self.db.commit()
+        try:
+            self.db.commit()
+        except IntegrityError:
+            self.db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Meal plan for this week already exists",
+            ) from None
         return self.to_plan_public(self._load_plan(plan.id))
 
     def _resolve_recipe_for_dish(self, dish_id: int, recipe_id: int | None) -> int | None:
@@ -180,6 +198,11 @@ class PlanningService:
 
     def _apply_assignment(self, item: MealPlanItem, dish_id: int | None, recipe_id: int | None) -> None:
         if dish_id is None:
+            if item.status != MealPlanItemStatus.planned:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Cannot clear dish on a meal that has already been reviewed",
+                )
             item.dish_id = None
             item.recipe_id = None
             item.manually_selected = False
@@ -199,6 +222,13 @@ class PlanningService:
     def update_item(self, item_id: int, payload: MealPlanItemUpdateRequest) -> MealPlanItemPublic:
         item = self._load_item(item_id)
         updates = payload.model_dump(exclude_unset=True)
+        forbidden_fields = {"status", "is_locked", "skip_reason", "skip_comment"}
+        blocked = forbidden_fields.intersection(updates)
+        if blocked:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Cannot update {', '.join(sorted(blocked))} via this endpoint",
+            )
         if "dish_id" in updates or "recipe_id" in updates:
             self._assert_assignment_allowed(item)
             dish_id = updates.get("dish_id", item.dish_id)

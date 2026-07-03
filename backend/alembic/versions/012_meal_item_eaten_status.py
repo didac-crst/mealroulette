@@ -16,7 +16,6 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.alter_column("meal_plan_items", "dish_id", new_column_name="planned_dish_id")
     op.alter_column("meal_plan_items", "locked", new_column_name="is_locked")
     op.add_column("meal_plan_items", sa.Column("skip_comment", sa.Text(), nullable=True))
 
@@ -75,4 +74,3 @@ def downgrade() -> None:
 
     op.drop_column("meal_plan_items", "skip_comment")
     op.alter_column("meal_plan_items", "is_locked", new_column_name="locked")
-    op.alter_column("meal_plan_items", "planned_dish_id", new_column_name="dish_id")

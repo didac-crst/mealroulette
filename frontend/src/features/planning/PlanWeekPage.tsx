@@ -9,7 +9,7 @@ import { WeekPlanShell, weekNavigationHandlers } from "./WeekPlanShell";
 
 export function PlanWeekPage() {
   const { accessToken } = useAuth();
-  const { plan, dishes, error, loading, load, setPlan, setError } = useWeekPlan(accessToken);
+  const { plan, dishes, error, loading, load, setError, replaceItem } = useWeekPlan(accessToken);
   const nav = weekNavigationHandlers(plan?.week_start_date ?? null, load);
 
   const grouped = useMemo(
@@ -17,14 +17,6 @@ export function PlanWeekPage() {
     [plan],
   );
   const dates = useMemo(() => (plan ? weekDates(plan.week_start_date) : []), [plan]);
-
-  function replaceItem(updated: MealPlanItem) {
-    setPlan((current) =>
-      current
-        ? { ...current, items: current.items.map((item) => (item.id === updated.id ? updated : item)) }
-        : current,
-    );
-  }
 
   if (loading && !plan) {
     return (
@@ -52,11 +44,11 @@ export function PlanWeekPage() {
                 <h4 className="meal-day-heading">{formatPlanDate(date)}</h4>
                 <div className="stack">
                   {dayItems.map((item) => (
-                      <MealSlotCard
-                        key={item.id}
-                        item={item}
-                        dishes={dishes}
-                        leftoverSources={[]}
+                    <MealSlotCard
+                      key={item.id}
+                      item={item}
+                      dishes={dishes}
+                      leftoverSources={[]}
                       accessToken={accessToken!}
                       mode="plan"
                       onChanged={replaceItem}
