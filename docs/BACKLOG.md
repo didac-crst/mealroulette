@@ -14,9 +14,9 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**v0.1 released** — tagged [`v0.1.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.1.0) on merge commit `b41cdae` ([PR #3](https://github.com/didac-crst/mealroulette/pull/3)).
+**v0.2 released** — tagged `v0.2.0` on merge commit `fb20858` ([PR #4](https://github.com/didac-crst/mealroulette/pull/4)).
 
-**Next:** Phase 5 — manual meal planning (v0.2), branch `phase-5/planning` (backend API in progress).
+**Next:** Phase 6 — shopping lists (v0.3).
 
 ---
 
@@ -27,7 +27,7 @@ Use one branch per milestone, then merge via pull request:
 - `phase-2/auth` — authentication and users (merged)
 - `phase-3/catalog` — core catalog (merged)
 - `phase-4/frontend` — dish library UI (merged in PR #3, `v0.1.0`)
-- `phase-5/planning` — manual meal planning (**in progress**)
+- `phase-5/planning` — manual meal planning (merged in PR #4, `v0.2.0`)
 
 ---
 
@@ -38,14 +38,14 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | Version | Theme | Status |
 | --- | --- | --- |
 | **v0.1** | Foundation — platform, auth, catalog (API + UI), basic frontend | **Done** ([`v0.1.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.1.0), merge `b41cdae`, PR #3) |
-| **v0.2** | Manual planning — weekly plan, meal actions, ratings, history | Not started |
+| **v0.2** | Manual planning — weekly plan, review flow, meal actions, ratings, lightweight leftovers | **Done** ([`v0.2.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.2.0), merge `fb20858`, PR #4) |
 | **v0.3** | Shopping list — generation, aggregation, pantry filter, UI | Not started |
 | **v0.4** | Telegram reminders — settings, scheduled and manual send | Not started |
 | **v0.5** | Automatic scheduler — explainable weekly generation, reroll | Not started |
 | **v0.6** | LLM-assisted entry — draft enrichment, review before save | Not started |
 | **v1.0** | Stable home version — mobile UI, backups, auth, scheduler, cooking mode | Not started |
 
-> **v0.1 shipped** as [`v0.1.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.1.0). The dish library UI is functional for household recipe entry. Release notes: [docs/releases/v0.1.0.md](releases/v0.1.0.md).
+> **v0.2 shipped** as [`v0.2.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.2.0). Plan and review lunch/dinner for the week, record what was eaten, rate meals, and track lightweight leftovers. Release notes: [docs/releases/v0.2.0.md](releases/v0.2.0.md).
 
 ### v0.1 — Foundation
 
@@ -83,15 +83,18 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 
 ### v0.2 — Manual Planning
 
-- [ ] Weekly plan view
-- [ ] Manual dish assignment
-- [ ] Meal plan items
-- [ ] Lock / unlock
-- [ ] Mark eaten (ate as planned)
-- [ ] Skip
-- [ ] Ate leftovers (lightweight — source meal reference only)
-- [ ] Meal history
-- [ ] Ratings
+- [x] Weekly plan view
+- [x] Manual dish assignment (with main recipe auto-select)
+- [x] Meal plan items (lunch + dinner, 7-day scaffold)
+- [x] Lock / unlock
+- [x] Mark eaten (ate as planned)
+- [x] Skip (optional reason / comment)
+- [x] Ate leftovers (lightweight — 7-day eaten-only sources, optional source picker)
+- [x] Meal history API
+- [x] Meal ratings (per meal slot, linked to dish/recipe)
+- [x] Review flow (`review_saved_at`, needs-review filter)
+- [x] Mobile polish (bottom tabs, review-first landing, touch-friendly actions)
+- [ ] Reroll / roulette again (deferred to Phase 8 scheduler)
 
 ### v0.3 — Shopping List
 
@@ -152,8 +155,8 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 2 | Authentication and users | v0.1 | Done |
 | 3 | Core catalog data | v0.1 | Done |
 | 4 | Frontend shell and dish library | v0.1 | Done (PR #3, `v0.1.0`) |
-| 5 | Manual meal planning | v0.2 | **Next** |
-| 6 | Shopping lists | v0.3 | Not started |
+| 5 | Manual meal planning | v0.2 | Done (PR #4, `v0.2.0`) |
+| 6 | Shopping lists | v0.3 | **Next** |
 | 7 | Telegram reminders | v0.4 | Not started |
 | 8 | Explainable scheduler | v0.5 | Not started |
 | 9 | Cooking mode | v1.0 | Not started |
@@ -229,7 +232,20 @@ On branch `phase-4/frontend` (ready to merge).
 - [x] Food profile tags: protein, carb, style, temperature (no cuisine, dietary, or dominant fields in UI)
 - [x] Course: starter, main, or dessert
 
-### Phases 5–12
+### Phase 5 — Manual meal planning ✅
+
+Merged in `fb20858` (PR #4, `v0.2.0`).
+
+- [x] Meal plans and plan items (migrations 011–014)
+- [x] Planning API: current/week plan, assign dish/recipe, lock, mark eaten, skip, ate leftovers, reset, ratings
+- [x] Lightweight leftovers: 7-day window, `eaten` sources only, no inventory
+- [x] `review_saved_at` — needs-review filter until rating/skip/leftover source confirmed
+- [x] Plan week UI and Review week UI with `MealSlotCard`
+- [x] Mobile polish: bottom tab bar, review-first landing, compact week nav
+- [x] Swagger OAuth2 token endpoint for `/docs`
+- [x] Planning integration and unit tests
+
+### Phases 6–12
 
 See [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) for full deliverables and acceptance criteria per phase.
 
@@ -269,9 +285,10 @@ Cross-reference for [docs/MVP.md](MVP.md). Checked items are done; the rest trac
 - [x] Admin and user roles
 - [x] Dishes, recipes, ingredients, units, tags (API)
 - [x] Ingredient normalization flow (API)
-- [ ] Weekly meal plan and manual assignment
-- [ ] Meal actions (lock, eaten, skip, ate leftovers, reroll)
-- [ ] Ratings
+- [x] Weekly meal plan and manual assignment
+- [x] Meal actions (lock, eaten, skip, ate leftovers)
+- [x] Ratings
+- [ ] Meal reroll (deferred to Phase 8)
 - [ ] Shopping list generation
 - [ ] Telegram settings and reminders
 - [ ] JSON export / import

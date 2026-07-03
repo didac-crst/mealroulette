@@ -7,7 +7,8 @@ Git tags mark **product versions** users can run. We do not tag individual imple
 | Tag | When |
 | --- | --- |
 | `v0.1.0` | Phase 4 merged — foundation complete (platform, auth, catalog API + dish UI) — **released** |
-| `v0.2.0`, … | Each subsequent product version when its roadmap scope is fully shipped |
+| `v0.2.0` | Phase 5 merged — manual meal planning (plan/review, actions, ratings, lightweight leftovers) — **released** |
+| `v0.3.0`, … | Each subsequent product version when its roadmap scope is fully shipped |
 
 Use [semantic versioning](https://semver.org/) at the product-version level: `vMAJOR.MINOR.PATCH`. Patch bumps are for fixes on an already-released version line.
 
@@ -31,11 +32,12 @@ git push origin v0.1.0
 | Tag | Commit | Date | What shipped |
 | --- | --- | --- | --- |
 | [`v0.1.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.1.0) | [`b41cdae`](https://github.com/didac-crst/mealroulette/commit/b41cdae) | 2026-07-02 | Foundation: platform, auth, catalog API, dish library UI — [release notes](releases/v0.1.0.md) |
+| [`v0.2.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.2.0) | [`fb20858`](https://github.com/didac-crst/mealroulette/commit/fb20858) | 2026-07-03 | Manual planning: weekly plan, review flow, meal actions, ratings, lightweight leftovers — [release notes](releases/v0.2.0.md) |
 
 ## Check out a release
 
 ```bash
-git checkout v0.1.0   # once tagged
+git checkout v0.2.0   # latest release
 docker compose up --build
 ```
 

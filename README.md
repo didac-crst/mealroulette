@@ -2,7 +2,7 @@
 
 MealRoulette is a self-hosted household meal planning app for deciding what to eat, planning lunch and dinner, generating shopping lists, sending Telegram reminders, and cooking from structured recipe steps.
 
-**v0.1 foundation** is implemented: auth, catalog API, and a dish library UI (login, dish cards, dish/recipe CRUD, ingredients, steps, tags, seasonality). Meal planning, shopping lists, Telegram, and the scheduler are not built yet — see [docs/BACKLOG.md](docs/BACKLOG.md).
+**v0.2 manual planning** is implemented: weekly plan and review flows for lunch/dinner, meal actions (lock, eaten, skip, ate leftovers), star ratings, and lightweight leftover tracking. Shopping lists, Telegram, and the scheduler are not built yet — see [docs/BACKLOG.md](docs/BACKLOG.md).
 
 ## Documentation
 
@@ -10,7 +10,7 @@ MealRoulette is a self-hosted household meal planning app for deciding what to e
 - [Cursor implementation roadmap](docs/CURSOR_ROADMAP.md)
 - [MVP scope](docs/MVP.md)
 - [Development backlog and progress](docs/BACKLOG.md)
-- [Releases and git tags](docs/RELEASES.md) — product version tags (`v0.1.0`, …)
+- [Releases and git tags](docs/RELEASES.md) — product version tags (`v0.1.0`, `v0.2.0`, …)
 - [CodeRabbit PR reviews](docs/CODERABBIT.md) — manual `@coderabbitai review` after CI is green
 
 ## Target Stack

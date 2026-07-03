@@ -229,7 +229,7 @@ Implementation notes:
 
 ### Phase 4 - Frontend Shell and Dish Library
 
-**Status:** Done on branch `phase-4/frontend` (ready to merge for v0.1).
+**Status:** Done — merged in PR #3 (`v0.1.0`, commit `b41cdae`).
 
 Deliverables:
 
@@ -257,6 +257,8 @@ Implementation notes (v0.1):
 - **Not in v0.1 UI:** dish library search/filters, dietary flags (planned: infer from recipe ingredients later), cuisine tags.
 
 ### Phase 5 - Manual Meal Planning
+
+**Status:** Done — merged in PR #4 (`v0.2.0`, commit `fb20858`).
 
 Deliverables:
 
@@ -304,6 +306,16 @@ Acceptance criteria:
 - `leftover_source_item_id` optional when marking `ate_leftovers`; source must be status `eaten`, within 7 days, same day or earlier. `ate_leftovers` meals are not valid sources.
 - Do **not** implement portion inventory, fridge/freezer tracking, expiration, or automatic leftover stock decrement in Phase 5.
 - Optional `servings_planned` / `servings_eaten` only if cheap — must not drive inventory logic.
+
+Implementation notes (v0.2):
+
+- Alembic revisions `011`–`014`: meal plans, plan items, statuses, `meal_ratings`, `review_saved_at`.
+- Planning API: `/api/planning/current`, week plan CRUD, assign dish/recipe, lock, mark eaten/skip/ate leftovers, reset, ratings.
+- `review_saved_at`: Review tab filters "needs review" until rating saved (eaten), skip saved, or leftover source confirmed.
+- Frontend: `/plan` and `/review` with shared `WeekPlanShell`, `MealSlotCard`, `StarRating`.
+- Mobile polish: bottom tab bar, review-first default route, compact week navigation, safe-area padding, larger touch targets.
+- Swagger OAuth2 password flow via `POST /api/auth/token` for `/docs` Authorize.
+- Reroll / auto-scheduler deferred to Phase 8.
 
 ### Phase 6 - Shopping Lists
 
