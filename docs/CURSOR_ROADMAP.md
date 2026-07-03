@@ -380,7 +380,7 @@ Deliverables:
 
 ### Phase 7 - Telegram Reminders
 
-**Status:** Done on branch `phase-7/telegram` (v0.4.0 — pending merge).
+**Status:** Done — merged in PR #6 (`v0.4.0`, commit `97b55b3`).
 
 Deliverables:
 

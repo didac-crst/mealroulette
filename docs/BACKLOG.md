@@ -15,9 +15,9 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Phase 7 complete** on branch `phase-7/telegram` — ready for PR merge and `v0.4.0` tag.
+**Phase 8** — explainable automatic scheduler and meal reroll. See [CURSOR_ROADMAP.md](CURSOR_ROADMAP.md#phase-8---explainable-scheduler).
 
-Next up: **Phase 8** — explainable automatic scheduler and meal reroll. See [CURSOR_ROADMAP.md](CURSOR_ROADMAP.md#phase-8---explainable-scheduler).
+**v0.4 shipped** as [`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0) (merge `97b55b3`, PR #6).
 
 ---
 
@@ -30,7 +30,7 @@ Use one branch per milestone, then merge via pull request:
 - `phase-4/frontend` — dish library UI (merged in PR #3, `v0.1.0`)
 - `phase-5/planning` — manual meal planning (merged in PR #4, `v0.2.0`)
 - `phase-6/shopping` — shopping lists, ingredient catalog seed, ingredient admin UI (merged in PR #5, `v0.3.0`)
-- `phase-7/telegram` — Telegram bot, reminders, on-demand commands, recipe links (**ready to merge**, `v0.4.0`)
+- `phase-7/telegram` — Telegram bot, reminders, on-demand commands, recipe links (merged in PR #6, `v0.4.0`)
 
 ---
 
@@ -43,7 +43,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.1** | Foundation — platform, auth, catalog (API + UI), basic frontend | **Done** ([`v0.1.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.1.0), merge `b41cdae`, PR #3) |
 | **v0.2** | Manual planning — weekly plan, review flow, meal actions, ratings, lightweight leftovers | **Done** ([`v0.2.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.2.0), merge `fb20858`, PR #4) |
 | **v0.3** | Shopping list — generation, aggregation, pantry filter, UI, ingredient catalog | **Done** ([`v0.3.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.3.0), merge `88d2675`, PR #5) |
-| **v0.4** | Telegram reminders — settings, scheduled and manual send, bot commands | **Ready** (branch `phase-7/telegram`; tag on merge) |
+| **v0.4** | Telegram reminders — settings, scheduled and manual send, bot commands | **Done** ([`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0), merge `97b55b3`, PR #6) |
 | **v0.5** | Automatic scheduler — explainable weekly generation, reroll | Not started |
 | **v0.6** | LLM-assisted entry — draft enrichment, review before save | Not started |
 | **v1.0** | Stable home version — mobile UI, backups, auth, scheduler, cooking mode | Not started |
@@ -170,7 +170,7 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 4 | Frontend shell and dish library | v0.1 | Done (PR #3, `v0.1.0`) |
 | 5 | Manual meal planning | v0.2 | Done (PR #4, `v0.2.0`) |
 | 6 | Shopping lists | v0.3 | Done (PR #5, `v0.3.0`) |
-| 7 | Telegram reminders | v0.4 | Done (branch `phase-7/telegram`, pending merge) |
+| 7 | Telegram reminders | v0.4 | Done (PR #6, `v0.4.0`) |
 | 8 | Explainable scheduler | v0.5 | Not started |
 | 9 | Cooking mode | v1.0 | Not started |
 | 10 | Backup, export, and import | v1.0 | Not started |
@@ -287,7 +287,7 @@ Branch: `phase-6/shopping`.
 
 ### Phase 7 — Telegram reminders ✅
 
-Branch: `phase-7/telegram` (ready to merge, `v0.4.0`).
+Branch: `phase-7/telegram` — merged in PR #6 (`v0.4.0`, commit `97b55b3`).
 
 - [x] Migration `019` — `telegram_settings`, `telegram_subscribers`
 - [x] `TELEGRAM_BOT_TOKEN` + optional `TELEGRAM_BOT_USERNAME` in `.env` (api + worker)

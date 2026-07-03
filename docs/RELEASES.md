@@ -9,7 +9,7 @@ Git tags mark **product versions** users can run. We do not tag individual imple
 | `v0.1.0` | Phase 4 merged — foundation complete (platform, auth, catalog API + dish UI) — **released** |
 | `v0.2.0` | Phase 5 merged — manual meal planning (plan/review, actions, ratings, lightweight leftovers) — **released** |
 | `v0.3.0` | Phase 6 merged — shopping lists, ingredient catalog, unit aggregation — **released** |
-| `v0.4.0` | Phase 7 merged — Telegram reminders, bot commands, recipe links — **ready on branch** |
+| `v0.4.0` | Phase 7 merged — Telegram reminders, bot commands, recipe links — **released** |
 
 Use [semantic versioning](https://semver.org/) at the product-version level: `vMAJOR.MINOR.PATCH`. Patch bumps are for fixes on an already-released version line.
 
@@ -35,12 +35,12 @@ git push origin v0.1.0
 | [`v0.1.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.1.0) | [`b41cdae`](https://github.com/didac-crst/mealroulette/commit/b41cdae) | 2026-07-02 | Foundation: platform, auth, catalog API, dish library UI — [release notes](releases/v0.1.0.md) |
 | [`v0.2.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.2.0) | [`fb20858`](https://github.com/didac-crst/mealroulette/commit/fb20858) | 2026-07-03 | Manual planning: weekly plan, review flow, meal actions, ratings, lightweight leftovers — [release notes](releases/v0.2.0.md) |
 | [`v0.3.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.3.0) | [`88d2675`](https://github.com/didac-crst/mealroulette/commit/88d2675) | 2026-07-03 | Shopping lists, ingredient catalog, unit aggregation — [release notes](releases/v0.3.0.md) |
-| `v0.4.0` | *(pending merge)* | — | Telegram reminders, bot commands, recipe links — [release notes](releases/v0.4.0.md) |
+| [`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0) | [`97b55b3`](https://github.com/didac-crst/mealroulette/commit/97b55b3) | 2026-07-03 | Telegram reminders, bot commands, recipe links — [release notes](releases/v0.4.0.md) |
 
 ## Check out a release
 
 ```bash
-git checkout v0.3.0   # latest tagged release
+git checkout v0.4.0   # latest tagged release
 docker compose up --build
 ```
 

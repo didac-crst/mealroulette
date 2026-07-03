@@ -2,7 +2,7 @@
 
 MealRoulette is a self-hosted household meal planning app for deciding what to eat, planning lunch and dinner, generating shopping lists, sending Telegram reminders, and cooking from structured recipe steps.
 
-**v0.4 Telegram reminders** are implemented on branch `phase-7/telegram`: bot commands, scheduled reminders, HTML planning/shopping messages, and tap-to-open recipes. The automatic scheduler is not built yet — see [docs/BACKLOG.md](docs/BACKLOG.md).
+**v0.4 Telegram reminders** are released ([`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0)): bot commands, scheduled HTML reminders, and tap-to-open recipes. The automatic scheduler is not built yet — see [docs/BACKLOG.md](docs/BACKLOG.md).
 
 ## Documentation
 
