@@ -62,3 +62,21 @@ class DifficultyLevel(str, enum.Enum):
     easy = "easy"
     medium = "medium"
     hard = "hard"
+
+
+class MealPlanStatus(str, enum.Enum):
+    draft = "draft"
+    active = "active"
+    archived = "archived"
+
+
+class MealSlot(str, enum.Enum):
+    lunch = "lunch"
+    dinner = "dinner"
+
+
+class MealPlanItemStatus(str, enum.Enum):
+    planned = "planned"
+    eaten = "eaten"
+    skipped = "skipped"
+    ate_leftovers = "ate_leftovers"

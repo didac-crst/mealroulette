@@ -969,10 +969,12 @@ Fields:
 - dish_id
 - recipe_id
 - status
-- locked
+- is_locked
 - manually_selected
 - skip_reason
-- leftover_source_item_id
+- skip_comment
+- leftover_source_item_id (optional; null = unknown / same dish)
+  - Valid sources: prior meals with status `eaten` only (not `ate_leftovers`), within the last 7 days relative to the current meal date, same day or earlier. `ate_leftovers` meals do not become new sources. Full leftover inventory is deferred.
 - selection_reasons_json
 - created_at
 - updated_at
@@ -985,16 +987,15 @@ Meal slots:
 Statuses:
 
 - planned
-- cooked
+- eaten
 - skipped
-- leftovers
-- cancelled
+- ate_leftovers
 
 Actions:
 
-- mark cooked
+- mark eaten (ate as planned)
 - skip
-- use leftovers
+- ate leftovers
 - roulette again
 - lock
 - unlock
@@ -1399,8 +1400,9 @@ Admin-only endpoints:
 
 ### 13.9 Ratings
 
-- `POST /api/dishes/{dish_id}/ratings`
-- `GET /api/dishes/{dish_id}/ratings`
+- `POST /api/meal-plan-items/{item_id}/reset-status`
+- `POST /api/meal-plan-items/{item_id}/rating`
+- `GET /api/meal-plan-items/{item_id}/rating`
 
 ### 13.10 Meal Plans
 
@@ -1413,9 +1415,9 @@ Admin-only endpoints:
 ### 13.11 Meal Plan Items
 
 - `PUT /api/meal-plan-items/{item_id}`
-- `POST /api/meal-plan-items/{item_id}/mark-cooked`
+- `POST /api/meal-plan-items/{item_id}/mark-eaten`
 - `POST /api/meal-plan-items/{item_id}/skip`
-- `POST /api/meal-plan-items/{item_id}/leftovers`
+- `POST /api/meal-plan-items/{item_id}/ate-leftovers`
 - `POST /api/meal-plan-items/{item_id}/reroll`
 - `POST /api/meal-plan-items/{item_id}/lock`
 - `POST /api/meal-plan-items/{item_id}/unlock`
