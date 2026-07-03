@@ -15,9 +15,9 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Phase 7 in progress** — branch `phase-7/telegram` (v0.4 Telegram reminders).
+**Phase 7 complete** on branch `phase-7/telegram` — ready for PR merge and `v0.4.0` tag.
 
-Scope: Telegram settings (admin), daily scheduled reminder via APScheduler worker, manual test/send endpoints, message formatting reusing shopping-list aggregation. See [CURSOR_ROADMAP.md](CURSOR_ROADMAP.md#phase-7---telegram-reminders) for the implementation plan.
+Next up: **Phase 8** — explainable automatic scheduler and meal reroll. See [CURSOR_ROADMAP.md](CURSOR_ROADMAP.md#phase-8---explainable-scheduler).
 
 ---
 
@@ -30,7 +30,7 @@ Use one branch per milestone, then merge via pull request:
 - `phase-4/frontend` — dish library UI (merged in PR #3, `v0.1.0`)
 - `phase-5/planning` — manual meal planning (merged in PR #4, `v0.2.0`)
 - `phase-6/shopping` — shopping lists, ingredient catalog seed, ingredient admin UI (merged in PR #5, `v0.3.0`)
-- `phase-7/telegram` — Telegram settings, reminders, worker job (**in progress**)
+- `phase-7/telegram` — Telegram bot, reminders, on-demand commands, recipe links (**ready to merge**, `v0.4.0`)
 
 ---
 
@@ -43,7 +43,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.1** | Foundation — platform, auth, catalog (API + UI), basic frontend | **Done** ([`v0.1.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.1.0), merge `b41cdae`, PR #3) |
 | **v0.2** | Manual planning — weekly plan, review flow, meal actions, ratings, lightweight leftovers | **Done** ([`v0.2.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.2.0), merge `fb20858`, PR #4) |
 | **v0.3** | Shopping list — generation, aggregation, pantry filter, UI, ingredient catalog | **Done** ([`v0.3.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.3.0), merge `88d2675`, PR #5) |
-| **v0.4** | Telegram reminders — settings, scheduled and manual send | Not started |
+| **v0.4** | Telegram reminders — settings, scheduled and manual send, bot commands | **Ready** (branch `phase-7/telegram`; tag on merge) |
 | **v0.5** | Automatic scheduler — explainable weekly generation, reroll | Not started |
 | **v0.6** | LLM-assisted entry — draft enrichment, review before save | Not started |
 | **v1.0** | Stable home version — mobile UI, backups, auth, scheduler, cooking mode | Not started |
@@ -110,14 +110,20 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [x] Per-ingredient unit behavior (family, preferred shopping unit, aggregation strategy)
 - [x] Ingredient unit conversions with approval workflow (API + admin UI)
 - [x] Ingredient admin dashboard (`/ingredients` list + edit)
+- [x] Ingredient category reference + dropdown editor (`ingredient_categories.yaml`)
 
 ### v0.4 — Telegram Reminders
 
-- [ ] Telegram settings
-- [ ] Send test message
-- [ ] Daily scheduled reminder
-- [ ] Shopping window config
-- [ ] Manual send now
+- [x] Telegram settings (admin UI + API)
+- [x] Send test message
+- [x] Daily scheduled reminder (APScheduler worker)
+- [x] Shopping window config (days, include today, pantry, group by category)
+- [x] Manual send now
+- [x] Subscriber model (`/subscribe`, `/unsubscribe`)
+- [x] On-demand bot commands (`/planning`, `/reminder`, `/shopping`)
+- [x] HTML message formatting with safe truncation
+- [x] Recipe deep links in planning (tap dish → ingredients + steps)
+- [x] Send saved shopping list via Telegram
 
 ### v0.5 — Automatic Scheduler
 
@@ -146,7 +152,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [ ] Backup / restore
 - [ ] Auth and roles
 - [ ] Scheduler reliable enough for real use
-- [ ] Telegram reminders
+- [x] Telegram reminders
 - [ ] Recipe cooking mode
 
 ---
@@ -164,7 +170,7 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 4 | Frontend shell and dish library | v0.1 | Done (PR #3, `v0.1.0`) |
 | 5 | Manual meal planning | v0.2 | Done (PR #4, `v0.2.0`) |
 | 6 | Shopping lists | v0.3 | Done (PR #5, `v0.3.0`) |
-| 7 | Telegram reminders | v0.4 | **In progress** (`phase-7/telegram`) |
+| 7 | Telegram reminders | v0.4 | Done (branch `phase-7/telegram`, pending merge) |
 | 8 | Explainable scheduler | v0.5 | Not started |
 | 9 | Cooking mode | v1.0 | Not started |
 | 10 | Backup, export, and import | v1.0 | Not started |
@@ -279,7 +285,24 @@ Branch: `phase-6/shopping`.
 - [x] Ingredient admin UI — catalog list, edit aliases/conversions/unit behavior
 - [x] Localization design documented ([LOCALIZATION.md](LOCALIZATION.md)); implementation deferred to Phase 11
 
-### Phases 7–12
+### Phase 7 — Telegram reminders ✅
+
+Branch: `phase-7/telegram` (ready to merge, `v0.4.0`).
+
+- [x] Migration `019` — `telegram_settings`, `telegram_subscribers`
+- [x] `TELEGRAM_BOT_TOKEN` + optional `TELEGRAM_BOT_USERNAME` in `.env` (api + worker)
+- [x] Telegram settings API and admin UI (`/settings/telegram`)
+- [x] Subscriber flow (`/subscribe`, `/unsubscribe`, `/help`)
+- [x] On-demand commands: `/planning`, `/reminder`, `/shopping` (HTML, 1–14 days)
+- [x] Recipe deep links in planning — tap dish → full recipe (ingredients + steps)
+- [x] Daily scheduled reminder via APScheduler (`send_daily_reminder`)
+- [x] Manual test + send-now endpoints; send saved shopping list
+- [x] HTML formatters with safe truncation; shopping aggregation reused
+- [x] Ingredient category reference + API + editor dropdown; seed import backfill
+- [x] Logo assets in `frontend/public/`
+- [x] Backend tests (telegram settings, API, reminder, formatters, updates, recipe links)
+
+### Phases 8–12
 
 See [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) for full deliverables and acceptance criteria per phase.
 
@@ -324,11 +347,11 @@ Cross-reference for [docs/MVP.md](MVP.md). Checked items are done; the rest trac
 - [x] Ratings
 - [ ] Meal reroll (deferred to Phase 8)
 - [x] Shopping list generation
-- [ ] Telegram settings and reminders
+- [x] Telegram settings and reminders
 - [ ] JSON export / import
 - [ ] Mounted backup folder (directory exists; backup logic not yet implemented)
 
-**MVP acceptance test** (not yet achievable): log in from a phone, create dishes, plan three days, generate a shopping list, send via Telegram, mark meals eaten, rate them, export a backup.
+**MVP acceptance test** (partially achievable): log in from a phone, create dishes, plan three days, generate a shopping list, send via Telegram, mark meals eaten, rate them. **Still missing:** export a backup (Phase 10).
 
 ---
 
