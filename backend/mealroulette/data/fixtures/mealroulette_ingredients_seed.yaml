@@ -1529,9 +1529,9 @@ ingredients:
   aggregation_strategy: prefer_mass
   aliases:
   - lardons
+  - bacon
   - bacon bits
   - lardon
-  - Bacon/lardons
 - canonical_name: hake_fillet
   display_name: Hake fillet
   description: White fish fillet, hake/merlu.

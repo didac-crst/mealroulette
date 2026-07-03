@@ -176,12 +176,12 @@ def test_format_reminder_message_html_uses_planning_then_ingredients():
 
     assert "<b>Reminder</b>" in message
     assert "  • <b>Lunch</b>: Carrot soup (main)" in message
-    assert "<b>Ingredients list::</b>" in message
+    assert "<b>Ingredients list:</b>" in message
     assert "<b>Carrot — ~2 unit</b>" in message
     assert "includes: 700 g + 2 unit" in message
     assert "↳ Carrot soup — 1 unit" in message
     assert "↳ Garden salad — 1 unit" in message
-    assert "(main)" not in message.split("<b>Ingredients list::</b>")[1]
+    assert "(main)" not in message.split("<b>Ingredients list:</b>")[1]
     assert "<b>vegetable</b>" not in message
     assert "Planned meals in window" not in message
 
@@ -193,6 +193,17 @@ def test_truncate_message_closes_unclosed_html_tags():
     truncated = truncate_message(long_message)
     assert truncated.endswith("… (message truncated)")
     assert truncated.count("<i>") == truncated.count("</i>")
+
+
+def test_truncate_message_closes_unclosed_anchor_tags():
+    from mealroulette.services.telegram_html_utils import close_unclosed_html_tags, truncate_message
+
+    assert close_unclosed_html_tags('<a href="https://example.com">link') == (
+        '<a href="https://example.com">link</a>'
+    )
+    long_message = '<a href="https://example.com/recipe/1">Dish name</a>\n' + ("x" * 5000)
+    truncated = truncate_message(long_message)
+    assert truncated.count("<a") == truncated.count("</a>")
 
 
 def test_format_shopping_message_html_totals_only_by_category():

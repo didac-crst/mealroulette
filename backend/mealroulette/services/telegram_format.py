@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 
 from mealroulette.models.enums import MealSlot
@@ -91,4 +91,4 @@ def format_shopping_list_message(
 def reminder_window_from_date(today: date, *, include_today: bool) -> date:
     if include_today:
         return today
-    return today.fromordinal(today.toordinal() + 1)
+    return today + timedelta(days=1)

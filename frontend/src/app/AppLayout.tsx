@@ -67,6 +67,14 @@ export function AppLayout() {
             {label}
           </NavLink>
         ))}
+        {isAdmin ? (
+          <NavLink
+            to="/settings/telegram"
+            className={({ isActive }) => `app-tab${isActive ? " app-tab-active" : ""}`}
+          >
+            Telegram
+          </NavLink>
+        ) : null}
       </nav>
     </div>
   );

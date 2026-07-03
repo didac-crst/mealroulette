@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC, date, datetime
+from datetime import UTC, datetime
 
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
@@ -59,7 +59,7 @@ class TelegramReminderService:
             "MealRoulette test\n\nTelegram is configured correctly.",
         )
 
-    def send_daily_reminder(self, *, _today: date | None = None) -> TelegramSendResult:
+    def send_daily_reminder(self) -> TelegramSendResult:
         settings_row = self.settings_service.get_row()
         message = self.on_demand_service.build_reminder_message(settings_row.shopping_window_days)
         _, token, chat_ids = self.settings_service.require_send_config(settings_row)

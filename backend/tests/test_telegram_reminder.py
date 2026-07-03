@@ -54,7 +54,7 @@ def test_send_daily_reminder_sends_html_reminder(db_session, catalog_seed):
 
 
 @pytest.mark.integration
-def test_send_daily_reminder_disabled_skips(db_session, catalog_seed):
+def test_send_daily_reminder_disabled_raises_http_exception(db_session, catalog_seed):
     row = TelegramSettings(id=TELEGRAM_SETTINGS_ID, enabled=False)
     db_session.merge(row)
     db_session.commit()

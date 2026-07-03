@@ -163,7 +163,7 @@ def format_reminder_message_html(
         return _truncate_message("\n".join(lines))
 
     lines.append("")
-    lines.append("<b>Ingredients list::</b>")
+    lines.append("<b>Ingredients list:</b>")
     for item in sorted(shopping_list.items, key=lambda row: row.display_name.casefold()):
         lines.extend(_format_ingredient_item_lines(item))
 

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import logging
 
+from collections.abc import Callable
+
 from sqlalchemy.orm import Session
 
 from mealroulette.core.config import get_settings
@@ -34,6 +36,8 @@ RECIPE_COMMANDS = {"/recipe"}
 
 def _normalize_command(text: str) -> str:
     parts = text.strip().split()
+    if not parts:
+        return ""
     command = parts[0].lower()
     if "@" in command:
         command = command.split("@", 1)[0]
@@ -90,10 +94,14 @@ class TelegramUpdateService:
         processed = 0
         for update in updates:
             update_id = update.get("update_id")
-            if isinstance(update_id, int):
-                self.settings_service.save_update_offset(row, update_id)
-            if self._handle_update(token, update):
-                processed += 1
+            try:
+                if self._handle_update(token, update):
+                    processed += 1
+            except Exception:
+                logger.exception("Failed to handle Telegram update %s", update_id)
+            finally:
+                if isinstance(update_id, int):
+                    self.settings_service.save_update_offset(row, update_id)
         return processed
 
     def _handle_update(self, token: str, update: dict) -> bool:
@@ -166,43 +174,31 @@ class TelegramUpdateService:
             return True
 
         if command in PLANNING_COMMANDS:
-            days = parse_days_arg(_command_args(text))
-            if days is None:
-                self.client.send_message(
-                    token,
-                    chat_id,
-                    f"Days must be a number between 1 and {MAX_ON_DEMAND_DAYS}. Example: /planning 3",
-                )
-                return True
-            message = self.on_demand_service.build_planning_message(days)
-            self.client.send_message(token, chat_id, message, parse_mode="HTML")
-            return True
+            return self._handle_days_command(
+                token,
+                chat_id,
+                text,
+                command_name="planning",
+                builder=self.on_demand_service.build_planning_message,
+            )
 
         if command in REMINDER_COMMANDS:
-            days = parse_days_arg(_command_args(text))
-            if days is None:
-                self.client.send_message(
-                    token,
-                    chat_id,
-                    f"Days must be a number between 1 and {MAX_ON_DEMAND_DAYS}. Example: /reminder 3",
-                )
-                return True
-            message = self.on_demand_service.build_reminder_message(days)
-            self.client.send_message(token, chat_id, message, parse_mode="HTML")
-            return True
+            return self._handle_days_command(
+                token,
+                chat_id,
+                text,
+                command_name="reminder",
+                builder=self.on_demand_service.build_reminder_message,
+            )
 
         if command in SHOPPING_COMMANDS:
-            days = parse_days_arg(_command_args(text))
-            if days is None:
-                self.client.send_message(
-                    token,
-                    chat_id,
-                    f"Days must be a number between 1 and {MAX_ON_DEMAND_DAYS}. Example: /shopping 3",
-                )
-                return True
-            message = self.on_demand_service.build_shopping_message(days)
-            self.client.send_message(token, chat_id, message, parse_mode="HTML")
-            return True
+            return self._handle_days_command(
+                token,
+                chat_id,
+                text,
+                command_name="shopping",
+                builder=self.on_demand_service.build_shopping_message,
+            )
 
         if command in RECIPE_COMMANDS:
             raw_args = _command_raw_args(text)
@@ -228,6 +224,27 @@ class TelegramUpdateService:
             return True
 
         return False
+
+    def _handle_days_command(
+        self,
+        token: str,
+        chat_id: str,
+        text: str,
+        *,
+        command_name: str,
+        builder: Callable[[int], str],
+    ) -> bool:
+        days = parse_days_arg(_command_args(text))
+        if days is None:
+            self.client.send_message(
+                token,
+                chat_id,
+                f"Days must be a number between 1 and {MAX_ON_DEMAND_DAYS}. Example: /{command_name} 3",
+            )
+            return True
+        message = builder(days)
+        self.client.send_message(token, chat_id, message, parse_mode="HTML")
+        return True
 
     def _send_recipe_message(self, token: str, chat_id: str, recipe_id: int) -> bool:
         message = self.on_demand_service.build_recipe_message(recipe_id)

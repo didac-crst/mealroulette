@@ -38,6 +38,7 @@ export function TelegramSettingsPage() {
   const [actionBusy, setActionBusy] = useState<"test" | "send" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [refreshWarning, setRefreshWarning] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -64,6 +65,15 @@ export function TelegramSettingsPage() {
       group_by_category: settingsData.group_by_category,
       timezone: settingsData.timezone,
     });
+  };
+
+  const reloadSilently = async () => {
+    try {
+      await reload();
+      setRefreshWarning(null);
+    } catch (err) {
+      setRefreshWarning(err instanceof ApiError ? err.message : "Failed to refresh settings");
+    }
   };
 
   useEffect(() => {
@@ -101,10 +111,11 @@ export function TelegramSettingsPage() {
     setSaving(true);
     setError(null);
     setNotice(null);
+    setRefreshWarning(null);
     try {
       await updateTelegramSettings(accessToken, form);
-      await reload();
       setNotice("Settings saved.");
+      await reloadSilently();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Failed to save settings");
     } finally {
@@ -119,14 +130,15 @@ export function TelegramSettingsPage() {
     setActionBusy(action);
     setError(null);
     setNotice(null);
+    setRefreshWarning(null);
     try {
       const result =
         action === "test" ? await sendTelegramTest(accessToken) : await sendTelegramDailyReminder(accessToken);
       setNotice(result.detail);
-      await reload();
+      await reloadSilently();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Telegram action failed");
-      await reload();
+      await reloadSilently();
     } finally {
       setActionBusy(null);
     }
@@ -176,6 +188,7 @@ export function TelegramSettingsPage() {
         </p>
       ) : null}
       {notice ? <p className="muted">{notice}</p> : null}
+      {refreshWarning ? <p className="muted">Saved, but refresh failed: {refreshWarning}</p> : null}
 
       <fieldset>
         <legend>Subscribers ({subscribers.length})</legend>

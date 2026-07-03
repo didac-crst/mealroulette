@@ -37,11 +37,12 @@ class PlanningService:
 
     @staticmethod
     def _meal_times(item: MealPlanItem) -> tuple[int | None, int | None]:
-        if item.recipe is not None:
-            return item.recipe.prep_time_minutes, item.recipe.cook_time_minutes
+        prep = item.recipe.prep_time_minutes if item.recipe is not None else None
+        cook = item.recipe.cook_time_minutes if item.recipe is not None else None
         if item.dish is not None:
-            return item.dish.default_prep_time_minutes, item.dish.default_cook_time_minutes
-        return None, None
+            prep = prep if prep is not None else item.dish.default_prep_time_minutes
+            cook = cook if cook is not None else item.dish.default_cook_time_minutes
+        return prep, cook
 
     @classmethod
     def to_item_public(cls, item: MealPlanItem) -> MealPlanItemPublic:

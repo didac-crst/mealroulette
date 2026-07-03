@@ -12,7 +12,7 @@ def esc(text: str, *, quote: bool = False) -> str:
 
 def close_unclosed_html_tags(text: str) -> str:
     open_tags: list[str] = []
-    for match in re.finditer(r"<(/?)(b|i|blockquote)\b[^>]*>", text, re.IGNORECASE):
+    for match in re.finditer(r"<(/?)(a|b|i|blockquote)\b[^>]*>", text, re.IGNORECASE):
         closing, tag = match.groups()
         tag = tag.lower()
         if closing:

@@ -174,6 +174,20 @@ def _register_ingredient_lookup(
         alias_to_ingredient[key] = ingredient
 
 
+def _resolve_canonical(
+    ingredient: Ingredient,
+    canonical: str,
+    ingredients_by_canonical: dict[str, Ingredient],
+) -> str:
+    previous_canonical = normalize_name(ingredient.canonical_name)
+    rename_conflict = (
+        canonical != previous_canonical
+        and canonical in ingredients_by_canonical
+        and ingredients_by_canonical[canonical].id != ingredient.id
+    )
+    return previous_canonical if rename_conflict else canonical
+
+
 def _needs_category(ingredient: Ingredient) -> bool:
     return not ingredient.category or not ingredient.category.strip()
 
@@ -197,14 +211,11 @@ def _backfill_uncategorized_ingredients(
         for row in rows:
             if not _ingredient_matches_row(ingredient, row):
                 continue
+            if not row.get("category"):
+                break
             canonical = normalize_name(row["canonical_name"])
             previous_canonical = normalize_name(ingredient.canonical_name)
-            rename_conflict = (
-                canonical != previous_canonical
-                and canonical in ingredients_by_canonical
-                and ingredients_by_canonical[canonical].id != ingredient.id
-            )
-            apply_canonical = previous_canonical if rename_conflict else canonical
+            apply_canonical = _resolve_canonical(ingredient, canonical, ingredients_by_canonical)
             _apply_seed_row_to_ingredient(
                 ingredient,
                 row,
@@ -219,7 +230,8 @@ def _backfill_uncategorized_ingredients(
                 ingredients_by_canonical=ingredients_by_canonical,
                 alias_to_ingredient=alias_to_ingredient,
             )
-            updated += 1
+            if not _needs_category(ingredient):
+                updated += 1
             break
     return updated
 
@@ -288,12 +300,7 @@ def import_ingredient_seed(
         else:
             previous_canonical = normalize_name(ingredient.canonical_name)
             previous_category = ingredient.category
-            rename_conflict = (
-                canonical != previous_canonical
-                and canonical in ingredients_by_canonical
-                and ingredients_by_canonical[canonical].id != ingredient.id
-            )
-            apply_canonical = previous_canonical if rename_conflict else canonical
+            apply_canonical = _resolve_canonical(ingredient, canonical, ingredients_by_canonical)
             _apply_seed_row_to_ingredient(
                 ingredient,
                 row,

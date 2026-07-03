@@ -207,7 +207,7 @@ All commands are handled by the worker via long polling. On-demand messages use 
 | `/subscribe` or `/start` | Join the reminder list (broadcast target for daily job). |
 | `/unsubscribe` or `/stop` | Leave the reminder list. |
 | `/planning [days]` | Meal plan for the next `days` (default **3**, max **14**). Shows lunch/dinner, prep/cook times, dish names as links when `TELEGRAM_BOT_USERNAME` is set. |
-| `/reminder [days]` | Same window as `/planning`, plus **Ingredients list::** with per-dish breakdown. Pantry items included. |
+| `/reminder [days]` | Same window as `/planning`, plus **Ingredients list:** with per-dish breakdown. Pantry items included. |
 | `/shopping [days]` | Category-grouped shopping totals only (no per-meal breakdown). Pantry items included. |
 | `/start recipe_<id>` | Open full recipe (ingredients + steps). Used when tapping a dish link in planning/reminder. |
 | `/recipe <id>` | Same as above, by recipe id (fallback). |

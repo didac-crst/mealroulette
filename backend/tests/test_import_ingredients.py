@@ -29,8 +29,6 @@ def test_import_ingredient_seed_creates_carrot_with_approved_conversion(db_sessi
 
 @pytest.mark.integration
 def test_import_ingredient_seed_updates_dish_created_ingredient(db_session, catalog_seed):
-    from mealroulette.models.catalog import Ingredient
-
     dish_style = Ingredient(
         canonical_name="arborio rice",
         display_name="arborio rice",
