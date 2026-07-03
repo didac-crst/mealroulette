@@ -15,9 +15,9 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Phase 7 next** — Telegram reminders (v0.4).
+**Phase 7 in progress** — branch `phase-7/telegram` (v0.4 Telegram reminders).
 
-Phase 6 (shopping lists, ingredient catalog, unit aggregation) shipped in **v0.3.0** — merged PR #5.
+Scope: Telegram settings (admin), daily scheduled reminder via APScheduler worker, manual test/send endpoints, message formatting reusing shopping-list aggregation. See [CURSOR_ROADMAP.md](CURSOR_ROADMAP.md#phase-7---telegram-reminders) for the implementation plan.
 
 ---
 
@@ -30,6 +30,7 @@ Use one branch per milestone, then merge via pull request:
 - `phase-4/frontend` — dish library UI (merged in PR #3, `v0.1.0`)
 - `phase-5/planning` — manual meal planning (merged in PR #4, `v0.2.0`)
 - `phase-6/shopping` — shopping lists, ingredient catalog seed, ingredient admin UI (merged in PR #5, `v0.3.0`)
+- `phase-7/telegram` — Telegram settings, reminders, worker job (**in progress**)
 
 ---
 
@@ -163,7 +164,7 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 4 | Frontend shell and dish library | v0.1 | Done (PR #3, `v0.1.0`) |
 | 5 | Manual meal planning | v0.2 | Done (PR #4, `v0.2.0`) |
 | 6 | Shopping lists | v0.3 | Done (PR #5, `v0.3.0`) |
-| 7 | Telegram reminders | v0.4 | Not started |
+| 7 | Telegram reminders | v0.4 | **In progress** (`phase-7/telegram`) |
 | 8 | Explainable scheduler | v0.5 | Not started |
 | 9 | Cooking mode | v1.0 | Not started |
 | 10 | Backup, export, and import | v1.0 | Not started |
