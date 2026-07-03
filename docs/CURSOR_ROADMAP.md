@@ -320,7 +320,7 @@ Implementation notes (v0.2):
 
 ### Phase 6 - Shopping Lists
 
-**Status:** In progress on branch `phase-6/shopping` (v0.3).
+**Status:** Done — merged in PR #5 (`v0.3.0`).
 
 **Prerequisite tooling (done on this branch):**
 
@@ -357,6 +357,15 @@ Acceptance criteria:
 - Admins can review and approve conversion suggestions from the ingredient dashboard.
 
 **Deferred to Phase 11:** multilingual content translations — design in [LOCALIZATION.md](LOCALIZATION.md).
+
+Implementation notes (v0.3):
+
+- Alembic revisions `015`–`018`: shopping lists, per-meal contributions, ingredient unit behavior, conversion uniqueness.
+- Shopping API: preview (`GET /api/shopping-list`), create/fetch lists, check-off items.
+- `services/quantities`: strategy-aware aggregation; approved conversions only for cross-dimension merge.
+- Ingredient seed: `import_ingredient_seed` + `mealroulette_ingredients_seed.yaml`.
+- Frontend: `/shopping` (List tab), `/ingredients` admin catalog and edit.
+- Localization design documented; implementation deferred to Phase 11.
 
 ### Later — Leftover inventory (after shopping lists)
 
