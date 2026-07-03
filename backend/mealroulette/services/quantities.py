@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from decimal import Decimal
 
-from mealroulette.models.enums import UnitDimension
+from mealroulette.models.enums import AggregationStrategy, UnitDimension
 
 
 class UnitsNotCompatibleError(ValueError):
@@ -94,9 +94,30 @@ def convert_quantity(
     )
 
 
+def cross_dimension_mergeable(
+    left: UnitInfo,
+    right: UnitInfo,
+    strategy: AggregationStrategy | None,
+    conversions: list[IngredientConversion] | None = None,
+) -> bool:
+    """Whether two quantities may be summed when dimensions differ."""
+    if left.dimension == right.dimension:
+        return units_mergeable(left, right, conversions)
+    if strategy in {
+        AggregationStrategy.strict_same_dimension,
+        AggregationStrategy.prefer_count,
+        AggregationStrategy.never_convert_count,
+    }:
+        return False
+    return units_mergeable(left, right, conversions)
+
+
 def aggregate_quantities(
     lines: list[QuantityLine],
     conversions: list[IngredientConversion] | None = None,
+    *,
+    aggregation_strategy: AggregationStrategy | None = None,
+    preferred_display_unit: UnitInfo | None = None,
 ) -> list[AggregatedQuantity]:
     """Merge compatible quantity lines for one ingredient; keep incompatible lines separate."""
     if not lines:
@@ -121,7 +142,7 @@ def aggregate_quantities(
             for other_index, other_group in enumerate(groups):
                 if other_index <= index or other_index in consumed:
                     continue
-                if _groups_mergeable(combined, other_group, conversions):
+                if _groups_mergeable(combined, other_group, conversions, aggregation_strategy):
                     combined.extend(other_group)
                     consumed.add(other_index)
                     merged = True
@@ -129,15 +150,20 @@ def aggregate_quantities(
             next_groups.append(combined)
         groups = next_groups
 
-    return [_collapse_group(ingredient_id, group, conversions) for group in groups]
+    return [_collapse_group(ingredient_id, group, conversions, aggregation_strategy, preferred_display_unit) for group in groups]
 
 
 def aggregate_by_ingredient(
     lines: list[QuantityLine],
     conversions_by_ingredient: dict[int, list[IngredientConversion]] | None = None,
+    *,
+    aggregation_strategy_by_ingredient: dict[int, AggregationStrategy | None] | None = None,
+    preferred_display_unit_by_ingredient: dict[int, UnitInfo | None] | None = None,
 ) -> list[AggregatedQuantity]:
     """Aggregate quantity lines, grouped per ingredient."""
     conversions_by_ingredient = conversions_by_ingredient or {}
+    aggregation_strategy_by_ingredient = aggregation_strategy_by_ingredient or {}
+    preferred_display_unit_by_ingredient = preferred_display_unit_by_ingredient or {}
     grouped_lines: dict[int, list[QuantityLine]] = {}
     for line in lines:
         grouped_lines.setdefault(line.ingredient_id, []).append(line)
@@ -145,7 +171,14 @@ def aggregate_by_ingredient(
     results: list[AggregatedQuantity] = []
     for ingredient_id, ingredient_lines in grouped_lines.items():
         conversions = conversions_by_ingredient.get(ingredient_id, [])
-        results.extend(aggregate_quantities(ingredient_lines, conversions))
+        results.extend(
+            aggregate_quantities(
+                ingredient_lines,
+                conversions,
+                aggregation_strategy=aggregation_strategy_by_ingredient.get(ingredient_id),
+                preferred_display_unit=preferred_display_unit_by_ingredient.get(ingredient_id),
+            )
+        )
     return results
 
 
@@ -164,9 +197,10 @@ def _groups_mergeable(
     left: list[QuantityLine],
     right: list[QuantityLine],
     conversions: list[IngredientConversion],
+    aggregation_strategy: AggregationStrategy | None = None,
 ) -> bool:
     return any(
-        units_mergeable(left_line.unit, right_line.unit, conversions)
+        cross_dimension_mergeable(left_line.unit, right_line.unit, aggregation_strategy, conversions)
         for left_line in left
         for right_line in right
     )
@@ -176,8 +210,10 @@ def _collapse_group(
     ingredient_id: int,
     group: list[QuantityLine],
     conversions: list[IngredientConversion],
+    aggregation_strategy: AggregationStrategy | None = None,
+    preferred_display_unit: UnitInfo | None = None,
 ) -> AggregatedQuantity:
-    target_unit = _display_unit_for_group(group, conversions)
+    target_unit = _display_unit_for_group(group, conversions, aggregation_strategy, preferred_display_unit)
     total = Decimal("0")
     approximate = False
 
@@ -197,8 +233,26 @@ def _collapse_group(
 def _display_unit_for_group(
     group: list[QuantityLine],
     conversions: list[IngredientConversion],
+    aggregation_strategy: AggregationStrategy | None = None,
+    preferred_display_unit: UnitInfo | None = None,
 ) -> UnitInfo:
+    if preferred_display_unit is not None and all(
+        cross_dimension_mergeable(line.unit, preferred_display_unit, aggregation_strategy, conversions)
+        for line in group
+    ):
+        return preferred_display_unit
+
     unique_units = list({line.unit.id: line.unit for line in group}.values())
+    if aggregation_strategy == AggregationStrategy.prefer_count:
+        count_units = [unit for unit in unique_units if unit.dimension == UnitDimension.count]
+        if count_units:
+            return sorted(count_units, key=lambda unit: unit.symbol)[0]
+    if aggregation_strategy == AggregationStrategy.prefer_volume:
+        volume_units = [unit for unit in unique_units if unit.dimension == UnitDimension.volume]
+        if volume_units:
+            volume_units.sort(key=lambda unit: (unit.conversion_to_base, unit.symbol))
+            return volume_units[0]
+
     unique_units.sort(
         key=lambda unit: (
             0 if unit.dimension in {UnitDimension.mass, UnitDimension.volume} else 1,
@@ -208,7 +262,7 @@ def _display_unit_for_group(
     )
     for candidate in unique_units:
         if all(
-            units_mergeable(line.unit, candidate, conversions)
+            cross_dimension_mergeable(line.unit, candidate, aggregation_strategy, conversions)
             for line in group
         ):
             return candidate

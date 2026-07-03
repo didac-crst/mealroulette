@@ -5,7 +5,9 @@ from enum import Enum
 from pydantic import BaseModel, ConfigDict, Field
 
 from mealroulette.models.enums import (
+    AggregationStrategy,
     ConversionConfidence,
+    ConversionSource,
     DifficultyLevel,
     DishCourse,
     DishStatus,
@@ -60,8 +62,12 @@ class IngredientPublic(BaseModel):
     canonical_name: str
     display_name: str
     category: str | None
+    family: str | None
     default_unit_id: int | None
     default_dimension: UnitDimension | None
+    preferred_shopping_unit_id: int | None
+    aggregation_unit_id: int | None
+    aggregation_strategy: AggregationStrategy | None
     pantry_item: bool
     season_start_month: int | None
     season_end_month: int | None
@@ -70,12 +76,39 @@ class IngredientPublic(BaseModel):
     updated_at: datetime
 
 
+class IngredientUnitConversionPublic(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    ingredient_id: int
+    from_unit_id: int
+    to_unit_id: int
+    from_unit_symbol: str
+    to_unit_symbol: str
+    factor: Decimal
+    confidence: ConversionConfidence
+    notes: str | None
+    approved: bool
+    source: ConversionSource | None
+    created_at: datetime
+    updated_at: datetime
+
+
+class IngredientDetailPublic(IngredientPublic):
+    aliases: list["IngredientAliasPublic"] = Field(default_factory=list)
+    unit_conversions: list[IngredientUnitConversionPublic] = Field(default_factory=list)
+
+
 class IngredientCreateRequest(BaseModel):
     canonical_name: str = Field(min_length=1, max_length=128)
     display_name: str = Field(min_length=1, max_length=128)
     category: str | None = Field(default=None, max_length=64)
+    family: str | None = Field(default=None, max_length=64)
     default_unit_id: int | None = None
     default_dimension: UnitDimension | None = None
+    preferred_shopping_unit_id: int | None = None
+    aggregation_unit_id: int | None = None
+    aggregation_strategy: AggregationStrategy | None = None
     pantry_item: bool = False
     season_start_month: int | None = Field(default=None, ge=1, le=12)
     season_end_month: int | None = Field(default=None, ge=1, le=12)
@@ -86,12 +119,34 @@ class IngredientCreateRequest(BaseModel):
 class IngredientUpdateRequest(BaseModel):
     display_name: str | None = Field(default=None, min_length=1, max_length=128)
     category: str | None = Field(default=None, max_length=64)
+    family: str | None = Field(default=None, max_length=64)
     default_unit_id: int | None = None
     default_dimension: UnitDimension | None = None
+    preferred_shopping_unit_id: int | None = None
+    aggregation_unit_id: int | None = None
+    aggregation_strategy: AggregationStrategy | None = None
     pantry_item: bool | None = None
     season_start_month: int | None = Field(default=None, ge=1, le=12)
     season_end_month: int | None = Field(default=None, ge=1, le=12)
     notes: str | None = None
+
+
+class IngredientUnitConversionCreateRequest(BaseModel):
+    from_unit_id: int
+    to_unit_id: int
+    factor: Decimal = Field(gt=0)
+    confidence: ConversionConfidence = ConversionConfidence.medium
+    notes: str | None = None
+    approved: bool = False
+    source: ConversionSource = ConversionSource.manual
+
+
+class IngredientUnitConversionUpdateRequest(BaseModel):
+    factor: Decimal | None = Field(default=None, gt=0)
+    confidence: ConversionConfidence | None = None
+    notes: str | None = None
+    approved: bool | None = None
+    source: ConversionSource | None = None
 
 
 class IngredientAliasPublic(BaseModel):

@@ -97,6 +97,8 @@ When the app data model changes (new tables like `users`, `dishes`, etc.), the P
 - `012_meal_item_eaten_status` — eaten/ate_leftovers statuses, is_locked, skip_comment
 - `013_meal_ratings_dish_id` — meal_ratings table (replaces ratings)
 - `014_review_saved_at` — review_saved_at on meal plan items
+- `015_shopping_lists` — shopping lists and shopping list items
+- `016_shopping_contributions` — per-meal ingredient breakdown on list items
 
 With Docker Compose, the **API container runs migrations automatically** on startup (`alembic upgrade head`), then loads **reference catalog data** (standard units and starter tags) from YAML if those rows are not already present.
 

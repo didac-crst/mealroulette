@@ -11,8 +11,9 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from mealroulette.models.catalog import Tag, Unit
-from mealroulette.models.enums import UnitDimension
+from mealroulette.models.catalog import Ingredient, IngredientUnitConversion, Tag, Unit
+from mealroulette.models.enums import ConversionConfidence, ConversionSource, UnitDimension
+from mealroulette.services.catalog import normalize_name
 
 REFERENCE_DIR = Path(__file__).parent / "reference"
 
@@ -21,10 +22,11 @@ REFERENCE_DIR = Path(__file__).parent / "reference"
 class SeedResult:
     units_added: int
     tags_added: int
+    conversions_added: int
 
     @property
     def total_added(self) -> int:
-        return self.units_added + self.tags_added
+        return self.units_added + self.tags_added + self.conversions_added
 
 
 def _load_yaml(filename: str) -> dict:
@@ -41,25 +43,86 @@ def load_reference_tags() -> list[dict]:
     return _load_yaml("tags.yaml")["tags"]
 
 
-def seed_catalog_data(db: Session) -> SeedResult:
-    """Insert reference units and tags that are not already present."""
-    units_added = 0
-    tags_added = 0
+def load_reference_ingredient_conversions() -> list[dict]:
+    return _load_yaml("ingredient_conversions.yaml")["conversions"]
 
-    existing_symbols = set(db.scalars(select(Unit.symbol)))
-    for row in load_reference_units():
+
+def seed_reference_units(db: Session, rows: list[dict] | None = None) -> int:
+    """Insert reference units idempotently (matches on symbol or name)."""
+    units_by_symbol = {unit.symbol: unit for unit in db.scalars(select(Unit))}
+    units_by_name = {unit.name: unit for unit in db.scalars(select(Unit))}
+    units_added = 0
+
+    for row in rows or load_reference_units():
         symbol = row["symbol"]
-        if symbol in existing_symbols:
+        name = row["name"]
+        if symbol in units_by_symbol or name in units_by_name:
+            continue
+
+        unit = Unit(
+            name=name,
+            symbol=symbol,
+            dimension=UnitDimension(row["dimension"]),
+            conversion_to_base=Decimal(str(row["conversion_to_base"])),
+        )
+        db.add(unit)
+        try:
+            with db.begin_nested():
+                db.flush()
+        except IntegrityError:
+            continue
+
+        units_by_symbol[symbol] = unit
+        units_by_name[name] = unit
+        units_added += 1
+
+    return units_added
+
+
+def seed_ingredient_conversions(db: Session) -> int:
+    """Insert approximate unit conversions for ingredients that already exist."""
+    units_by_symbol = {unit.symbol: unit for unit in db.scalars(select(Unit))}
+    ingredients_by_canonical = {
+        ingredient.canonical_name: ingredient for ingredient in db.scalars(select(Ingredient))
+    }
+    existing = {
+        (conversion.ingredient_id, conversion.from_unit_id, conversion.to_unit_id)
+        for conversion in db.scalars(select(IngredientUnitConversion))
+    }
+
+    conversions_added = 0
+    for row in load_reference_ingredient_conversions():
+        ingredient = ingredients_by_canonical.get(normalize_name(row["ingredient"]))
+        if ingredient is None:
+            continue
+        from_unit = units_by_symbol.get(row["from_unit"])
+        to_unit = units_by_symbol.get(row["to_unit"])
+        if from_unit is None or to_unit is None:
+            continue
+        key = (ingredient.id, from_unit.id, to_unit.id)
+        if key in existing:
             continue
         db.add(
-            Unit(
-                name=row["name"],
-                symbol=symbol,
-                dimension=UnitDimension(row["dimension"]),
-                conversion_to_base=Decimal(row["conversion_to_base"]),
+            IngredientUnitConversion(
+                ingredient_id=ingredient.id,
+                from_unit_id=from_unit.id,
+                to_unit_id=to_unit.id,
+                factor=Decimal(row["factor"]),
+                confidence=ConversionConfidence.approximate,
+                notes=row.get("notes"),
+                approved=True,
+                source=ConversionSource.seed,
             )
         )
-        units_added += 1
+        conversions_added += 1
+
+    return conversions_added
+
+
+def seed_catalog_data(db: Session) -> SeedResult:
+    """Insert reference units and tags that are not already present."""
+    units_added = seed_reference_units(db)
+    tags_added = 0
 
     existing_tags = {(tag.family, tag.name) for tag in db.scalars(select(Tag))}
     for row in load_reference_tags():
@@ -69,11 +132,17 @@ def seed_catalog_data(db: Session) -> SeedResult:
         db.add(Tag(family=row["family"], name=row["name"], description=row.get("description")))
         tags_added += 1
 
-    if units_added or tags_added:
+    conversions_added = seed_ingredient_conversions(db)
+
+    if units_added or tags_added or conversions_added:
         try:
             db.commit()
         except IntegrityError:
             db.rollback()
-            return SeedResult(units_added=0, tags_added=0)
+            return SeedResult(units_added=0, tags_added=0, conversions_added=0)
 
-    return SeedResult(units_added=units_added, tags_added=tags_added)
+    return SeedResult(
+        units_added=units_added,
+        tags_added=tags_added,
+        conversions_added=conversions_added,
+    )

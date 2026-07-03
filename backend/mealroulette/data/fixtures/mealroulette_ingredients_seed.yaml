@@ -1,0 +1,2288 @@
+version: 1
+name: MealRoulette ingredient seed
+description: Draft canonical ingredient database with families, aliases, preferred units, and suggested ingredient-specific
+  conversions. Generated from the provided sample dishes plus common household recipe needs.
+review_status: draft_needs_human_review
+units:
+- symbol: g
+  name: gram
+  dimension: mass
+  conversion_to_base: 1
+- symbol: kg
+  name: kilogram
+  dimension: mass
+  conversion_to_base: 1000
+- symbol: ml
+  name: milliliter
+  dimension: volume
+  conversion_to_base: 1
+- symbol: l
+  name: liter
+  dimension: volume
+  conversion_to_base: 1000
+- symbol: tsp
+  name: teaspoon
+  dimension: volume
+  conversion_to_base: 5
+- symbol: tbsp
+  name: tablespoon
+  dimension: volume
+  conversion_to_base: 15
+- symbol: unit
+  name: unit
+  dimension: count
+  conversion_to_base: 1
+- symbol: clove
+  name: clove
+  dimension: count
+  conversion_to_base: 1
+- symbol: bunch
+  name: bunch
+  dimension: count
+  conversion_to_base: 1
+- symbol: can
+  name: can
+  dimension: count
+  conversion_to_base: 1
+- symbol: pack
+  name: pack
+  dimension: count
+  conversion_to_base: 1
+- symbol: head
+  name: head
+  dimension: count
+  conversion_to_base: 1
+- symbol: block
+  name: block
+  dimension: count
+  conversion_to_base: 1
+- symbol: slice
+  name: slice
+  dimension: count
+  conversion_to_base: 1
+ingredient_families:
+- name: tomato_family
+  description: Fresh and preserved tomato products. Related for similarity, not automatically interchangeable for shopping.
+- name: onion_family
+  description: Onions, shallots, spring onions and similar alliums.
+- name: garlic_family
+  description: Fresh garlic and garlic-derived products.
+- name: pepper_family
+  description: Sweet bell peppers and chili peppers.
+- name: mushroom_family
+  description: Common mushrooms and specialty mushrooms.
+- name: rice_family
+  description: Different rice types; do not merge because cooking behavior differs.
+- name: pasta_family
+  description: Dry pasta and fresh/stuffed pasta; cooking and shopping forms differ.
+- name: legume_family
+  description: Beans, lentils, chickpeas and peas.
+- name: dairy_family
+  description: Milk, cream, yogurt, butter and cheeses.
+- name: cheese_family
+  description: Cheeses; related but not generally interchangeable.
+- name: citrus_family
+  description: Lemon, lime and similar citrus fruits.
+- name: herb_family
+  description: Fresh herbs; bunch-to-gram conversion is approximate.
+- name: stock_family
+  description: Vegetable, fish, chicken or meat stocks.
+- name: seafood_family
+  description: Fish, shellfish, mollusks and seafood products.
+- name: bread_pastry_family
+  description: Bread, wraps, pastries and dough bases.
+- name: potato_family
+  description: Potato and sweet potato are related but not interchangeable.
+- name: cabbage_family
+  description: Cabbage, kale, cauliflower and brassicas.
+- name: sauce_condiment_family
+  description: Prepared sauces, pastes, condiments and flavor bases.
+ingredients:
+- canonical_name: tomato
+  display_name: Tomato
+  description: Generic fresh tomato. Use more specific canonical ingredients for cherry, canned, paste or dried tomato.
+  category: vegetable
+  family: tomato_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: allow_approximate_conversion
+  aliases:
+  - tomate
+  - tomates
+  - tomatoes
+  - fresh tomato
+  - tomàquet
+  - jitomate
+  seasonality:
+    preferred_months:
+    - 6
+    - 7
+    - 8
+    - 9
+    strength: medium
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 120
+    basis: one medium fresh tomato
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: cherry_tomato
+  display_name: Cherry tomato
+  description: Small fresh tomatoes, typically used whole in salads or roasted dishes.
+  category: vegetable
+  family: tomato_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - tomates cerises
+  - tomate cerise
+  - cherry tomatoes
+  - tomatitos
+  seasonality:
+    preferred_months:
+    - 6
+    - 7
+    - 8
+    - 9
+    strength: medium
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 15
+    basis: one cherry tomato
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: coeur_de_boeuf_tomato
+  display_name: Coeur de boeuf tomato
+  description: Large ribbed beefsteak-style tomato, useful when recipe specifically needs large meaty tomatoes.
+  category: vegetable
+  family: tomato_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: allow_approximate_conversion
+  aliases:
+  - coeur de boeuf
+  - cœur de bœuf
+  - beefsteak tomato
+  seasonality:
+    preferred_months:
+    - 6
+    - 7
+    - 8
+    - 9
+    strength: medium
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 250
+    basis: one medium-large coeur de boeuf tomato
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: canned_chopped_tomatoes
+  display_name: Canned chopped tomatoes
+  description: Canned diced/chopped tomatoes in juice. Not the same as fresh tomato for shopping.
+  category: canned
+  family: tomato_family
+  pantry_item: true
+  default_recipe_unit: can
+  preferred_shopping_unit: can
+  aggregation_unit: can
+  aggregation_strategy: prefer_count
+  aliases:
+  - tomates concassées
+  - tomates en dés
+  - canned chopped tomatoes
+  - diced tomatoes
+  - tomato can
+  unit_conversions:
+  - from_unit: can
+    to_unit: g
+    factor: 400
+    basis: standard EU can gross contents
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: tomato_passata
+  display_name: Tomato passata
+  description: Smooth tomato puree/passata, usually sold in bottles or cartons.
+  category: canned
+  family: tomato_family
+  pantry_item: true
+  default_recipe_unit: ml
+  preferred_shopping_unit: ml
+  aggregation_unit: ml
+  aggregation_strategy: prefer_volume
+  aliases:
+  - passata
+  - coulis de tomate
+  - tomato puree smooth
+  unit_conversions:
+  - from_unit: l
+    to_unit: ml
+    factor: 1000
+    basis: exact metric conversion
+    confidence: exact
+    source: seed_suggestion
+    approved: true
+- canonical_name: tomato_paste
+  display_name: Tomato paste
+  description: Concentrated tomato paste. Do not merge with passata or canned tomato.
+  category: condiment
+  family: tomato_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - concentré de tomate
+  - tomato concentrate
+  - double concentrated tomato paste
+- canonical_name: sun_dried_tomatoes
+  display_name: Sun-dried tomatoes
+  description: Dried or oil-preserved tomatoes, strong flavor; distinct from fresh/canned tomatoes.
+  category: preserved
+  family: tomato_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - dried tomatoes
+  - tomates séchées
+  - tomates confites
+  - sun dried tomatoes
+- canonical_name: onion
+  display_name: Onion
+  description: Generic yellow/brown cooking onion.
+  category: vegetable
+  family: onion_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - oignon
+  - oignons
+  - yellow onion
+  - brown onion
+  - cebolla
+  seasonality:
+    preferred_months:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+    - 11
+    - 12
+    strength: neutral
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 120
+    basis: one medium onion
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: red_onion
+  display_name: Red onion
+  description: Red/purple onion, common raw or lightly cooked.
+  category: vegetable
+  family: onion_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - oignon rouge
+  - red onions
+  - cebolla morada
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 120
+    basis: one medium red onion
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: spring_onion
+  display_name: Spring onion
+  description: Green onion/scallion, sold by bunch or individual stems.
+  category: vegetable
+  family: onion_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: bunch
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - cébette
+  - oignon nouveau
+  - green onion
+  - scallion
+  - spring onions
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 15
+    basis: one spring onion stem
+    confidence: low
+    source: seed_suggestion
+    approved: false
+  - from_unit: bunch
+    to_unit: g
+    factor: 100
+    basis: one bunch of spring onions
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: shallot
+  display_name: Shallot
+  description: Small mild allium, not equivalent to onion when counted.
+  category: vegetable
+  family: onion_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - échalote
+  - échalotes
+  - shallots
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 35
+    basis: one medium shallot
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: garlic
+  display_name: Garlic
+  description: Fresh garlic cloves. Store recipes as cloves when possible.
+  category: vegetable
+  family: garlic_family
+  pantry_item: true
+  default_recipe_unit: clove
+  preferred_shopping_unit: head
+  aggregation_unit: clove
+  aggregation_strategy: prefer_count
+  aliases:
+  - ail
+  - gousse d ail
+  - gousse d’ail
+  - garlic clove
+  unit_conversions:
+  - from_unit: clove
+    to_unit: g
+    factor: 5
+    basis: one medium garlic clove
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+  - from_unit: head
+    to_unit: clove
+    factor: 10
+    basis: one garlic head average cloves
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: carrot
+  display_name: Carrot
+  description: Fresh carrot. Recipes often use unit or grams; shopping can aggregate approximately to grams.
+  category: vegetable
+  family: root_vegetable_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: allow_approximate_conversion
+  aliases:
+  - carotte
+  - carottes
+  - carrots
+  - zanahoria
+  - pastanaga
+  - möhre
+  seasonality:
+    preferred_months:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+    - 11
+    - 12
+    strength: neutral
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 80
+    basis: one medium carrot
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: celery_stalk
+  display_name: Celery stalk
+  description: Individual celery stalk/rib, not a whole celery head.
+  category: vegetable
+  family: root_vegetable_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - celery rib
+  - branche de céleri
+  - céleri branche
+  - celery stalks
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 40
+    basis: one celery stalk/rib
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: leek
+  display_name: Leek
+  description: Fresh leek, often counted by unit.
+  category: vegetable
+  family: onion_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - poireau
+  - poireaux
+  - leeks
+  seasonality:
+    preferred_months:
+    - 10
+    - 11
+    - 12
+    - 1
+    - 2
+    - 3
+    strength: medium
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 250
+    basis: one medium leek trimmed
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: potato
+  display_name: Potato
+  description: Generic potato. Use specific varieties only when cooking behavior matters.
+  category: vegetable
+  family: potato_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - pomme de terre
+  - pommes de terre
+  - patata
+  - patate
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 150
+    basis: one medium potato
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: sweet_potato
+  display_name: Sweet potato
+  description: Sweet potato, distinct from regular potato.
+  category: vegetable
+  family: potato_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - patate douce
+  - sweet potatoes
+  - boniato
+  seasonality:
+    preferred_months:
+    - 9
+    - 10
+    - 11
+    - 12
+    - 1
+    - 2
+    - 3
+    strength: medium
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 250
+    basis: one medium sweet potato
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: pumpkin
+  display_name: Pumpkin
+  description: Pumpkin or squash flesh for soups, stews and quiches.
+  category: vegetable
+  family: squash_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - potiron
+  - courge
+  - pumpkin flesh
+  - butternut
+  - butternut squash
+  seasonality:
+    preferred_months:
+    - 9
+    - 10
+    - 11
+    - 12
+    - 1
+    - 2
+    strength: strong
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 1000
+    basis: one small pumpkin/squash usable flesh, very approximate
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: zucchini
+  display_name: Zucchini
+  description: Fresh zucchini/courgette.
+  category: vegetable
+  family: squash_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: allow_approximate_conversion
+  aliases:
+  - courgette
+  - courgettes
+  - zucchinis
+  seasonality:
+    preferred_months:
+    - 6
+    - 7
+    - 8
+    - 9
+    strength: medium
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 200
+    basis: one medium zucchini
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: aubergine
+  display_name: Aubergine
+  description: Eggplant/aubergine, often counted by unit.
+  category: vegetable
+  family: nightshade_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: allow_approximate_conversion
+  aliases:
+  - eggplant
+  - aubergines
+  - berenjena
+  - albergínia
+  seasonality:
+    preferred_months:
+    - 6
+    - 7
+    - 8
+    - 9
+    strength: medium
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 300
+    basis: one medium aubergine
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: bell_pepper
+  display_name: Bell pepper
+  description: Generic sweet bell pepper. Use color-specific entries if the recipe needs red/green/yellow.
+  category: vegetable
+  family: pepper_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - poivron
+  - poivrons
+  - sweet pepper
+  - pepper
+  seasonality:
+    preferred_months:
+    - 6
+    - 7
+    - 8
+    - 9
+    strength: medium
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 160
+    basis: one medium bell pepper
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: red_bell_pepper
+  display_name: Red bell pepper
+  description: Red sweet bell pepper; separate when color matters for recipe or shopping.
+  category: vegetable
+  family: pepper_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - poivron rouge
+  - red pepper
+  - red sweet pepper
+  seasonality:
+    preferred_months:
+    - 6
+    - 7
+    - 8
+    - 9
+    strength: medium
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 160
+    basis: one medium red bell pepper
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: green_beans
+  display_name: Green beans
+  description: Fresh or frozen green beans; use frozen_green_beans if you want separate shopping behavior.
+  category: vegetable
+  family: bean_vegetable_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - haricots verts
+  - green bean
+  seasonality:
+    preferred_months:
+    - 6
+    - 7
+    - 8
+    - 9
+    strength: medium
+- canonical_name: cucumber
+  display_name: Cucumber
+  description: Fresh cucumber.
+  category: vegetable
+  family: squash_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - concombre
+  - cucumbers
+  - pepino
+  seasonality:
+    preferred_months:
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    strength: medium
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 300
+    basis: one medium cucumber
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: radish
+  display_name: Radish
+  description: Fresh radishes, often sold by bunch.
+  category: vegetable
+  family: root_vegetable_family
+  pantry_item: false
+  default_recipe_unit: bunch
+  preferred_shopping_unit: bunch
+  aggregation_unit: bunch
+  aggregation_strategy: prefer_count
+  aliases:
+  - radis
+  - radishes
+  seasonality:
+    preferred_months:
+    - 3
+    - 4
+    - 5
+    - 6
+    strength: medium
+  unit_conversions:
+  - from_unit: bunch
+    to_unit: g
+    factor: 250
+    basis: one bunch of radishes
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: cauliflower
+  display_name: Cauliflower
+  description: Whole cauliflower or florets.
+  category: vegetable
+  family: cabbage_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: allow_approximate_conversion
+  aliases:
+  - chou fleur
+  - chou-fleur
+  - cauliflower head
+  seasonality:
+    preferred_months:
+    - 3
+    - 4
+    - 5
+    - 6
+    - 9
+    - 10
+    - 11
+    strength: medium
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 700
+    basis: one medium cauliflower trimmed florets
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: kale
+  display_name: Kale
+  description: Fresh kale leaves.
+  category: vegetable
+  family: cabbage_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - chou kale
+  - grünkohl
+  seasonality:
+    preferred_months:
+    - 9
+    - 10
+    - 11
+    - 12
+    - 1
+    - 2
+    strength: medium
+- canonical_name: kohlrabi
+  display_name: Kohlrabi
+  description: Kohlrabi bulb.
+  category: vegetable
+  family: cabbage_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - chou rave
+  - chou-rave
+  - kohlrabi bulb
+  seasonality:
+    preferred_months:
+    - 3
+    - 4
+    - 5
+    - 6
+    - 9
+    - 10
+    strength: medium
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 250
+    basis: one medium kohlrabi bulb
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: red_cabbage
+  display_name: Red cabbage
+  description: Red cabbage, whole or shredded.
+  category: vegetable
+  family: cabbage_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - chou rouge
+  - red cabbage shredded
+  seasonality:
+    preferred_months:
+    - 9
+    - 10
+    - 11
+    - 12
+    - 1
+    - 2
+    - 3
+    strength: medium
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 1000
+    basis: one small red cabbage
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: spinach
+  display_name: Spinach
+  description: Fresh or frozen spinach. Consider separate frozen_spinach if needed.
+  category: vegetable
+  family: leafy_green_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - épinards
+  - spinach leaves
+- canonical_name: brown_mushrooms
+  display_name: Brown mushrooms
+  description: Brown button/cremini mushrooms.
+  category: fungus
+  family: mushroom_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - champignons bruns
+  - cremini mushrooms
+  - brown button mushrooms
+- canonical_name: white_mushrooms
+  display_name: White mushrooms
+  description: White button mushrooms.
+  category: fungus
+  family: mushroom_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - champignons de paris
+  - white button mushrooms
+- canonical_name: mixed_mushrooms
+  display_name: Mixed mushrooms
+  description: Mixed mushrooms, useful when exact variety is flexible.
+  category: fungus
+  family: mushroom_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - mélange de champignons
+  - assorted mushrooms
+- canonical_name: portobello_mushroom
+  display_name: Portobello mushroom
+  description: Large portobello mushroom caps, often counted by unit.
+  category: fungus
+  family: mushroom_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - portobello
+  - portobello mushrooms
+  - portobello caps
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 85
+    basis: one portobello cap
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: rice
+  display_name: Rice
+  description: Generic dry rice. Use specific rice types when cooking behavior matters.
+  category: grain
+  family: rice_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - riz
+  - arroz
+  - arròs
+- canonical_name: jasmine_rice
+  display_name: Jasmine rice
+  description: Fragrant long-grain rice for Asian-style dishes.
+  category: grain
+  family: rice_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - riz jasmin
+  - thai rice
+  - riz thaï
+- canonical_name: basmati_rice
+  display_name: Basmati rice
+  description: Long-grain aromatic rice, common for Indian curries.
+  category: grain
+  family: rice_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - riz basmati
+- canonical_name: arborio_rice
+  display_name: Arborio rice
+  description: Short-grain risotto rice. Do not merge with generic rice.
+  category: grain
+  family: rice_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - riz arborio
+  - risotto rice
+  - riz à risotto
+- canonical_name: sushi_rice
+  display_name: Sushi rice
+  description: Short-grain sticky rice for sushi/onigiri style recipes.
+  category: grain
+  family: rice_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - riz sushi
+  - japanese rice
+- canonical_name: quinoa
+  display_name: Quinoa
+  description: Dry quinoa grain/pseudocereal.
+  category: grain
+  family: quinoa_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - quinua
+- canonical_name: couscous
+  display_name: Couscous
+  description: Dry couscous/semolina grains.
+  category: grain
+  family: couscous_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - semoule couscous
+  - semoule moyenne
+- canonical_name: spaghetti
+  display_name: Spaghetti
+  description: Dry spaghetti pasta.
+  category: pasta
+  family: pasta_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - spaghettis
+- canonical_name: wholegrain_pasta
+  display_name: Wholegrain pasta
+  description: Dry wholegrain pasta, shape not specified.
+  category: pasta
+  family: pasta_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - pâtes complètes
+  - whole wheat pasta
+  - wholemeal pasta
+- canonical_name: stuffed_pasta
+  display_name: Stuffed pasta
+  description: Fresh stuffed pasta such as ravioli/tortellini/fiorelli.
+  category: pasta
+  family: pasta_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - fiorelli
+  - ravioli
+  - tortellini
+  - pâtes farcies
+- canonical_name: fideua_noodles
+  display_name: Fideua noodles
+  description: Short thin noodles for Catalan fideuà.
+  category: pasta
+  family: pasta_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - fideus
+  - fideos
+  - fideua pasta
+  - fideuà noodles
+- canonical_name: rice_noodles
+  display_name: Rice noodles
+  description: Dry rice noodles for Thai/Vietnamese recipes.
+  category: pasta
+  family: pasta_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - nouilles de riz
+  - pad thai noodles
+- canonical_name: spaetzle
+  display_name: Spaetzle
+  description: Fresh or packaged German egg noodles/dumplings.
+  category: pasta
+  family: pasta_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - spätzle
+  - spaetzle noodles
+- canonical_name: chickpeas
+  display_name: Chickpeas
+  description: Chickpeas/garbanzo beans. Can be dry or canned; specify can when canned.
+  category: legume
+  family: legume_family
+  pantry_item: true
+  default_recipe_unit: can
+  preferred_shopping_unit: can
+  aggregation_unit: can
+  aggregation_strategy: prefer_count
+  aliases:
+  - pois chiches
+  - garbanzo beans
+  - cigrons
+  unit_conversions:
+  - from_unit: can
+    to_unit: g
+    factor: 240
+    basis: one 400 g can drained weight
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: black_beans
+  display_name: Black beans
+  description: Black beans, often canned for quick recipes.
+  category: legume
+  family: legume_family
+  pantry_item: true
+  default_recipe_unit: can
+  preferred_shopping_unit: can
+  aggregation_unit: can
+  aggregation_strategy: prefer_count
+  aliases:
+  - haricots noirs
+  - frijoles negros
+  unit_conversions:
+  - from_unit: can
+    to_unit: g
+    factor: 240
+    basis: one 400 g can drained weight
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: white_beans
+  display_name: White beans
+  description: White beans such as cannellini/haricots blancs.
+  category: legume
+  family: legume_family
+  pantry_item: true
+  default_recipe_unit: can
+  preferred_shopping_unit: can
+  aggregation_unit: can
+  aggregation_strategy: prefer_count
+  aliases:
+  - haricots blancs
+  - cannellini beans
+  unit_conversions:
+  - from_unit: can
+    to_unit: g
+    factor: 240
+    basis: one 400 g can drained weight
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: brown_lentils
+  display_name: Brown lentils
+  description: Brown/green lentils, dry or canned depending recipe.
+  category: legume
+  family: legume_family
+  pantry_item: true
+  default_recipe_unit: can
+  preferred_shopping_unit: can
+  aggregation_unit: can
+  aggregation_strategy: prefer_count
+  aliases:
+  - lentilles brunes
+  - lentilles vertes
+  - green lentils
+  - lentils can
+  unit_conversions:
+  - from_unit: can
+    to_unit: g
+    factor: 240
+    basis: one 400 g can drained weight
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: red_lentils
+  display_name: Red lentils
+  description: Split red lentils/lentilles corail, usually dry and fast-cooking.
+  category: legume
+  family: legume_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - lentilles corail
+  - red split lentils
+  - lentejas rojas
+  - llenties vermelles
+- canonical_name: frozen_peas
+  display_name: Frozen peas
+  description: Frozen green peas.
+  category: frozen
+  family: legume_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - petits pois surgelés
+  - peas frozen
+- canonical_name: sweetcorn
+  display_name: Sweetcorn
+  description: Corn kernels, usually canned or frozen.
+  category: canned
+  family: legume_family
+  pantry_item: true
+  default_recipe_unit: can
+  preferred_shopping_unit: can
+  aggregation_unit: can
+  aggregation_strategy: prefer_count
+  aliases:
+  - maïs
+  - corn
+  - sweet corn
+  unit_conversions:
+  - from_unit: can
+    to_unit: g
+    factor: 285
+    basis: one standard can drained weight
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: eggs
+  display_name: Eggs
+  description: Chicken eggs. Keep count for shopping; gram conversion is only for baking normalization.
+  category: egg
+  family: egg_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - egg
+  - oeuf
+  - œuf
+  - oeufs
+  - œufs
+  - huevos
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 50
+    basis: one medium egg without shell
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: milk
+  display_name: Milk
+  description: Cow milk or generic milk unless recipe needs specific type.
+  category: dairy
+  family: dairy_family
+  pantry_item: true
+  default_recipe_unit: ml
+  preferred_shopping_unit: l
+  aggregation_unit: ml
+  aggregation_strategy: prefer_volume
+  aliases:
+  - lait
+- canonical_name: cream
+  display_name: Cream
+  description: Liquid cooking cream. Keep separate from crème fraîche and cream cheese.
+  category: dairy
+  family: dairy_family
+  pantry_item: true
+  default_recipe_unit: ml
+  preferred_shopping_unit: ml
+  aggregation_unit: ml
+  aggregation_strategy: prefer_volume
+  aliases:
+  - crème liquide
+  - cooking cream
+  - single cream
+  - heavy cream
+  unit_conversions:
+  - from_unit: tbsp
+    to_unit: ml
+    factor: 15
+    basis: standard tablespoon
+    confidence: high
+    source: seed_suggestion
+    approved: true
+- canonical_name: creme_fraiche
+  display_name: Crème fraîche
+  description: Thick cultured cream, not interchangeable with liquid cream in all recipes.
+  category: dairy
+  family: dairy_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - crème fraîche
+  - creme fraiche
+- canonical_name: greek_yogurt
+  display_name: Greek yogurt
+  description: Thick Greek-style yogurt.
+  category: dairy
+  family: dairy_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - yaourt grec
+  - greek-style yogurt
+  - yogourt grec
+  unit_conversions:
+  - from_unit: tbsp
+    to_unit: g
+    factor: 15
+    basis: one tablespoon yogurt approximate
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: butter
+  display_name: Butter
+  description: Butter, salted or unsalted unless specified.
+  category: dairy
+  family: dairy_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - beurre
+  unit_conversions:
+  - from_unit: tbsp
+    to_unit: g
+    factor: 14
+    basis: one tablespoon butter
+    confidence: high
+    source: seed_suggestion
+    approved: false
+- canonical_name: parmesan
+  display_name: Parmesan
+  description: Hard Italian cheese, grated or block.
+  category: cheese
+  family: cheese_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - parmigiano
+  - parmesan cheese
+  - parmigiano reggiano
+- canonical_name: grated_cheese
+  display_name: Grated cheese
+  description: Generic grated cheese blend. Use specific cheese when recipe requires it.
+  category: cheese
+  family: cheese_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - fromage râpé
+  - emmental râpé
+  - shredded cheese
+- canonical_name: feta
+  display_name: Feta
+  description: Feta cheese.
+  category: cheese
+  family: cheese_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - feta cheese
+  - féta
+- canonical_name: halloumi
+  display_name: Halloumi
+  description: Firm grilling cheese.
+  category: cheese
+  family: cheese_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - halloumi cheese
+- canonical_name: paneer
+  display_name: Paneer
+  description: Indian-style fresh cheese.
+  category: cheese
+  family: cheese_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - panir
+- canonical_name: cream_cheese
+  display_name: Cream cheese
+  description: Fresh spreadable cheese.
+  category: cheese
+  family: cheese_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - fromage frais
+  - philadelphia
+  - cream cheese spread
+- canonical_name: chicken_breast
+  display_name: Chicken breast
+  description: Boneless chicken breast fillet.
+  category: meat
+  family: chicken_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - blanc de poulet
+  - chicken fillet
+  - filet de poulet
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 150
+    basis: one chicken breast fillet
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: minced_beef
+  display_name: Minced beef
+  description: Ground/minced beef.
+  category: meat
+  family: beef_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - boeuf haché
+  - bœuf haché
+  - ground beef
+- canonical_name: bacon
+  display_name: Bacon/lardons
+  description: Bacon strips or lardons.
+  category: meat
+  family: pork_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - lardons
+  - bacon bits
+  - lardon
+- canonical_name: hake_fillet
+  display_name: Hake fillet
+  description: White fish fillet, hake/merlu.
+  category: fish
+  family: seafood_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - colin
+  - merlu
+  - hake
+  - hake fillets
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 125
+    basis: one fish fillet
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: salmon_fillet
+  display_name: Salmon fillet
+  description: Salmon fillet or portion.
+  category: fish
+  family: seafood_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - saumon
+  - filet de saumon
+  - salmon
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 150
+    basis: one salmon portion
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: tuna
+  display_name: Tuna
+  description: Fresh tuna, not canned tuna.
+  category: fish
+  family: seafood_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - thon frais
+  - fresh tuna
+- canonical_name: canned_tuna
+  display_name: Canned tuna
+  description: Canned tuna, drained weight varies by can.
+  category: canned
+  family: seafood_family
+  pantry_item: true
+  default_recipe_unit: can
+  preferred_shopping_unit: can
+  aggregation_unit: can
+  aggregation_strategy: prefer_count
+  aliases:
+  - thon en boîte
+  - tuna can
+  - canned tuna
+  unit_conversions:
+  - from_unit: can
+    to_unit: g
+    factor: 140
+    basis: one medium can drained tuna
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: prawns
+  display_name: Prawns
+  description: Raw or cooked prawns/shrimp.
+  category: seafood
+  family: seafood_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - shrimp
+  - crevettes
+  - gambas
+- canonical_name: mussels
+  display_name: Mussels
+  description: Mussels, usually shell-on unless specified.
+  category: seafood
+  family: seafood_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - moules
+- canonical_name: calamari
+  display_name: Calamari
+  description: Squid/calamari pieces or rings.
+  category: seafood
+  family: seafood_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - calamar
+  - squid
+- canonical_name: firm_tofu
+  display_name: Firm tofu
+  description: Firm tofu block.
+  category: plant_protein
+  family: tofu_soy_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - tofu ferme
+  - tofu
+  unit_conversions:
+  - from_unit: block
+    to_unit: g
+    factor: 400
+    basis: one common tofu block
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: baguette
+  display_name: Baguette
+  description: French baguette or demi-baguette depending recipe.
+  category: bread
+  family: bread_pastry_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - baguettes
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 250
+    basis: one standard baguette
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: tortilla_wraps
+  display_name: Tortilla wraps
+  description: Soft wheat/corn tortilla wraps.
+  category: bread
+  family: bread_pastry_family
+  pantry_item: true
+  default_recipe_unit: unit
+  preferred_shopping_unit: pack
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - wraps
+  - tortillas
+  - galettes wraps
+  unit_conversions:
+  - from_unit: pack
+    to_unit: unit
+    factor: 8
+    basis: one common pack of wraps
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: flatbread_base
+  display_name: Flatbread base
+  description: Prepared flatbread/flammkuchen/pizza-style base.
+  category: bread
+  family: bread_pastry_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - flammkuchen base
+  - flatbread
+  - base flammekueche
+- canonical_name: puff_pastry
+  display_name: Puff pastry
+  description: Ready-rolled puff pastry sheet.
+  category: pastry
+  family: bread_pastry_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - pâte feuilletée
+  - puff pastry sheet
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 280
+    basis: one ready-rolled pastry sheet
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: shortcrust_pastry
+  display_name: Shortcrust pastry
+  description: Ready-rolled shortcrust pastry sheet.
+  category: pastry
+  family: bread_pastry_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - pâte brisée
+  - shortcrust pastry sheet
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 230
+    basis: one ready-rolled shortcrust pastry sheet
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: pretzel_bread
+  display_name: Pretzel bread
+  description: Laugen/pretzel bread used for dumpling bakes.
+  category: bread
+  family: bread_pastry_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - laugen bread
+  - pain bretzel
+  - bretzel bread
+- canonical_name: breadcrumbs
+  display_name: Breadcrumbs
+  description: Dry breadcrumbs/chapelure.
+  category: pantry
+  family: bread_pastry_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - chapelure
+  - bread crumbs
+- canonical_name: lemon
+  display_name: Lemon
+  description: Fresh lemon.
+  category: fruit
+  family: citrus_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - citron
+  - lemons
+  unit_conversions:
+  - from_unit: unit
+    to_unit: ml
+    factor: 45
+    basis: juice from one medium lemon
+    confidence: low
+    source: seed_suggestion
+    approved: false
+  - from_unit: unit
+    to_unit: g
+    factor: 120
+    basis: one medium lemon whole
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: lime
+  display_name: Lime
+  description: Fresh lime.
+  category: fruit
+  family: citrus_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - citron vert
+  - limes
+  unit_conversions:
+  - from_unit: unit
+    to_unit: ml
+    factor: 30
+    basis: juice from one medium lime
+    confidence: low
+    source: seed_suggestion
+    approved: false
+  - from_unit: unit
+    to_unit: g
+    factor: 70
+    basis: one medium lime whole
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: avocado
+  display_name: Avocado
+  description: Fresh avocado.
+  category: fruit
+  family: avocado_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - avocat
+  - avocados
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 150
+    basis: edible flesh of one medium avocado
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: parsley
+  display_name: Parsley
+  description: Fresh parsley bunch.
+  category: herb
+  family: herb_family
+  pantry_item: false
+  default_recipe_unit: bunch
+  preferred_shopping_unit: bunch
+  aggregation_unit: bunch
+  aggregation_strategy: prefer_count
+  aliases:
+  - persil
+  - flat parsley
+  - persil plat
+  unit_conversions:
+  - from_unit: bunch
+    to_unit: g
+    factor: 30
+    basis: one small bunch parsley
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: coriander
+  display_name: Coriander
+  description: Fresh coriander/cilantro bunch.
+  category: herb
+  family: herb_family
+  pantry_item: false
+  default_recipe_unit: bunch
+  preferred_shopping_unit: bunch
+  aggregation_unit: bunch
+  aggregation_strategy: prefer_count
+  aliases:
+  - cilantro
+  - coriandre
+  unit_conversions:
+  - from_unit: bunch
+    to_unit: g
+    factor: 30
+    basis: one small bunch coriander
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: fresh_thyme
+  display_name: Fresh thyme
+  description: Fresh thyme bunch/sprigs.
+  category: herb
+  family: herb_family
+  pantry_item: false
+  default_recipe_unit: bunch
+  preferred_shopping_unit: bunch
+  aggregation_unit: bunch
+  aggregation_strategy: prefer_count
+  aliases:
+  - thym frais
+  - thyme
+  unit_conversions:
+  - from_unit: bunch
+    to_unit: g
+    factor: 20
+    basis: one small bunch thyme
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: fresh_sage
+  display_name: Fresh sage
+  description: Fresh sage bunch/leaves.
+  category: herb
+  family: herb_family
+  pantry_item: false
+  default_recipe_unit: bunch
+  preferred_shopping_unit: bunch
+  aggregation_unit: bunch
+  aggregation_strategy: prefer_count
+  aliases:
+  - sauge fraîche
+  - sage
+  unit_conversions:
+  - from_unit: bunch
+    to_unit: g
+    factor: 20
+    basis: one small bunch sage
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: basil_paste
+  display_name: Basil paste
+  description: Prepared basil paste, distinct from fresh basil.
+  category: condiment
+  family: sauce_condiment_family
+  pantry_item: true
+  default_recipe_unit: ml
+  preferred_shopping_unit: ml
+  aggregation_unit: ml
+  aggregation_strategy: prefer_volume
+  aliases:
+  - pâte de basilic
+  - basil puree
+- canonical_name: vegetable_stock
+  display_name: Vegetable stock
+  description: Prepared vegetable stock, broth or reconstituted stock cube.
+  category: stock
+  family: stock_family
+  pantry_item: true
+  default_recipe_unit: ml
+  preferred_shopping_unit: ml
+  aggregation_unit: ml
+  aggregation_strategy: prefer_volume
+  aliases:
+  - bouillon de légumes
+  - vegetable broth
+  - veg stock
+- canonical_name: fish_stock
+  display_name: Fish stock
+  description: Prepared fish stock/fumet.
+  category: stock
+  family: stock_family
+  pantry_item: true
+  default_recipe_unit: ml
+  preferred_shopping_unit: ml
+  aggregation_unit: ml
+  aggregation_strategy: prefer_volume
+  aliases:
+  - fumet de poisson
+  - bouillon de poisson
+- canonical_name: coconut_milk
+  display_name: Coconut milk
+  description: Canned/carton coconut milk for curries and stews.
+  category: canned
+  family: sauce_condiment_family
+  pantry_item: true
+  default_recipe_unit: ml
+  preferred_shopping_unit: ml
+  aggregation_unit: ml
+  aggregation_strategy: prefer_volume
+  aliases:
+  - lait de coco
+  - leche de coco
+  - llet de coco
+  unit_conversions:
+  - from_unit: can
+    to_unit: ml
+    factor: 400
+    basis: one standard coconut milk can
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: curry_paste
+  display_name: Curry paste
+  description: Prepared curry paste, e.g. panang/yellow/red curry paste.
+  category: condiment
+  family: sauce_condiment_family
+  pantry_item: true
+  default_recipe_unit: ml
+  preferred_shopping_unit: ml
+  aggregation_unit: ml
+  aggregation_strategy: prefer_volume
+  aliases:
+  - pâte de curry
+  - thai curry paste
+  unit_conversions:
+  - from_unit: tbsp
+    to_unit: ml
+    factor: 15
+    basis: standard tablespoon
+    confidence: high
+    source: seed_suggestion
+    approved: true
+- canonical_name: curry_powder
+  display_name: Curry powder
+  description: Dry curry spice blend.
+  category: spice
+  family: spice_family
+  pantry_item: true
+  default_recipe_unit: tsp
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: allow_approximate_conversion
+  aliases:
+  - poudre de curry
+  - curry spice
+  unit_conversions:
+  - from_unit: tsp
+    to_unit: g
+    factor: 2.5
+    basis: one teaspoon curry powder
+    confidence: low
+    source: seed_suggestion
+    approved: false
+  - from_unit: tbsp
+    to_unit: g
+    factor: 7.5
+    basis: one tablespoon curry powder
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: dukkah_spice
+  display_name: Dukkah spice
+  description: Dukkah nut/spice blend.
+  category: spice
+  family: spice_family
+  pantry_item: true
+  default_recipe_unit: tbsp
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: allow_approximate_conversion
+  aliases:
+  - dukkah
+  - duqqa
+  unit_conversions:
+  - from_unit: tbsp
+    to_unit: g
+    factor: 8
+    basis: one tablespoon dukkah, approximate
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: oregano
+  display_name: Oregano
+  description: Dried oregano.
+  category: spice
+  family: herb_family
+  pantry_item: true
+  default_recipe_unit: tsp
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: allow_approximate_conversion
+  aliases:
+  - origan
+  unit_conversions:
+  - from_unit: tsp
+    to_unit: g
+    factor: 1
+    basis: one teaspoon dried oregano
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: chili_flakes
+  display_name: Chili flakes
+  description: Dried chili flakes.
+  category: spice
+  family: pepper_family
+  pantry_item: true
+  default_recipe_unit: tsp
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: allow_approximate_conversion
+  aliases:
+  - flocons de piment
+  - chilli flakes
+  - piment concassé
+  unit_conversions:
+  - from_unit: tsp
+    to_unit: g
+    factor: 2
+    basis: one teaspoon chili flakes
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: red_chili
+  display_name: Red chili
+  description: Fresh red chili pepper.
+  category: vegetable
+  family: pepper_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - piment rouge
+  - red chilli
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 15
+    basis: one fresh chili
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: green_chili
+  display_name: Green chili
+  description: Fresh green chili pepper.
+  category: vegetable
+  family: pepper_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: unit
+  aggregation_strategy: prefer_count
+  aliases:
+  - piment vert
+  - green chilli
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 15
+    basis: one fresh chili
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: mayonnaise
+  display_name: Mayonnaise
+  description: Prepared mayonnaise.
+  category: condiment
+  family: sauce_condiment_family
+  pantry_item: true
+  default_recipe_unit: tbsp
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: allow_approximate_conversion
+  aliases:
+  - mayo
+  - mayonnaise sauce
+  unit_conversions:
+  - from_unit: tbsp
+    to_unit: g
+    factor: 14
+    basis: one tablespoon mayonnaise
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: peanut_butter
+  display_name: Peanut butter
+  description: Peanut butter/paste.
+  category: condiment
+  family: sauce_condiment_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - beurre de cacahuète
+  - peanut paste
+  unit_conversions:
+  - from_unit: tbsp
+    to_unit: g
+    factor: 16
+    basis: one tablespoon peanut butter
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: allioli
+  display_name: Allioli
+  description: Garlic mayonnaise/allioli sauce.
+  category: condiment
+  family: sauce_condiment_family
+  pantry_item: true
+  default_recipe_unit: tbsp
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: allow_approximate_conversion
+  aliases:
+  - aioli
+  - aïoli
+  - allioli sauce
+  unit_conversions:
+  - from_unit: tbsp
+    to_unit: g
+    factor: 15
+    basis: one tablespoon allioli
+    confidence: medium
+    source: seed_suggestion
+    approved: false
+- canonical_name: capers
+  display_name: Capers
+  description: Capers in brine.
+  category: condiment
+  family: sauce_condiment_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - câpres
+  - capres
+  unit_conversions:
+  - from_unit: tbsp
+    to_unit: g
+    factor: 9
+    basis: one tablespoon drained capers
+    confidence: low
+    source: seed_suggestion
+    approved: false
+- canonical_name: black_olives
+  display_name: Black olives
+  description: Pitted black olives.
+  category: condiment
+  family: olive_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - olives noires
+  - black pitted olives
+- canonical_name: white_wine
+  display_name: White wine
+  description: Dry white wine for cooking.
+  category: alcohol
+  family: sauce_condiment_family
+  pantry_item: true
+  default_recipe_unit: ml
+  preferred_shopping_unit: ml
+  aggregation_unit: ml
+  aggregation_strategy: prefer_volume
+  aliases:
+  - vin blanc
+  - dry white wine

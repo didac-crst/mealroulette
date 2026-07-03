@@ -64,6 +64,7 @@ mealroulette/
     package.json
   docs/
     CURSOR_ROADMAP.md
+    LOCALIZATION.md
     MVP.md
   SPECS.md
   backups/
@@ -424,7 +425,9 @@ Acceptance criteria:
 - Backup files are written under `/backups`.
 - Old backups are removed according to retention settings.
 
-### Phase 11 - LLM-Assisted Entry
+### Phase 11 - LLM-Assisted Entry & Localization
+
+**Status:** Not started. Design spec: [LOCALIZATION.md](LOCALIZATION.md).
 
 Deliverables:
 
@@ -435,12 +438,23 @@ Deliverables:
 - Suggest tags endpoint
 - Normalize ingredients endpoint
 - Draft review UI
+- **Localization foundation:** `translations` table with `status`, `source_text_hash`, review metadata; `default_locale` on dish/recipe/ingredient
+- **Localization jobs:** `localization_jobs` + `localization_job_items` for one-click bulk translate
+- **Glossary:** protected terms and consistent culinary vocabulary for LLM prompts
+- **Bulk translate:** field-aware batched `POST /api/admin/localization/jobs` → draft translations → admin approve
+- **Locale-aware reads:** `?locale=fr` with fallback chain; UI chrome via frontend i18n (separate from content)
+- Optional: LLM-suggested ingredient **aliases** per target locale (not a substitute for display translations)
 
 Acceptance criteria:
 
 - LLM endpoints require authentication.
 - LLM output is saved only after explicit user confirmation.
 - Ingredient suggestions still pass through normalization flow.
+- Approved translations are served deterministically; stale translations are not shown to normal users.
+- Bulk translation is idempotent (unique `entity_type + entity_id + field_name + locale`).
+- Source text changes mark approved translations as `stale`.
+- Recipe step translation preserves quantities, times, temperatures, units, and appliance terms.
+- Ingredient display translations remain separate from search aliases.
 
 ### Phase 12 - v1 Hardening
 

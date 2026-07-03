@@ -6,6 +6,7 @@ This file is the **status board**. It does not replace the product spec or build
 
 - [SPECS.md](../SPECS.md) — product requirements and long-term version roadmap (v0.1 → v1.0)
 - [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) — implementation phases (Phase 0 → Phase 12)
+- [docs/LOCALIZATION.md](LOCALIZATION.md) — multilingual content design (Phase 11; documented early, implement later)
 - [docs/MVP.md](MVP.md) — MVP scope and acceptance test
 
 Update this file when a phase or version milestone lands.
@@ -99,11 +100,11 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 
 ### v0.3 — Shopping List
 
-- [ ] Generate shopping list for next X days
-- [ ] Aggregate compatible units
-- [ ] Group by category
-- [ ] Exclude pantry items
-- [ ] Basic shopping list UI
+- [x] Generate shopping list for next X days
+- [x] Aggregate compatible units
+- [x] Group by category
+- [x] Exclude pantry items
+- [x] Basic shopping list UI
 
 ### v0.4 — Telegram Reminders
 
@@ -257,11 +258,11 @@ Supports local testing; distinct from Phase 10 full JSON export/import.
 
 Branch: `phase-6/shopping`.
 
-- [ ] Shopping list models and migration
-- [ ] Dynamic list generation from meal plans (date window)
-- [ ] Unit aggregation via `services/quantities`
-- [ ] Pantry filtering and category grouping
-- [ ] Shopping list API and UI
+- [x] Shopping list models and migration
+- [x] Dynamic list generation from meal plans (date window)
+- [x] Unit aggregation via `services/quantities`
+- [x] Pantry filtering and category grouping
+- [x] Shopping list API and UI
 
 ### Phases 7–12
 
@@ -307,7 +308,7 @@ Cross-reference for [docs/MVP.md](MVP.md). Checked items are done; the rest trac
 - [x] Meal actions (lock, eaten, skip, ate leftovers)
 - [x] Ratings
 - [ ] Meal reroll (deferred to Phase 8)
-- [ ] Shopping list generation
+- [x] Shopping list generation
 - [ ] Telegram settings and reminders
 - [ ] JSON export / import
 - [ ] Mounted backup folder (directory exists; backup logic not yet implemented)

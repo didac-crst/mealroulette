@@ -27,6 +27,7 @@ from mealroulette.schemas.catalog import (
     RecipeStepCreateRequest,
     SeasonalityUpsertRequest,
 )
+from mealroulette.data.seed_catalog import seed_ingredient_conversions
 from mealroulette.services.catalog import CatalogService
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
@@ -218,6 +219,10 @@ def import_dish_fixtures(db: Session, path: Path | str = DEFAULT_FIXTURE_PATH) -
                     ),
                 )
                 ingredients_added += 1
+
+    conversions_added = seed_ingredient_conversions(db)
+    if conversions_added:
+        db.commit()
 
     return ImportResult(
         dishes_added=dishes_added,

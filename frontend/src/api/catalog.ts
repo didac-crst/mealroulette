@@ -86,6 +86,72 @@ export type Ingredient = {
   canonical_name: string;
   display_name: string;
   category: string | null;
+  family: string | null;
+  default_unit_id: number | null;
+  default_dimension: "mass" | "volume" | "count" | null;
+  preferred_shopping_unit_id: number | null;
+  aggregation_unit_id: number | null;
+  aggregation_strategy:
+    | "strict_same_dimension"
+    | "prefer_mass"
+    | "prefer_volume"
+    | "prefer_count"
+    | "allow_approximate_conversion"
+    | "never_convert_count"
+    | null;
+  pantry_item: boolean;
+  season_start_month: number | null;
+  season_end_month: number | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type IngredientAlias = {
+  id: number;
+  ingredient_id: number;
+  alias: string;
+  language: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type IngredientConversion = {
+  id: number;
+  ingredient_id: number;
+  from_unit_id: number;
+  to_unit_id: number;
+  from_unit_symbol: string;
+  to_unit_symbol: string;
+  factor: string;
+  confidence: string;
+  notes: string | null;
+  approved: boolean;
+  source: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type IngredientDetail = Ingredient & {
+  aliases: IngredientAlias[];
+  unit_conversions: IngredientConversion[];
+};
+
+export type IngredientInput = {
+  canonical_name?: string;
+  display_name: string;
+  category?: string | null;
+  family?: string | null;
+  default_unit_id?: number | null;
+  default_dimension?: Ingredient["default_dimension"];
+  preferred_shopping_unit_id?: number | null;
+  aggregation_unit_id?: number | null;
+  aggregation_strategy?: Ingredient["aggregation_strategy"];
+  pantry_item?: boolean;
+  season_start_month?: number | null;
+  season_end_month?: number | null;
+  notes?: string | null;
+  aliases?: string[];
 };
 
 export type RecipeIngredient = {
@@ -102,6 +168,7 @@ export type Unit = {
   id: number;
   name: string;
   symbol: string;
+  dimension: "mass" | "volume" | "count";
 };
 
 export type DishInput = {
@@ -309,8 +376,104 @@ export async function deleteRecipeIngredient(token: string, itemId: number): Pro
   });
 }
 
-export async function fetchIngredients(token: string): Promise<Ingredient[]> {
-  return apiRequest<Ingredient[]>("/api/ingredients", withToken(token));
+export async function fetchIngredients(token: string, search?: string): Promise<Ingredient[]> {
+  const query = search?.trim() ? `?search=${encodeURIComponent(search.trim())}` : "";
+  return apiRequest<Ingredient[]>(`/api/ingredients${query}`, withToken(token));
+}
+
+export async function fetchIngredient(token: string, ingredientId: number): Promise<IngredientDetail> {
+  return apiRequest<IngredientDetail>(`/api/ingredients/${ingredientId}`, withToken(token));
+}
+
+export async function createIngredient(token: string, payload: IngredientInput): Promise<Ingredient> {
+  return apiRequest<Ingredient>("/api/ingredients", {
+    method: "POST",
+    body: JSON.stringify(payload),
+    ...withToken(token),
+  });
+}
+
+export async function updateIngredient(
+  token: string,
+  ingredientId: number,
+  payload: Partial<IngredientInput>,
+): Promise<Ingredient> {
+  return apiRequest<Ingredient>(`/api/ingredients/${ingredientId}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+    ...withToken(token),
+  });
+}
+
+export async function deleteIngredient(token: string, ingredientId: number): Promise<void> {
+  return apiRequest<void>(`/api/ingredients/${ingredientId}`, {
+    method: "DELETE",
+    ...withToken(token),
+  });
+}
+
+export async function createIngredientAlias(
+  token: string,
+  ingredientId: number,
+  payload: { alias: string; language?: string | null },
+): Promise<IngredientAlias> {
+  return apiRequest<IngredientAlias>(`/api/ingredients/${ingredientId}/aliases`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+    ...withToken(token),
+  });
+}
+
+export async function deleteIngredientAlias(token: string, aliasId: number): Promise<void> {
+  return apiRequest<void>(`/api/ingredient-aliases/${aliasId}`, {
+    method: "DELETE",
+    ...withToken(token),
+  });
+}
+
+export async function createIngredientConversion(
+  token: string,
+  ingredientId: number,
+  payload: {
+    from_unit_id: number;
+    to_unit_id: number;
+    factor: string;
+    confidence?: string;
+    notes?: string | null;
+    approved?: boolean;
+    source?: string;
+  },
+): Promise<IngredientConversion> {
+  return apiRequest<IngredientConversion>(`/api/ingredients/${ingredientId}/conversions`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+    ...withToken(token),
+  });
+}
+
+export async function updateIngredientConversion(
+  token: string,
+  conversionId: number,
+  payload: {
+    factor?: string;
+    confidence?: string;
+    notes?: string | null;
+    approved?: boolean;
+    source?: string;
+  },
+): Promise<IngredientConversion> {
+  return apiRequest<IngredientConversion>(`/api/ingredient-conversions/${conversionId}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+    ...withToken(token),
+  });
+}
+
+export async function deleteIngredientConversion(token: string, conversionId: number): Promise<void> {
+  return apiRequest<void>(`/api/ingredient-conversions/${conversionId}`, {
+    method: "DELETE",
+    ...withToken(token),
+  });
 }
 
 export async function resolveIngredient(token: string, proposedName: string): Promise<IngredientResolveResponse> {

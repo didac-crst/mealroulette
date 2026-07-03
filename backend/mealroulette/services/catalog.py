@@ -11,22 +11,28 @@ from mealroulette.models.catalog import (
     DishSeasonality,
     Ingredient,
     IngredientAlias,
+    IngredientUnitConversion,
     Recipe,
     RecipeIngredient,
     RecipeStep,
     Tag,
     Unit,
 )
-from mealroulette.models.enums import DishStatus, RecipeType, SeasonalityMode, SeasonalityStrength
+from mealroulette.models.enums import AggregationStrategy, ConversionSource, DishStatus, RecipeType, SeasonalityMode, SeasonalityStrength
 from mealroulette.schemas.catalog import (
     DishCreateRequest,
     DishPublic,
     DishUpdateRequest,
     IngredientAliasCreateRequest,
+    IngredientAliasPublic,
     IngredientConfirmAction,
     IngredientCreateRequest,
+    IngredientDetailPublic,
     IngredientPublic,
     IngredientResolveResponse,
+    IngredientUnitConversionCreateRequest,
+    IngredientUnitConversionPublic,
+    IngredientUnitConversionUpdateRequest,
     IngredientUpdateRequest,
     RecipeCreateRequest,
     RecipeIngredientCreateRequest,
@@ -116,6 +122,31 @@ class CatalogService:
     def to_ingredient_public(ingredient: Ingredient) -> IngredientPublic:
         return IngredientPublic.model_validate(ingredient)
 
+    @staticmethod
+    def to_conversion_public(conversion: IngredientUnitConversion) -> IngredientUnitConversionPublic:
+        return IngredientUnitConversionPublic(
+            id=conversion.id,
+            ingredient_id=conversion.ingredient_id,
+            from_unit_id=conversion.from_unit_id,
+            to_unit_id=conversion.to_unit_id,
+            from_unit_symbol=conversion.from_unit.symbol,
+            to_unit_symbol=conversion.to_unit.symbol,
+            factor=conversion.factor,
+            confidence=conversion.confidence,
+            notes=conversion.notes,
+            approved=conversion.approved,
+            source=conversion.source,
+            created_at=conversion.created_at,
+            updated_at=conversion.updated_at,
+        )
+
+    def to_ingredient_detail(self, ingredient: Ingredient) -> IngredientDetailPublic:
+        return IngredientDetailPublic(
+            **self.to_ingredient_public(ingredient).model_dump(),
+            aliases=[IngredientAliasPublic.model_validate(alias) for alias in ingredient.aliases],
+            unit_conversions=[self.to_conversion_public(conversion) for conversion in ingredient.unit_conversions],
+        )
+
     def _set_main_recipe(self, dish_id: int, recipe_id: int) -> None:
         recipes = list(self.db.scalars(select(Recipe).where(Recipe.dish_id == dish_id)))
         for recipe in recipes:
@@ -187,16 +218,31 @@ class CatalogService:
         query = select(Ingredient).order_by(Ingredient.display_name)
         if search:
             pattern = f"%{search.strip().lower()}%"
+            alias_match = (
+                select(IngredientAlias.ingredient_id)
+                .where(func.lower(IngredientAlias.alias).like(pattern))
+                .scalar_subquery()
+            )
             query = query.where(
                 or_(
                     func.lower(Ingredient.canonical_name).like(pattern),
                     func.lower(Ingredient.display_name).like(pattern),
+                    func.lower(Ingredient.category).like(pattern),
+                    Ingredient.id.in_(alias_match),
                 )
             )
         return list(self.db.scalars(query))
 
     def get_ingredient(self, ingredient_id: int) -> Ingredient:
-        ingredient = self.db.get(Ingredient, ingredient_id)
+        ingredient = self.db.scalar(
+            select(Ingredient)
+            .options(
+                selectinload(Ingredient.aliases),
+                selectinload(Ingredient.unit_conversions).selectinload(IngredientUnitConversion.from_unit),
+                selectinload(Ingredient.unit_conversions).selectinload(IngredientUnitConversion.to_unit),
+            )
+            .where(Ingredient.id == ingredient_id)
+        )
         if ingredient is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ingredient not found")
         return ingredient
@@ -287,8 +333,12 @@ class CatalogService:
             canonical_name=canonical,
             display_name=payload.display_name,
             category=payload.category,
+            family=payload.family,
             default_unit_id=payload.default_unit_id,
             default_dimension=payload.default_dimension,
+            preferred_shopping_unit_id=payload.preferred_shopping_unit_id,
+            aggregation_unit_id=payload.aggregation_unit_id,
+            aggregation_strategy=payload.aggregation_strategy,
             pantry_item=payload.pantry_item,
             season_start_month=payload.season_start_month,
             season_end_month=payload.season_end_month,
@@ -349,6 +399,89 @@ class CatalogService:
         if alias is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Alias not found")
         self.db.delete(alias)
+        self.db.commit()
+
+    def list_conversions(self, ingredient_id: int) -> list[IngredientUnitConversion]:
+        self.get_ingredient(ingredient_id)
+        return list(
+            self.db.scalars(
+                select(IngredientUnitConversion)
+                .options(
+                    selectinload(IngredientUnitConversion.from_unit),
+                    selectinload(IngredientUnitConversion.to_unit),
+                )
+                .where(IngredientUnitConversion.ingredient_id == ingredient_id)
+                .order_by(IngredientUnitConversion.from_unit_id, IngredientUnitConversion.to_unit_id)
+            )
+        )
+
+    def create_conversion(
+        self,
+        ingredient_id: int,
+        payload: IngredientUnitConversionCreateRequest,
+    ) -> IngredientUnitConversion:
+        ingredient = self.get_ingredient(ingredient_id)
+        self.get_unit(payload.from_unit_id)
+        self.get_unit(payload.to_unit_id)
+        existing = self.db.scalar(
+            select(IngredientUnitConversion).where(
+                IngredientUnitConversion.ingredient_id == ingredient.id,
+                IngredientUnitConversion.from_unit_id == payload.from_unit_id,
+                IngredientUnitConversion.to_unit_id == payload.to_unit_id,
+            )
+        )
+        if existing is not None:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Conversion already exists")
+        conversion = IngredientUnitConversion(
+            ingredient_id=ingredient.id,
+            from_unit_id=payload.from_unit_id,
+            to_unit_id=payload.to_unit_id,
+            factor=payload.factor,
+            confidence=payload.confidence,
+            notes=payload.notes,
+            approved=payload.approved,
+            source=payload.source,
+        )
+        self.db.add(conversion)
+        self.db.commit()
+        self.db.refresh(conversion)
+        loaded = self.db.scalar(
+            select(IngredientUnitConversion)
+            .options(
+                selectinload(IngredientUnitConversion.from_unit),
+                selectinload(IngredientUnitConversion.to_unit),
+            )
+            .where(IngredientUnitConversion.id == conversion.id)
+        )
+        assert loaded is not None
+        return loaded
+
+    def update_conversion(
+        self,
+        conversion_id: int,
+        payload: IngredientUnitConversionUpdateRequest,
+    ) -> IngredientUnitConversion:
+        conversion = self.db.scalar(
+            select(IngredientUnitConversion)
+            .options(
+                selectinload(IngredientUnitConversion.from_unit),
+                selectinload(IngredientUnitConversion.to_unit),
+            )
+            .where(IngredientUnitConversion.id == conversion_id)
+        )
+        if conversion is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversion not found")
+        for field, value in payload.model_dump(exclude_unset=True).items():
+            setattr(conversion, field, value)
+        self.db.commit()
+        self.db.refresh(conversion)
+        return conversion
+
+    def delete_conversion(self, conversion_id: int) -> None:
+        conversion = self.db.get(IngredientUnitConversion, conversion_id)
+        if conversion is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversion not found")
+        self.db.delete(conversion)
         self.db.commit()
 
     def _apply_tags(self, dish: Dish, tag_ids: list[int]) -> None:
