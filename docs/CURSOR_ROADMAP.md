@@ -266,18 +266,44 @@ Deliverables:
 - Current plan API
 - Manual assignment
 - Lock/unlock
-- Mark cooked
-- Skip
-- Use leftovers
+- Mark meal as eaten (`eaten`)
+- Skip meal (`skipped`, with optional `skip_reason` / `skip_comment`)
+- Ate leftovers (`ate_leftovers`, optional `leftover_source_item_id`)
 - Ratings
-- Meal history events derived from item status changes
+- Meal history derived from item status changes
+
+**Lightweight leftovers only (Phase 5 scope):**
+
+- Track what was eaten at each meal slot — not prepared-food inventory.
+- `ate_leftovers` may reference a prior `meal_plan_item` as `leftover_source_item_id`, or use **Unknown / same dish** (`null`).
+- Valid sources: status `eaten` only (not `ate_leftovers` — no fake leftover chains), within the **last 7 days** relative to the current meal date, same day or earlier.
+- `ate_leftovers` meals do not become new leftover sources.
+- UI actions: **Ate as planned**, **Ate leftovers**, **Skipped**.
+
+**Deferred to a later phase (after shopping lists):**
+
+- `leftover_batch` inventory (portions, fridge/freezer, expiration)
+- Portion decrement and manual corrections
+- Scheduling from available leftover stock
+- Shopping-list exclusion for meals made from prepared leftovers
 
 Acceptance criteria:
 
 - User can plan lunch and dinner for a week manually.
 - Locked items remain locked.
-- Cooked/skipped/leftover state is stored and visible.
+- Eaten/skipped/ate_leftovers state is stored and visible.
 - Ratings affect stored dish/user rating records.
+
+**Implementation notes (do not treat "cooked" as meal completion):**
+
+- Meal item statuses: `planned`, `eaten`, `skipped`, `ate_leftovers`.
+- UI workflows: **Plan** (assign dish/recipe, lock) and **Review** (execution status, rating).
+- Review display: past/today `planned` shows as **Not reviewed**.
+- Execution actions only for today/past; future meals read-only in Review.
+- **Undo status** resets to `planned`, clears execution metadata and meal rating.
+- `leftover_source_item_id` optional when marking `ate_leftovers`; source must be status `eaten`, within 7 days, same day or earlier. `ate_leftovers` meals are not valid sources.
+- Do **not** implement portion inventory, fridge/freezer tracking, expiration, or automatic leftover stock decrement in Phase 5.
+- Optional `servings_planned` / `servings_eaten` only if cheap — must not drive inventory logic.
 
 ### Phase 6 - Shopping Lists
 
@@ -297,6 +323,17 @@ Acceptance criteria:
 - Compatible units aggregate through base units.
 - Incompatible units remain separate unless an ingredient-specific conversion exists.
 - Shopping items show which planned meals require them.
+
+### Later — Leftover inventory (after shopping lists)
+
+Not part of Phase 5. Introduce when shopping-list generation can exclude ingredients for meals made from prepared leftovers.
+
+Deliverables:
+
+- `leftover_batch` records (dish, recipe, portions, storage, cooked_at, expires_at)
+- Portion accounting and manual corrections
+- Schedule meals from available leftover stock
+- Shopping-list exclusion for meals sourced from leftovers
 
 ### Phase 7 - Telegram Reminders
 

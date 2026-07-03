@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from mealroulette.api.routes.auth import router as auth_router
 from mealroulette.api.routes.catalog import router as catalog_router
 from mealroulette.api.routes.health import router as health_router
+from mealroulette.api.routes.planning import router as planning_router
 from mealroulette.api.routes.users import router as users_router
 from mealroulette.core.config import settings
 from mealroulette.core.errors import http_exception_handler, validation_exception_handler
@@ -12,7 +13,21 @@ from fastapi.exceptions import RequestValidationError
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="MealRoulette", version="0.1.0", debug=settings.debug)
+    app = FastAPI(
+        title="MealRoulette",
+        version="0.1.0",
+        debug=settings.debug,
+        description=(
+            "API docs: click **Authorize**, enter your username and password, then call protected "
+            "endpoints. `/api/auth/login` returns tokens but does not attach them automatically; "
+            "use **Authorize** or `POST /api/auth/token`. `/api/auth/refresh` requires "
+            "`refresh_token` (not `access_token`) and rotates the refresh token on each use."
+        ),
+        swagger_ui_parameters={
+            "tryItOutEnabled": True,
+            "persistAuthorization": True,
+        },
+    )
 
     app.add_middleware(
         CORSMiddleware,
@@ -28,6 +43,7 @@ def create_app() -> FastAPI:
     app.include_router(health_router, prefix="/api")
     app.include_router(auth_router, prefix="/api")
     app.include_router(catalog_router, prefix="/api")
+    app.include_router(planning_router, prefix="/api")
     app.include_router(users_router, prefix="/api")
 
     return app

@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -9,7 +9,7 @@ from mealroulette.auth.security import decode_token
 from mealroulette.db.session import get_db
 from mealroulette.models.user import User, UserRole
 
-bearer_scheme = HTTPBearer(auto_error=False)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token", auto_error=False)
 
 
 def parse_token_user_id(subject: str | int | None) -> int:
@@ -28,17 +28,17 @@ def parse_token_user_id(subject: str | int | None) -> int:
 
 
 def get_current_user(
-    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    token: str | None = Depends(oauth2_scheme),
     db: Session = Depends(get_db),
 ) -> User:
-    if credentials is None or credentials.scheme.lower() != "bearer":
+    if token is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not authenticated",
         )
 
     try:
-        payload = decode_token(credentials.credentials)
+        payload = decode_token(token)
     except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

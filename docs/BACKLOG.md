@@ -16,7 +16,7 @@ Update this file when a phase or version milestone lands.
 
 **v0.1 released** — tagged [`v0.1.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.1.0) on merge commit `b41cdae` ([PR #3](https://github.com/didac-crst/mealroulette/pull/3)).
 
-**Next:** Phase 5 — manual meal planning (v0.2).
+**Next:** Phase 5 — manual meal planning (v0.2), branch `phase-5/planning` (backend API in progress).
 
 ---
 
@@ -27,6 +27,7 @@ Use one branch per milestone, then merge via pull request:
 - `phase-2/auth` — authentication and users (merged)
 - `phase-3/catalog` — core catalog (merged)
 - `phase-4/frontend` — dish library UI (merged in PR #3, `v0.1.0`)
+- `phase-5/planning` — manual meal planning (**in progress**)
 
 ---
 
@@ -86,9 +87,9 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [ ] Manual dish assignment
 - [ ] Meal plan items
 - [ ] Lock / unlock
-- [ ] Mark cooked
+- [ ] Mark eaten (ate as planned)
 - [ ] Skip
-- [ ] Leftovers
+- [ ] Ate leftovers (lightweight — source meal reference only)
 - [ ] Meal history
 - [ ] Ratings
 
@@ -269,14 +270,14 @@ Cross-reference for [docs/MVP.md](MVP.md). Checked items are done; the rest trac
 - [x] Dishes, recipes, ingredients, units, tags (API)
 - [x] Ingredient normalization flow (API)
 - [ ] Weekly meal plan and manual assignment
-- [ ] Meal actions (lock, cooked, skip, leftovers, reroll)
+- [ ] Meal actions (lock, eaten, skip, ate leftovers, reroll)
 - [ ] Ratings
 - [ ] Shopping list generation
 - [ ] Telegram settings and reminders
 - [ ] JSON export / import
 - [ ] Mounted backup folder (directory exists; backup logic not yet implemented)
 
-**MVP acceptance test** (not yet achievable): log in from a phone, create dishes, plan three days, generate a shopping list, send via Telegram, mark meals cooked, rate them, export a backup.
+**MVP acceptance test** (not yet achievable): log in from a phone, create dishes, plan three days, generate a shopping list, send via Telegram, mark meals eaten, rate them, export a backup.
 
 ---
 

@@ -11,6 +11,19 @@ def test_hash_and_verify_password():
     assert not verify_password("wrong-password", password_hash)
 
 
+def test_token_endpoint_returns_tokens(client, admin_user):
+    response = client.post(
+        "/api/auth/token",
+        data={"username": "admin", "password": "adminpassword"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["token_type"] == "bearer"
+    assert payload["access_token"]
+    assert payload["refresh_token"]
+
+
 def test_login_returns_tokens(client, admin_user):
     response = client.post(
         "/api/auth/login",

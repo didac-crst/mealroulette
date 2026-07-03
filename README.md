@@ -93,6 +93,10 @@ When the app data model changes (new tables like `users`, `dishes`, etc.), the P
 - `008_recipe_is_main` — main recipe flag per dish
 - `009_dish_image_url` — optional dish image URL
 - `010_dish_course_simplify` — course limited to starter, main, dessert
+- `011_meal_planning` — meal plans, plan items, ratings
+- `012_meal_item_eaten_status` — eaten/ate_leftovers statuses, is_locked, skip_comment
+- `013_meal_ratings_dish_id` — meal_ratings table (replaces ratings)
+- `014_review_saved_at` — review_saved_at on meal plan items
 
 With Docker Compose, the **API container runs migrations automatically** on startup (`alembic upgrade head`), then loads **reference catalog data** (standard units and starter tags) from YAML if those rows are not already present.
 
@@ -134,20 +138,25 @@ The API uses **two different tokens**. Mixing them up returns `401 Unauthorized`
 | `access_token` | `GET /api/auth/me`, `GET /api/users`, and other protected endpoints |
 | `refresh_token` | `POST /api/auth/refresh` and `POST /api/auth/logout` only |
 
-**Step by step:**
+**Easiest way (Swagger Authorize):**
 
 1. Open http://localhost:8000/docs
-2. Call `POST /api/auth/login` with username/password
-3. Copy the `access_token` from the response (not `refresh_token`)
-4. Click the **Authorize** button (top right)
-5. Paste only the `access_token` value and confirm
-6. Now `GET /api/auth/me` should work
+2. Click **Authorize** (top right)
+3. Enter your **username** and **password** (leave client id/secret empty)
+4. Click **Authorize**, then **Close**
+5. Call any protected endpoint — Swagger sends the `access_token` automatically
+
+`POST /api/auth/login` still works for manual testing, but it does **not** attach the token to other requests. Use **Authorize** or `POST /api/auth/token` instead.
+
+**Manual token paste (alternative):**
+
+1. Call `POST /api/auth/login` and copy `access_token`
+2. Click **Authorize** and paste only the token (no `Bearer` prefix)
 
 **Refresh token:**
 
-1. Call `POST /api/auth/login` again (or use a saved `refresh_token`)
-2. Call `POST /api/auth/refresh`
-3. Put the `refresh_token` in the request body:
+1. Call `POST /api/auth/login` (or use a saved `refresh_token`)
+2. Call `POST /api/auth/refresh` with the **refresh** token in the body:
 
 ```json
 {
@@ -155,16 +164,18 @@ The API uses **two different tokens**. Mixing them up returns `401 Unauthorized`
 }
 ```
 
-Do **not** put the refresh token in **Authorize**. That button is only for the access token.
+Each successful refresh **replaces** the refresh token. Reusing the old one returns `401`.
+
+Do **not** put the refresh token in **Authorize** — that field is only for the access token.
 
 **Common mistakes**
 
 | Mistake | Error |
 | --- | --- |
-| Calling `/api/auth/me` without Authorize | `Not authenticated` |
+| Calling protected endpoints without **Authorize** | `Not authenticated` |
 | Putting `refresh_token` in Authorize | `Invalid token type` |
 | Putting `access_token` in `/api/auth/refresh` body | `Invalid token type` |
-| Using a refresh token after logout | `Refresh token revoked or expired` |
+| Reusing a refresh token after `/refresh` or `/logout` | `Refresh token revoked or expired` |
 
 ### curl example
 

@@ -28,11 +28,16 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
   if (!response.ok) {
     let detail = `Request failed with status ${response.status}`;
     try {
-      const body = (await response.json()) as { detail?: string | { msg?: string }[] };
+      const body = (await response.json()) as {
+        detail?: string | { msg?: string }[];
+        error?: { message?: string };
+      };
       if (typeof body.detail === "string") {
         detail = body.detail;
       } else if (Array.isArray(body.detail) && body.detail[0]?.msg) {
         detail = body.detail[0].msg;
+      } else if (body.error?.message) {
+        detail = body.error.message;
       }
     } catch {
       // keep default message

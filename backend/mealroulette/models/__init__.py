@@ -13,10 +13,14 @@ from mealroulette.models.catalog import (
 )
 from mealroulette.models.enums import (
     ConversionConfidence,
+    MealPlanItemStatus,
+    MealPlanStatus,
+    MealSlot,
     SeasonalityMode,
     SeasonalityStrength,
     UnitDimension,
 )
+from mealroulette.models.planning import MealPlan, MealPlanItem, MealRating
 from mealroulette.models.user import RefreshToken, User, UserRole
 
 __all__ = [
@@ -27,6 +31,12 @@ __all__ = [
     "Ingredient",
     "IngredientAlias",
     "IngredientUnitConversion",
+    "MealPlan",
+    "MealPlanItem",
+    "MealPlanItemStatus",
+    "MealPlanStatus",
+    "MealSlot",
+    "MealRating",
     "Recipe",
     "RecipeIngredient",
     "RecipeStep",

@@ -23,7 +23,7 @@ Build a self-hosted app that lets a household enter recipes, manually plan lunch
 - Ingredient normalization flow.
 - Weekly lunch/dinner meal plan.
 - Manual meal assignment.
-- Lock/unlock, mark cooked, skip, leftovers, reroll placeholder.
+- Lock/unlock, mark eaten, skip, ate leftovers, reroll placeholder.
 - Ratings.
 - Shopping list generation for a selected date window.
 - Compatible unit aggregation.
@@ -65,4 +65,4 @@ Build a self-hosted app that lets a household enter recipes, manually plan lunch
 
 ## MVP Acceptance Test
 
-A user can log in from a phone, create several dishes with normalized ingredients, plan lunch and dinner for the next three days, generate a shopping list, receive or manually send the list through Telegram, mark meals as cooked, rate them, and export a backup.
+A user can log in from a phone, create several dishes with normalized ingredients, plan lunch and dinner for the next three days, generate a shopping list, receive or manually send the list through Telegram, mark meals as eaten, rate them, and export a backup.

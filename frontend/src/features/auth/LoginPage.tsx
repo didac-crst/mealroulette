@@ -13,7 +13,7 @@ export function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
 
   if (!loading && user) {
-    const redirect = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? "/dishes";
+    const redirect = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? "/review";
     return <Navigate to={redirect} replace />;
   }
 

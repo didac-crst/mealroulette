@@ -8,6 +8,8 @@ import { DishEditPage } from "../features/dishes/DishEditPage";
 import { DishListPage } from "../features/dishes/DishListPage";
 import { RecipeDetailPage } from "../features/dishes/RecipeDetailPage";
 import { RecipeEditPage } from "../features/dishes/RecipeEditPage";
+import { PlanWeekPage } from "../features/planning/PlanWeekPage";
+import { ReviewWeekPage } from "../features/planning/ReviewWeekPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 
 export function AppRouter() {
@@ -18,7 +20,9 @@ export function AppRouter() {
           <Route path="/login" element={<LoginPage />} />
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
-              <Route index element={<Navigate to="/dishes" replace />} />
+              <Route index element={<Navigate to="/review" replace />} />
+              <Route path="plan" element={<PlanWeekPage />} />
+              <Route path="review" element={<ReviewWeekPage />} />
               <Route path="dishes" element={<DishListPage />} />
               <Route path="dishes/new" element={<DishEditPage />} />
               <Route path="dishes/:dishId" element={<DishDetailPage />} />
@@ -28,7 +32,7 @@ export function AppRouter() {
               <Route path="dishes/:dishId/recipes/:recipeId/edit" element={<RecipeEditPage />} />
             </Route>
           </Route>
-          <Route path="*" element={<Navigate to="/dishes" replace />} />
+          <Route path="*" element={<Navigate to="/review" replace />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
