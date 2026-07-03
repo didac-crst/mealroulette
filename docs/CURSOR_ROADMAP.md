@@ -380,6 +380,8 @@ Deliverables:
 
 ### Phase 7 - Telegram Reminders
 
+**Status:** In progress on branch `phase-7/telegram` (v0.4).
+
 Deliverables:
 
 - Telegram settings API
@@ -394,6 +396,68 @@ Acceptance criteria:
 - Admin can configure Telegram without exposing the token afterward.
 - Manual send uses the same formatting and aggregation as the scheduled job.
 - Disabled settings prevent sends.
+
+#### Implementation plan (v0.4)
+
+**1. Database & secrets**
+
+- Migration `019_telegram_settings`: singleton household row (`telegram_settings` table per SPECS §7.19).
+- Fields: `enabled`, `bot_token_encrypted`, `chat_id`, `daily_reminder_time`, `shopping_window_days`, `include_today`, `include_pantry_items`, `group_by_category`, timestamps.
+- Encrypt bot token at rest with Fernet key derived from `SECRET_KEY` (`services/secrets.py`); never return token on `GET` — expose `has_bot_token: bool` instead.
+- Optional: `timezone` column (default `Europe/Paris`) for cron interpretation.
+
+**2. Backend services (reuse shopping logic)**
+
+- `TelegramSettingsService` — get/update singleton settings; decrypt token only inside send path.
+- `TelegramMessageFormatter` — build plain-text message from `ShoppingListPublic` (categories, `~` approximate lines, planned meals); match SPECS §3.5 example; stay under Telegram 4096-char limit (truncate with notice if needed).
+- `TelegramReminderService.send_daily_reminder()` — implement SPECS §15 steps: read settings → if disabled, return → compute `from_date` from `include_today` → call `ShoppingListService.generate_preview()` → format → `TelegramClient.send_message()`.
+- `TelegramClient` — thin wrapper around Bot API `sendMessage` (httpx); map API errors to domain exceptions.
+
+**3. API routes** (admin-only except none — all admin per SPECS §14.2 Settings)
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/telegram/settings` | Public settings without secrets |
+| `PUT` | `/api/telegram/settings` | Upsert; empty/missing token keeps existing encrypted value |
+| `POST` | `/api/telegram/test` | Send fixed test message |
+| `POST` | `/api/telegram/send-daily-reminder` | Manual run (same code path as worker) |
+| `POST` | `/api/shopping-lists/{id}/send-telegram` | Send a saved list (SPECS §13.12) |
+
+**4. Worker**
+
+- Replace `worker.py` placeholder with APScheduler `BackgroundScheduler`.
+- Register cron job from DB settings: reload schedule when settings change (or poll every minute and compare `daily_reminder_time` + `enabled`).
+- Job calls `TelegramReminderService.send_daily_reminder()` with a DB session (same pattern as API).
+- Add `apscheduler` + `httpx` to `pyproject.toml` dependencies.
+
+**5. Frontend** (admin Settings screen)
+
+- Route `/settings/telegram` (or `/settings` with Telegram section) — link from header for admins only.
+- Form: enabled, bot token (password input, blank = unchanged), chat ID, reminder time, window days, include today, include pantry, group by category.
+- Actions: **Save**, **Send test**, **Send reminder now**.
+- Show last send status / error if returned by API (optional `last_sent_at` column in migration if useful).
+
+**6. Tests**
+
+- Unit: message formatter (categories, planned meals, approximate quantities).
+- Unit: settings update preserves token when field omitted.
+- Integration: `send_daily_reminder` with mocked httpx (no real Telegram).
+- Integration: disabled settings → no HTTP call.
+- Worker: smoke test that scheduler registers job (optional).
+
+**7. Docs & release**
+
+- Update `README.md` (BotFather setup, chat ID discovery).
+- `.env.example`: note `SECRET_KEY` required for token encryption.
+- On merge: tag `v0.4.0`, `docs/releases/v0.4.0.md`.
+
+**Suggested commit slices**
+
+1. Migration + model + encryption helper + settings API
+2. Formatter + reminder service + Telegram client + API send endpoints
+3. Worker + APScheduler
+4. Frontend settings UI
+5. Tests + docs
 
 ### Phase 8 - Explainable Scheduler
 
