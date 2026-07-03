@@ -52,6 +52,19 @@ a {
   box-sizing: border-box;
 }
 
+.app-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.app-header-logo {
+  flex-shrink: 0;
+  display: block;
+  border-radius: 50%;
+}
+
 .app-header-brand h1 {
   margin: 0;
   font-size: 1.25rem;
@@ -525,6 +538,17 @@ button:disabled {
 
 .login-card {
   margin-top: 3rem;
+}
+
+.login-logo {
+  display: block;
+  margin: 0 auto 0.75rem;
+}
+
+.login-logo img {
+  display: block;
+  margin: 0 auto;
+  border-radius: 50%;
 }
 
 .plan-page {

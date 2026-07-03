@@ -49,6 +49,8 @@ def main() -> None:
         f"{result.conversions_added} conversion(s), "
         f"{result.units_added} unit(s)."
     )
+    if result.ingredients_updated:
+        print(f"Updated {result.ingredients_updated} existing ingredient(s) from seed metadata.")
     if result.ingredients_skipped:
         print(f"Skipped {result.ingredients_skipped} existing ingredient(s); added missing aliases/conversions.")
     if result.unknown_unit_skips:

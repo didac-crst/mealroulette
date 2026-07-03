@@ -171,6 +171,11 @@ export type Unit = {
   dimension: "mass" | "volume" | "count";
 };
 
+export type IngredientCategory = {
+  id: string;
+  label: string;
+};
+
 export type DishInput = {
   name: string;
   description?: string | null;
@@ -502,4 +507,8 @@ export async function confirmIngredient(
 
 export async function fetchUnits(token: string): Promise<Unit[]> {
   return apiRequest<Unit[]>("/api/units", withToken(token));
+}
+
+export async function fetchIngredientCategories(token: string): Promise<IngredientCategory[]> {
+  return apiRequest<IngredientCategory[]>("/api/ingredient-categories", withToken(token));
 }

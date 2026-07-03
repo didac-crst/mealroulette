@@ -1,0 +1,50 @@
+# Canonical ingredient categories used by the seed catalog and ingredient editor.
+categories:
+  - id: alcohol
+    label: Alcohol
+  - id: bread
+    label: Bread
+  - id: canned
+    label: Canned
+  - id: cheese
+    label: Cheese
+  - id: condiment
+    label: Condiment
+  - id: dairy
+    label: Dairy
+  - id: egg
+    label: Egg
+  - id: fish
+    label: Fish
+  - id: frozen
+    label: Frozen
+  - id: fruit
+    label: Fruit
+  - id: fungus
+    label: Fungus
+  - id: grain
+    label: Grain
+  - id: herb
+    label: Herb
+  - id: legume
+    label: Legume
+  - id: meat
+    label: Meat
+  - id: pantry
+    label: Pantry
+  - id: pasta
+    label: Pasta
+  - id: pastry
+    label: Pastry
+  - id: plant_protein
+    label: Plant protein
+  - id: preserved
+    label: Preserved
+  - id: seafood
+    label: Seafood
+  - id: spice
+    label: Spice
+  - id: stock
+    label: Stock
+  - id: vegetable
+    label: Vegetable

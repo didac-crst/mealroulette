@@ -14,6 +14,7 @@ import { IngredientListPage } from "../features/ingredients/IngredientListPage";
 import { PlanWeekPage } from "../features/planning/PlanWeekPage";
 import { ReviewWeekPage } from "../features/planning/ReviewWeekPage";
 import { ShoppingPage } from "../features/shopping/ShoppingPage";
+import { TelegramSettingsPage } from "../features/settings/TelegramSettingsPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 
 export function AppRouter() {
@@ -39,6 +40,7 @@ export function AppRouter() {
               <Route path="ingredients/new" element={<IngredientEditPage />} />
               <Route path="ingredients/:ingredientId" element={<IngredientDetailPage />} />
               <Route path="ingredients/:ingredientId/edit" element={<IngredientEditPage />} />
+              <Route path="settings/telegram" element={<TelegramSettingsPage />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/review" replace />} />
