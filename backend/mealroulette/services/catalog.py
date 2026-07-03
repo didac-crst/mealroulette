@@ -481,7 +481,11 @@ class CatalogService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversion not found")
         for field, value in payload.model_dump(exclude_unset=True).items():
             setattr(conversion, field, value)
-        self.db.commit()
+        try:
+            self.db.commit()
+        except IntegrityError:
+            self.db.rollback()
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Conversion already exists") from None
         self.db.refresh(conversion)
         return conversion
 
