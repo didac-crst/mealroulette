@@ -9,11 +9,13 @@ import {
   deleteIngredientAlias,
   deleteIngredientConversion,
   fetchIngredient,
+  fetchIngredientCategories,
   fetchUnits,
   updateIngredient,
   updateIngredientConversion,
   type IngredientDetail,
   type IngredientInput,
+  type IngredientCategory,
   type Unit,
 } from "../../api/catalog";
 import { ApiError } from "../../api/client";
@@ -77,6 +79,7 @@ export function IngredientEditPage() {
   const [form, setForm] = useState<IngredientInput>(emptyForm);
   const [detail, setDetail] = useState<IngredientDetail | null>(null);
   const [units, setUnits] = useState<Unit[]>([]);
+  const [categories, setCategories] = useState<IngredientCategory[]>([]);
   const [newAliases, setNewAliases] = useState("");
   const [aliasLanguage, setAliasLanguage] = useState("");
   const [conversionForm, setConversionForm] = useState({
@@ -107,6 +110,9 @@ export function IngredientEditPage() {
     fetchUnits(accessToken)
       .then(setUnits)
       .catch(() => setUnits([]));
+    fetchIngredientCategories(accessToken)
+      .then(setCategories)
+      .catch(() => setCategories([]));
   }, [accessToken]);
 
   useEffect(() => {
@@ -327,10 +333,23 @@ export function IngredientEditPage() {
             <div className="grid-2">
               <label>
                 Category
-                <input
+                <select
                   value={form.category ?? ""}
-                  onChange={(event) => setForm({ ...form, category: event.target.value })}
-                />
+                  onChange={(event) =>
+                    setForm({ ...form, category: event.target.value || null })
+                  }
+                >
+                  <option value="">—</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.label}
+                    </option>
+                  ))}
+                  {form.category &&
+                    !categories.some((category) => category.id === form.category) && (
+                      <option value={form.category}>{form.category}</option>
+                    )}
+                </select>
               </label>
               <label>
                 Family

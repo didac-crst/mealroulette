@@ -380,20 +380,102 @@ Deliverables:
 
 ### Phase 7 - Telegram Reminders
 
+**Status:** Done on branch `phase-7/telegram` (v0.4.0 — pending merge).
+
 Deliverables:
 
 - Telegram settings API
-- Secret-safe response schema
+- Subscriber model (`/subscribe`, `/unsubscribe`)
 - Test message endpoint
 - Daily reminder service
-- APScheduler job
+- APScheduler worker + `getUpdates` polling for bot commands
 - Manual send endpoint
+- On-demand commands (`/planning`, `/reminder`, `/shopping`)
+- HTML message formatting
+- Recipe deep links in planning (tap dish → full recipe)
+- Send saved shopping list via Telegram
+- Ingredient category reference + editor dropdown
 
 Acceptance criteria:
 
-- Admin can configure Telegram without exposing the token afterward.
-- Manual send uses the same formatting and aggregation as the scheduled job.
+- Admin can configure reminder schedule without exposing the bot token in API responses.
+- Manual send uses the same code path as the scheduled job.
 - Disabled settings prevent sends.
+- Subscribers receive broadcasts; `/subscribe` registers chat IDs.
+
+#### Implementation notes (v0.4)
+
+- Alembic revision `019`: `telegram_settings`, `telegram_subscribers`.
+- Bot token in `TELEGRAM_BOT_TOKEN` (`.env` / Docker); optional `TELEGRAM_BOT_USERNAME` for `t.me` recipe deep links. *(Original plan: Fernet-encrypted token in DB — simplified for self-hosting.)*
+- Worker: APScheduler minute poll for `daily_reminder_time`; parallel `getUpdates` loop for commands.
+- HTML formatters: `telegram_format_html.py`, `telegram_recipe.py` (ingredients + steps); safe truncation via `telegram_html_utils.py`.
+- Admin UI: `/settings/telegram` — schedule, test, send now, subscriber list.
+- Ingredient polish: `reference/ingredient_categories.yaml`, `GET /api/ingredient-categories`, seed import backfill.
+- Release notes: [docs/releases/v0.4.0.md](releases/v0.4.0.md).
+
+#### Original implementation plan (v0.4)
+
+**1. Database & secrets**
+
+- Migration `019_telegram_settings`: singleton household row (`telegram_settings` table per SPECS §7.19).
+- Fields: `enabled`, `daily_reminder_time`, `shopping_window_days`, `include_today`, `include_pantry_items`, `group_by_category`, `timezone`, `last_sent_at`, `last_error`, `last_update_id`.
+- `telegram_subscribers` table replaces fixed `chat_id` in settings.
+- Bot token via environment variable (not stored in DB).
+
+**2. Backend services (reuse shopping logic)**
+
+- `TelegramSettingsService` — get/update singleton settings; token from env.
+- `TelegramMessageFormatter` / `telegram_format_html` — HTML messages from shopping list and meal plan data; 4096-char limit with safe truncation.
+- Daily scheduled reminder and **Send reminder now** use the same HTML path as `/reminder` (`TelegramOnDemandService.build_reminder_message`).
+- `TelegramOnDemandService` — `/planning`, `/reminder`, `/shopping` on-demand messages.
+- `TelegramUpdateService` — poll `getUpdates`, handle commands and recipe deep links.
+- `TelegramClient` — `sendMessage`, `getUpdates`, `getMe` (httpx).
+
+**3. API routes** (admin-only)
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/telegram/settings` | Settings without secrets |
+| `PUT` | `/api/telegram/settings` | Update schedule flags |
+| `GET` | `/api/telegram/subscribers` | List subscribers |
+| `POST` | `/api/telegram/test` | Send fixed test message |
+| `POST` | `/api/telegram/send-daily-reminder` | Manual run (same code path as worker) |
+| `POST` | `/api/shopping-lists/{id}/send-telegram` | Send a saved list |
+
+**4. Worker**
+
+- APScheduler `BackgroundScheduler` in `worker.py`.
+- Minute poll compares `daily_reminder_time` + `enabled` + subscribers.
+- `getUpdates` loop handles `/subscribe`, `/planning`, recipe links, etc.
+
+**5. Frontend** (admin Settings screen)
+
+- Route `/settings/telegram` — link from header for admins.
+- Form: enabled, reminder time, window days, include today, include pantry, group by category, timezone.
+- Actions: **Save**, **Send test**, **Send reminder now**.
+- Subscriber list; `TELEGRAM_BOT_TOKEN` setup instructions.
+
+**6. Tests**
+
+- Formatters (HTML planning, reminder, shopping, recipe).
+- Settings and subscriber requirements.
+- API integration with mocked Telegram.
+- Update handler (`/subscribe`, `/planning`, `/start recipe_<id>`).
+
+**7. Docs & release**
+
+- `README.md` — BotFather setup, `/subscribe`, recipe links.
+- `.env.example` — `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME`.
+- On merge: tag `v0.4.0`, [docs/releases/v0.4.0.md](releases/v0.4.0.md).
+
+**Suggested commit slices**
+
+1. Migration + models + settings API
+2. Formatter + reminder service + Telegram client + API send endpoints
+3. Worker + APScheduler + update polling
+4. On-demand commands + HTML formatters + recipe links
+5. Frontend settings UI + ingredient categories
+6. Tests + docs
 
 ### Phase 8 - Explainable Scheduler
 

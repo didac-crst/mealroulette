@@ -35,8 +35,18 @@ class PlanningService:
     def week_start_for(date_value: date) -> date:
         return date_value - timedelta(days=date_value.weekday())
 
+    @staticmethod
+    def _meal_times(item: MealPlanItem) -> tuple[int | None, int | None]:
+        prep = item.recipe.prep_time_minutes if item.recipe is not None else None
+        cook = item.recipe.cook_time_minutes if item.recipe is not None else None
+        if item.dish is not None:
+            prep = prep if prep is not None else item.dish.default_prep_time_minutes
+            cook = cook if cook is not None else item.dish.default_cook_time_minutes
+        return prep, cook
+
     @classmethod
     def to_item_public(cls, item: MealPlanItem) -> MealPlanItemPublic:
+        prep_time_minutes, cook_time_minutes = cls._meal_times(item)
         return MealPlanItemPublic(
             id=item.id,
             meal_plan_id=item.meal_plan_id,
@@ -46,6 +56,8 @@ class PlanningService:
             recipe_id=item.recipe_id,
             dish_name=item.dish.name if item.dish else None,
             recipe_variant_name=item.recipe.variant_name if item.recipe else None,
+            prep_time_minutes=prep_time_minutes,
+            cook_time_minutes=cook_time_minutes,
             status=item.status,
             is_locked=item.is_locked,
             manually_selected=item.manually_selected,

@@ -33,7 +33,9 @@ from mealroulette.schemas.catalog import (
     TagPublic,
     TagUpdateRequest,
     UnitPublic,
+    IngredientCategoryPublic,
 )
+from mealroulette.data.ingredient_categories import load_ingredient_categories
 from mealroulette.services.catalog import CatalogService
 
 router = APIRouter(tags=["catalog"])
@@ -45,6 +47,11 @@ def list_units(
     db: Session = Depends(get_db),
 ) -> list[UnitPublic]:
     return [UnitPublic.model_validate(unit) for unit in CatalogService(db).list_units()]
+
+
+@router.get("/ingredient-categories", response_model=list[IngredientCategoryPublic])
+def list_ingredient_categories(_user: User = Depends(get_current_user)) -> list[IngredientCategoryPublic]:
+    return [IngredientCategoryPublic.model_validate(row) for row in load_ingredient_categories()]
 
 
 @router.get("/tags", response_model=list[TagPublic])

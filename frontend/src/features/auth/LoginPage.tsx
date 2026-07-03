@@ -33,6 +33,10 @@ export function LoginPage() {
   return (
     <main className="app-shell">
       <section className="card login-card">
+        <picture className="login-logo">
+          <source srcSet="/logo-header.webp" type="image/webp" />
+          <img src="/logo-header.png" alt="" width={72} height={72} />
+        </picture>
         <h1>MealRoulette</h1>
         <p className="muted">Sign in to manage your household meal library.</p>
         <form onSubmit={handleSubmit} className="stack">
