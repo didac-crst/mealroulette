@@ -1,0 +1,2 @@
+# Deprecated: conversions are defined in mealroulette_ingredients_seed.yaml.
+# seed_catalog.load_reference_ingredient_conversions() reads from that file.

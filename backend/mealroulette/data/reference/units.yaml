@@ -41,3 +41,19 @@ units:
     symbol: bunch
     dimension: count
     conversion_to_base: "1"
+  - name: head
+    symbol: head
+    dimension: count
+    conversion_to_base: "1"
+  - name: block
+    symbol: block
+    dimension: count
+    conversion_to_base: "1"
+  - name: slice
+    symbol: slice
+    dimension: count
+    conversion_to_base: "1"
+  - name: pack
+    symbol: pack
+    dimension: count
+    conversion_to_base: "1"

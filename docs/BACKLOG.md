@@ -6,6 +6,7 @@ This file is the **status board**. It does not replace the product spec or build
 
 - [SPECS.md](../SPECS.md) — product requirements and long-term version roadmap (v0.1 → v1.0)
 - [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) — implementation phases (Phase 0 → Phase 12)
+- [docs/LOCALIZATION.md](LOCALIZATION.md) — multilingual content design (Phase 11; documented early, implement later)
 - [docs/MVP.md](MVP.md) — MVP scope and acceptance test
 
 Update this file when a phase or version milestone lands.
@@ -14,9 +15,9 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**v0.2 released** — tagged `v0.2.0` on merge commit `fb20858` ([PR #4](https://github.com/didac-crst/mealroulette/pull/4)).
+**Phase 7 next** — Telegram reminders (v0.4).
 
-**Next:** Phase 6 — shopping lists (v0.3).
+Phase 6 (shopping lists, ingredient catalog, unit aggregation) shipped in **v0.3.0** — merged PR #5.
 
 ---
 
@@ -28,6 +29,7 @@ Use one branch per milestone, then merge via pull request:
 - `phase-3/catalog` — core catalog (merged)
 - `phase-4/frontend` — dish library UI (merged in PR #3, `v0.1.0`)
 - `phase-5/planning` — manual meal planning (merged in PR #4, `v0.2.0`)
+- `phase-6/shopping` — shopping lists, ingredient catalog seed, ingredient admin UI (merged in PR #5, `v0.3.0`)
 
 ---
 
@@ -39,7 +41,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | --- | --- | --- |
 | **v0.1** | Foundation — platform, auth, catalog (API + UI), basic frontend | **Done** ([`v0.1.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.1.0), merge `b41cdae`, PR #3) |
 | **v0.2** | Manual planning — weekly plan, review flow, meal actions, ratings, lightweight leftovers | **Done** ([`v0.2.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.2.0), merge `fb20858`, PR #4) |
-| **v0.3** | Shopping list — generation, aggregation, pantry filter, UI | Not started |
+| **v0.3** | Shopping list — generation, aggregation, pantry filter, UI, ingredient catalog | **Done** ([`v0.3.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.3.0), PR #5) |
 | **v0.4** | Telegram reminders — settings, scheduled and manual send | Not started |
 | **v0.5** | Automatic scheduler — explainable weekly generation, reroll | Not started |
 | **v0.6** | LLM-assisted entry — draft enrichment, review before save | Not started |
@@ -98,11 +100,15 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 
 ### v0.3 — Shopping List
 
-- [ ] Generate shopping list for next X days
-- [ ] Aggregate compatible units
-- [ ] Group by category
-- [ ] Exclude pantry items
-- [ ] Basic shopping list UI
+- [x] Generate shopping list for next X days
+- [x] Aggregate compatible units (including approved ingredient-specific conversions)
+- [x] Group by category
+- [x] Exclude pantry items
+- [x] Basic shopping list UI (planned meals, `~` approximate totals, per-meal breakdown)
+- [x] Ingredient seed catalog (`mealroulette_ingredients_seed.yaml` + `import_ingredient_seed`)
+- [x] Per-ingredient unit behavior (family, preferred shopping unit, aggregation strategy)
+- [x] Ingredient unit conversions with approval workflow (API + admin UI)
+- [x] Ingredient admin dashboard (`/ingredients` list + edit)
 
 ### v0.4 — Telegram Reminders
 
@@ -156,7 +162,7 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 3 | Core catalog data | v0.1 | Done |
 | 4 | Frontend shell and dish library | v0.1 | Done (PR #3, `v0.1.0`) |
 | 5 | Manual meal planning | v0.2 | Done (PR #4, `v0.2.0`) |
-| 6 | Shopping lists | v0.3 | **Next** |
+| 6 | Shopping lists | v0.3 | Done (PR #5, `v0.3.0`) |
 | 7 | Telegram reminders | v0.4 | Not started |
 | 8 | Explainable scheduler | v0.5 | Not started |
 | 9 | Cooking mode | v1.0 | Not started |
@@ -245,7 +251,34 @@ Merged in `fb20858` (PR #4, `v0.2.0`).
 - [x] Swagger OAuth2 token endpoint for `/docs`
 - [x] Planning integration and unit tests
 
-### Phases 6–12
+### Dev tooling — YAML fixtures
+
+Supports local testing; distinct from Phase 10 full JSON export/import.
+
+- [x] `sample_dishes.yaml` fixture format (symbolic tags, units, ingredient names)
+- [x] `import_sample_dishes` CLI — idempotent import via catalog service
+- [x] `mealroulette_ingredients_seed.yaml` — canonical ingredients, aliases, unit conversions
+- [x] `import_ingredient_seed` CLI — idempotent ingredient catalog import (`--no-bootstrap-approve` to keep seed suggestions unapproved)
+
+### Phase 6 — Shopping lists ✅
+
+Merged in PR #5 (`v0.3.0`).
+
+Branch: `phase-6/shopping`.
+
+- [x] Shopping list models and migrations (`015`–`016`)
+- [x] Dynamic list generation from meal plans (date window)
+- [x] Unit aggregation via `services/quantities` (strategy-aware, approved conversions only)
+- [x] Pantry filtering and category grouping
+- [x] Per-meal source contributions on list items
+- [x] Shopping list API and UI (`/shopping`, nav tab **List**)
+- [x] Ingredient unit behavior migration (`017`) — family, preferred shopping unit, aggregation unit/strategy
+- [x] Ingredient seed import and conversion approval bootstrap
+- [x] Ingredient conversions CRUD API (unique triplet constraint, migration `018`)
+- [x] Ingredient admin UI — catalog list, edit aliases/conversions/unit behavior
+- [x] Localization design documented ([LOCALIZATION.md](LOCALIZATION.md)); implementation deferred to Phase 11
+
+### Phases 7–12
 
 See [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) for full deliverables and acceptance criteria per phase.
 
@@ -289,7 +322,7 @@ Cross-reference for [docs/MVP.md](MVP.md). Checked items are done; the rest trac
 - [x] Meal actions (lock, eaten, skip, ate leftovers)
 - [x] Ratings
 - [ ] Meal reroll (deferred to Phase 8)
-- [ ] Shopping list generation
+- [x] Shopping list generation
 - [ ] Telegram settings and reminders
 - [ ] JSON export / import
 - [ ] Mounted backup folder (directory exists; backup logic not yet implemented)

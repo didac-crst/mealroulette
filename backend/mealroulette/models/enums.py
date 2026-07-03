@@ -22,8 +22,28 @@ class SeasonalityStrength(str, enum.Enum):
 
 
 class ConversionConfidence(str, enum.Enum):
+    exact = "exact"
+    high = "high"
+    medium = "medium"
+    low = "low"
+    not_recommended = "not_recommended"
     approximate = "approximate"
     measured = "measured"
+
+
+class ConversionSource(str, enum.Enum):
+    manual = "manual"
+    seed = "seed"
+    llm_suggested = "llm_suggested"
+
+
+class AggregationStrategy(str, enum.Enum):
+    strict_same_dimension = "strict_same_dimension"
+    prefer_mass = "prefer_mass"
+    prefer_volume = "prefer_volume"
+    prefer_count = "prefer_count"
+    allow_approximate_conversion = "allow_approximate_conversion"
+    never_convert_count = "never_convert_count"
 
 
 class DishCourse(str, enum.Enum):
@@ -80,3 +100,10 @@ class MealPlanItemStatus(str, enum.Enum):
     eaten = "eaten"
     skipped = "skipped"
     ate_leftovers = "ate_leftovers"
+
+
+class ShoppingListStatus(str, enum.Enum):
+    draft = "draft"
+    active = "active"
+    completed = "completed"
+    archived = "archived"

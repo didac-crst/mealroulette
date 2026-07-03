@@ -18,7 +18,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from mealroulette.db.base import Base
 from mealroulette.models.enums import (
+    AggregationStrategy,
     ConversionConfidence,
+    ConversionSource,
     DishCourse,
     DishStatus,
     RecipeType,
@@ -72,6 +74,12 @@ class Ingredient(Base):
         Enum(UnitDimension, name="unit_dimension", create_type=False), nullable=True
     )
     pantry_item: Mapped[bool] = mapped_column(Boolean, default=False)
+    family: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    preferred_shopping_unit_id: Mapped[int | None] = mapped_column(ForeignKey("units.id"), nullable=True)
+    aggregation_unit_id: Mapped[int | None] = mapped_column(ForeignKey("units.id"), nullable=True)
+    aggregation_strategy: Mapped[AggregationStrategy | None] = mapped_column(
+        Enum(AggregationStrategy, name="aggregation_strategy"), nullable=True
+    )
     season_start_month: Mapped[int | None] = mapped_column(Integer, nullable=True)
     season_end_month: Mapped[int | None] = mapped_column(Integer, nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -80,7 +88,9 @@ class Ingredient(Base):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
 
-    default_unit: Mapped[Unit | None] = relationship()
+    default_unit: Mapped[Unit | None] = relationship(foreign_keys=[default_unit_id])
+    preferred_shopping_unit: Mapped[Unit | None] = relationship(foreign_keys=[preferred_shopping_unit_id])
+    aggregation_unit: Mapped[Unit | None] = relationship(foreign_keys=[aggregation_unit_id])
     aliases: Mapped[list["IngredientAlias"]] = relationship(back_populates="ingredient", cascade="all, delete-orphan")
     unit_conversions: Mapped[list["IngredientUnitConversion"]] = relationship(
         back_populates="ingredient", cascade="all, delete-orphan"
@@ -105,6 +115,14 @@ class IngredientAlias(Base):
 
 class IngredientUnitConversion(Base):
     __tablename__ = "ingredient_unit_conversions"
+    __table_args__ = (
+        UniqueConstraint(
+            "ingredient_id",
+            "from_unit_id",
+            "to_unit_id",
+            name="uq_ingredient_unit_conversions_triplet",
+        ),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     ingredient_id: Mapped[int] = mapped_column(ForeignKey("ingredients.id", ondelete="CASCADE"), index=True)
@@ -115,6 +133,10 @@ class IngredientUnitConversion(Base):
         Enum(ConversionConfidence, name="conversion_confidence"), default=ConversionConfidence.approximate
     )
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    approved: Mapped[bool] = mapped_column(Boolean, default=False)
+    source: Mapped[ConversionSource | None] = mapped_column(
+        Enum(ConversionSource, name="conversion_source"), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()

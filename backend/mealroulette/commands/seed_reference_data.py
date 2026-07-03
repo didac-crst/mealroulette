@@ -17,7 +17,10 @@ def seed_reference_data() -> None:
         print("Reference catalog data already up to date.")
         return
 
-    print(f"Added {result.units_added} unit(s) and {result.tags_added} tag(s).")
+    print(
+        f"Added {result.units_added} unit(s), {result.tags_added} tag(s), "
+        f"and {result.conversions_added} ingredient conversion(s)."
+    )
 
 
 def main() -> None:

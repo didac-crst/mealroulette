@@ -58,7 +58,7 @@ Build a self-hosted app that lets a household enter recipes, manually plan lunch
 3. Add catalog models and CRUD. ✅
 4. Add dish library UI (login, dishes, recipes, steps, ingredients). ✅
 5. Add meal plan models and manual planning. ✅
-6. Add shopping list generation.
+6. Add shopping list generation. ✅
 7. Add Telegram reminders.
 8. Add backups.
 9. Add cooking mode.

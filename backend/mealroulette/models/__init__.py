@@ -18,9 +18,11 @@ from mealroulette.models.enums import (
     MealSlot,
     SeasonalityMode,
     SeasonalityStrength,
+    ShoppingListStatus,
     UnitDimension,
 )
 from mealroulette.models.planning import MealPlan, MealPlanItem, MealRating
+from mealroulette.models.shopping import ShoppingList, ShoppingListItem
 from mealroulette.models.user import RefreshToken, User, UserRole
 
 __all__ = [
@@ -42,7 +44,9 @@ __all__ = [
     "RecipeStep",
     "RefreshToken",
     "SeasonalityMode",
-    "SeasonalityStrength",
+    "ShoppingList",
+    "ShoppingListItem",
+    "ShoppingListStatus",
     "Tag",
     "Unit",
     "UnitDimension",

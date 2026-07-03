@@ -12,9 +12,13 @@ from mealroulette.schemas.catalog import (
     IngredientAliasPublic,
     IngredientConfirmRequest,
     IngredientCreateRequest,
+    IngredientDetailPublic,
     IngredientPublic,
     IngredientResolveRequest,
     IngredientResolveResponse,
+    IngredientUnitConversionCreateRequest,
+    IngredientUnitConversionPublic,
+    IngredientUnitConversionUpdateRequest,
     IngredientUpdateRequest,
     RecipeCreateRequest,
     RecipeIngredientCreateRequest,
@@ -136,14 +140,14 @@ def create_ingredient(
     return service.to_ingredient_public(service.create_ingredient(payload))
 
 
-@router.get("/ingredients/{ingredient_id}", response_model=IngredientPublic)
+@router.get("/ingredients/{ingredient_id}", response_model=IngredientDetailPublic)
 def get_ingredient(
     ingredient_id: int,
     _user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-) -> IngredientPublic:
+) -> IngredientDetailPublic:
     service = CatalogService(db)
-    return service.to_ingredient_public(service.get_ingredient(ingredient_id))
+    return service.to_ingredient_detail(service.get_ingredient(ingredient_id))
 
 
 @router.put("/ingredients/{ingredient_id}", response_model=IngredientPublic)
@@ -197,6 +201,57 @@ def delete_ingredient_alias(
     db: Session = Depends(get_db),
 ) -> None:
     CatalogService(db).delete_alias(alias_id)
+
+
+@router.get(
+    "/ingredients/{ingredient_id}/conversions",
+    response_model=list[IngredientUnitConversionPublic],
+)
+def list_ingredient_conversions(
+    ingredient_id: int,
+    _user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[IngredientUnitConversionPublic]:
+    service = CatalogService(db)
+    return [service.to_conversion_public(conversion) for conversion in service.list_conversions(ingredient_id)]
+
+
+@router.post(
+    "/ingredients/{ingredient_id}/conversions",
+    response_model=IngredientUnitConversionPublic,
+    status_code=201,
+)
+def create_ingredient_conversion(
+    ingredient_id: int,
+    payload: IngredientUnitConversionCreateRequest,
+    _admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+) -> IngredientUnitConversionPublic:
+    service = CatalogService(db)
+    return service.to_conversion_public(service.create_conversion(ingredient_id, payload))
+
+
+@router.put(
+    "/ingredient-conversions/{conversion_id}",
+    response_model=IngredientUnitConversionPublic,
+)
+def update_ingredient_conversion(
+    conversion_id: int,
+    payload: IngredientUnitConversionUpdateRequest,
+    _admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+) -> IngredientUnitConversionPublic:
+    service = CatalogService(db)
+    return service.to_conversion_public(service.update_conversion(conversion_id, payload))
+
+
+@router.delete("/ingredient-conversions/{conversion_id}", status_code=204)
+def delete_ingredient_conversion(
+    conversion_id: int,
+    _admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+) -> None:
+    CatalogService(db).delete_conversion(conversion_id)
 
 
 @router.get("/dishes", response_model=list[DishPublic])
