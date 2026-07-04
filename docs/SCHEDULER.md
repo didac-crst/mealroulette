@@ -190,7 +190,28 @@ Creates the meal-plan week if needed, assigns the dish to the chosen lunch/dinne
 
 ---
 
-## 8. Selection reasons (example)
+## 8. Scheduled roulette (worker)
+
+Configured in **`scheduler_settings`** (admin UI `/settings/scheduler`, API `GET/PUT /api/scheduler/settings`).
+
+| Setting | Default | Meaning |
+| --- | --- | --- |
+| `enabled` | false | Worker runs job when true |
+| `run_weekday` | 4 (Friday) | Local weekday to trigger |
+| `run_time` | 18:00 | Local time (with `timezone`) |
+| `target_week_offset` | 1 | 0 = this Mon–Sun, 1 = next week, etc. |
+| `notify_telegram` | true | Broadcast after successful generate |
+| `notify_planning_days` | 7 | Days of plan shown in Telegram HTML |
+
+**Worker:** minute cron (same as daily Telegram reminder). `ScheduledRouletteService.run_scheduled()` skips unless `should_run_scheduled` (once per local calendar day).
+
+**On trigger:** `get_or_create_plan(target_week)` → `generate_week` → optional **“New roulette”** HTML message to Telegram subscribers (reuses planning formatter).
+
+**Manual:** `POST /api/scheduler/run-roulette` (admin) runs immediately regardless of schedule.
+
+---
+
+## 9. Selection reasons (example)
 
 ```json
 {
@@ -205,7 +226,7 @@ Creates the meal-plan week if needed, assigns the dish to the chosen lunch/dinne
 
 ---
 
-## 9. Tests (required)
+## 10. Tests (required)
 
 - Mass, volume, count conversions and vector normalize (see slice 2 tests).
 - Temporal weight symmetry; closer neighbours penalize more.
@@ -216,7 +237,7 @@ Creates the meal-plan week if needed, assigns the dish to the chosen lunch/dinne
 
 ---
 
-## 10. Related docs
+## 11. Related docs
 
 - [SPECS.md §10–12](../SPECS.md#10-meal-similarity-logic) — product-level scheduler design
 - [CURSOR_ROADMAP.md § Phase 8](CURSOR_ROADMAP.md#phase-8---explainable-scheduler) — deliverables and UI slices

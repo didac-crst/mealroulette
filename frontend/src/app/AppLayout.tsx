@@ -18,6 +18,7 @@ export function AppLayout() {
         ...TAB_ROUTES,
         { to: "/ingredients", label: "Ingredients" } as const,
         { to: "/settings/telegram", label: "Telegram" } as const,
+        { to: "/settings/scheduler", label: "Scheduler" } as const,
       ]
     : TAB_ROUTES;
 

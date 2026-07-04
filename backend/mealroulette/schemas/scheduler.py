@@ -1,4 +1,4 @@
-from datetime import datetime, time
+from datetime import datetime, time, date
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -73,3 +73,13 @@ class MealPlanRouletteResponse(BaseModel):
 class MealPlanUndoRouletteResponse(BaseModel):
     restored: bool
     can_undo: bool = False
+
+
+class SchedulerRouletteRunResult(BaseModel):
+    ran: bool
+    detail: str
+    meal_plan_id: int | None = None
+    week_start_date: date | None = None
+    assignments_count: int = 0
+    warnings: list[str] = Field(default_factory=list)
+    telegram_recipient_count: int = 0

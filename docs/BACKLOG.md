@@ -159,8 +159,8 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [x] Plan dish from gallery (calendar day + lunch/dinner)
 - [x] Selection reasons on auto-picked items
 - [x] Plan UI: generate week, reroll, undo, swap, reasons display
-- [ ] Scheduled roulette (e.g. Friday → next Mon–Sun) + admin settings UI
-- [ ] Telegram “New roulette” notification (configurable planning days)
+- [x] Scheduled roulette worker job + admin settings UI (`/settings/scheduler`)
+- [x] Telegram “New roulette” notification (configurable planning days)
 
 ### v0.6 — LLM-Assisted Entry
 

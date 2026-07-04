@@ -7,10 +7,12 @@ from mealroulette.models.user import User
 from mealroulette.schemas.scheduler import (
     PlanningRulePublic,
     PlanningRuleUpdateRequest,
+    SchedulerRouletteRunResult,
     SchedulerSettingsPublic,
     SchedulerSettingsUpdateRequest,
 )
 from mealroulette.services.planning_rule_service import PlanningRuleService
+from mealroulette.services.scheduled_roulette import ScheduledRouletteService
 from mealroulette.services.scheduler_settings import SchedulerSettingsService
 
 router = APIRouter(tags=["scheduler"])
@@ -48,3 +50,24 @@ def update_scheduler_settings(
     db: Session = Depends(get_db),
 ) -> SchedulerSettingsPublic:
     return SchedulerSettingsService(db).update(payload)
+
+
+@router.post("/scheduler/run-roulette", response_model=SchedulerRouletteRunResult)
+def run_scheduler_roulette_now(
+    _admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+) -> SchedulerRouletteRunResult:
+    result = ScheduledRouletteService(db).run_now()
+    telegram = result.telegram
+    detail = f"Generated {result.assignments_count} meals for week {result.week_start_date.isoformat()}"
+    if telegram is not None:
+        detail = f"{detail}. {telegram.detail}"
+    return SchedulerRouletteRunResult(
+        ran=True,
+        detail=detail,
+        meal_plan_id=result.meal_plan_id,
+        week_start_date=result.week_start_date,
+        assignments_count=result.assignments_count,
+        warnings=result.warnings,
+        telegram_recipient_count=telegram.recipient_count if telegram else 0,
+    )
