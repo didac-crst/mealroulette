@@ -479,7 +479,7 @@ Acceptance criteria:
 
 ### Phase 8 - Explainable Scheduler
 
-**Status:** In progress on branch `phase-8/scheduler` (v0.5.0).
+**Status:** Complete on branch `phase-8/scheduler` (v0.5.0, PR #8) — pending merge approval.
 
 #### Product behaviour
 
@@ -561,7 +561,7 @@ Worker minute poll (same as daily reminder). On success, broadcast **“New roul
 4. Reroll + generate + undo API + temporal neighbours + swap ✅
 5. Plan UI + reasons display + plan-from-gallery ✅
 6. Worker scheduled job + Telegram “New roulette” ✅
-7. Tests, docs, release notes `v0.5.0.md`
+7. Tests, docs, release notes `v0.5.0.md` ✅
 
 Acceptance criteria (summary):
 

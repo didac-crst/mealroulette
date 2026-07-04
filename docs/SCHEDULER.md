@@ -232,7 +232,7 @@ Configured in **`scheduler_settings`** (admin UI `/settings/scheduler`, API `GET
 - Temporal weight symmetry; closer neighbours penalize more.
 - Future locked meals affect scoring.
 - Sequential generation: later slot sees earlier pick as neighbour.
-- Generate / reroll / undo API; swap exchange.
+- Generate / reroll / undo API; swap exchange; Phase 8 acceptance API tests (`test_scheduler_acceptance.py`).
 - Locked meals preserved; past slots blocked.
 
 ---
