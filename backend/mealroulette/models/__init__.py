@@ -22,6 +22,7 @@ from mealroulette.models.enums import (
     UnitDimension,
 )
 from mealroulette.models.planning import MealPlan, MealPlanItem, MealRating
+from mealroulette.models.scheduler import PlanningRule, SchedulerSettings
 from mealroulette.models.shopping import ShoppingList, ShoppingListItem
 from mealroulette.models.telegram import TelegramSettings, TelegramSubscriber
 from mealroulette.models.user import RefreshToken, User, UserRole
@@ -40,10 +41,12 @@ __all__ = [
     "MealPlanStatus",
     "MealSlot",
     "MealRating",
+    "PlanningRule",
     "Recipe",
     "RecipeIngredient",
     "RecipeStep",
     "RefreshToken",
+    "SchedulerSettings",
     "SeasonalityMode",
     "ShoppingList",
     "ShoppingListItem",
