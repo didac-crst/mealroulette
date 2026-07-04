@@ -64,6 +64,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.4** | Telegram reminders — settings, scheduled and manual send, bot commands | **Done** ([`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0), merge `a560e7a`, PR #7) |
 | **v0.5** | Automatic scheduler — explainable weekly generation, reroll | **In progress** (branch `phase-8/scheduler`) |
 | **v0.6** | LLM-assisted entry — draft enrichment, review before save | Not started |
+| **Future** | Composable meals — complete / half / dessert roles, paired halves, manual desserts | Backlog only (see below) |
 | **v1.0** | Stable home version — mobile UI, backups, auth, scheduler, cooking mode | Not started |
 
 > **v0.4 shipped** as [`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0). Telegram bot commands, scheduled HTML reminders, recipe deep links, and admin settings. Release notes: [docs/releases/v0.4.0.md](releases/v0.4.0.md).
@@ -161,12 +162,52 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [ ] Scheduled roulette (e.g. Friday → next Mon–Sun) + admin settings UI
 - [ ] Telegram “New roulette” notification (configurable planning days)
 
+### v0.6 — LLM-Assisted Entry
+
 - [ ] LLM dish enrichment
 - [ ] Suggest ingredients
 - [ ] Suggest tags
 - [ ] Suggest steps
 - [ ] Suggest seasonality
 - [ ] Review before save
+
+### Future — composable meals (meal role)
+
+**Status:** Backlog only — do not implement until v0.5 scheduler is stable. Captures product intent for “one slot = one complete meal **or** two half meals”; desserts planned manually only.
+
+**Meal role** (exactly one per dish/recipe — name TBD in spec):
+
+| Role | Scheduler | Example |
+| --- | --- | --- |
+| **Complete meal** | Auto-assignable as the sole dish for a lunch/dinner slot | Mushroom risotto |
+| **Half meal** | Auto-assignable only as **one of two** components in the same slot | Beans & potatoes; ham croquettes |
+| **Dessert** | **Manual assign only** — never picked by roulette | Fruit crumble |
+
+**Product rules (draft):**
+
+- A lunch/dinner slot is satisfied by either **1× complete** or **2× half** (pair chosen by scheduler).
+- Do **not** model “beans + croquettes” as a single synthetic complete dish — keep real dishes separate for ingredients, ratings, and cooking.
+- Desserts may appear on the plan (for shopping and review) but are **excluded from** `generate_week`, `reroll`, and scheduled roulette.
+- Half-meal pairing should prefer variety/compatibility (shared style, temperature, prep burden — rules TBD).
+
+**Checklist (when scheduled):**
+
+- [ ] Data model: `meal_role` enum (`complete_meal`, `half_meal`, `dessert`) — decide **dish-level vs recipe-level** (today `course` is on `Dish`: `starter` \| `main` \| `dessert`; may replace or coexist).
+- [ ] Migration + catalog UI: required role on save; seed/fixture updates.
+- [ ] **Multi-component slots:** `MealPlanItem` currently has one `dish_id` / `recipe_id` per slot — need components (e.g. child rows or JSON list) without breaking the unique `(plan, date, meal_slot)` constraint.
+- [ ] Scheduler: candidate generation for complete vs compatible half pairs; desserts filtered out of auto pool.
+- [ ] Weekly targets: count **per slot** (one fish dinner), not per component — document edge cases.
+- [ ] Similarity / vectors: score pairs (or each half vs neighbours); avoid double-counting same slot in neighbour logic.
+- [ ] Shopping list: aggregate ingredients from **all** components in a slot.
+- [ ] Plan UI: show two lines per slot when composed; swap/reroll semantics (reroll pair? one half?).
+- [ ] Telegram / cooking mode: display multiple dishes per slot.
+- [ ] Map legacy `course=starter` → half meal or drop starter enum (product decision).
+
+**Open questions:**
+
+- Manual “add second half” on an existing slot vs scheduler-only pairing?
+- Can a half meal be promoted to complete for simple weeks (catalog convenience)?
+- Rating: one rating per slot or per component?
 
 ### v1.0 — Stable Home Version
 
