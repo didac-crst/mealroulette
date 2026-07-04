@@ -148,7 +148,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 ### v0.5 — Automatic Scheduler
 
 - [ ] Planning rules + weekly targets with tolerance
-- [ ] Family-vector similarity (on-the-fly, L1 % + cosine distance)
+- [ ] Family-vector similarity ([SCHEDULER.md](SCHEDULER.md): on-the-fly L1 %, count fallback 100 g, cosine distance)
 - [ ] History-aware scoring (eaten meals, ratings, recency)
 - [ ] Seasonality + rating scoring
 - [ ] Generate week (unlocked slots only; locked preserved)
@@ -326,7 +326,7 @@ Branch: merged in PR #7 (`v0.4.0`).
 
 ### Phase 8 — Explainable scheduler (in progress)
 
-Branch: `phase-8/scheduler` (target `v0.5.0`). Full plan: [CURSOR_ROADMAP.md § Phase 8](CURSOR_ROADMAP.md#phase-8---explainable-scheduler).
+Branch: `phase-8/scheduler` (target `v0.5.0`). Full plan: [CURSOR_ROADMAP.md § Phase 8](CURSOR_ROADMAP.md#phase-8---explainable-scheduler). Vector math: [SCHEDULER.md](SCHEDULER.md).
 
 ### Phases 9–12
 

@@ -502,25 +502,23 @@ Three roulette triggers share one engine (`SchedulerService`):
 | **Dish tags** (`protein`, `carb`, `style`, …) | Weekly targets, hard/soft constraints, selection reasons |
 | **Family vector** | Similarity only — avoid repeating the same *kind* of meal recently |
 
-Do **not** use ML embeddings (per SPECS §10). Vectors are sparse proportion dicts built **on the fly** from the main recipe.
+Do **not** use ML embeddings (per SPECS §10). Vectors are sparse proportion dicts built **on the fly** from the main recipe. **Full calculation rules:** [docs/SCHEDULER.md](SCHEDULER.md).
 
-#### Family vector algorithm
+#### Family vector (summary)
 
-1. Load main-recipe ingredients (normalized catalog rows).
-2. Convert each line to **grams** (reference scale, not shopping precision):
-   - **Mass:** use existing unit conversion to g.
-   - **Count:** convert via approved ingredient unit conversions to g; skip line if impossible.
-   - **Volume:** convert to ml when possible; if no conversion, treat **1 ml ≈ 1 g** (approximate reference only).
-3. Map each ingredient to `ingredient.family` (fallback: `category`, then canonical bucket). Skip rows with no family.
-4. **Exclude from vector** (keeps dict sparse; negligible impact on distance):
-   - `pantry_item=true`
-   - optional `min_grams` threshold before rollup (e.g. &lt; 5 g spices — drops out before L1 normalize)
-5. Sum grams per family → **L1-normalize to percentages** (sum = 100%). Most dimensions are 0 / absent.
-6. **Dynamic vocabulary:** only families present in the compared dishes participate; a new `family` in the seed never breaks old vectors.
+See **[SCHEDULER.md](SCHEDULER.md)** for the authoritative spec. Summary:
 
-**Similarity:** **cosine similarity** on sparse percentage dicts (same cost as sparse Euclidean; scale-safe). Convert to distance `1 - cosine` for penalties. Compare candidate vs each **eaten** meal in a recency window; apply `max` or decay-weighted penalty. Same dish within N days = hard exclude.
+1. Main-recipe lines → **grams** (mass / volume / count rules).
+2. **Count:** approved unit→g conversion if present; else **default 100 g × count** (never skip the line).
+3. **Volume:** ml path when possible; else **1 ml ≈ 1 g** reference.
+4. Roll up to `ingredient.family` (fallback: category, canonical name).
+5. Exclude `pantry_item` and lines &lt; 5 g before rollup.
+6. L1-normalize to **percentages** (sparse dict).
+7. **Cosine similarity** for distance `1 - cosine` vs recent **eaten** meals; same dish in window = hard exclude.
 
-**History profile:** built at roulette time from `meal_history` (`eaten`, ratings, skips) — no separate embedding table.
+Configurable defaults in `planning_rules.rules_json`: `default_grams_per_count` (100), `vector_min_grams` (5).
+
+**History profile:** built at roulette time from `meal_history` — no stored embedding table.
 
 #### Scoring (soft)
 
