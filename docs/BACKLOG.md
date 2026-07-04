@@ -155,7 +155,9 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [x] Reroll one meal (today and future only)
 - [x] Undo last roulette action
 - [x] Meal swap (manual rebalance, no scoring)
+- [x] Plan dish from gallery (calendar day + lunch/dinner)
 - [x] Selection reasons on auto-picked items
+- [x] Plan UI: generate week, reroll, undo, swap, reasons display
 - [ ] Scheduled roulette (e.g. Friday → next Mon–Sun) + admin settings UI
 - [ ] Telegram “New roulette” notification (configurable planning days)
 

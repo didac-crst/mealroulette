@@ -17,6 +17,9 @@ import {
   sortMealItems,
   todayIso,
   leftoverSourcesFor,
+  selectionReasonsList,
+  weekStartForDate,
+  canRerollMeal,
 } from "./planFormat";
 
 function item(overrides: Partial<MealPlanItem>): MealPlanItem {
@@ -144,5 +147,25 @@ describe("planFormat", () => {
     expect(isLeftoverSourceCandidate(candidates[1], target)).toBe(false);
     expect(isLeftoverSourceCandidate(candidates[2], target)).toBe(false);
     expect(leftoverSourcesFor(target, candidates).map((entry) => entry.id)).toEqual([1]);
+  });
+
+  it("extracts scheduler selection reasons", () => {
+    const withReasons = item({
+      selection_reasons_json: {
+        reasons: ["Helps fish target (1/2 this week)", "Good variety vs neighbouring meals"],
+      },
+    });
+    expect(selectionReasonsList(withReasons)).toEqual([
+      "Helps fish target (1/2 this week)",
+      "Good variety vs neighbouring meals",
+    ]);
+    expect(selectionReasonsList(item({ selection_reasons_json: null }))).toEqual([]);
+  });
+
+  it("computes Monday week start and reroll eligibility", () => {
+    expect(weekStartForDate("2026-07-09")).toBe("2026-07-06");
+    expect(canRerollMeal(item({ date: todayIso(), status: "planned", is_locked: false }))).toBe(true);
+    expect(canRerollMeal(item({ date: "2020-01-01", status: "planned", is_locked: false }))).toBe(false);
+    expect(canRerollMeal(item({ date: todayIso(), status: "planned", is_locked: true }))).toBe(false);
   });
 });

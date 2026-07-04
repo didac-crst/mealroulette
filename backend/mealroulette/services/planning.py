@@ -78,6 +78,7 @@ class PlanningService:
             week_start_date=plan.week_start_date,
             status=plan.status,
             items=[cls.to_item_public(item) for item in items],
+            roulette_undo_available=plan.last_roulette_undo_json is not None,
             created_at=plan.created_at,
             updated_at=plan.updated_at,
         )
@@ -225,6 +226,7 @@ class PlanningService:
         item.dish_id = dish_id
         item.recipe_id = self._resolve_recipe_for_dish(dish_id, recipe_id)
         item.manually_selected = True
+        item.selection_reasons_json = None
         if item.status == MealPlanItemStatus.skipped:
             item.status = MealPlanItemStatus.planned
         item.skip_reason = None
@@ -498,3 +500,43 @@ class PlanningService:
 
         self.db.commit()
         return self.to_item_public(self._load_item(source.id)), self.to_item_public(self._load_item(target.id))
+
+    def assign_meal_slot(
+        self,
+        *,
+        meal_date: date,
+        meal_slot: MealSlot,
+        dish_id: int,
+        recipe_id: int | None = None,
+    ) -> MealPlanItemPublic:
+        reference_date = date.today()
+        if meal_date < reference_date:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Cannot assign a dish to a past meal",
+            )
+
+        plan = self.get_or_create_plan(meal_date)
+        item = next(
+            (candidate for candidate in plan.items if candidate.date == meal_date and candidate.meal_slot == meal_slot),
+            None,
+        )
+        if item is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Meal slot not found in the plan week",
+            )
+        if item.status != MealPlanItemStatus.planned:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Can only assign dishes to planned meals",
+            )
+        if item.is_locked:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Cannot change dish or recipe on a locked meal",
+            )
+
+        self._apply_assignment(item, dish_id, recipe_id)
+        self.db.commit()
+        return self.to_item_public(self._load_item(item.id))

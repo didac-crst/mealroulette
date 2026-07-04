@@ -29,8 +29,37 @@ export type MealPlan = {
   week_start_date: string;
   status: "draft" | "active" | "archived";
   items: MealPlanItem[];
+  roulette_undo_available: boolean;
   created_at: string;
   updated_at: string;
+};
+
+export type MealPlanRouletteResponse = {
+  warnings: string[];
+  variety: {
+    average_distance_to_neighbours: number | null;
+    items: Array<{
+      dish_id: number;
+      dish_name: string;
+      nearest_neighbour_dish: string | null;
+      nearest_neighbour_date?: string;
+      distance: number | null;
+      variety_label: string;
+    }>;
+  };
+  assignments_count: number;
+  total_score: number;
+  can_undo: boolean;
+};
+
+export type MealPlanUndoRouletteResponse = {
+  restored: boolean;
+  can_undo: boolean;
+};
+
+export type MealPlanItemSwapResponse = {
+  source: MealPlanItem;
+  target: MealPlanItem;
 };
 
 export type MealRating = {
@@ -148,6 +177,65 @@ export async function upsertMealRating(
   body: { rating: number; comment?: string | null },
 ): Promise<MealRatingUpsertResponse> {
   return apiRequest<MealRatingUpsertResponse>(`/api/meal-plan-items/${itemId}/rating`, {
+    method: "POST",
+    token,
+    body: JSON.stringify(body),
+  });
+}
+
+export async function generateMealPlanWeek(token: string, mealPlanId: number): Promise<MealPlan> {
+  return apiRequest<MealPlan>(`/api/meal-plans/${mealPlanId}/generate`, {
+    method: "POST",
+    token,
+  });
+}
+
+export async function generateMealPlanWeekDetails(
+  token: string,
+  mealPlanId: number,
+): Promise<MealPlanRouletteResponse> {
+  return apiRequest<MealPlanRouletteResponse>(`/api/meal-plans/${mealPlanId}/generate/details`, {
+    method: "POST",
+    token,
+  });
+}
+
+export async function rerollMealPlanItem(token: string, itemId: number): Promise<MealPlanItem> {
+  return apiRequest<MealPlanItem>(`/api/meal-plan-items/${itemId}/reroll`, {
+    method: "POST",
+    token,
+  });
+}
+
+export async function undoMealPlanRoulette(token: string, mealPlanId: number): Promise<MealPlanUndoRouletteResponse> {
+  return apiRequest<MealPlanUndoRouletteResponse>(`/api/meal-plans/${mealPlanId}/undo-roulette`, {
+    method: "POST",
+    token,
+  });
+}
+
+export async function swapMealPlanItems(
+  token: string,
+  sourceItemId: number,
+  targetItemId: number,
+): Promise<MealPlanItemSwapResponse> {
+  return apiRequest<MealPlanItemSwapResponse>(`/api/meal-plan-items/${sourceItemId}/swap`, {
+    method: "POST",
+    token,
+    body: JSON.stringify({ target_item_id: targetItemId }),
+  });
+}
+
+export async function assignMealPlanSlot(
+  token: string,
+  body: {
+    date: string;
+    meal_slot: MealSlot;
+    dish_id: number;
+    recipe_id?: number | null;
+  },
+): Promise<MealPlanItem> {
+  return apiRequest<MealPlanItem>("/api/meal-plan-items/assign", {
     method: "POST",
     token,
     body: JSON.stringify(body),

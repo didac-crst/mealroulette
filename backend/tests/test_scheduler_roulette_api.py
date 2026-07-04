@@ -1,8 +1,10 @@
 from datetime import date, timedelta
 
 import pytest
+from sqlalchemy import select
 
 from mealroulette.data.import_dishes import DEFAULT_FIXTURE_PATH, import_dish_fixtures
+from mealroulette.models.catalog import Dish
 from mealroulette.services.planning import PlanningService
 
 pytestmark = pytest.mark.integration
@@ -84,3 +86,33 @@ def test_swap_meals_api(client, catalog_seed, user_headers, db_session):
     body = response.json()
     assert body["source"]["dish_id"] == 2
     assert body["target"]["dish_id"] == 1
+
+
+def test_assign_meal_slot_from_dish_gallery(client, catalog_seed, user_headers, db_session):
+    _seed(db_session)
+    from datetime import date, timedelta
+
+    from mealroulette.services.planning import PlanningService
+
+    planning = PlanningService(db_session)
+    reference_today = date(2026, 7, 1)
+    week_start = planning.week_start_for(reference_today + timedelta(days=7))
+    plan = planning.get_or_create_plan(week_start)
+    target_item = next(item for item in plan.items if item.date > reference_today and item.meal_slot.value == "dinner")
+    dish = db_session.scalar(select(Dish).limit(1))
+
+    response = client.post(
+        "/api/meal-plan-items/assign",
+        headers=user_headers,
+        json={
+            "date": target_item.date.isoformat(),
+            "meal_slot": "dinner",
+            "dish_id": dish.id,
+        },
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["id"] == target_item.id
+    assert body["dish_id"] == dish.id
+    assert body["manually_selected"] is True
+    assert body["selection_reasons_json"] is None

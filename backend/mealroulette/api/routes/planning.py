@@ -15,6 +15,7 @@ from mealroulette.schemas.planning import (
     MealPlanItemSwapResponse,
     MealPlanItemUpdateRequest,
     MealPlanPublic,
+    MealPlanSlotAssignRequest,
     MealRatingCreateRequest,
     MealRatingPublic,
     MealRatingUpsertResponse,
@@ -212,6 +213,20 @@ def undo_meal_plan_roulette(
 ) -> MealPlanUndoRouletteResponse:
     restored = SchedulerService(db).undo_last_roulette(meal_plan_id)
     return MealPlanUndoRouletteResponse(restored=restored, can_undo=False)
+
+
+@router.post("/meal-plan-items/assign", response_model=MealPlanItemPublic)
+def assign_meal_plan_slot(
+    payload: MealPlanSlotAssignRequest,
+    _user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MealPlanItemPublic:
+    return PlanningService(db).assign_meal_slot(
+        meal_date=payload.date,
+        meal_slot=payload.meal_slot,
+        dish_id=payload.dish_id,
+        recipe_id=payload.recipe_id,
+    )
 
 
 @router.post("/meal-plan-items/{item_id}/swap", response_model=MealPlanItemSwapResponse)

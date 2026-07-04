@@ -559,7 +559,7 @@ Worker minute poll (same as daily reminder). On success, broadcast **“New roul
 2. Family vector + cosine similarity + unit tests
 3. Scoring engine + 50-attempt generator
 4. Reroll + generate + undo API + temporal neighbours + swap ✅
-5. Plan UI + reasons display
+5. Plan UI + reasons display + plan-from-gallery ✅
 6. Worker scheduled job + Telegram “New roulette”
 7. Tests, docs, release notes `v0.5.0.md`
 

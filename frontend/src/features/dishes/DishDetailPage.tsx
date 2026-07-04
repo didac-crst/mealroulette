@@ -18,6 +18,7 @@ import { useAuth } from "../auth/AuthContext";
 import { formatRecipeDifficulty, formatRecipeTime } from "./effectiveValues";
 import { DishClassificationSummary } from "./DishClassificationSummary";
 import { dishPlaceholderEmoji } from "./dishVisual";
+import { PlanForMealDialog } from "../planning/PlanForMealDialog";
 
 type RecipeSummary = {
   recipe: Recipe;
@@ -38,6 +39,7 @@ export function DishDetailPage() {
   const [loading, setLoading] = useState(true);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [planDialogOpen, setPlanDialogOpen] = useState(false);
 
   const load = useCallback(async () => {
     if (!accessToken || !hasValidId) {
@@ -140,6 +142,9 @@ export function DishDetailPage() {
           <ButtonLink to="/dishes" variant="secondary">
             Back
           </ButtonLink>
+          <button type="button" className="button" onClick={() => setPlanDialogOpen(true)}>
+            Plan for…
+          </button>
           {isAdmin ? <ButtonLink to={`/dishes/${dish.id}/edit`}>Edit dish</ButtonLink> : null}
           {isAdmin ? (
             <ButtonLink to={`/dishes/${dish.id}/recipes/new`}>Add recipe</ButtonLink>
@@ -226,6 +231,17 @@ export function DishDetailPage() {
           </ul>
         )}
       </div>
+
+      {accessToken ? (
+        <PlanForMealDialog
+          open={planDialogOpen}
+          dishId={dish.id}
+          dishName={dish.name}
+          recipes={recipeSummaries.map((summary) => summary.recipe)}
+          accessToken={accessToken}
+          onClose={() => setPlanDialogOpen(false)}
+        />
+      ) : null}
     </section>
   );
 }

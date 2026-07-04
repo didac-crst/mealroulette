@@ -350,6 +350,16 @@ button:disabled {
   font-size: 0.8rem;
 }
 
+.dish-card-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dish-card-plan {
+  width: 100%;
+}
+
 .dish-detail-header {
   align-items: center;
 }
@@ -1019,4 +1029,100 @@ legend {
 
 .ingredient-conversion-row {
   padding: 0.75rem;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(16, 24, 40, 0.45);
+}
+
+.modal-card {
+  width: min(100%, 28rem);
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: white;
+  border: 1px solid #d9e2ec;
+  box-shadow: 0 12px 40px rgba(16, 24, 40, 0.18);
+}
+
+.meal-slot-toggle {
+  display: flex;
+  gap: 1rem;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.meal-slot-toggle legend {
+  padding: 0;
+  margin-bottom: 0.35rem;
+}
+
+.selection-reasons {
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.5rem;
+  background: #f0f4f8;
+  border: 1px solid #d9e2ec;
+}
+
+.selection-reasons-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.selection-reasons-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.9rem;
+}
+
+.plan-roulette-toolbar {
+  gap: 0.75rem;
+}
+
+.plan-roulette-actions {
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.roulette-variety {
+  padding-top: 0.25rem;
+  border-top: 1px solid #d9e2ec;
+}
+
+.variety-list {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.swap-target-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.swap-target-button {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  text-align: left;
+}
+
+.success {
+  color: #0f7b4b;
+  margin: 0;
 }

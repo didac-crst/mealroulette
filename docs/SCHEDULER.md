@@ -182,6 +182,12 @@ The generator fills slots **in calendar order** (Mon lunch → Mon dinner → �
 
 Lock flags stay on each slot; only the dishes move.
 
+### 7.1 Plan from dish gallery
+
+`POST /api/meal-plan-items/assign` with `{ "date", "meal_slot", "dish_id", "recipe_id?" }`.
+
+Creates the meal-plan week if needed, assigns the dish to the chosen lunch/dinner slot (today or future), sets `manually_selected=true`, and clears auto `selection_reasons_json`. UI entry points: dish library card **Plan for…** and dish detail page.
+
 ---
 
 ## 8. Selection reasons (example)

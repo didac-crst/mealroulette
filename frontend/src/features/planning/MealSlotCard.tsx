@@ -21,6 +21,8 @@ import {
   formatReviewStatus,
   formatSlotLabel,
   formatStatus,
+  canRerollMeal,
+  canSwapMeal,
   isFutureMealDate,
   leftoverSourceLabel,
   reviewStatusClassName,
@@ -31,31 +33,43 @@ import {
   showSkipSummary,
   showUndoStatus,
   statusClassName,
+  swappableMeals,
 } from "./planFormat";
+import { SelectionReasons } from "./SelectionReasons";
 import { StarRating } from "./StarRating";
+import { SwapSlotDialog } from "./SwapSlotDialog";
 
 type Props = {
   item: MealPlanItem;
   dishes: Dish[];
+  planItems?: MealPlanItem[];
   leftoverSources: MealPlanItem[];
   sourceLookupItems?: MealPlanItem[];
   accessToken: string;
   mode: "plan" | "review";
+  rouletteBusy?: boolean;
   onChanged: (item: MealPlanItem) => void;
   onError: (message: string) => void;
+  onReroll?: (item: MealPlanItem) => void;
+  onSwap?: (source: MealPlanItem, targetItemId: number) => void;
 };
 
 export function MealSlotCard({
   item,
   dishes,
+  planItems = [],
   leftoverSources,
   sourceLookupItems,
   accessToken,
   mode,
+  rouletteBusy = false,
   onChanged,
   onError,
+  onReroll,
+  onSwap,
 }: Props) {
   const [busy, setBusy] = useState(false);
+  const [swapOpen, setSwapOpen] = useState(false);
   const [rating, setRating] = useState<number | null>(null);
   const [comment, setComment] = useState("");
   const [skipReason, setSkipReason] = useState(item.skip_reason ?? "");
@@ -74,6 +88,10 @@ export function MealSlotCard({
   const statusLabel = mode === "review" ? formatReviewStatus(item) : formatStatus(item.status);
   const statusClass = mode === "review" ? reviewStatusClassName(item) : statusClassName(item.status);
   const showUndo = mode === "review" && showUndoStatus(item);
+  const actionBusy = busy || rouletteBusy;
+  const swapTargets = swappableMeals(item, planItems);
+  const showReroll = mode === "plan" && onReroll && canRerollMeal(item);
+  const showSwap = mode === "plan" && onSwap && canSwapMeal(item);
 
   useEffect(() => {
     if (mode !== "plan" || !item.dish_id) {
@@ -267,11 +285,33 @@ export function MealSlotCard({
             <p className="muted meal-slot-recipe">No recipe for this dish yet.</p>
           ) : null}
 
+          <SelectionReasons item={item} />
+
           <div className="meal-slot-actions">
+            {showReroll ? (
+              <button
+                type="button"
+                className="button button-secondary"
+                disabled={actionBusy}
+                onClick={() => onReroll?.(item)}
+              >
+                Reroll
+              </button>
+            ) : null}
+            {showSwap ? (
+              <button
+                type="button"
+                className="button button-secondary"
+                disabled={actionBusy}
+                onClick={() => setSwapOpen(true)}
+              >
+                Swap
+              </button>
+            ) : null}
             <button
               type="button"
               className="button button-secondary"
-              disabled={busy || (!item.is_locked && !item.dish_id)}
+              disabled={actionBusy || (!item.is_locked && !item.dish_id)}
               onClick={() =>
                 void run(() =>
                   item.is_locked
@@ -283,6 +323,18 @@ export function MealSlotCard({
               {item.is_locked ? "Unlock" : "Lock"}
             </button>
           </div>
+          {swapOpen && onSwap ? (
+            <SwapSlotDialog
+              item={item}
+              targets={swapTargets}
+              busy={actionBusy}
+              onClose={() => setSwapOpen(false)}
+              onConfirm={(targetItemId) => {
+                setSwapOpen(false);
+                onSwap(item, targetItemId);
+              }}
+            />
+          ) : null}
         </>
       ) : null}
 
