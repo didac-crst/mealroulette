@@ -15,9 +15,26 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Phase 7 shipped** as [`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0) (merge `a560e7a`, PR #7).
+**Phase 8 in progress** on branch `phase-8/scheduler` — explainable automatic scheduler, family-vector similarity, scheduled Friday roulette, Telegram “New roulette”. Target: **`v0.5.0`**.
 
-Next up: **Phase 8** — explainable automatic scheduler and meal reroll. See [CURSOR_ROADMAP.md](CURSOR_ROADMAP.md#phase-8---explainable-scheduler).
+See [CURSOR_ROADMAP.md](CURSOR_ROADMAP.md#phase-8---explainable-scheduler).
+
+---
+
+## Technical debt watchlist
+
+Track these as opportunistic refactors, not a standalone rewrite. Prefer tackling them when the affected area is already changing for a feature or bug fix.
+
+- [ ] Add CI gates for frontend build/typecheck and backend lint/format, not only test execution.
+- [ ] Split large frontend page components into smaller form sections, data-loading hooks, validation helpers, and reusable controls:
+  - `frontend/src/features/dishes/RecipeEditPage.tsx`
+  - `frontend/src/features/ingredients/IngredientEditPage.tsx`
+  - `frontend/src/features/planning/MealSlotCard.tsx`
+- [ ] Break up large backend services by separating read/query helpers, mutation workflows, serialization helpers, and domain rules:
+  - `backend/mealroulette/services/catalog.py`
+  - `backend/mealroulette/services/shopping.py`
+- [ ] Split `frontend/src/styles/app.css` into feature-level or component-level style files once UI changes become frequent.
+- [ ] Strengthen frontend coverage around edit forms, planning flows, and shopping list behavior.
 
 ---
 
@@ -31,6 +48,7 @@ Use one branch per milestone, then merge via pull request:
 - `phase-5/planning` — manual meal planning (merged in PR #4, `v0.2.0`)
 - `phase-6/shopping` — shopping lists, ingredient catalog seed, ingredient admin UI (merged in PR #5, `v0.3.0`)
 - `phase-7/telegram-review` — Telegram bot, reminders, on-demand commands, recipe links (merged in PR #7, `v0.4.0`)
+- `phase-8/scheduler` — explainable scheduler, family-vector similarity, scheduled roulette (**in progress**, `v0.5.0`)
 
 ---
 
@@ -44,7 +62,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.2** | Manual planning — weekly plan, review flow, meal actions, ratings, lightweight leftovers | **Done** ([`v0.2.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.2.0), merge `fb20858`, PR #4) |
 | **v0.3** | Shopping list — generation, aggregation, pantry filter, UI, ingredient catalog | **Done** ([`v0.3.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.3.0), merge `88d2675`, PR #5) |
 | **v0.4** | Telegram reminders — settings, scheduled and manual send, bot commands | **Done** ([`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0), merge `a560e7a`, PR #7) |
-| **v0.5** | Automatic scheduler — explainable weekly generation, reroll | Not started |
+| **v0.5** | Automatic scheduler — explainable weekly generation, reroll | **In progress** (branch `phase-8/scheduler`) |
 | **v0.6** | LLM-assisted entry — draft enrichment, review before save | Not started |
 | **v1.0** | Stable home version — mobile UI, backups, auth, scheduler, cooking mode | Not started |
 
@@ -129,14 +147,16 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 
 ### v0.5 — Automatic Scheduler
 
-- [ ] Weekly plan generation
-- [ ] Weekly category targets
-- [ ] Seasonality scoring
-- [ ] Rating scoring
-- [ ] Avoid recent dishes
-- [ ] Similarity scoring
-- [ ] Roulette again
-- [ ] Selection reasons
+- [ ] Planning rules + weekly targets with tolerance
+- [ ] Family-vector similarity (on-the-fly, L1 % + cosine distance)
+- [ ] History-aware scoring (eaten meals, ratings, recency)
+- [ ] Seasonality + rating scoring
+- [ ] Generate week (unlocked slots only; locked preserved)
+- [ ] Reroll one meal (today and future only)
+- [ ] Undo last roulette action
+- [ ] Scheduled roulette (e.g. Friday → next Mon–Sun) + admin settings UI
+- [ ] Telegram “New roulette” notification (configurable planning days)
+- [ ] Selection reasons on auto-picked items
 
 ### v0.6 — LLM-Assisted Entry
 
@@ -173,7 +193,7 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 5 | Manual meal planning | v0.2 | Done (PR #4, `v0.2.0`) |
 | 6 | Shopping lists | v0.3 | Done (PR #5, `v0.3.0`) |
 | 7 | Telegram reminders | v0.4 | Done (PR #7, `v0.4.0`) |
-| 8 | Explainable scheduler | v0.5 | Not started |
+| 8 | Explainable scheduler | v0.5 | In progress (branch `phase-8/scheduler`) |
 | 9 | Cooking mode | v1.0 | Not started |
 | 10 | Backup, export, and import | v1.0 | Not started |
 | 11 | LLM-assisted entry | v0.6 | Not started |
@@ -304,7 +324,11 @@ Branch: merged in PR #7 (`v0.4.0`).
 - [x] Logo assets in `frontend/public/`
 - [x] Backend tests (telegram settings, API, reminder, formatters, updates, recipe links)
 
-### Phases 8–12
+### Phase 8 — Explainable scheduler (in progress)
+
+Branch: `phase-8/scheduler` (target `v0.5.0`). Full plan: [CURSOR_ROADMAP.md § Phase 8](CURSOR_ROADMAP.md#phase-8---explainable-scheduler).
+
+### Phases 9–12
 
 See [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) for full deliverables and acceptance criteria per phase.
 
