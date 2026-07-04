@@ -11,13 +11,17 @@ from mealroulette.schemas.planning import (
     MealPlanItemAteLeftoversRequest,
     MealPlanItemPublic,
     MealPlanItemSkipRequest,
+    MealPlanItemSwapRequest,
+    MealPlanItemSwapResponse,
     MealPlanItemUpdateRequest,
     MealPlanPublic,
     MealRatingCreateRequest,
     MealRatingPublic,
     MealRatingUpsertResponse,
 )
+from mealroulette.schemas.scheduler import MealPlanRouletteResponse, MealPlanUndoRouletteResponse
 from mealroulette.services.planning import PlanningService
+from mealroulette.services.scheduler_service import SchedulerService
 
 router = APIRouter(tags=["planning"])
 
@@ -142,3 +146,80 @@ def list_meal_history(
     db: Session = Depends(get_db),
 ) -> list[MealPlanItemPublic]:
     return PlanningService(db).list_history(limit=limit)
+
+
+@router.post("/meal-plans/{meal_plan_id}/generate", response_model=MealPlanPublic)
+def generate_meal_plan_week(
+    meal_plan_id: int,
+    _user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MealPlanPublic:
+    planning = PlanningService(db)
+    SchedulerService(db).generate_week(meal_plan_id)
+    return planning.to_plan_public(planning._load_plan(meal_plan_id))
+
+
+@router.post("/meal-plans/{meal_plan_id}/generate/details", response_model=MealPlanRouletteResponse)
+def generate_meal_plan_week_details(
+    meal_plan_id: int,
+    _user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MealPlanRouletteResponse:
+    service = SchedulerService(db)
+    result, variety = service.generate_week(meal_plan_id)
+    return MealPlanRouletteResponse(
+        warnings=result.warnings,
+        variety=variety,
+        assignments_count=len(result.assignments),
+        total_score=result.total_score,
+        can_undo=True,
+    )
+
+
+@router.post("/meal-plan-items/{item_id}/reroll", response_model=MealPlanItemPublic)
+def reroll_meal_plan_item(
+    item_id: int,
+    _user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MealPlanItemPublic:
+    planning = PlanningService(db)
+    SchedulerService(db).reroll_item(item_id)
+    return planning.to_item_public(planning._load_item(item_id))
+
+
+@router.post("/meal-plan-items/{item_id}/reroll/details", response_model=MealPlanRouletteResponse)
+def reroll_meal_plan_item_details(
+    item_id: int,
+    _user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MealPlanRouletteResponse:
+    service = SchedulerService(db)
+    result, variety = service.reroll_item(item_id)
+    return MealPlanRouletteResponse(
+        warnings=result.warnings,
+        variety=variety,
+        assignments_count=len(result.assignments),
+        total_score=result.total_score,
+        can_undo=True,
+    )
+
+
+@router.post("/meal-plans/{meal_plan_id}/undo-roulette", response_model=MealPlanUndoRouletteResponse)
+def undo_meal_plan_roulette(
+    meal_plan_id: int,
+    _user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MealPlanUndoRouletteResponse:
+    restored = SchedulerService(db).undo_last_roulette(meal_plan_id)
+    return MealPlanUndoRouletteResponse(restored=restored, can_undo=False)
+
+
+@router.post("/meal-plan-items/{item_id}/swap", response_model=MealPlanItemSwapResponse)
+def swap_meal_plan_items(
+    item_id: int,
+    payload: MealPlanItemSwapRequest,
+    _user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MealPlanItemSwapResponse:
+    source, target = PlanningService(db).swap_items(item_id, payload.target_item_id)
+    return MealPlanItemSwapResponse(source=source, target=target)

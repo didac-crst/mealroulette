@@ -36,6 +36,8 @@ def test_generate_week_fills_future_plan(db_session, catalog_seed, scheduler_see
     assert len(assigned) == 14
     assert all(item.selection_reasons_json for item in assigned)
     assert len(variety["items"]) == 14
+    db_session.refresh(plan)
+    assert plan.last_roulette_undo_json is not None
 
 
 def test_generate_week_preserves_locked_slots(db_session, catalog_seed, scheduler_seed):
@@ -64,3 +66,47 @@ def test_generate_week_preserves_locked_slots(db_session, catalog_seed, schedule
     assert locked_item.dish_id == locked_dish.id
     assert locked_item.is_locked is True
     assert len(result.assignments) == 13
+
+
+def test_reroll_and_undo_restore_previous_assignment(db_session, catalog_seed, scheduler_seed):
+    _seed_dishes(db_session)
+    planning = PlanningService(db_session)
+    reference_today = date(2026, 7, 1)
+    week_start = planning.week_start_for(reference_today + timedelta(days=7))
+    plan = planning.get_or_create_plan(week_start)
+
+    service = SchedulerService(db_session)
+    service.generate_week(plan.id, today=reference_today)
+
+    target_item = next(item for item in plan.items if item.date > reference_today)
+    db_session.refresh(target_item)
+    previous_dish_id = target_item.dish_id
+    previous_recipe_id = target_item.recipe_id
+    assert previous_dish_id is not None
+
+    service.reroll_item(target_item.id, today=reference_today)
+    db_session.refresh(target_item)
+    assert target_item.dish_id is not None
+
+    service.undo_last_roulette(plan.id)
+    db_session.refresh(target_item)
+    assert target_item.dish_id == previous_dish_id
+    assert target_item.recipe_id == previous_recipe_id
+
+    with pytest.raises(Exception) as exc_info:
+        service.undo_last_roulette(plan.id)
+    assert exc_info.value.status_code == 400
+
+
+def test_reroll_rejected_for_past_slot(db_session, catalog_seed, scheduler_seed):
+    _seed_dishes(db_session)
+    planning = PlanningService(db_session)
+    reference_today = date(2026, 7, 10)
+    week_start = planning.week_start_for(reference_today - timedelta(days=3))
+    plan = planning.get_or_create_plan(week_start)
+    past_item = next(item for item in plan.items if item.date < reference_today)
+
+    service = SchedulerService(db_session)
+    with pytest.raises(Exception) as exc_info:
+        service.reroll_item(past_item.id, today=reference_today)
+    assert exc_info.value.status_code == 400

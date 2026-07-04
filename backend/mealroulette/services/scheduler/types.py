@@ -24,11 +24,16 @@ class DishCandidate:
 
 
 @dataclass(frozen=True)
-class EatenMealSnapshot:
+class MealNeighbourSnapshot:
     dish_id: int
     dish_name: str
     meal_date: date
     vector: dict[str, float]
+    source: str = "eaten"
+
+
+# Backward-compatible alias used by catalog loaders and tests.
+EatenMealSnapshot = MealNeighbourSnapshot
 
 
 @dataclass(frozen=True)

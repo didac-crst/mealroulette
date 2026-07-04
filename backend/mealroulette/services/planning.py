@@ -456,3 +456,45 @@ class PlanningService:
             .limit(limit)
         )
         return [self.to_item_public(item) for item in items]
+
+    def swap_items(self, source_item_id: int, target_item_id: int) -> tuple[MealPlanItemPublic, MealPlanItemPublic]:
+        source = self._load_item(source_item_id)
+        target = self._load_item(target_item_id)
+        if source.meal_plan_id != target.meal_plan_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Meals must belong to the same week plan",
+            )
+        if source.id == target.id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Cannot swap a meal with itself",
+            )
+
+        reference_date = date.today()
+        for item in (source, target):
+            if item.status != MealPlanItemStatus.planned:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Can only swap planned meals",
+                )
+            if item.date < reference_date:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Cannot swap past meals",
+                )
+
+        source_dish_id = source.dish_id
+        source_recipe_id = source.recipe_id
+        source_reasons = source.selection_reasons_json
+
+        source.dish_id = target.dish_id
+        source.recipe_id = target.recipe_id
+        source.selection_reasons_json = target.selection_reasons_json
+
+        target.dish_id = source_dish_id
+        target.recipe_id = source_recipe_id
+        target.selection_reasons_json = source_reasons
+
+        self.db.commit()
+        return self.to_item_public(self._load_item(source.id)), self.to_item_public(self._load_item(target.id))

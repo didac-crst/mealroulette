@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-from datetime import date
-
 from mealroulette.models.enums import SeasonalityMode
 from mealroulette.schemas.scheduler import PlanningRulesConfig
 from mealroulette.services.scheduler.similarity import shared_family_keys, similarity_distance
 from mealroulette.services.scheduler.targets import weekly_target_score_delta
-from mealroulette.services.scheduler.types import DishCandidate, EatenMealSnapshot, GenerationSlot
+from mealroulette.services.scheduler.types import DishCandidate, GenerationSlot, MealNeighbourSnapshot
 
 
 def seasonality_score(candidate: DishCandidate, *, month: int, prefer_seasonal: bool) -> tuple[float, str | None]:
@@ -29,45 +27,45 @@ def rating_score(candidate: DishCandidate, *, prefer_high_rated: bool) -> tuple[
     return normalized, reason
 
 
-def recency_weight(days_ago: int, *, window_days: int) -> float:
-    if days_ago < 0:
+def temporal_weight(days_apart: int, *, window_days: int) -> float:
+    if days_apart < 0:
         return 0.0
     if window_days <= 0:
         return 1.0
-    return max(0.2, 1.0 - (days_ago / window_days))
+    return max(0.2, 1.0 - (days_apart / window_days))
 
 
-def history_similarity_penalty(
+def neighbour_similarity_penalty(
     candidate: DishCandidate,
     slot: GenerationSlot,
     *,
-    eaten_meals: list[EatenMealSnapshot],
+    neighbours: list[MealNeighbourSnapshot],
     rules: PlanningRulesConfig,
 ) -> tuple[float, list[str]]:
     reasons: list[str] = []
     max_penalty = 0.0
     max_distance = 0.0
 
-    for meal in eaten_meals:
-        if meal.meal_date >= slot.meal_date:
-            continue
-        days_ago = (slot.meal_date - meal.meal_date).days
-        if days_ago > rules.avoid_similar_meals_within_days:
+    for meal in neighbours:
+        days_apart = abs((slot.meal_date - meal.meal_date).days)
+        if days_apart > rules.avoid_similar_meals_within_days:
             continue
 
         distance = similarity_distance(candidate.vector, meal.vector)
         similarity = 1.0 - distance
         max_distance = max(max_distance, distance)
-        weight = recency_weight(days_ago, window_days=rules.history_window_days)
+        weight = temporal_weight(days_apart, window_days=rules.history_window_days)
         max_penalty = max(max_penalty, weight * similarity)
 
         if similarity >= rules.similarity_threshold:
             shared = shared_family_keys(candidate.vector, meal.vector, min_pct=5.0)
             shared_label = ", ".join(shared[:3]) if shared else "similar ingredient mix"
-            reasons.append(f"Similar to {meal.dish_name} on {meal.meal_date.isoformat()} ({shared_label})")
+            reasons.append(
+                f"Similar to {meal.dish_name} on {meal.meal_date.isoformat()} ({shared_label})"
+            )
 
     if max_distance >= 0.45 and not reasons:
-        reasons.insert(0, f"Good variety vs recent meals (min distance {max_distance:.2f})")
+        reasons.insert(0, f"Good variety vs neighbouring meals (min distance {max_distance:.2f})")
 
     return max_penalty, reasons
 
@@ -77,7 +75,7 @@ def score_candidate_for_slot(
     slot: GenerationSlot,
     *,
     assigned_dish_ids: list[int],
-    eaten_meals: list[EatenMealSnapshot],
+    neighbours: list[MealNeighbourSnapshot],
     rules: PlanningRulesConfig,
 ) -> tuple[float, dict]:
     month = slot.meal_date.month
@@ -90,10 +88,10 @@ def score_candidate_for_slot(
         assigned_dish_ids=assigned_dish_ids,
         rules=rules,
     )
-    similarity_penalty, similarity_reasons = history_similarity_penalty(
+    similarity_penalty, similarity_reasons = neighbour_similarity_penalty(
         candidate,
         slot,
-        eaten_meals=eaten_meals,
+        neighbours=neighbours,
         rules=rules,
     )
 
@@ -105,17 +103,17 @@ def score_candidate_for_slot(
     reasons.extend(target_reasons)
     reasons.extend(similarity_reasons[:2])
 
+    relevant_neighbours = [
+        meal
+        for meal in neighbours
+        if abs((slot.meal_date - meal.meal_date).days) <= rules.avoid_similar_meals_within_days
+    ]
     payload = {
         "reasons": reasons,
         "score": round(total, 3),
         "similarity_distance_max": round(
             max(
-                (
-                    similarity_distance(candidate.vector, meal.vector)
-                    for meal in eaten_meals
-                    if meal.meal_date < slot.meal_date
-                    and (slot.meal_date - meal.meal_date).days <= rules.avoid_similar_meals_within_days
-                ),
+                (similarity_distance(candidate.vector, meal.vector) for meal in relevant_neighbours),
                 default=0.0,
             ),
             3,

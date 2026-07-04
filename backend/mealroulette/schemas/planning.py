@@ -65,6 +65,15 @@ class MealPlanItemAteLeftoversRequest(BaseModel):
     leftover_source_item_id: int | None = None
 
 
+class MealPlanItemSwapRequest(BaseModel):
+    target_item_id: int
+
+
+class MealPlanItemSwapResponse(BaseModel):
+    source: MealPlanItemPublic
+    target: MealPlanItemPublic
+
+
 class MealRatingPublic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

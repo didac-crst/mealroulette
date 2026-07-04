@@ -147,18 +147,17 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 
 ### v0.5 — Automatic Scheduler
 
-- [ ] Planning rules + weekly targets with tolerance
-- [ ] Family-vector similarity ([SCHEDULER.md](SCHEDULER.md): on-the-fly L1 %, count fallback 100 g, cosine distance)
-- [ ] History-aware scoring (eaten meals, ratings, recency)
-- [ ] Seasonality + rating scoring
-- [ ] Generate week (unlocked slots only; locked preserved)
-- [ ] Reroll one meal (today and future only)
-- [ ] Undo last roulette action
+- [x] Planning rules + weekly targets with tolerance
+- [x] Family-vector similarity ([SCHEDULER.md](SCHEDULER.md): on-the-fly L1 %, count fallback 100 g, cosine distance)
+- [x] History-aware scoring (temporal neighbours: eaten + planned + in-run picks)
+- [x] Seasonality + rating scoring
+- [x] Generate week (unlocked slots only; locked preserved)
+- [x] Reroll one meal (today and future only)
+- [x] Undo last roulette action
+- [x] Meal swap (manual rebalance, no scoring)
+- [x] Selection reasons on auto-picked items
 - [ ] Scheduled roulette (e.g. Friday → next Mon–Sun) + admin settings UI
 - [ ] Telegram “New roulette” notification (configurable planning days)
-- [ ] Selection reasons on auto-picked items
-
-### v0.6 — LLM-Assisted Entry
 
 - [ ] LLM dish enrichment
 - [ ] Suggest ingredients

@@ -10,12 +10,13 @@ from mealroulette.services.scheduler.constraints import (
     passes_same_dish_window,
     passes_slot_suitability,
 )
+from mealroulette.services.scheduler.neighbours import build_similarity_neighbours
 from mealroulette.services.scheduler.scoring import score_candidate_for_slot
 from mealroulette.services.scheduler.targets import weekly_target_warnings
 from mealroulette.services.scheduler.types import (
     DishCandidate,
-    EatenMealSnapshot,
     GenerationSlot,
+    MealNeighbourSnapshot,
     SlotAssignment,
     WeekGenerationResult,
 )
@@ -27,7 +28,7 @@ def generate_week_assignments(
     *,
     fixed_assignments: dict[int, int],
     fixed_dates_by_item: dict[int, date],
-    eaten_meals: list[EatenMealSnapshot],
+    eaten_meals: list[MealNeighbourSnapshot],
     rules: PlanningRulesConfig,
     today: date,
     rng: random.Random | None = None,
@@ -42,6 +43,8 @@ def generate_week_assignments(
     best_warnings: list[str] = []
 
     ordered_slots = sorted(slots, key=lambda slot: (slot.meal_date, meal_slot_sort_key(slot.meal_slot)))
+    slot_dates_by_item = {slot.item_id: slot.meal_date for slot in ordered_slots}
+    slot_dates_by_item.update(fixed_dates_by_item)
 
     for _ in range(rules.plan_attempts):
         attempt_assignments: list[SlotAssignment] = []
@@ -51,8 +54,20 @@ def generate_week_assignments(
         for slot in ordered_slots:
             planned_dish_dates = [
                 (dish_id, fixed_dates_by_item[item_id]) for item_id, dish_id in fixed_assignments.items()
-            ] + [(assignment.dish_id, slot.meal_date) for assignment in attempt_assignments]
+            ] + [
+                (assignment.dish_id, slot_dates_by_item[assignment.item_id])
+                for assignment in attempt_assignments
+            ]
             dish_date_index = build_dish_date_index(eaten_meals, planned_dish_dates)
+            neighbours = build_similarity_neighbours(
+                eaten_meals=eaten_meals,
+                fixed_assignments=fixed_assignments,
+                fixed_dates_by_item=fixed_dates_by_item,
+                attempt_assignments=attempt_assignments,
+                slot_dates_by_item=slot_dates_by_item,
+                candidates_by_id=candidates_by_id,
+                exclude_item_id=slot.item_id,
+            )
 
             eligible: list[tuple[DishCandidate, float, dict]] = []
             for candidate in candidates:
@@ -72,7 +87,7 @@ def generate_week_assignments(
                     candidate,
                     slot,
                     assigned_dish_ids=assigned_dish_ids,
-                    eaten_meals=eaten_meals,
+                    neighbours=neighbours,
                     rules=rules,
                 )
                 eligible.append((candidate, score, payload))

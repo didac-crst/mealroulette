@@ -60,3 +60,16 @@ class SchedulerSettingsUpdateRequest(BaseModel):
     target_week_offset: int | None = Field(default=None, ge=0, le=4)
     notify_telegram: bool | None = None
     notify_planning_days: int | None = Field(default=None, ge=1, le=14)
+
+
+class MealPlanRouletteResponse(BaseModel):
+    warnings: list[str]
+    variety: dict
+    assignments_count: int
+    total_score: float
+    can_undo: bool = True
+
+
+class MealPlanUndoRouletteResponse(BaseModel):
+    restored: bool
+    can_undo: bool = False

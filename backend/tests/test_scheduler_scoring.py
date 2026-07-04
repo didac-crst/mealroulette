@@ -2,7 +2,7 @@ from datetime import date
 
 import pytest
 
-from mealroulette.models.enums import MealSlot, SeasonalityMode
+from mealroulette.models.enums import MealPlanItemStatus, MealSlot
 from mealroulette.schemas.scheduler import PlanningRulesConfig, WeeklyTargetSpec
 from mealroulette.services.scheduler.constraints import (
     build_dish_date_index,
@@ -10,11 +10,12 @@ from mealroulette.services.scheduler.constraints import (
     passes_slot_suitability,
     slot_is_regenerable,
 )
-from mealroulette.models.enums import MealPlanItemStatus
-from mealroulette.services.scheduler.scoring import history_similarity_penalty, score_candidate_for_slot
+from mealroulette.services.scheduler.neighbours import build_similarity_neighbours
+from mealroulette.services.scheduler.scoring import neighbour_similarity_penalty, score_candidate_for_slot, temporal_weight
 from mealroulette.services.scheduler.targets import dish_matches_weekly_target, weekly_target_warnings
-from mealroulette.services.scheduler.types import DishCandidate, EatenMealSnapshot, GenerationSlot
+from mealroulette.services.scheduler.types import DishCandidate, GenerationSlot, MealNeighbourSnapshot
 from mealroulette.services.scheduler.variety import build_variety_assessment
+from mealroulette.models.enums import SeasonalityMode
 
 
 def _candidate(
@@ -95,39 +96,100 @@ def test_same_dish_window_blocks_recent_repeat():
     rules = _rules(avoid_same_dish_within_days=7)
     candidate = _candidate(1)
     slot = GenerationSlot(item_id=10, meal_date=date(2026, 7, 10), meal_slot=MealSlot.dinner)
-    dish_dates = build_dish_date_index(
-        [],
-        [(1, date(2026, 7, 8))],
-    )
+    dish_dates = build_dish_date_index([], [(1, date(2026, 7, 8))])
     assert not passes_same_dish_window(candidate, slot, dish_dates=dish_dates, rules=rules)
 
 
-def test_history_penalty_higher_for_similar_meals():
+def test_temporal_weight_is_symmetric():
+    assert temporal_weight(0, window_days=14) == pytest.approx(1.0)
+    assert temporal_weight(7, window_days=14) == pytest.approx(0.5)
+    assert temporal_weight(14, window_days=14) == pytest.approx(0.2)
+
+
+def test_neighbour_penalty_higher_for_similar_meals():
     rules = _rules(similarity_threshold=0.75)
     candidate = _candidate(1, vector={"chicken": 1.0})
     slot = GenerationSlot(item_id=1, meal_date=date(2026, 7, 10), meal_slot=MealSlot.dinner)
-    similar_meal = EatenMealSnapshot(
+    similar_meal = MealNeighbourSnapshot(
         dish_id=2,
         dish_name="Roast chicken",
         meal_date=date(2026, 7, 5),
         vector={"chicken": 1.0},
+        source="eaten",
     )
-    different_meal = EatenMealSnapshot(
+    different_meal = MealNeighbourSnapshot(
         dish_id=3,
         dish_name="Lentil stew",
         meal_date=date(2026, 7, 5),
         vector={"legumes": 1.0},
+        source="eaten",
     )
 
-    similar_penalty, similar_reasons = history_similarity_penalty(
-        candidate, slot, eaten_meals=[similar_meal], rules=rules
+    similar_penalty, similar_reasons = neighbour_similarity_penalty(
+        candidate, slot, neighbours=[similar_meal], rules=rules
     )
-    different_penalty, _ = history_similarity_penalty(
-        candidate, slot, eaten_meals=[different_meal], rules=rules
+    different_penalty, _ = neighbour_similarity_penalty(
+        candidate, slot, neighbours=[different_meal], rules=rules
     )
 
     assert similar_penalty > different_penalty
     assert any("Similar to Roast chicken" in reason for reason in similar_reasons)
+
+
+def test_future_planned_neighbour_penalizes_closer_slots_more():
+    rules = _rules(similarity_threshold=0.75, avoid_similar_meals_within_days=14)
+    candidate = _candidate(1, vector={"pasta": 1.0})
+    slot = GenerationSlot(item_id=10, meal_date=date(2026, 7, 10), meal_slot=MealSlot.lunch)
+    close_neighbour = MealNeighbourSnapshot(
+        dish_id=2,
+        dish_name="Fixed risotto",
+        meal_date=date(2026, 7, 11),
+        vector={"pasta": 1.0},
+        source="planned",
+    )
+    far_neighbour = MealNeighbourSnapshot(
+        dish_id=3,
+        dish_name="Fixed risotto",
+        meal_date=date(2026, 7, 13),
+        vector={"pasta": 1.0},
+        source="planned",
+    )
+
+    close_penalty, _ = neighbour_similarity_penalty(candidate, slot, neighbours=[close_neighbour], rules=rules)
+    far_penalty, _ = neighbour_similarity_penalty(candidate, slot, neighbours=[far_neighbour], rules=rules)
+
+    assert close_penalty > far_penalty
+
+
+def test_build_similarity_neighbours_includes_fixed_and_generated():
+    eaten = [
+        MealNeighbourSnapshot(
+            dish_id=99,
+            dish_name="Old pasta",
+            meal_date=date(2026, 7, 1),
+            vector={"pasta": 1.0},
+            source="eaten",
+        )
+    ]
+    fixed = {20: 2}
+    fixed_dates = {20: date(2026, 7, 9)}
+    attempt = []
+    candidates = {
+        2: _candidate(2, name="Locked fish", vector={"fish": 1.0}),
+        3: _candidate(3, name="New veg", vector={"vegetables": 1.0}),
+    }
+
+    neighbours = build_similarity_neighbours(
+        eaten_meals=eaten,
+        fixed_assignments=fixed,
+        fixed_dates_by_item=fixed_dates,
+        attempt_assignments=attempt,
+        slot_dates_by_item={**fixed_dates, 30: date(2026, 7, 10)},
+        candidates_by_id=candidates,
+    )
+
+    assert len(neighbours) == 2
+    assert {meal.source for meal in neighbours} == {"eaten", "planned"}
 
 
 def test_weekly_target_matching_and_warnings():
@@ -142,46 +204,50 @@ def test_weekly_target_matching_and_warnings():
     assert any("below minimum" in warning for warning in warnings)
 
 
-def test_score_candidate_prefers_different_history():
+def test_score_candidate_prefers_different_neighbours():
     rules = _rules(similarity_threshold=0.75, prefer_seasonal=False, prefer_high_rated=False)
     slot = GenerationSlot(item_id=1, meal_date=date(2026, 7, 10), meal_slot=MealSlot.dinner)
     similar = _candidate(1, name="Similar", vector={"pasta": 1.0})
     different = _candidate(2, name="Different", vector={"fish": 1.0})
-    eaten = [
-        EatenMealSnapshot(
+    neighbours = [
+        MealNeighbourSnapshot(
             dish_id=99,
             dish_name="Recent pasta",
             meal_date=date(2026, 7, 5),
             vector={"pasta": 1.0},
+            source="eaten",
         )
     ]
 
     similar_score, _ = score_candidate_for_slot(
-        similar, slot, assigned_dish_ids=[], eaten_meals=eaten, rules=rules
+        similar, slot, assigned_dish_ids=[], neighbours=neighbours, rules=rules
     )
     different_score, _ = score_candidate_for_slot(
-        different, slot, assigned_dish_ids=[], eaten_meals=eaten, rules=rules
+        different, slot, assigned_dish_ids=[], neighbours=neighbours, rules=rules
     )
 
     assert different_score > similar_score
 
 
 def test_variety_assessment_labels_distance():
-    recent = EatenMealSnapshot(
-        dish_id=1,
-        dish_name="Pasta",
-        meal_date=date(2026, 6, 28),
-        vector={"pasta": 1.0},
-    )
+    neighbours = [
+        MealNeighbourSnapshot(
+            dish_id=1,
+            dish_name="Pasta",
+            meal_date=date(2026, 6, 28),
+            vector={"pasta": 1.0},
+            source="eaten",
+        )
+    ]
     assessment = build_variety_assessment(
         new_assignments=[
             (2, "Fish stew", {"fish": 1.0}),
             (3, "More pasta", {"pasta": 1.0}),
         ],
-        recent_meals=[recent],
+        neighbours=neighbours,
     )
 
     by_name = {item["dish_name"]: item for item in assessment["items"]}
     assert by_name["Fish stew"]["variety_label"] == "very different"
     assert by_name["More pasta"]["variety_label"] == "very similar"
-    assert assessment["average_distance_to_recent"] is not None
+    assert assessment["average_distance_to_neighbours"] is not None

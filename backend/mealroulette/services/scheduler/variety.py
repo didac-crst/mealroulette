@@ -1,40 +1,40 @@
 from __future__ import annotations
 
-from mealroulette.services.scheduler.types import EatenMealSnapshot
+from mealroulette.services.scheduler.similarity import similarity_distance
+from mealroulette.services.scheduler.types import MealNeighbourSnapshot
 
 
 def build_variety_assessment(
     *,
     new_assignments: list[tuple[int, str, dict[str, float]]],
-    recent_meals: list[EatenMealSnapshot],
+    neighbours: list[MealNeighbourSnapshot],
 ) -> dict:
     """Build a user-facing variety summary without embedding projection.
 
     Each new assignment is (dish_id, dish_name, family_vector).
+    Neighbours include eaten history and other meals in the plan window.
     """
     if not new_assignments:
-        return {"average_distance_to_recent": None, "items": []}
-
-    from mealroulette.services.scheduler.similarity import similarity_distance
+        return {"average_distance_to_neighbours": None, "items": []}
 
     items: list[dict] = []
     distances: list[float] = []
 
     for dish_id, dish_name, vector in new_assignments:
-        if not recent_meals:
+        if not neighbours:
             items.append(
                 {
                     "dish_id": dish_id,
                     "dish_name": dish_name,
-                    "nearest_recent_dish": None,
+                    "nearest_neighbour_dish": None,
                     "distance": None,
-                    "variety_label": "no recent history",
+                    "variety_label": "no neighbours in window",
                 }
             )
             continue
 
         nearest = min(
-            recent_meals,
+            neighbours,
             key=lambda meal: similarity_distance(vector, meal.vector),
         )
         distance = similarity_distance(vector, nearest.vector)
@@ -43,8 +43,9 @@ def build_variety_assessment(
             {
                 "dish_id": dish_id,
                 "dish_name": dish_name,
-                "nearest_recent_dish": nearest.dish_name,
-                "nearest_recent_date": nearest.meal_date.isoformat(),
+                "nearest_neighbour_dish": nearest.dish_name,
+                "nearest_neighbour_date": nearest.meal_date.isoformat(),
+                "nearest_neighbour_source": nearest.source,
                 "distance": round(distance, 3),
                 "variety_label": _variety_label(distance),
             }
@@ -52,7 +53,7 @@ def build_variety_assessment(
 
     average = round(sum(distances) / len(distances), 3) if distances else None
     return {
-        "average_distance_to_recent": average,
+        "average_distance_to_neighbours": average,
         "items": items,
     }
 
