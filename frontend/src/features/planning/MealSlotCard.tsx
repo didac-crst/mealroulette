@@ -351,23 +351,25 @@ export function MealSlotCard({
         </>
       ) : null}
 
-      {mode === "today" && item.dish_id ? (
+      {mode === "today" && (item.dish_id || showReviewExecutionActions(item)) ? (
         <div className="meal-slot-actions meal-slot-actions-primary today-meal-primary-actions">
-          {canOpenCookMode(item) ? (
-            cookRecipeId ? (
-              <Link to={`/recipes/${cookRecipeId}/cook`} className="button">
-                Cook
-              </Link>
-            ) : cookRecipesLoading ? (
-              <button type="button" className="button" disabled>
-                Cook
-              </button>
+          {item.dish_id ? (
+            canOpenCookMode(item) ? (
+              cookRecipeId ? (
+                <Link to={`/recipes/${cookRecipeId}/cook`} className="button">
+                  Cook
+                </Link>
+              ) : cookRecipesLoading ? (
+                <button type="button" className="button" disabled>
+                  Cook
+                </button>
+              ) : (
+                <span className="muted">No recipe to cook</span>
+              )
             ) : (
-              <span className="muted">No recipe to cook</span>
+              <span className="muted">Leftovers — no cooking steps</span>
             )
-          ) : (
-            <span className="muted">Leftovers — no cooking steps</span>
-          )}
+          ) : null}
           {showReviewExecutionActions(item) && onReviewToggle ? (
             <button type="button" className="button button-secondary" onClick={onReviewToggle}>
               {reviewExpanded ? "Hide review" : "Review"}

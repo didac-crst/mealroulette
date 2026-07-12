@@ -93,16 +93,15 @@ export function useCookingStepTimers(onTimerFinished?: (stepId: number) => void)
       if (!hasRunningCookingTimers(timersRef.current)) {
         return;
       }
-      setTimers((current) => {
-        const ticked = tickCookingTimers(current);
-        if (!ticked) {
-          return current;
-        }
-        for (const stepId of ticked.finishedStepIds) {
-          onTimerFinishedRef.current?.(stepId);
-        }
-        return ticked.timers;
-      });
+      const ticked = tickCookingTimers(timersRef.current);
+      if (!ticked) {
+        return;
+      }
+      timersRef.current = ticked.timers;
+      setTimers(ticked.timers);
+      for (const stepId of ticked.finishedStepIds) {
+        onTimerFinishedRef.current?.(stepId);
+      }
     }, 1000);
     return () => window.clearInterval(timerId);
   }, []);

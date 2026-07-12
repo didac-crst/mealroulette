@@ -52,7 +52,7 @@ Use one branch per milestone, then merge via pull request:
 - `phase-7/telegram-review` — Telegram bot, reminders, on-demand commands, recipe links (merged in PR #7, `v0.4.0`)
 - `phase-8/scheduler` — explainable scheduler, family-vector similarity, scheduled roulette (merged, `v0.5.0`, PR #8)
 - `phase-9/computed-recipe-traits` — public keys, food groups, computed recipe traits, taxonomy & resolver (merged in PR #9, `v0.6.0`)
-- `phase-10/cooking-mode` — read-only cooking view (in progress)
+- `phase-10/cooking-mode` — interactive cooking mode with step timers & Telegram alerts (PR #10)
 
 ---
 
@@ -121,7 +121,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [x] Meal history API
 - [x] Meal ratings (per meal slot, linked to dish/recipe)
 - [x] Review flow (`review_saved_at`, needs-review filter)
-- [x] Mobile polish (bottom tabs, today-first landing, touch-friendly actions)
+- [x] Mobile polish (bottom tabs, today-first landing (Phase 10), touch-friendly actions)
 - [x] Reroll / roulette again (Phase 8 scheduler)
 
 ### v0.3 — Shopping List

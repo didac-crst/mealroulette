@@ -35,8 +35,8 @@ Timer state is **local to the cooking session** (lost on refresh or leaving cook
 | --- | --- |
 | Read-only step navigation | Recipe editing |
 | **Today home** with Cook + Review entry | Step-level ingredient mapping |
-| Full recipe ingredient list | Persistent cooking sessions (DB) |
-| Mobile-first layout | Voice / hands-free |
+| Full recipe ingredient list | Voice / hands-free |
+| Mobile-first layout | Scheduler integration |
 | Step countdown timers (`timer_seconds` on steps) | Persistent cooking sessions (DB) |
 | In-browser gentle timer chime + optional system notification | Per-user Telegram targeting |
 | Telegram alert when timer ends (subscribers) | Per-user / household Telegram targeting |

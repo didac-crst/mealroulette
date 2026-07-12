@@ -97,6 +97,8 @@ export function RecipeCookingPage() {
     resetTimer,
     dismissTimer,
   } = useCookingStepTimers(handleTimerFinished);
+  const timersRef = useRef(timers);
+  timersRef.current = timers;
 
   const cancelTelegramForStep = useCallback(
     async (stepId: number) => {
@@ -135,6 +137,15 @@ export function RecipeCookingPage() {
           step_number: step.step_number,
           remaining_seconds: remainingSeconds,
         });
+        const liveTimer = timersRef.current[stepId];
+        const stillRunning =
+          liveTimer?.running === true && !liveTimer.finished && !liveTimer.acknowledged;
+        if (!stillRunning) {
+          if (alert.telegram_scheduled) {
+            await cancelCookingTimerAlert(accessToken, alert.id);
+          }
+          return;
+        }
         if (alert.telegram_scheduled) {
           telegramAlertIdsRef.current[stepId] = alert.id;
         }

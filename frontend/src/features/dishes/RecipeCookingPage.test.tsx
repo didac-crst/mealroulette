@@ -11,6 +11,23 @@ const mockFetchRecipeIngredients = vi.fn();
 const mockFetchUnits = vi.fn();
 const mockFetchIngredients = vi.fn();
 
+const mockScheduleCookingTimerAlert = vi.fn();
+const mockCancelCookingTimerAlert = vi.fn();
+const mockCancelCookingTimerAlertForStep = vi.fn();
+
+vi.mock("../../api/cooking", () => ({
+  scheduleCookingTimerAlert: (...args: unknown[]) => mockScheduleCookingTimerAlert(...args),
+  cancelCookingTimerAlert: (...args: unknown[]) => mockCancelCookingTimerAlert(...args),
+  cancelCookingTimerAlertForStep: (...args: unknown[]) => mockCancelCookingTimerAlertForStep(...args),
+}));
+
+vi.mock("./cookingTimerAlarm", () => ({
+  primeCookingTimerAudio: vi.fn(),
+  requestCookingTimerNotificationPermission: vi.fn().mockResolvedValue(undefined),
+  startCookingTimerAlarm: vi.fn(() => vi.fn()),
+  stopCookingTimerAlarm: vi.fn(),
+}));
+
 vi.mock("../../api/catalog", () => ({
   fetchRecipe: (...args: unknown[]) => mockFetchRecipe(...args),
   fetchDish: (...args: unknown[]) => mockFetchDish(...args),
@@ -92,6 +109,9 @@ function renderCookingPage(recipeId = "42") {
 describe("RecipeCookingPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockScheduleCookingTimerAlert.mockResolvedValue({ id: 99, telegram_scheduled: false });
+    mockCancelCookingTimerAlert.mockResolvedValue(undefined);
+    mockCancelCookingTimerAlertForStep.mockResolvedValue(undefined);
     mockFetchRecipe.mockResolvedValue(recipe);
     mockFetchDish.mockResolvedValue(dish);
     mockFetchRecipeSteps.mockResolvedValue([
@@ -305,7 +325,9 @@ describe("RecipeCookingPage", () => {
       renderCookingPage();
 
       fireEvent.click(await screen.findByRole("button", { name: "Start timer" }));
-      vi.advanceTimersByTime(2000);
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(2000);
+      });
       fireEvent.click(screen.getByRole("button", { name: "Next" }));
 
       expect(screen.getByLabelText("Active cooking timers")).toBeInTheDocument();

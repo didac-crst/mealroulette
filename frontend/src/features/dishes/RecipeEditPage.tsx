@@ -32,7 +32,7 @@ import {
 import { ApiError } from "../../api/client";
 import { ButtonLink } from "../../components/ButtonLink";
 import { useAuth } from "../auth/AuthContext";
-import { formatStepTimerLabel, timerMinutesFromSeconds, timerSecondsFromMinutesInput } from "./recipeCooking";
+import { formatStepTimerLabel, stepTimerDurationSeconds, timerMinutesFromSeconds, timerSecondsFromMinutesInput } from "./recipeCooking";
 import { RECIPE_TYPE_OPTIONS } from "./classification";
 import { DIFFICULTY_OPTIONS } from "./constants";
 import { DishInheritedContext } from "./DishClassificationSummary";
@@ -527,10 +527,8 @@ function StepEditorRow({
     }
   }
 
-  const timerLabel =
-    step.timer_seconds != null && step.timer_seconds > 0
-      ? formatStepTimerLabel(step.timer_seconds)
-      : null;
+  const timerSeconds = stepTimerDurationSeconds(step);
+  const timerLabel = timerSeconds != null ? formatStepTimerLabel(timerSeconds) : null;
 
   if (editing) {
     return (
