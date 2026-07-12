@@ -1,14 +1,14 @@
 # Cooking mode (Phase 10)
 
-**Status:** Implemented on branch `phase-10/cooking-mode`  
-**Target product version:** v1.0 (first slice; no backend changes)  
+**Status:** Released in [`v0.7.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.7.0)  
+**Target product version:** v0.7 (first slice toward v1.0)  
 **Depends on:** v0.6.0 catalog keys, recipe steps, and recipe ingredients APIs
 
 ## Goal
 
 Add a cooking-focused recipe view: a mobile-friendly, distraction-free mode for following recipe steps while cooking.
 
-This phase must **not** change scheduler, weekly goals, taxonomy, shopping aggregation, recipe trait computation, or Telegram behaviour.
+This phase must **not** change scheduler, weekly goals, taxonomy, or shopping aggregation. Existing Telegram **reminder** behaviour is unchanged; cooking adds optional **timer alerts** for subscribers.
 
 ## User flow
 

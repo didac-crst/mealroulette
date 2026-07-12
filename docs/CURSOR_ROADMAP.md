@@ -139,14 +139,14 @@ The default commit hook should fail if tests fail. Lint/format hooks may run in 
 
 ## Implementation Phases
 
-Phases 0–9 shipped through **`v0.6.0`**. Phases 10–13 cover cooking mode, backup, LLM/localization, and v1 hardening.
+Phases 0–10 shipped through **`v0.7.0`**. Phases 11–13 cover backup, LLM/localization, and v1 hardening.
 
 | Phase | Name | Target version |
 | --- | --- | --- |
 | 9 | Computed recipe traits & catalog keys | v0.6 |
-| 10 | Cooking mode | v1.0 |
+| 10 | Cooking mode | v0.7 |
 | 11 | Backup, export, and import | v1.0 |
-| 12 | LLM-assisted entry & localization | v0.7 |
+| 12 | LLM-assisted entry & localization | v0.8 |
 | 13 | v1 hardening | v1.0 |
 
 ### Phase 0 - Project Bootstrap
@@ -797,19 +797,19 @@ Do **not** in Phase 9 unless explicitly approved later:
 
 ### Phase 10 - Cooking Mode
 
-**Status:** Implemented on `phase-10/cooking-mode` (PR pending). Spec: [COOKING_MODE.md](COOKING_MODE.md).
+**Status:** Done — [`v0.7.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.7.0), PR [#10](https://github.com/didac-crst/mealroulette/pull/10). Spec: [COOKING_MODE.md](COOKING_MODE.md).
 
-First pass (frontend-only, no DB migrations):
+Delivered:
 
 - **`/today` home** — today's lunch/dinner cards; default route after login
 - **Cook** and **Review** on each today card (Review expands inline; week Review tab unchanged)
 - Route `/recipes/:recipeId/cook` and **Cook** entry from recipe detail
-- Step-by-step read-only viewer with Previous / Next
-- Optional **step timer** (minutes on each step in recipe edit → countdown in cooking mode)
-- Full recipe ingredient list in a collapsible panel
+- Step-by-step cooking viewer with Previous / Next, step timers, and running-timers bar
+- Browser chime + optional notification when a timer finishes; Telegram timer alerts (migration `026`)
+- Full recipe ingredient list in a collapsible panel; dish library real-time search
 - Mobile-first layout; local step index only (no persistent session)
 
-Deferred to later Phase 10+ slices (see spec):
+Deferred to later slices (see spec):
 
 - Thermomix step badges and appliance layout
 - Persistent cooking sessions, voice, Telegram deep links

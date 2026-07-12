@@ -15,11 +15,11 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Phase 10 — Cooking mode** — PR [#10](https://github.com/didac-crst/mealroulette/pull/10) open on `phase-10/cooking-mode` (from `main` after `v0.6.0`).
+**Phase 11 — Backup, export, and import** on `main` (from `v0.7.0`).
 
-Spec: [COOKING_MODE.md](COOKING_MODE.md). See [CURSOR_ROADMAP.md § Phase 10](CURSOR_ROADMAP.md#phase-10---cooking-mode).
+See [CURSOR_ROADMAP.md § Phase 11](CURSOR_ROADMAP.md#phase-11---backup-export-and-import).
 
-**v0.6 shipped** as [`v0.6.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.6.0) — catalog keys, computed traits, taxonomy, resolver, taxonomy navigator UI.
+**v0.7 shipped** as [`v0.7.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.7.0) — Today home, cooking mode, step timers, Telegram cooking alerts, dish search. Release notes: [docs/releases/v0.7.0.md](releases/v0.7.0.md).
 
 ---
 
@@ -68,9 +68,10 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.4** | Telegram reminders — settings, scheduled and manual send, bot commands | **Done** ([`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0), merge `a560e7a`, PR #7) |
 | **v0.5** | Automatic scheduler — explainable weekly generation, reroll | **Done** ([`v0.5.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.5.0)) |
 | **v0.6** | Catalog keys & computed traits — public keys, food groups, recipe trait metadata | **Done** ([`v0.6.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.6.0), merge `322c30c`, PR #9) |
-| **v0.7** | LLM-assisted entry — draft enrichment, review before save | Not started |
+| **v0.7** | Cooking mode — Today home, step-by-step cooking, timers, dish search | **Done** ([`v0.7.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.7.0), merge `9f8fe92`, PR #10) |
+| **v0.8** | LLM-assisted entry — draft enrichment, review before save | Not started |
 | **Future** | Composable meals — complete / half / dessert roles, paired halves, manual desserts | Backlog only (see below) |
-| **v1.0** | Stable home version — mobile UI, backups, auth, scheduler, cooking mode | Not started |
+| **v1.0** | Stable home version — backups, auth hardening, scheduler reliability | Not started |
 
 > **v0.6 shipped** as [`v0.6.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.6.0). Catalog keys, computed traits, taxonomy APIs, resolver, taxonomy navigator UI. Release notes: [docs/releases/v0.6.0.md](releases/v0.6.0.md).
 
@@ -213,7 +214,15 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [ ] Recipe-driven validation (≥95% auto-resolve target)
 - [ ] Promote remaining reviewed proposal rows in batches when evidence supports
 
-### v0.7 — LLM-Assisted Entry
+### v0.7 — Cooking mode
+
+- [x] Today home (`/today`) with Cook + Review
+- [x] Cooking mode route and step navigation
+- [x] Step timers with browser chime and Telegram alerts
+- [x] Dish library real-time search
+- [x] Release notes [`v0.7.0.md`](releases/v0.7.0.md)
+
+### v0.8 — LLM-Assisted Entry
 
 - [ ] LLM dish enrichment
 - [ ] Suggest ingredients
@@ -289,9 +298,9 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 7 | Telegram reminders | v0.4 | Done (PR #7, `v0.4.0`) |
 | 8 | Explainable scheduler | v0.5 | Done (`v0.5.0`) |
 | 9 | Computed recipe traits & catalog keys | v0.6 | Done (PR #9, `v0.6.0`) |
-| 10 | Cooking mode | v1.0 | In progress |
+| 10 | Cooking mode | v0.7 | Done (PR #10, `v0.7.0`) |
 | 11 | Backup, export, and import | v1.0 | Not started |
-| 12 | LLM-assisted entry & localization | v0.7 | Not started |
+| 12 | LLM-assisted entry & localization | v0.8 | Not started |
 | 13 | v1 hardening | v1.0 | Not started |
 
 ### Phase 0 — Project bootstrap ✅
@@ -461,9 +470,9 @@ Shipped in `v0.6.0` via PR #9. Full plan: [CURSOR_ROADMAP.md § Phase 9](CURSOR_
 - [x] Release notes `v0.6.0.md`
 - [x] Validation: `make test-backend` (189 passed, 2 skipped), frontend 18 passed, `npm run build` green; `make validate-taxonomy` — 0 blockers
 
-### Phase 10 — Cooking mode 🚧
+### Phase 10 — Cooking mode ✅
 
-Branch: `phase-10/cooking-mode`. Spec: [COOKING_MODE.md](COOKING_MODE.md).
+Branch: `phase-10/cooking-mode`. Spec: [COOKING_MODE.md](COOKING_MODE.md). Merged PR [#10](https://github.com/didac-crst/mealroulette/pull/10), tag [`v0.7.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.7.0), merge `9f8fe92`.
 
 - [x] Phase 10 spec (`docs/COOKING_MODE.md`)
 - [x] **`/today` home** — default route; lunch/dinner cards with Cook + Review
@@ -477,7 +486,7 @@ Branch: `phase-10/cooking-mode`. Spec: [COOKING_MODE.md](COOKING_MODE.md).
 - [x] Dish library real-time search (client-side)
 - [x] Frontend tests (navigation, boundaries, no-step fallback)
 - [x] Manual mobile QA
-- [ ] Merge PR and tag when v1.0 slice complete
+- [x] Merge PR and tag [`v0.7.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.7.0)
 
 Deferred (not first pass): Thermomix layout, persistent sessions, Telegram entry.
 
