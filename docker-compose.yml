@@ -10,6 +10,7 @@ services:
       - "5432:5432"
     volumes:
       - mealroulette-postgres-data:/var/lib/postgresql/data
+      - ./scripts/init-test-db.sh:/docker-entrypoint-initdb.d/01-init-test-db.sh:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mealroulette} -d ${POSTGRES_DB:-mealroulette}"]
       interval: 5s
@@ -30,6 +31,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health/ready')\""]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
     volumes:
       - ./backups:/backups
 
@@ -47,7 +54,7 @@ services:
       db:
         condition: service_healthy
       api:
-        condition: service_started
+        condition: service_healthy
     volumes:
       - ./backups:/backups
 
@@ -57,9 +64,15 @@ services:
     ports:
       - "3000:3000"
     environment:
-      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+      VITE_DEV_PROXY_TARGET: http://api:8000
+      VITE_API_URL: ${VITE_API_URL:-}
+    volumes:
+      - ./frontend:/app
+      - frontend-node-modules:/app/node_modules
     depends_on:
-      - api
+      api:
+        condition: service_healthy
 
 volumes:
   mealroulette-postgres-data:
+  frontend-node-modules:

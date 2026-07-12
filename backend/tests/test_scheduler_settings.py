@@ -57,6 +57,24 @@ def test_should_run_scheduled_once_per_local_day(db_session):
 
 
 @pytest.mark.integration
+def test_should_run_scheduled_after_run_time_same_day(db_session):
+    service = SchedulerSettingsService(db_session)
+    row = service.get_row()
+    row.enabled = True
+    row.run_weekday = 4
+    row.run_time = time(18, 0)
+    row.timezone = "UTC"
+    row.last_roulette_at = None
+    db_session.commit()
+
+    friday_1830 = datetime(2026, 7, 3, 18, 30, tzinfo=UTC)
+    assert service.should_run_scheduled(row, now=friday_1830) is True
+
+    friday_1759 = datetime(2026, 7, 3, 17, 59, tzinfo=UTC)
+    assert service.should_run_scheduled(row, now=friday_1759) is False
+
+
+@pytest.mark.integration
 def test_record_roulette_success_clears_error(db_session):
     service = SchedulerSettingsService(db_session)
     row = service.get_row()

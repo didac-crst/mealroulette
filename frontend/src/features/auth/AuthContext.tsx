@@ -24,6 +24,31 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+const SESSION_RESTORE_ATTEMPTS = 5;
+const SESSION_RESTORE_DELAY_MS = 1_000;
+
+async function sleep(ms: number): Promise<void> {
+  await new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+async function fetchMeWithRetry(accessToken: string): Promise<UserPublic> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < SESSION_RESTORE_ATTEMPTS; attempt += 1) {
+    try {
+      return await authApi.fetchMe(accessToken);
+    } catch (error) {
+      lastError = error;
+      if (error instanceof ApiError && error.status === 401) {
+        throw error;
+      }
+      if (attempt < SESSION_RESTORE_ATTEMPTS - 1) {
+        await sleep(SESSION_RESTORE_DELAY_MS * (attempt + 1));
+      }
+    }
+  }
+  throw lastError;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserPublic | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -48,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const me = await authApi.fetchMe(stored.accessToken);
+      const me = await fetchMeWithRetry(stored.accessToken);
       applySession(stored.accessToken, me);
     } catch (error) {
       if (error instanceof ApiError && error.status === 401) {
@@ -58,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             accessToken: tokens.access_token,
             refreshToken: tokens.refresh_token,
           });
-          const me = await authApi.fetchMe(tokens.access_token);
+          const me = await fetchMeWithRetry(tokens.access_token);
           applySession(tokens.access_token, me);
           setLoading(false);
           return;
@@ -84,7 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         accessToken: tokens.access_token,
         refreshToken: tokens.refresh_token,
       });
-      const me = await authApi.fetchMe(tokens.access_token);
+      const me = await fetchMeWithRetry(tokens.access_token);
       applySession(tokens.access_token, me);
     },
     [applySession],

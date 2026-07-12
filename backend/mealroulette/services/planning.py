@@ -8,6 +8,8 @@ from sqlalchemy.orm import Session, selectinload
 from mealroulette.models.catalog import Dish, Recipe
 from mealroulette.models.enums import MealPlanItemStatus, MealPlanStatus, MealSlot
 from mealroulette.models.planning import MealPlan, MealPlanItem, MealRating
+from mealroulette.services.household_time import household_local_today
+from mealroulette.services.scheduler.undo import clear_undo_snapshot
 from mealroulette.schemas.planning import (
     MealPlanCreateRequest,
     MealPlanItemPublic,
@@ -168,7 +170,7 @@ class PlanningService:
         return self._load_plan(plan.id)
 
     def get_current_plan(self) -> MealPlanPublic:
-        plan = self.get_or_create_plan(date.today())
+        plan = self.get_or_create_plan(household_local_today(self.db))
         return self.to_plan_public(plan)
 
     def get_plan_by_week(self, week_start: date) -> MealPlanPublic:
@@ -219,6 +221,7 @@ class PlanningService:
             item.dish_id = None
             item.recipe_id = None
             item.manually_selected = False
+            item.selection_reasons_json = None
             return
         dish = self.db.get(Dish, dish_id)
         if dish is None:
@@ -371,6 +374,9 @@ class PlanningService:
                 detail="Assign a dish before locking the meal",
             )
         item.is_locked = True
+        plan = self.db.get(MealPlan, item.meal_plan_id)
+        if plan is not None:
+            clear_undo_snapshot(plan)
         self.db.commit()
         return self.to_item_public(self._load_item(item.id))
 
@@ -473,8 +479,13 @@ class PlanningService:
                 detail="Cannot swap a meal with itself",
             )
 
-        reference_date = date.today()
+        reference_date = household_local_today(self.db)
         for item in (source, target):
+            if item.is_locked:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Cannot swap locked meals",
+                )
             if item.status != MealPlanItemStatus.planned:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
@@ -498,6 +509,9 @@ class PlanningService:
         target.recipe_id = source_recipe_id
         target.selection_reasons_json = source_reasons
 
+        plan = self.db.get(MealPlan, source.meal_plan_id)
+        if plan is not None:
+            clear_undo_snapshot(plan)
         self.db.commit()
         return self.to_item_public(self._load_item(source.id)), self.to_item_public(self._load_item(target.id))
 
@@ -509,7 +523,7 @@ class PlanningService:
         dish_id: int,
         recipe_id: int | None = None,
     ) -> MealPlanItemPublic:
-        reference_date = date.today()
+        reference_date = household_local_today(self.db)
         if meal_date < reference_date:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -537,6 +551,7 @@ class PlanningService:
                 detail="Cannot change dish or recipe on a locked meal",
             )
 
+        clear_undo_snapshot(plan)
         self._apply_assignment(item, dish_id, recipe_id)
         self.db.commit()
         return self.to_item_public(self._load_item(item.id))

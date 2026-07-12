@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import type { Recipe } from "../../api/catalog";
 import type { MealPlanItem, MealSlot } from "../../api/planning";
@@ -35,6 +35,19 @@ export function PlanForMealDialog({
 
   const dates = useMemo(() => weekDates(weekStart), [weekStart]);
   const selectableDates = useMemo(() => dates.filter((date) => date >= todayIso()), [dates]);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open, onClose]);
 
   if (!open) {
     return null;

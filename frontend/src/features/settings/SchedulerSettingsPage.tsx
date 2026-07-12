@@ -10,6 +10,7 @@ import {
   type SchedulerSettingsInput,
 } from "../../api/scheduler";
 import { ApiError } from "../../api/client";
+import { formatInstantInTimeZone } from "../../lib/datetime";
 import { useAuth } from "../auth/AuthContext";
 import { SettingsPageShell } from "./SettingsPageShell";
 
@@ -118,10 +119,13 @@ export function SchedulerSettingsPage() {
     try {
       const result = await runSchedulerRouletteNow(accessToken);
       setNotice(result.detail);
-      await reload();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Roulette run failed");
+    }
+    try {
       await reload();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Failed to refresh scheduler settings");
     } finally {
       setRunning(false);
     }
@@ -142,7 +146,10 @@ export function SchedulerSettingsPage() {
     >
 
       {settings?.last_roulette_at ? (
-        <p className="muted">Last roulette: {new Date(settings.last_roulette_at).toLocaleString()}</p>
+        <p className="muted">
+          Last roulette ({settings.timezone}):{" "}
+          {formatInstantInTimeZone(settings.last_roulette_at, settings.timezone)}
+        </p>
       ) : null}
       {settings?.last_error ? <p className="error">Last error: {settings.last_error}</p> : null}
       {error ? (
@@ -228,13 +235,13 @@ export function SchedulerSettingsPage() {
         </label>
 
         <div className="row-between">
-          <button type="submit" className="button" disabled={saving}>
+          <button type="submit" className="button" disabled={saving || running}>
             {saving ? "Saving…" : "Save settings"}
           </button>
           <button
             type="button"
             className="button button-secondary"
-            disabled={running}
+            disabled={saving || running}
             onClick={() => void handleRunNow()}
           >
             {running ? "Running…" : "Run roulette now"}

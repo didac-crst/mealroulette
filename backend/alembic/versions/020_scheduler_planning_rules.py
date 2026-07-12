@@ -49,6 +49,7 @@ def upgrade() -> None:
             }
         ],
     )
+    op.execute(sa.text("SELECT setval('planning_rules_id_seq', (SELECT MAX(id) FROM planning_rules))"))
 
     op.create_table(
         "scheduler_settings",

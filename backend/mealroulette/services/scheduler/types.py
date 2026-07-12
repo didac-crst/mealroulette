@@ -30,6 +30,7 @@ class MealNeighbourSnapshot:
     meal_date: date
     vector: dict[str, float]
     source: str = "eaten"
+    item_id: int | None = None
 
 
 # Backward-compatible alias used by catalog loaders and tests.

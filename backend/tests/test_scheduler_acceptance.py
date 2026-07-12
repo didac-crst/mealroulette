@@ -17,17 +17,21 @@ def _seed(db_session):
     import_dish_fixtures(db_session, DEFAULT_FIXTURE_PATH)
 
 
+def _future_week_start(planning: PlanningService, *, days_ahead: int = 7) -> date:
+    return planning.week_start_for(date.today() + timedelta(days=days_ahead))
+
+
 def test_generate_preserves_locked_slot_api(client, catalog_seed, scheduler_seed, user_headers, db_session):
     _seed(db_session)
     planning = PlanningService(db_session)
-    reference_today = date(2026, 7, 1)
-    week_start = planning.week_start_for(reference_today + timedelta(days=7))
+    reference_today = date.today()
+    week_start = _future_week_start(planning)
     plan = planning.get_or_create_plan(week_start)
 
     locked_item = next(
         item
         for item in plan.items
-        if item.date > reference_today and item.meal_slot == MealSlot.lunch
+        if item.date >= reference_today and item.meal_slot == MealSlot.lunch
     )
     locked_dish = db_session.scalar(select(Dish).limit(1))
     locked_item.dish_id = locked_dish.id
@@ -50,11 +54,11 @@ def test_manually_assigned_slot_skipped_on_generate_api(
 ):
     _seed(db_session)
     planning = PlanningService(db_session)
-    reference_today = date(2026, 7, 1)
-    week_start = planning.week_start_for(reference_today + timedelta(days=7))
+    reference_today = date.today()
+    week_start = _future_week_start(planning)
     plan = planning.get_or_create_plan(week_start)
     target_item = next(
-        item for item in plan.items if item.date > reference_today and item.meal_slot == MealSlot.dinner
+        item for item in plan.items if item.date >= reference_today and item.meal_slot == MealSlot.dinner
     )
     dish = db_session.scalar(select(Dish).offset(1).limit(1))
 
@@ -99,7 +103,7 @@ def test_auto_assignments_include_selection_reasons_api(
 ):
     _seed(db_session)
     planning = PlanningService(db_session)
-    week_start = planning.week_start_for(date(2026, 7, 1) + timedelta(days=7))
+    week_start = _future_week_start(planning)
     plan = planning.get_or_create_plan(week_start)
 
     response = client.post(f"/api/meal-plans/{plan.id}/generate", headers=user_headers)

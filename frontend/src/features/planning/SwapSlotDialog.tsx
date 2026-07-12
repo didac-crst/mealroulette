@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+
 import type { MealPlanItem } from "../../api/planning";
 import { formatPlanDate, formatSlotLabel } from "./planFormat";
 
@@ -10,12 +12,28 @@ type Props = {
 };
 
 export function SwapSlotDialog({ item, targets, busy, onClose, onConfirm }: Props) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    dialogRef.current?.focus();
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
   return (
     <div className="modal-backdrop" role="presentation" onClick={onClose}>
       <div
+        ref={dialogRef}
         className="modal-card stack"
         role="dialog"
+        aria-modal="true"
         aria-labelledby="swap-slot-title"
+        tabIndex={-1}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="row-between">
@@ -40,7 +58,9 @@ export function SwapSlotDialog({ item, targets, busy, onClose, onConfirm }: Prop
                   disabled={busy}
                   onClick={() => onConfirm(target.id)}
                 >
-                  <span>{formatPlanDate(target.date)} · {formatSlotLabel(target.meal_slot)}</span>
+                  <span>
+                    {formatPlanDate(target.date)} · {formatSlotLabel(target.meal_slot)}
+                  </span>
                   <span className="muted">{target.dish_name ?? "Empty slot"}</span>
                 </button>
               </li>

@@ -1,4 +1,13 @@
-export const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
+function resolveApiUrl(): string {
+  const configured = import.meta.env.VITE_API_URL?.trim();
+  if (configured) {
+    return configured.replace(/\/$/, "");
+  }
+  // Same-origin /api requests; Vite proxies them to the backend (see vite.config.ts).
+  return "";
+}
+
+export const API_URL = resolveApiUrl();
 
 export class ApiError extends Error {
   constructor(
@@ -12,18 +21,40 @@ export class ApiError extends Error {
 
 export type ApiRequestOptions = RequestInit & {
   token?: string | null;
+  timeoutMs?: number;
 };
 
+const DEFAULT_TIMEOUT_MS = 30_000;
+
+async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new ApiError("Request timed out — is the API running?", 0);
+    }
+    throw error;
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}
+
 export async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
-  const { token, headers, ...rest } = options;
-  const response = await fetch(`${API_URL}${path}`, {
-    ...rest,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...headers,
+  const { token, headers, timeoutMs = DEFAULT_TIMEOUT_MS, ...rest } = options;
+  const response = await fetchWithTimeout(
+    `${API_URL}${path}`,
+    {
+      ...rest,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...headers,
+      },
     },
-  });
+    timeoutMs,
+  );
 
   if (!response.ok) {
     let detail = `Request failed with status ${response.status}`;

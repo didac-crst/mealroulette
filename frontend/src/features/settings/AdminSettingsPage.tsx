@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../auth/AuthContext";
+import { HouseholdClock } from "./HouseholdClock";
 
 type SettingsLink = {
   to: string;
@@ -57,14 +58,26 @@ function SettingsGroup({ heading, links }: { heading: string; links: SettingsLin
 }
 
 export function AdminSettingsPage() {
-  const { isAdmin } = useAuth();
+  const { isAdmin, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isAdmin) {
+    if (!loading && !isAdmin) {
       navigate("/review");
     }
-  }, [isAdmin, navigate]);
+  }, [isAdmin, loading, navigate]);
+
+  if (loading) {
+    return (
+      <section className="card stack settings-page">
+        <p className="muted">Loading…</p>
+      </section>
+    );
+  }
+
+  if (!isAdmin) {
+    return null;
+  }
 
   return (
     <section className="card stack settings-page">
@@ -72,6 +85,8 @@ export function AdminSettingsPage() {
         <h2>Settings</h2>
         <p className="muted settings-page-subtitle">Household admin — meal rules, automation, and catalog.</p>
       </div>
+
+      <HouseholdClock />
 
       <SettingsGroup heading="Meal planning" links={PLANNING_LINKS} />
       <SettingsGroup heading="Integrations" links={INTEGRATION_LINKS} />

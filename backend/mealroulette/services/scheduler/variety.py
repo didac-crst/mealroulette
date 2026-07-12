@@ -6,12 +6,12 @@ from mealroulette.services.scheduler.types import MealNeighbourSnapshot
 
 def build_variety_assessment(
     *,
-    new_assignments: list[tuple[int, str, dict[str, float]]],
+    new_assignments: list[tuple[int, int, str, dict[str, float]]],
     neighbours: list[MealNeighbourSnapshot],
 ) -> dict:
     """Build a user-facing variety summary without embedding projection.
 
-    Each new assignment is (dish_id, dish_name, family_vector).
+    Each new assignment is (item_id, dish_id, dish_name, family_vector).
     Neighbours include eaten history and other meals in the plan window.
     """
     if not new_assignments:
@@ -20,8 +20,9 @@ def build_variety_assessment(
     items: list[dict] = []
     distances: list[float] = []
 
-    for dish_id, dish_name, vector in new_assignments:
-        if not neighbours:
+    for item_id, dish_id, dish_name, vector in new_assignments:
+        relevant_neighbours = [meal for meal in neighbours if meal.item_id != item_id]
+        if not relevant_neighbours:
             items.append(
                 {
                     "dish_id": dish_id,
@@ -34,7 +35,7 @@ def build_variety_assessment(
             continue
 
         nearest = min(
-            neighbours,
+            relevant_neighbours,
             key=lambda meal: similarity_distance(vector, meal.vector),
         )
         distance = similarity_distance(vector, nearest.vector)

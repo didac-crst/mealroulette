@@ -51,10 +51,8 @@ def passes_same_dish_window(
     dish_dates: dict[int, list[date]],
     rules: PlanningRulesConfig,
 ) -> bool:
-    from datetime import timedelta
-
-    window_start = slot.meal_date - timedelta(days=rules.avoid_same_dish_within_days)
+    window_days = rules.avoid_same_dish_within_days
     for meal_date in dish_dates.get(candidate.dish_id, []):
-        if window_start <= meal_date <= slot.meal_date:
+        if abs((slot.meal_date - meal_date).days) <= window_days:
             return False
     return True

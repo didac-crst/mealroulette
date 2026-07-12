@@ -30,6 +30,10 @@ def save_undo_snapshot(
     }
 
 
+def clear_undo_snapshot(plan: MealPlan) -> None:
+    plan.last_roulette_undo_json = None
+
+
 def restore_undo_snapshot(db: Session, plan: MealPlan) -> bool:
     snapshot = plan.last_roulette_undo_json
     if not snapshot:

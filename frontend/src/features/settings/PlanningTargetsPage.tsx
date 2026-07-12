@@ -90,6 +90,16 @@ export function PlanningTargetsPage() {
   const usedKeys = useMemo(() => new Set(rows.map((row) => row.key.trim()).filter(Boolean)), [rows]);
   const availablePresets = TARGET_PRESETS.filter((preset) => !usedKeys.has(preset));
 
+  useEffect(() => {
+    if (availablePresets.length === 0) {
+      setNewPreset("");
+      return;
+    }
+    if (!availablePresets.includes(newPreset as (typeof TARGET_PRESETS)[number])) {
+      setNewPreset(availablePresets[0]);
+    }
+  }, [availablePresets, newPreset]);
+
   const updateRow = (index: number, patch: Partial<TargetRow>) => {
     setRows((current) => current.map((row, rowIndex) => (rowIndex === index ? { ...row, ...patch } : row)));
   };
@@ -99,10 +109,13 @@ export function PlanningTargetsPage() {
   };
 
   const addPresetRow = () => {
-    if (!newPreset || usedKeys.has(newPreset)) {
+    const preset = availablePresets.includes(newPreset as (typeof TARGET_PRESETS)[number])
+      ? newPreset
+      : availablePresets[0];
+    if (!preset || usedKeys.has(preset)) {
       return;
     }
-    setRows((current) => [...current, { key: newPreset, min: 1, max: 2 }]);
+    setRows((current) => [...current, { key: preset, min: 1, max: 2 }]);
   };
 
   const handleSubmit = async (event: FormEvent) => {

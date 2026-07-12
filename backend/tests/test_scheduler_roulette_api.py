@@ -14,10 +14,14 @@ def _seed(db_session):
     import_dish_fixtures(db_session, DEFAULT_FIXTURE_PATH)
 
 
+def _future_week_start(planning: PlanningService, *, days_ahead: int = 7) -> date:
+    return planning.week_start_for(date.today() + timedelta(days=days_ahead))
+
+
 def test_generate_week_api(client, catalog_seed, scheduler_seed, user_headers, db_session):
     _seed(db_session)
     planning = PlanningService(db_session)
-    week_start = planning.week_start_for(date(2026, 7, 1) + timedelta(days=7))
+    week_start = _future_week_start(planning)
     plan = planning.get_or_create_plan(week_start)
 
     response = client.post(f"/api/meal-plans/{plan.id}/generate/details", headers=user_headers)
@@ -31,18 +35,19 @@ def test_generate_week_api(client, catalog_seed, scheduler_seed, user_headers, d
 def test_reroll_and_undo_api(client, catalog_seed, scheduler_seed, user_headers, db_session):
     _seed(db_session)
     planning = PlanningService(db_session)
-    reference_today = date(2026, 7, 1)
-    week_start = planning.week_start_for(reference_today + timedelta(days=7))
+    reference_today = date.today()
+    week_start = _future_week_start(planning)
     plan = planning.get_or_create_plan(week_start)
 
     generate = client.post(f"/api/meal-plans/{plan.id}/generate", headers=user_headers)
     assert generate.status_code == 200
     plan_body = generate.json()
-    target = next(item for item in plan_body["items"] if item["date"] > reference_today.isoformat())
+    target = next(item for item in plan_body["items"] if item["date"] >= reference_today.isoformat())
     previous_dish_id = target["dish_id"]
 
     reroll = client.post(f"/api/meal-plan-items/{target['id']}/reroll", headers=user_headers)
     assert reroll.status_code == 200
+    assert reroll.json()["dish_id"] != previous_dish_id
 
     undo = client.post(f"/api/meal-plans/{plan.id}/undo-roulette", headers=user_headers)
     assert undo.status_code == 200
@@ -55,13 +60,9 @@ def test_reroll_and_undo_api(client, catalog_seed, scheduler_seed, user_headers,
 
 def test_swap_meals_api(client, catalog_seed, user_headers, db_session):
     _seed(db_session)
-    from sqlalchemy import select
-
-    from mealroulette.models.catalog import Dish
-
     planning = PlanningService(db_session)
-    reference_today = date(2026, 7, 1)
-    week_start = planning.week_start_for(reference_today + timedelta(days=7))
+    reference_today = date.today()
+    week_start = _future_week_start(planning)
     plan = planning.get_or_create_plan(week_start)
 
     dishes = db_session.scalars(select(Dish).limit(2)).all()
@@ -84,21 +85,19 @@ def test_swap_meals_api(client, catalog_seed, user_headers, db_session):
     )
     assert response.status_code == 200
     body = response.json()
-    assert body["source"]["dish_id"] == 2
-    assert body["target"]["dish_id"] == 1
+    assert body["source"]["dish_id"] == dishes[1].id
+    assert body["target"]["dish_id"] == dishes[0].id
 
 
 def test_assign_meal_slot_from_dish_gallery(client, catalog_seed, user_headers, db_session):
     _seed(db_session)
-    from datetime import date, timedelta
-
-    from mealroulette.services.planning import PlanningService
-
     planning = PlanningService(db_session)
-    reference_today = date(2026, 7, 1)
-    week_start = planning.week_start_for(reference_today + timedelta(days=7))
+    reference_today = date.today()
+    week_start = _future_week_start(planning)
     plan = planning.get_or_create_plan(week_start)
-    target_item = next(item for item in plan.items if item.date > reference_today and item.meal_slot.value == "dinner")
+    target_item = next(
+        item for item in plan.items if item.date >= reference_today and item.meal_slot.value == "dinner"
+    )
     dish = db_session.scalar(select(Dish).limit(1))
 
     response = client.post(

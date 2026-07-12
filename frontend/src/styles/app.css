@@ -1136,6 +1136,27 @@ legend {
   font-size: 0.9rem;
 }
 
+.household-clock {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  align-items: baseline;
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.65rem;
+  background: #f0f4f8;
+  font-size: 0.9rem;
+}
+
+.household-clock-label {
+  font-weight: 600;
+  color: #334e68;
+}
+
+.household-clock-value {
+  font-variant-numeric: tabular-nums;
+}
+
 .settings-page-header {
   display: flex;
   flex-direction: column;

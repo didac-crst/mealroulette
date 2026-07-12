@@ -20,6 +20,8 @@ import {
   selectionReasonsList,
   weekStartForDate,
   canRerollMeal,
+  canSwapMeal,
+  swappableMeals,
 } from "./planFormat";
 
 function item(overrides: Partial<MealPlanItem>): MealPlanItem {
@@ -167,5 +169,12 @@ describe("planFormat", () => {
     expect(canRerollMeal(item({ date: todayIso(), status: "planned", is_locked: false }))).toBe(true);
     expect(canRerollMeal(item({ date: "2020-01-01", status: "planned", is_locked: false }))).toBe(false);
     expect(canRerollMeal(item({ date: todayIso(), status: "planned", is_locked: true }))).toBe(false);
+    expect(canSwapMeal(item({ date: todayIso(), status: "planned", is_locked: true }))).toBe(false);
+    expect(
+      swappableMeals(item({ id: 1, date: todayIso(), status: "planned", is_locked: false }), [
+        item({ id: 2, date: todayIso(), status: "planned", is_locked: true }),
+        item({ id: 3, date: todayIso(), status: "planned", is_locked: false }),
+      ]).map((entry) => entry.id),
+    ).toEqual([3]);
   });
 });

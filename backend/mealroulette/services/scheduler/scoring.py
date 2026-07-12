@@ -44,7 +44,7 @@ def neighbour_similarity_penalty(
 ) -> tuple[float, list[str]]:
     reasons: list[str] = []
     max_penalty = 0.0
-    max_distance = 0.0
+    min_distance: float | None = None
 
     for meal in neighbours:
         days_apart = abs((slot.meal_date - meal.meal_date).days)
@@ -53,7 +53,7 @@ def neighbour_similarity_penalty(
 
         distance = similarity_distance(candidate.vector, meal.vector)
         similarity = 1.0 - distance
-        max_distance = max(max_distance, distance)
+        min_distance = distance if min_distance is None else min(min_distance, distance)
         weight = temporal_weight(days_apart, window_days=rules.history_window_days)
         max_penalty = max(max_penalty, weight * similarity)
 
@@ -64,8 +64,8 @@ def neighbour_similarity_penalty(
                 f"Similar to {meal.dish_name} on {meal.meal_date.isoformat()} ({shared_label})"
             )
 
-    if max_distance >= 0.45 and not reasons:
-        reasons.insert(0, f"Good variety vs neighbouring meals (min distance {max_distance:.2f})")
+    if min_distance is not None and min_distance >= 0.45 and not reasons:
+        reasons.insert(0, f"Good variety vs neighbouring meals (min distance {min_distance:.2f})")
 
     return max_penalty, reasons
 
@@ -75,6 +75,7 @@ def score_candidate_for_slot(
     slot: GenerationSlot,
     *,
     assigned_dish_ids: list[int],
+    candidates_by_id: dict[int, DishCandidate],
     neighbours: list[MealNeighbourSnapshot],
     rules: PlanningRulesConfig,
 ) -> tuple[float, dict]:
@@ -86,6 +87,7 @@ def score_candidate_for_slot(
     target_delta, target_reasons = weekly_target_score_delta(
         candidate,
         assigned_dish_ids=assigned_dish_ids,
+        candidates_by_id=candidates_by_id,
         rules=rules,
     )
     similarity_penalty, similarity_reasons = neighbour_similarity_penalty(
@@ -112,7 +114,7 @@ def score_candidate_for_slot(
         "reasons": reasons,
         "score": round(total, 3),
         "similarity_distance_max": round(
-            max(
+            min(
                 (similarity_distance(candidate.vector, meal.vector) for meal in relevant_neighbours),
                 default=0.0,
             ),

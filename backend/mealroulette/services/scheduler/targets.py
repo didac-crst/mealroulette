@@ -36,11 +36,11 @@ def weekly_target_score_delta(
     candidate: DishCandidate,
     *,
     assigned_dish_ids: list[int],
+    candidates_by_id: dict[int, DishCandidate],
     rules: PlanningRulesConfig,
 ) -> tuple[float, list[str]]:
     reasons: list[str] = []
     score_delta = 0.0
-    candidates_by_id = {candidate.dish_id: candidate}
 
     for target_key, spec in rules.weekly_targets.items():
         current = count_weekly_target(target_key, assigned_dish_ids, candidates_by_id=candidates_by_id)

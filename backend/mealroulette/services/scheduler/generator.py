@@ -32,6 +32,7 @@ def generate_week_assignments(
     rules: PlanningRulesConfig,
     today: date,
     rng: random.Random | None = None,
+    forbidden_dish_ids: frozenset[int] | None = None,
 ) -> WeekGenerationResult:
     random_source = rng or random.Random()
     if not slots:
@@ -73,6 +74,8 @@ def generate_week_assignments(
             for candidate in candidates:
                 if candidate.dish_id in assigned_dish_ids:
                     continue
+                if forbidden_dish_ids and candidate.dish_id in forbidden_dish_ids:
+                    continue
                 if not passes_slot_suitability(candidate, slot.meal_slot):
                     continue
                 if not passes_same_dish_window(
@@ -87,6 +90,7 @@ def generate_week_assignments(
                     candidate,
                     slot,
                     assigned_dish_ids=assigned_dish_ids,
+                    candidates_by_id=candidates_by_id,
                     neighbours=neighbours,
                     rules=rules,
                 )

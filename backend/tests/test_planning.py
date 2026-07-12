@@ -36,11 +36,20 @@ def _past_or_today_item(plan):
     pytest.fail("expected at least one past or today meal slot")
 
 
-def _future_item(plan):
+def _future_item(plan, *, client=None, user_headers=None):
     today = date.today()
     for item in plan["items"]:
         if date.fromisoformat(item["date"]) > today:
             return item
+    if client is not None and user_headers is not None:
+        week_start = date.fromisoformat(plan["week_start_date"])
+        next_plan = client.get(
+            f"/api/meal-plans/{(week_start + timedelta(days=7)).isoformat()}",
+            headers=user_headers,
+        ).json()
+        for item in next_plan["items"]:
+            if date.fromisoformat(item["date"]) > today:
+                return item
     pytest.fail("expected at least one future meal slot")
 
 
@@ -132,7 +141,7 @@ def test_future_date_status_rejected(client, catalog_seed, admin_headers, user_h
         json={"name": "Future Dish", "status": "active"},
     ).json()
     plan = client.get("/api/meal-plans/current", headers=user_headers).json()
-    future = _future_item(plan)
+    future = _future_item(plan, client=client, user_headers=user_headers)
 
     client.put(
         f"/api/meal-plan-items/{future['id']}",
@@ -465,7 +474,7 @@ def test_future_meal_rating_rejected(client, catalog_seed, admin_headers, user_h
         json={"name": "Future Rated", "status": "active"},
     ).json()
     plan = client.get("/api/meal-plans/current", headers=user_headers).json()
-    future = _future_item(plan)
+    future = _future_item(plan, client=client, user_headers=user_headers)
     client.put(
         f"/api/meal-plan-items/{future['id']}",
         headers=user_headers,

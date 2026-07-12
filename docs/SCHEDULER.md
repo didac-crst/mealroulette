@@ -100,7 +100,7 @@ Similarity is **not** eaten-history-only. At scoring time for slot **S**, build 
 
 | Source | Included when | `source` label |
 | --- | --- | --- |
-| **Eaten meals** | `|S.date − E.date| ≤ avoid_similar_meals_within_days` | `eaten` |
+| **Eaten meals** | `abs(S.date − E.date) ≤ avoid_similar_meals_within_days` | `eaten` |
 | **Locked / manual / other assigned plan meals** | same window, same week plan | `planned` |
 | **Slots already filled earlier in this generation attempt** | same window | `generated` |
 
@@ -203,7 +203,7 @@ Configured in **`scheduler_settings`** (admin UI `/settings/scheduler`, API `GET
 | `notify_telegram` | true | Broadcast after successful generate |
 | `notify_planning_days` | 7 | Days of plan shown in Telegram HTML |
 
-**Worker:** minute cron (same as daily Telegram reminder). `ScheduledRouletteService.run_scheduled()` skips unless `should_run_scheduled` (once per local calendar day).
+**Worker:** minute cron (same as daily Telegram reminder). `ScheduledRouletteService.run_scheduled()` skips unless `should_run_scheduled`: on the configured local weekday, at or after `run_time`, once per local calendar day.
 
 **On trigger:** `get_or_create_plan(target_week)` → `generate_week` → optional **“New roulette”** HTML message to Telegram subscribers (reuses planning formatter).
 

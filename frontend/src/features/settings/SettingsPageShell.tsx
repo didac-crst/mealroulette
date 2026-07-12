@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { ButtonLink } from "../../components/ButtonLink";
+import { HouseholdClock } from "./HouseholdClock";
 
 type Props = {
   title: string;
@@ -20,6 +21,7 @@ export function SettingsPageShell({ title, subtitle, children }: Props) {
           {subtitle ? <p className="muted settings-page-subtitle">{subtitle}</p> : null}
         </div>
       </div>
+      <HouseholdClock />
       {children}
     </section>
   );

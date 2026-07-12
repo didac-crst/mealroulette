@@ -17,11 +17,15 @@ def _seed_dishes(db_session):
     import_dish_fixtures(db_session, DEFAULT_FIXTURE_PATH)
 
 
+def _future_week_start(planning: PlanningService, *, days_ahead: int = 7) -> date:
+    return planning.week_start_for(date.today() + timedelta(days=days_ahead))
+
+
 def test_generate_week_fills_future_plan(db_session, catalog_seed, scheduler_seed):
     _seed_dishes(db_session)
     planning = PlanningService(db_session)
-    reference_today = date(2026, 7, 1)
-    week_start = planning.week_start_for(reference_today + timedelta(days=7))
+    reference_today = date.today()
+    week_start = _future_week_start(planning)
     plan = planning.get_or_create_plan(week_start)
 
     service = SchedulerService(db_session)
@@ -43,14 +47,14 @@ def test_generate_week_fills_future_plan(db_session, catalog_seed, scheduler_see
 def test_generate_week_preserves_locked_slots(db_session, catalog_seed, scheduler_seed):
     _seed_dishes(db_session)
     planning = PlanningService(db_session)
-    reference_today = date(2026, 7, 1)
-    week_start = planning.week_start_for(reference_today + timedelta(days=7))
+    reference_today = date.today()
+    week_start = _future_week_start(planning)
     plan = planning.get_or_create_plan(week_start)
 
     locked_item = next(
         item
         for item in plan.items
-        if item.date > reference_today and item.meal_slot == MealSlot.lunch
+        if item.date >= reference_today and item.meal_slot == MealSlot.lunch
     )
     locked_dish = db_session.scalar(select(Dish).limit(1))
     locked_item.dish_id = locked_dish.id
@@ -71,14 +75,14 @@ def test_generate_week_preserves_locked_slots(db_session, catalog_seed, schedule
 def test_reroll_and_undo_restore_previous_assignment(db_session, catalog_seed, scheduler_seed):
     _seed_dishes(db_session)
     planning = PlanningService(db_session)
-    reference_today = date(2026, 7, 1)
-    week_start = planning.week_start_for(reference_today + timedelta(days=7))
+    reference_today = date.today()
+    week_start = _future_week_start(planning)
     plan = planning.get_or_create_plan(week_start)
 
     service = SchedulerService(db_session)
     service.generate_week(plan.id, today=reference_today)
 
-    target_item = next(item for item in plan.items if item.date > reference_today)
+    target_item = next(item for item in plan.items if item.date >= reference_today)
     db_session.refresh(target_item)
     previous_dish_id = target_item.dish_id
     previous_recipe_id = target_item.recipe_id
@@ -87,6 +91,7 @@ def test_reroll_and_undo_restore_previous_assignment(db_session, catalog_seed, s
     service.reroll_item(target_item.id, today=reference_today)
     db_session.refresh(target_item)
     assert target_item.dish_id is not None
+    assert target_item.dish_id != previous_dish_id
 
     service.undo_last_roulette(plan.id)
     db_session.refresh(target_item)
@@ -101,8 +106,8 @@ def test_reroll_and_undo_restore_previous_assignment(db_session, catalog_seed, s
 def test_reroll_rejected_for_past_slot(db_session, catalog_seed, scheduler_seed):
     _seed_dishes(db_session)
     planning = PlanningService(db_session)
-    reference_today = date(2026, 7, 10)
-    week_start = planning.week_start_for(reference_today - timedelta(days=3))
+    reference_today = date.today()
+    week_start = planning.week_start_for(reference_today - timedelta(days=7))
     plan = planning.get_or_create_plan(week_start)
     past_item = next(item for item in plan.items if item.date < reference_today)
 

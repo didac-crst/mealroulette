@@ -50,6 +50,7 @@ export function DishListPage() {
     }
     setPlanLoading(true);
     setPlanDish(dish);
+    setPlanRecipes([]);
     try {
       const recipes = await fetchRecipes(accessToken, dish.id);
       setPlanRecipes(recipes);

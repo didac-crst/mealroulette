@@ -15,8 +15,8 @@ export function SelectionReasons({ item }: Props) {
     <div className="selection-reasons">
       <p className="selection-reasons-title muted">Why this meal</p>
       <ul className="selection-reasons-list">
-        {reasons.map((reason) => (
-          <li key={reason}>{reason}</li>
+        {reasons.map((reason, index) => (
+          <li key={`${index}-${reason}`}>{reason}</li>
         ))}
       </ul>
     </div>

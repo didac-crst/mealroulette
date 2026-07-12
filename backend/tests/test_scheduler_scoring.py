@@ -12,7 +12,11 @@ from mealroulette.services.scheduler.constraints import (
 )
 from mealroulette.services.scheduler.neighbours import build_similarity_neighbours
 from mealroulette.services.scheduler.scoring import neighbour_similarity_penalty, score_candidate_for_slot, temporal_weight
-from mealroulette.services.scheduler.targets import dish_matches_weekly_target, weekly_target_warnings
+from mealroulette.services.scheduler.targets import (
+    dish_matches_weekly_target,
+    weekly_target_score_delta,
+    weekly_target_warnings,
+)
 from mealroulette.services.scheduler.types import DishCandidate, GenerationSlot, MealNeighbourSnapshot
 from mealroulette.services.scheduler.variety import build_variety_assessment
 from mealroulette.models.enums import SeasonalityMode
@@ -220,10 +224,20 @@ def test_score_candidate_prefers_different_neighbours():
     ]
 
     similar_score, _ = score_candidate_for_slot(
-        similar, slot, assigned_dish_ids=[], neighbours=neighbours, rules=rules
+        similar,
+        slot,
+        assigned_dish_ids=[],
+        candidates_by_id={1: similar, 2: different},
+        neighbours=neighbours,
+        rules=rules,
     )
     different_score, _ = score_candidate_for_slot(
-        different, slot, assigned_dish_ids=[], neighbours=neighbours, rules=rules
+        different,
+        slot,
+        assigned_dish_ids=[],
+        candidates_by_id={1: similar, 2: different},
+        neighbours=neighbours,
+        rules=rules,
     )
 
     assert different_score > similar_score
@@ -241,8 +255,8 @@ def test_variety_assessment_labels_distance():
     ]
     assessment = build_variety_assessment(
         new_assignments=[
-            (2, "Fish stew", {"fish": 1.0}),
-            (3, "More pasta", {"pasta": 1.0}),
+            (10, 2, "Fish stew", {"fish": 1.0}),
+            (11, 3, "More pasta", {"pasta": 1.0}),
         ],
         neighbours=neighbours,
     )
@@ -251,3 +265,57 @@ def test_variety_assessment_labels_distance():
     assert by_name["Fish stew"]["variety_label"] == "very different"
     assert by_name["More pasta"]["variety_label"] == "very similar"
     assert assessment["average_distance_to_neighbours"] is not None
+
+
+def test_same_dish_window_blocks_future_meals():
+    rules = _rules(avoid_same_dish_within_days=7)
+    slot = GenerationSlot(item_id=1, meal_date=date(2026, 7, 10), meal_slot=MealSlot.lunch)
+    candidate = _candidate(5, name="Repeat")
+    dish_dates = build_dish_date_index([], [(5, date(2026, 7, 11))])
+
+    assert passes_same_dish_window(candidate, slot, dish_dates=dish_dates, rules=rules) is False
+
+
+def test_weekly_target_score_uses_assigned_catalog():
+    rules = _rules(weekly_targets={"fish": WeeklyTargetSpec(min=2, max=2)}, weekly_target_tolerance=0)
+    fish = _candidate(1, name="Fish", protein_tags=frozenset({"fish"}))
+    fish_two = _candidate(3, name="Another fish", protein_tags=frozenset({"fish"}))
+    candidates_by_id = {1: fish, 3: fish_two}
+
+    score_delta, reasons = weekly_target_score_delta(
+        fish_two,
+        assigned_dish_ids=[1],
+        candidates_by_id=candidates_by_id,
+        rules=rules,
+    )
+
+    assert score_delta > 0
+    assert any("Helps fish target" in reason for reason in reasons)
+
+
+def test_variety_assessment_excludes_current_assignment():
+    neighbours = [
+        MealNeighbourSnapshot(
+            dish_id=3,
+            dish_name="More pasta",
+            meal_date=date(2026, 7, 9),
+            vector={"pasta": 1.0},
+            source="generated",
+            item_id=11,
+        ),
+        MealNeighbourSnapshot(
+            dish_id=1,
+            dish_name="Fish stew",
+            meal_date=date(2026, 6, 28),
+            vector={"fish": 1.0},
+            source="eaten",
+        ),
+    ]
+    assessment = build_variety_assessment(
+        new_assignments=[(11, 3, "More pasta", {"pasta": 1.0})],
+        neighbours=neighbours,
+    )
+
+    item = assessment["items"][0]
+    assert item["nearest_neighbour_dish"] == "Fish stew"
+    assert item["variety_label"] == "very different"

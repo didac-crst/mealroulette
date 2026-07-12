@@ -75,7 +75,9 @@ class SchedulerSettingsService:
         scheduled = row.run_time
         if local.weekday() != row.run_weekday:
             return False
-        if (local.hour, local.minute) != (scheduled.hour, scheduled.minute):
+        scheduled_minutes = scheduled.hour * 60 + scheduled.minute
+        local_minutes = local.hour * 60 + local.minute
+        if local_minutes < scheduled_minutes:
             return False
         if row.last_roulette_at is not None:
             last_local = row.last_roulette_at.astimezone(zone)

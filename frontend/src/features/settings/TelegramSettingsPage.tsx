@@ -12,6 +12,7 @@ import {
   type TelegramSubscriber,
 } from "../../api/telegram";
 import { ApiError } from "../../api/client";
+import { formatInstantInTimeZone } from "../../lib/datetime";
 import { useAuth } from "../auth/AuthContext";
 import { SettingsPageShell } from "./SettingsPageShell";
 
@@ -167,7 +168,10 @@ export function TelegramSettingsPage() {
       )}
 
       {settings?.last_sent_at ? (
-        <p className="muted">Last sent: {new Date(settings.last_sent_at).toLocaleString()}</p>
+        <p className="muted">
+          Last sent ({settings.timezone}):{" "}
+          {formatInstantInTimeZone(settings.last_sent_at, settings.timezone)}
+        </p>
       ) : null}
       {settings?.last_error ? <p className="error">Last error: {settings.last_error}</p> : null}
       {error ? (

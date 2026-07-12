@@ -10,6 +10,7 @@ def snapshot_from_candidate(
     *,
     meal_date: date,
     source: str,
+    item_id: int | None = None,
 ) -> MealNeighbourSnapshot:
     return MealNeighbourSnapshot(
         dish_id=candidate.dish_id,
@@ -17,6 +18,7 @@ def snapshot_from_candidate(
         meal_date=meal_date,
         vector=candidate.vector,
         source=source,
+        item_id=item_id,
     )
 
 
@@ -40,7 +42,9 @@ def build_similarity_neighbours(
         meal_date = fixed_dates_by_item.get(item_id)
         if candidate is None or meal_date is None:
             continue
-        neighbours.append(snapshot_from_candidate(candidate, meal_date=meal_date, source="planned"))
+        neighbours.append(
+            snapshot_from_candidate(candidate, meal_date=meal_date, source="planned", item_id=item_id)
+        )
 
     for assignment in attempt_assignments:
         if assignment.item_id == exclude_item_id:
@@ -49,6 +53,13 @@ def build_similarity_neighbours(
         meal_date = slot_dates_by_item.get(assignment.item_id)
         if candidate is None or meal_date is None:
             continue
-        neighbours.append(snapshot_from_candidate(candidate, meal_date=meal_date, source="generated"))
+        neighbours.append(
+            snapshot_from_candidate(
+                candidate,
+                meal_date=meal_date,
+                source="generated",
+                item_id=assignment.item_id,
+            )
+        )
 
     return neighbours

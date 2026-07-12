@@ -75,7 +75,16 @@ pip install pre-commit
 pre-commit install
 ```
 
-Integration tests expect PostgreSQL at `TEST_DATABASE_URL`. The easiest local setup is `docker compose up db`.
+Integration tests expect PostgreSQL at `TEST_DATABASE_URL` (default: `mealroulette_test` on `localhost:5432`). From the **repository root**:
+
+```bash
+make test-db-setup   # starts db, creates mealroulette_test if needed
+cd backend && python -m pytest -q
+```
+
+Or run everything in one step: `make test-backend`.
+
+If you only run `docker compose up -d db`, ensure Docker/Colima is running and the `db` service is healthy (`docker compose ps`). The init script creates `mealroulette_test` on first volume init; for an existing Postgres volume use `make test-db-setup` once.
 
 ## Database migrations (Alembic)
 
@@ -261,7 +270,7 @@ The **worker** also runs the scheduled weekly roulette when enabled. The **API**
 | `target_week_offset` | int | `1` | Which Mon–Sun week to fill (`0` = current week, `1` = next week). |
 | `notify_telegram` | bool | `true` | Send “New roulette” to subscribers after generate. |
 | `notify_planning_days` | int (1–14) | `7` | Days of plan shown in the Telegram message. |
-| `last_run_at` | datetime | — | Read-only: last successful scheduled/manual run. |
+| `last_roulette_at` | datetime | — | Read-only: last successful scheduled/manual run. |
 | `last_error` | string | — | Read-only: last failure message, if any. |
 
 #### Plan UI roulette
@@ -287,6 +296,8 @@ After `make up`:
 | API docs (Swagger) | http://localhost:8000/docs |
 | Health check | http://localhost:8000/api/health |
 | Frontend | http://localhost:3000 |
+
+On a phone or another device on the same Wi‑Fi, open `http://<this-computer-ip>:3000` — no `VITE_API_URL` or IP config needed; the UI calls `/api` on the same host and Vite proxies to the backend.
 
 ### Login flow in Swagger (`/docs`)
 

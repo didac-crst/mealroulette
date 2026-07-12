@@ -3,9 +3,11 @@ from __future__ import annotations
 from datetime import date, timedelta
 
 from fastapi import HTTPException, status
+from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from mealroulette.models.planning import MealPlan, MealPlanItem
+from mealroulette.services.household_time import household_local_today
 from mealroulette.services.planning import PlanningService
 from mealroulette.services.planning_rule_service import PlanningRuleService
 from mealroulette.services.scheduler.catalog import load_dish_candidates, load_eaten_meal_snapshots
@@ -13,7 +15,7 @@ from mealroulette.services.scheduler.constraints import slot_is_regenerable
 from mealroulette.services.scheduler.generator import generate_week_assignments
 from mealroulette.services.scheduler.neighbours import build_similarity_neighbours
 from mealroulette.services.scheduler.types import GenerationSlot, WeekGenerationResult
-from mealroulette.services.scheduler.undo import restore_undo_snapshot, save_undo_snapshot
+from mealroulette.services.scheduler.undo import clear_undo_snapshot, restore_undo_snapshot, save_undo_snapshot
 from mealroulette.services.scheduler.variety import build_variety_assessment
 
 
@@ -29,9 +31,9 @@ class SchedulerService:
         *,
         today: date | None = None,
     ) -> tuple[WeekGenerationResult, dict]:
-        reference_date = today or date.today()
+        reference_date = today or household_local_today(self.db)
         rules = self.rules_service.get_active_rules()
-        plan = self._load_plan(meal_plan_id)
+        plan = self._load_plan_for_update(meal_plan_id)
         candidates = self._load_candidates(rules)
 
         regenerable_slots, fixed_assignments, fixed_dates_by_item = self._partition_plan_items(
@@ -76,7 +78,7 @@ class SchedulerService:
         *,
         today: date | None = None,
     ) -> tuple[WeekGenerationResult, dict]:
-        reference_date = today or date.today()
+        reference_date = today or household_local_today(self.db)
         rules = self.rules_service.get_active_rules()
         item = self._load_item(item_id)
         if not slot_is_regenerable(
@@ -91,7 +93,9 @@ class SchedulerService:
                 detail="This meal slot cannot be rerolled",
             )
 
-        plan = self._load_plan(item.meal_plan_id)
+        previous_dish_id = item.dish_id
+        plan = self._load_plan_for_update(item.meal_plan_id)
+        item = next(plan_item for plan_item in plan.items if plan_item.id == item_id)
         candidates = self._load_candidates(rules)
         slot = GenerationSlot(item_id=item.id, meal_date=item.date, meal_slot=item.meal_slot)
 
@@ -103,6 +107,7 @@ class SchedulerService:
             fixed_assignments[plan_item.id] = plan_item.dish_id
             fixed_dates_by_item[plan_item.id] = plan_item.date
 
+        forbidden_dish_ids = frozenset({previous_dish_id}) if previous_dish_id is not None else None
         eaten_meals = self._load_eaten_meals([slot], rules)
         result = generate_week_assignments(
             [slot],
@@ -112,6 +117,7 @@ class SchedulerService:
             eaten_meals=eaten_meals,
             rules=rules,
             today=reference_date,
+            forbidden_dish_ids=forbidden_dish_ids,
         )
         if not result.assignments:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=result.warnings[0])
@@ -205,6 +211,7 @@ class SchedulerService:
         return build_variety_assessment(
             new_assignments=[
                 (
+                    assignment.item_id,
                     assignment.dish_id,
                     candidates_by_id[assignment.dish_id].dish_name,
                     candidates_by_id[assignment.dish_id].vector,
@@ -213,6 +220,17 @@ class SchedulerService:
             ],
             neighbours=neighbours,
         )
+
+    def _load_plan_for_update(self, meal_plan_id: int) -> MealPlan:
+        plan = self.db.scalar(
+            select(MealPlan)
+            .where(MealPlan.id == meal_plan_id)
+            .options(selectinload(MealPlan.items))
+            .with_for_update()
+        )
+        if plan is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Meal plan not found")
+        return plan
 
     def _load_plan(self, meal_plan_id: int) -> MealPlan:
         plan = self.db.get(

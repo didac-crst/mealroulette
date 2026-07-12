@@ -97,7 +97,7 @@ class ScheduledRouletteService:
             from_date=from_date,
             to_date=to_date,
             days=days,
-            bot_username=self.on_demand_service._bot_username(),
+            bot_username=self.on_demand_service.bot_username(),
             heading="New roulette",
         )
 
