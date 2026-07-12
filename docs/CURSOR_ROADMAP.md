@@ -139,7 +139,7 @@ The default commit hook should fail if tests fail. Lint/format hooks may run in 
 
 ## Implementation Phases
 
-Phases 0–8 shipped through **`v0.5.0`**. **Phase 9** (computed traits, **`v0.6.0`**) is **implementation complete** on `phase-9/computed-recipe-traits` (pending merge and release tag). Phases 10–13 cover cooking mode, backup, LLM/localization, and v1 hardening.
+Phases 0–9 shipped through **`v0.6.0`**. Phases 10–13 cover cooking mode, backup, LLM/localization, and v1 hardening.
 
 | Phase | Name | Target version |
 | --- | --- | --- |
@@ -582,7 +582,7 @@ Acceptance criteria (summary):
 
 ### Phase 9 - Computed Recipe Traits & Catalog Keys
 
-**Status:** Implementation complete on branch `phase-9/computed-recipe-traits`. Target release: **`v0.6.0`** (pending merge and tag).
+**Status:** Shipped in **`v0.6.0`** via PR #9.
 
 **Goal:** Add stable public keys, ingredient food groups, and computed recipe traits while keeping v0.5 behaviour intact — especially weekly target settings, scheduler generation/reroll, dish catalog, recipe variants, shopping list, planning UI, and Telegram planning output.
 
@@ -610,7 +610,7 @@ RECIPE_SEQUENCE_WIDTH = 3
 ```
 
 - **Dish:** `<slug>-<random_suffix>` — total length 32; slug max 20; random suffix fills remainder (min 8); generated once; **does not change when dish name changes**; globally unique.
-- **Recipe:** `<dish_public_key>-001` — sequence width 3; unique per dish; total length 36.
+- **Recipe:** `<dish_public_key>-001` — sequence width 3 minimum, grows for 1000+; unique per dish; normally length 36, with database capacity up to 40.
 - Random alphabet: `0123456789abcdefghjkmnpqrstvwxyz`
 
 #### Ingredient food groups
@@ -771,7 +771,7 @@ Do **not** in Phase 9 unless explicitly approved later:
 - Ingredient resolver + taxonomy browsing APIs ✅
 - API and frontend exposure (catalog, planning, taxonomy navigator) ✅
 - Scheduler candidate field (tags unchanged) ✅
-- Release notes `docs/releases/v0.6.0.md` ✅ (draft)
+- Release notes `docs/releases/v0.6.0.md` ✅
 
 #### Acceptance criteria
 

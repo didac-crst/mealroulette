@@ -74,9 +74,9 @@ Format: `<slug>-<random_suffix>`
 
 Format: `<dish_public_key>-001`
 
-- Sequence width **3** (001, 002, …).
+- Sequence width **3 minimum** (`001`, `002`, …); width grows for `1000+`.
 - Unique per dish (`recipes.dish_id` + `sequence_number`).
-- Total public key length **36**.
+- Total public key length is normally **36**, with database capacity up to **40** for long sequence suffixes.
 
 ### Sequence ordering (backfill and new recipes)
 

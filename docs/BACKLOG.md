@@ -15,11 +15,11 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Phase 9 implementation complete** on branch `phase-9/computed-recipe-traits` — stable public keys, ingredient food groups, computed recipe traits, taxonomy APIs, ingredient resolver, and taxonomy navigator UI (**target `v0.6.0`**, pending merge and release tag).
+**v0.6 shipped** — stable public keys, ingredient food groups, computed recipe traits, taxonomy APIs, ingredient resolver, and taxonomy navigator UI.
 
 See [CURSOR_ROADMAP.md § Phase 9](CURSOR_ROADMAP.md#phase-9---computed-recipe-traits--catalog-keys).
 
-**v0.5 shipped** as [`v0.5.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.5.0) — explainable scheduler, settings hub, weekly targets UI.
+**v0.6 shipped** as [`v0.6.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.6.0) — catalog keys, computed traits, taxonomy, resolver, taxonomy navigator UI.
 
 ---
 
@@ -51,7 +51,7 @@ Use one branch per milestone, then merge via pull request:
 - `phase-6/shopping` — shopping lists, ingredient catalog seed, ingredient admin UI (merged in PR #5, `v0.3.0`)
 - `phase-7/telegram-review` — Telegram bot, reminders, on-demand commands, recipe links (merged in PR #7, `v0.4.0`)
 - `phase-8/scheduler` — explainable scheduler, family-vector similarity, scheduled roulette (merged, `v0.5.0`, PR #8)
-- `phase-9/computed-recipe-traits` — public keys, food groups, computed recipe traits, taxonomy & resolver (**implementation complete**, target `v0.6.0`)
+- `phase-9/computed-recipe-traits` — public keys, food groups, computed recipe traits, taxonomy & resolver (merged in PR #9, `v0.6.0`)
 
 ---
 
@@ -66,12 +66,12 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.3** | Shopping list — generation, aggregation, pantry filter, UI, ingredient catalog | **Done** ([`v0.3.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.3.0), merge `88d2675`, PR #5) |
 | **v0.4** | Telegram reminders — settings, scheduled and manual send, bot commands | **Done** ([`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0), merge `a560e7a`, PR #7) |
 | **v0.5** | Automatic scheduler — explainable weekly generation, reroll | **Done** ([`v0.5.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.5.0)) |
-| **v0.6** | Catalog keys & computed traits — public keys, food groups, recipe trait metadata | **Implementation complete** (branch `phase-9/computed-recipe-traits`, pending release tag) |
+| **v0.6** | Catalog keys & computed traits — public keys, food groups, recipe trait metadata | **Done** ([`v0.6.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.6.0), merge `322c30c`, PR #9) |
 | **v0.7** | LLM-assisted entry — draft enrichment, review before save | Not started |
 | **Future** | Composable meals — complete / half / dessert roles, paired halves, manual desserts | Backlog only (see below) |
 | **v1.0** | Stable home version — mobile UI, backups, auth, scheduler, cooking mode | Not started |
 
-> **v0.5 shipped** as [`v0.5.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.5.0). Explainable scheduler, plan roulette UI, scheduled job, Telegram “New roulette”, settings hub. Release notes: [docs/releases/v0.5.0.md](releases/v0.5.0.md).
+> **v0.6 shipped** as [`v0.6.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.6.0). Catalog keys, computed traits, taxonomy APIs, resolver, taxonomy navigator UI. Release notes: [docs/releases/v0.6.0.md](releases/v0.6.0.md).
 
 ### v0.1 — Foundation
 
@@ -185,7 +185,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [x] Ingredient resolver (exact/alias/fuzzy) + taxonomy browsing APIs — see [TAXONOMY_AND_RESOLVER.md](TAXONOMY_AND_RESOLVER.md)
 - [x] Frontend: TypeScript types, ingredient food-group field, trait display, taxonomy navigator (`/ingredients/taxonomy`)
 - [x] Tests: key generation, trait rules, migration backfill, resolver, taxonomy API, scheduler/weekly-target regression
-- [x] Release notes `v0.6.0.md` (draft — finalize date on tag)
+- [x] Release notes `v0.6.0.md`
 
 **Out of scope for v0.6 initial pass (later explicit steps):**
 
@@ -285,7 +285,7 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 6 | Shopping lists | v0.3 | Done (PR #5, `v0.3.0`) |
 | 7 | Telegram reminders | v0.4 | Done (PR #7, `v0.4.0`) |
 | 8 | Explainable scheduler | v0.5 | Done (`v0.5.0`) |
-| 9 | Computed recipe traits & catalog keys | v0.6 | Done (branch, pending `v0.6.0` tag) |
+| 9 | Computed recipe traits & catalog keys | v0.6 | Done (PR #9, `v0.6.0`) |
 | 10 | Cooking mode | v1.0 | Not started |
 | 11 | Backup, export, and import | v1.0 | Not started |
 | 12 | LLM-assisted entry & localization | v0.7 | Not started |
@@ -435,7 +435,7 @@ Shipped as [`v0.5.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0
 
 ### Phase 9 — Computed recipe traits & catalog keys ✅
 
-Branch: `phase-9/computed-recipe-traits` (target `v0.6.0`). Full plan: [CURSOR_ROADMAP.md § Phase 9](CURSOR_ROADMAP.md#phase-9---computed-recipe-traits--catalog-keys). Specs: [COMPUTED_TRAITS.md](COMPUTED_TRAITS.md), [TAXONOMY_AND_RESOLVER.md](TAXONOMY_AND_RESOLVER.md).
+Shipped in `v0.6.0` via PR #9. Full plan: [CURSOR_ROADMAP.md § Phase 9](CURSOR_ROADMAP.md#phase-9---computed-recipe-traits--catalog-keys). Specs: [COMPUTED_TRAITS.md](COMPUTED_TRAITS.md), [TAXONOMY_AND_RESOLVER.md](TAXONOMY_AND_RESOLVER.md).
 
 **Authoritative taxonomy files** (not the superseded single-YAML proposal):
 
@@ -455,7 +455,7 @@ Branch: `phase-9/computed-recipe-traits` (target `v0.6.0`). Full plan: [CURSOR_R
 - [x] Regression: scheduler acceptance, weekly targets settings, shopping unchanged
 - [x] Ingredient resolver (exact/alias/fuzzy/classify-candidate) + taxonomy browsing APIs
 - [x] Taxonomy navigator UI (`/ingredients/taxonomy`)
-- [x] Release notes `v0.6.0.md` (draft)
+- [x] Release notes `v0.6.0.md`
 - [x] Validation: `make test-backend` (189 passed, 2 skipped), frontend 18 passed, `npm run build` green; `make validate-taxonomy` — 0 blockers
 
 ### Phases 10–13

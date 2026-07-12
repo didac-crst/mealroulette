@@ -2,7 +2,7 @@
 
 MealRoulette is a self-hosted household meal planning app for deciding what to eat, planning lunch and dinner, generating shopping lists, sending Telegram reminders, and cooking from structured recipe steps.
 
-**v0.5.0** adds the explainable meal scheduler. **v0.6.0** (branch `phase-9/computed-recipe-traits`, PR #9) adds computed recipe traits, ingredient taxonomy, and the resolver — see [docs/releases/v0.6.0.md](docs/releases/v0.6.0.md), [docs/COMPUTED_TRAITS.md](docs/COMPUTED_TRAITS.md), and [docs/TAXONOMY_AND_RESOLVER.md](docs/TAXONOMY_AND_RESOLVER.md).
+**v0.5.0** adds the explainable meal scheduler. **v0.6.0** adds computed recipe traits, ingredient taxonomy, and the resolver — see [docs/releases/v0.6.0.md](docs/releases/v0.6.0.md), [docs/COMPUTED_TRAITS.md](docs/COMPUTED_TRAITS.md), and [docs/TAXONOMY_AND_RESOLVER.md](docs/TAXONOMY_AND_RESOLVER.md).
 
 ## Documentation
 
