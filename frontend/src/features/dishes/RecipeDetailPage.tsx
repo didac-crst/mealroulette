@@ -25,6 +25,7 @@ import {
   formatRecipeDifficulty,
   formatRecipeTime,
 } from "./effectiveValues";
+import { formatComputedTraits } from "./computedTraits";
 
 export function RecipeDetailPage() {
   const { dishId, recipeId } = useParams();
@@ -114,18 +115,7 @@ export function RecipeDetailPage() {
             Key: {recipe.public_key} · Sequence {recipe.sequence_number}
           </p>
           {recipe.computed_traits_json ? (
-            <p className="muted">
-              Traits:{" "}
-              {[
-                recipe.computed_traits_json.vegan ? "vegan" : "not vegan",
-                recipe.computed_traits_json.carb_heavy ? "carb-heavy" : null,
-                recipe.computed_traits_json.dominant_protein
-                  ? `protein ${String(recipe.computed_traits_json.dominant_protein)}`
-                  : null,
-              ]
-                .filter(Boolean)
-                .join(" · ")}
-            </p>
+            <p className="muted">Traits: {formatComputedTraits(recipe.computed_traits_json)}</p>
           ) : null}
         </div>
         <div className="row-actions">

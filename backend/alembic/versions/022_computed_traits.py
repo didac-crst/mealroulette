@@ -42,6 +42,37 @@ def upgrade() -> None:
     op.create_unique_constraint("uq_recipes_dish_sequence", "recipes", ["dish_id", "sequence_number"])
 
 
+def _ensure_reference_units(session: Session, load_reference_units) -> tuple:
+    """Seed g/ml when missing so trait backfill works on databases without reference units."""
+    from decimal import Decimal
+
+    from sqlalchemy import select
+
+    from mealroulette.models.catalog import Unit
+    from mealroulette.models.enums import UnitDimension
+
+    gram = session.scalar(select(Unit).where(Unit.symbol == "g"))
+    if gram is None:
+        gram = Unit(
+            name="Gram",
+            symbol="g",
+            dimension=UnitDimension.mass,
+            conversion_to_base=Decimal("1"),
+        )
+        session.add(gram)
+    milliliter = session.scalar(select(Unit).where(Unit.symbol == "ml"))
+    if milliliter is None:
+        milliliter = Unit(
+            name="Milliliter",
+            symbol="ml",
+            dimension=UnitDimension.volume,
+            conversion_to_base=Decimal("1"),
+        )
+        session.add(milliliter)
+    session.flush()
+    return load_reference_units(session)
+
+
 def _backfill(session: Session) -> None:
     from sqlalchemy import select
 
@@ -70,7 +101,10 @@ def _backfill(session: Session) -> None:
         else:
             raise RuntimeError(f"Could not generate unique public key for dish {dish.id}")
 
-    gram_unit, ml_unit = load_reference_units(session)
+    if not dishes:
+        return
+
+    gram_unit, ml_unit = _ensure_reference_units(session, load_reference_units)
 
     for dish in dishes:
         recipes = list(

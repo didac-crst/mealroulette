@@ -60,7 +60,10 @@ export function IngredientTaxonomyPage() {
     }
     fetchFoodGroupFamilies(accessToken, selectedGroupId)
       .then(setFamilies)
-      .catch(() => setFamilies([]));
+      .catch((err) => {
+        setFamilies([]);
+        setError(err instanceof ApiError ? err.message : "Failed to load families");
+      });
   }, [accessToken, selectedGroupId]);
 
   useEffect(() => {
@@ -70,7 +73,10 @@ export function IngredientTaxonomyPage() {
     }
     fetchFamilyIngredients(accessToken, selectedFamilyId)
       .then(setIngredients)
-      .catch(() => setIngredients([]));
+      .catch((err) => {
+        setIngredients([]);
+        setError(err instanceof ApiError ? err.message : "Failed to load ingredients");
+      });
   }, [accessToken, selectedFamilyId]);
 
   async function handleResolve(event: FormEvent) {

@@ -1,4 +1,4 @@
-.PHONY: test test-unit test-integration test-backend test-frontend up down test-db-setup free-ports validate-taxonomy
+.PHONY: test test-unit test-integration test-backend test-frontend up down test-db-setup free-ports validate-taxonomy apply-conversion-policy reconcile-taxonomy
 
 test: test-db-setup test-backend test-frontend
 
@@ -36,4 +36,4 @@ apply-conversion-policy:
 	cd backend && python3.12 -m mealroulette.commands.apply_conversion_policy
 
 reconcile-taxonomy:
-	cd backend && python3.12 -m mealroulette.commands.reconcile_taxonomy && $(MAKE) validate-taxonomy
+	cd backend && python3.12 -m mealroulette.commands.reconcile_taxonomy && python3.12 -m mealroulette.commands.validate_taxonomy

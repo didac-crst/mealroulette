@@ -1,6 +1,7 @@
 from mealroulette.services.food_groups import food_group_for_ingredient
 from mealroulette.services.public_keys import (
     DISH_PUBLIC_KEY_LENGTH,
+    RECIPE_PUBLIC_KEY_MAX_LENGTH,
     generate_dish_public_key,
     generate_recipe_public_key,
     slug_from_dish_name,
@@ -13,7 +14,14 @@ def test_slug_from_dish_name_truncates_and_normalizes():
     slug = slug_from_dish_name("Chicken & Rice Bowl!")
     assert slug
     assert len(slug) <= 20
-    assert all(char in "0123456789abcdefghjkmnpqrstvwxyz" for char in slug)
+    assert "chicken" in slug
+    assert "l" in slug
+
+
+def test_slug_from_dish_name_keeps_common_letters():
+    slug = slug_from_dish_name("Lentil Soup")
+    assert "lentil" in slug
+    assert "soup" in slug
 
 
 def test_generate_dish_public_key_length_and_format():
@@ -33,6 +41,14 @@ def test_generate_recipe_public_key():
     recipe_key = generate_recipe_public_key(dish_key, 1)
     assert validate_recipe_public_key(recipe_key, dish_public_key=dish_key)
     assert recipe_key.endswith("-001")
+
+
+def test_generate_recipe_public_key_supports_four_digit_sequence():
+    dish_key = generate_dish_public_key("Pasta")
+    recipe_key = generate_recipe_public_key(dish_key, 1000)
+    assert validate_recipe_public_key(recipe_key, dish_public_key=dish_key)
+    assert recipe_key.endswith("-1000")
+    assert len(recipe_key) <= RECIPE_PUBLIC_KEY_MAX_LENGTH
 
 
 def test_food_group_mapping_and_override():

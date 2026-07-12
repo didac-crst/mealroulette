@@ -6,9 +6,9 @@ Phase 9 ingredient taxonomy specs, proposals, and validation reports.
 
 | File | Role |
 | --- | --- |
-| [backend/mealroulette/data/taxonomy/food_groups.yaml](../backend/mealroulette/data/taxonomy/food_groups.yaml) | 20 food groups |
-| [backend/mealroulette/data/taxonomy/ingredient_families.yaml](../backend/mealroulette/data/taxonomy/ingredient_families.yaml) | 55 families |
-| [backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml](../backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml) | 108 canonical ingredients (import target) |
+| [backend/mealroulette/data/taxonomy/food_groups.yaml](../backend/mealroulette/data/taxonomy/food_groups.yaml) | 22 food groups |
+| [backend/mealroulette/data/taxonomy/ingredient_families.yaml](../backend/mealroulette/data/taxonomy/ingredient_families.yaml) | 69 families |
+| [backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml](../backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml) | 412 canonical ingredients (import target) |
 
 See also [TAXONOMY_AND_RESOLVER.md](../TAXONOMY_AND_RESOLVER.md) and [COMPUTED_TRAITS.md](../COMPUTED_TRAITS.md).
 
@@ -33,10 +33,12 @@ Run the deterministic validator:
 cd backend && python3.12 -m mealroulette.commands.validate_taxonomy
 ```
 
-Latest exception report:
+Latest exception report (regenerate with `make validate-taxonomy` after seed or taxonomy changes):
 
 - [reports/taxonomy_validation_report.md](reports/taxonomy_validation_report.md)
 - [reports/taxonomy_validation_report.json](reports/taxonomy_validation_report.json)
+
+**Commit policy:** these reports are **checked in** as the last-known-good validation snapshot for the active seed. They are not hand-edited — run `make validate-taxonomy` whenever `mealroulette_ingredients_seed.yaml` or files under `backend/mealroulette/data/taxonomy/` change, then commit the updated reports alongside the data change.
 
 ## MVP policy highlights (from assessment)
 

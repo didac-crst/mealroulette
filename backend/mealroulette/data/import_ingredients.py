@@ -297,34 +297,18 @@ def import_ingredient_seed(
         )
 
         if ingredient is None:
-            season_start, season_end = _season_months(row.get("seasonality"))
             ingredient = Ingredient(
                 canonical_name=canonical,
                 display_name=row["display_name"],
-                category=row.get("category"),
-                food_group=food_group_for_ingredient(
-                    food_group=row.get("food_group"),
-                    category=row.get("category"),
-                    family=row.get("family"),
-                ),
-                family=row.get("family"),
-                storage_class=row.get("storage_class"),
-                storage_after_opening=row.get("storage_after_opening"),
-                culinary_category=row.get("culinary_category"),
-                product_form=row.get("product_form"),
-                preservation=row.get("preservation"),
-                traits_json=row.get("traits") if isinstance(row.get("traits"), dict) else None,
-                default_unit_id=_unit_id(units_by_symbol, row.get("default_recipe_unit")),
-                preferred_shopping_unit_id=_unit_id(units_by_symbol, row.get("preferred_shopping_unit")),
-                aggregation_unit_id=_unit_id(units_by_symbol, row.get("aggregation_unit")),
-                aggregation_strategy=_parse_strategy(row.get("aggregation_strategy")),
-                pantry_item=bool(row.get("pantry_item", False)),
-                season_start_month=season_start,
-                season_end_month=season_end,
-                notes=row.get("description"),
             )
             db.add(ingredient)
             db.flush()
+            _apply_seed_row_to_ingredient(
+                ingredient,
+                row,
+                canonical=canonical,
+                units_by_symbol=units_by_symbol,
+            )
             ingredients_added += 1
         else:
             previous_canonical = normalize_name(ingredient.canonical_name)

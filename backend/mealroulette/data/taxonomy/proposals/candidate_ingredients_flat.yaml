@@ -2341,7 +2341,7 @@ ingredients:
     priority: optional
     likely_food_group: fish
     likely_family: white_fish_family
-    aliases: [colin d Alaska, abadejo]
+    aliases: [colin d Alaska]
     notes: Pollock.
     risk_flags: []
     review_status: candidate
@@ -3576,7 +3576,7 @@ ingredients:
     priority: common
     likely_food_group: meat
     likely_family: chicken_family
-    aliases: [cuisse de poulet, muslo de pollo]
+    aliases: [cuisse de poulet, pierna de pollo]
     notes: Chicken leg.
     risk_flags: []
     review_status: candidate

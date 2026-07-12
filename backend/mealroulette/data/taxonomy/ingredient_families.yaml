@@ -65,14 +65,15 @@ ingredient_families:
 - id: bread_family
   food_group: carbohydrate
   label: Bread family
-  description: 'Baguette, country bread, sandwich bread, rye bread, sourdough, brioche, buns, panko, croutons, and similar
-    bread products.
+  description: 'Loaves and rolls eaten as bread (baguette, sourdough, rye, brioche, buns). Use bread_pastry_family for dough,
+    pastry, and flatbreads.
 
     '
 - id: bread_pastry_family
   food_group: carbohydrate
   label: Bread and pastry family
-  description: 'Bread, dough, pastry, puff pastry, pizza dough, tortillas, wraps, flatbreads, and similar.
+  description: 'Dough, pastry, puff pastry, pizza dough, tortillas, wraps, flatbreads, panko, and croutons. Use bread_family
+    for whole loaves and rolls.
 
     '
 - id: carrot_family
@@ -297,7 +298,7 @@ ingredient_families:
   food_group: condiment
   label: Prepared sauce family
   description: 'Mayonnaise, aioli, ketchup, Worcestershire sauce, prepared bechamel, demi-glace, and similar bought prepared
-    sauces.
+    sauces. Use olive_pickle_family for capers and olives.
 
     '
 - id: rabbit_family
@@ -321,8 +322,8 @@ ingredient_families:
 - id: sauce_condiment_family
   food_group: condiment
   label: Sauce and condiment family
-  description: 'Prepared sauces, spreads, pastes, and condiments that are not better classified in a more specific family
-    (mayonnaise, peanut butter, allioli, capers, and similar).
+  description: 'Spreads, pastes, and condiments without a more specific family (peanut butter, allioli, mustard, and similar).
+    Use prepared_sauce_family for mayonnaise and bought sauces; olive_pickle_family for capers and olives.
 
     '
 - id: seed_family

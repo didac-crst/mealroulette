@@ -11,15 +11,17 @@ These files are **proposal and validation inputs** from the Phase 9 catalogue ex
 
 **Active truth** remains:
 
-- `backend/mealroulette/data/taxonomy/food_groups.yaml` (20 groups)
-- `backend/mealroulette/data/taxonomy/ingredient_families.yaml` (55 families)
-- `backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml` (108 ingredients)
+- `backend/mealroulette/data/taxonomy/food_groups.yaml` (22 groups)
+- `backend/mealroulette/data/taxonomy/ingredient_families.yaml` (69 families)
+- `backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml` (412 ingredients)
 
 ## Validate proposals
 
 ```bash
-cd backend && python3.12 -m mealroulette.commands.validate_taxonomy
+cd backend && python3.12 -m mealroulette.commands.validate_taxonomy --proposal
 ```
+
+Default `validate_taxonomy` validates the **active seed** only. Use `--proposal` for files under this directory.
 
 Optional flags: `--candidates`, `--taxonomy`, `--report`, `--json-report`.
 

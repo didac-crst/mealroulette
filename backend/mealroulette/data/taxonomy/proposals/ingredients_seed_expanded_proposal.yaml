@@ -3645,7 +3645,7 @@ ingredients:
     preferred_shopping_unit: g
     aggregation_unit: g
     aggregation_strategy: prefer_mass
-    aliases: [colin d Alaska, abadejo]
+    aliases: [colin d Alaska]
     review_status: candidate
   - canonical_name: smoked_salmon
     display_name: Smoked Salmon
@@ -5571,7 +5571,7 @@ ingredients:
     preferred_shopping_unit: unit
     aggregation_unit: unit
     aggregation_strategy: prefer_count
-    aliases: [cuisse de poulet, muslo de pollo]
+    aliases: [cuisse de pollo, pierna de pollo]
     review_status: candidate
   - canonical_name: chicken_mince
     display_name: Chicken Mince

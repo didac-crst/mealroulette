@@ -100,6 +100,8 @@ def normalize_conversion_row(canonical: str, conversion: dict[str, Any]) -> dict
     row = deepcopy(conversion)
     from_unit = str(row.get("from_unit", "")).strip()
     to_unit = str(row.get("to_unit", "")).strip()
+    row["from_unit"] = from_unit
+    row["to_unit"] = to_unit
 
     if _is_exact_pair(from_unit, to_unit):
         expected = EXACT_CONVERSION_FACTORS[(from_unit, to_unit)]

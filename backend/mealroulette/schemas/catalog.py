@@ -2,7 +2,9 @@ from datetime import datetime
 from decimal import Decimal
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+from mealroulette.data.taxonomy_loader import food_group_ids
 
 from mealroulette.models.enums import (
     AggregationStrategy,
@@ -18,6 +20,17 @@ from mealroulette.models.enums import (
     UnitDimension,
     VegetableLevel,
 )
+
+_VALID_FOOD_GROUPS = food_group_ids()
+
+
+def _validate_food_group_value(value: str | None) -> str | None:
+    if value is None:
+        return value
+    normalized = value.strip().lower()
+    if normalized not in _VALID_FOOD_GROUPS:
+        raise ValueError(f"Unknown food_group: {value}")
+    return normalized
 
 
 class UnitPublic(BaseModel):
@@ -132,6 +145,11 @@ class IngredientCreateRequest(BaseModel):
     notes: str | None = None
     aliases: list[str] = Field(default_factory=list)
 
+    @field_validator("food_group")
+    @classmethod
+    def validate_food_group(cls, value: str | None) -> str | None:
+        return _validate_food_group_value(value)
+
 
 class IngredientUpdateRequest(BaseModel):
     display_name: str | None = Field(default=None, min_length=1, max_length=128)
@@ -151,6 +169,11 @@ class IngredientUpdateRequest(BaseModel):
     season_start_month: int | None = Field(default=None, ge=1, le=12)
     season_end_month: int | None = Field(default=None, ge=1, le=12)
     notes: str | None = None
+
+    @field_validator("food_group")
+    @classmethod
+    def validate_food_group(cls, value: str | None) -> str | None:
+        return _validate_food_group_value(value)
 
 
 class IngredientUnitConversionCreateRequest(BaseModel):

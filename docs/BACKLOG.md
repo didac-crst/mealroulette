@@ -175,7 +175,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [x] Migration: `ingredients.food_group`, `dishes.public_key`, `recipes.public_key`, `recipes.sequence_number`, `recipes.computed_traits_json`
 - [x] Backfill food groups from category mapping; backfill public keys and recipe sequences; compute traits
 - [x] Stable dish public keys (`<slug>-<random>`, length 32, immutable on rename)
-- [x] Stable recipe public keys (`<dish_public_key>-001`, sequence width 3)
+- [x] Stable recipe public keys (`<dish_public_key>-001`, min 3-digit sequence; grows for 1000+)
 - [x] Ingredient food-group vocabulary + centralized category→group mapping module
 - [x] Recipe trait computation service (family vector, food groups, vegan, carb_heavy, dominant carb/protein)
 - [x] Explicit trait refresh on recipe/ingredient/conversion changes
@@ -202,6 +202,10 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [x] Deterministic validator + exception report — `make validate-taxonomy`
 - [x] Reconcile active seed — **412 ingredients**, **0 blockers** — [docs/taxonomy/RECONCILIATION_LOG.md](taxonomy/RECONCILIATION_LOG.md)
 - [x] Migration `023` — `storage_class`, `culinary_category`, `product_form`, `preservation`
+- [x] Migration `024` — `storage_after_opening`, `traits_json`
+- [x] Migration `025` — widen `recipes.public_key` for long sequence suffixes
+- [x] Human review batch — 17 active ingredients resolved (see [RECONCILIATION_LOG.md](taxonomy/RECONCILIATION_LOG.md))
+- [x] CodeRabbit review findings addressed (PR #9)
 - [ ] Re-import reconciled seed into running DB (`import_ingredient_seed` after deploy)
 - [ ] LLM semantic validation batches — [llm_taxonomy_review_prompt.md](taxonomy/llm_taxonomy_review_prompt.md)
 - [ ] Recipe-driven validation (≥95% auto-resolve target)
@@ -441,7 +445,7 @@ Branch: `phase-9/computed-recipe-traits` (target `v0.6.0`). Full plan: [CURSOR_R
 
 **Ingredient seed (single file):** `backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml` — validated against taxonomy on import. The duplicate `taxonomy/ingredients_seed.yaml` and embedded `ingredient_families` block in the fixtures file were removed.
 
-- [x] Migration `022` + backfill (food groups, public keys, recipe sequences, computed traits)
+- [x] Migration `022`–`025` + backfill (food groups, public keys, recipe sequences, computed traits, taxonomy metadata)
 - [x] Public key generation services + tests
 - [x] Food group mapping module + ingredient API/UI
 - [x] Recipe trait computation + refresh hooks
@@ -452,7 +456,7 @@ Branch: `phase-9/computed-recipe-traits` (target `v0.6.0`). Full plan: [CURSOR_R
 - [x] Ingredient resolver (exact/alias/fuzzy/classify-candidate) + taxonomy browsing APIs
 - [x] Taxonomy navigator UI (`/ingredients/taxonomy`)
 - [x] Release notes `v0.6.0.md` (draft)
-- [x] Validation: `make test-backend` (177 passed), frontend 18 passed, `npm run build` green
+- [x] Validation: `make test-backend` (189 passed, 2 skipped), frontend 18 passed, `npm run build` green; `make validate-taxonomy` — 0 blockers
 
 ### Phases 10–13
 

@@ -22,6 +22,12 @@ def test_exact_tbsp_ml_is_approved():
     assert row["factor"] == 15
 
 
+def test_normalize_conversion_row_writes_back_stripped_units():
+    row = normalize_conversion_row("capers", {"from_unit": " tbsp ", "to_unit": " ml ", "factor": 15})
+    assert row["from_unit"] == "tbsp"
+    assert row["to_unit"] == "ml"
+
+
 def test_herb_bunch_to_g_unapproved():
     row = normalize_conversion_row(
         "parsley",

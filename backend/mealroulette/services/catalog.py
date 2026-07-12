@@ -286,24 +286,29 @@ class CatalogService:
 
     def resolve_ingredient(self, proposed_name: str) -> IngredientResolveResponse:
         raw = IngredientResolverService(self.db).resolve(proposed_name)
+        ingredient_ids: list[int] = []
+        if raw.get("ingredient") and raw["ingredient"].get("id") is not None:
+            ingredient_ids.append(int(raw["ingredient"]["id"]))
+        for item in raw.get("suggestions") or []:
+            if item.get("id") is not None:
+                ingredient_ids.append(int(item["id"]))
+
+        by_id: dict[int, Ingredient] = {}
+        if ingredient_ids:
+            for loaded in self.db.scalars(select(Ingredient).where(Ingredient.id.in_(ingredient_ids))):
+                by_id[loaded.id] = loaded
+
         ingredient = None
         if raw.get("ingredient"):
-            canonical = raw["ingredient"]["canonical_name"]
-            db_ingredient = self.db.scalar(
-                select(Ingredient).where(func.lower(Ingredient.canonical_name) == normalize_name(canonical))
-            )
-            if db_ingredient is not None:
-                ingredient = self.to_ingredient_public(db_ingredient)
+            match_id = raw["ingredient"].get("id")
+            if match_id is not None and int(match_id) in by_id:
+                ingredient = self.to_ingredient_public(by_id[int(match_id)])
 
-        suggestions: list[IngredientPublic] = []
-        for item in raw.get("suggestions") or []:
-            db_ingredient = self.db.scalar(
-                select(Ingredient).where(
-                    func.lower(Ingredient.canonical_name) == normalize_name(item["canonical_name"])
-                )
-            )
-            if db_ingredient is not None:
-                suggestions.append(self.to_ingredient_public(db_ingredient))
+        suggestions = [
+            self.to_ingredient_public(by_id[int(item["id"])])
+            for item in (raw.get("suggestions") or [])
+            if item.get("id") is not None and int(item["id"]) in by_id
+        ]
 
         return IngredientResolveResponse(
             status=raw["status"],
@@ -371,6 +376,10 @@ class CatalogService:
                 family=payload.family,
             ),
             family=payload.family,
+            storage_class=payload.storage_class,
+            culinary_category=payload.culinary_category,
+            product_form=payload.product_form,
+            preservation=payload.preservation,
             default_unit_id=payload.default_unit_id,
             default_dimension=payload.default_dimension,
             preferred_shopping_unit_id=payload.preferred_shopping_unit_id,
@@ -599,30 +608,43 @@ class CatalogService:
     def create_dish(self, payload: DishCreateRequest) -> Dish:
         if self.db.scalar(select(Dish).where(Dish.name == payload.name)):
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Dish already exists")
-        dish = Dish(
-            public_key=self._generate_unique_dish_public_key(payload.name),
-            name=payload.name,
-            description=payload.description,
-            default_servings=payload.default_servings,
-            course=payload.course,
-            status=payload.status,
-            image_url=payload.image_url,
-            suitable_for_lunch=payload.suitable_for_lunch,
-            suitable_for_dinner=payload.suitable_for_dinner,
-            weekday_friendly=payload.weekday_friendly,
-            leftovers_possible=payload.leftovers_possible,
-            freezer_friendly=payload.freezer_friendly,
-            kids_friendly=payload.kids_friendly,
-            active=payload.status == DishStatus.active,
-            notes=payload.notes,
+        for attempt in range(5):
+            dish = Dish(
+                public_key=self._generate_unique_dish_public_key(payload.name),
+                name=payload.name,
+                description=payload.description,
+                default_servings=payload.default_servings,
+                course=payload.course,
+                status=payload.status,
+                image_url=payload.image_url,
+                suitable_for_lunch=payload.suitable_for_lunch,
+                suitable_for_dinner=payload.suitable_for_dinner,
+                weekday_friendly=payload.weekday_friendly,
+                leftovers_possible=payload.leftovers_possible,
+                freezer_friendly=payload.freezer_friendly,
+                kids_friendly=payload.kids_friendly,
+                active=payload.status == DishStatus.active,
+                notes=payload.notes,
+            )
+            self.db.add(dish)
+            self.db.flush()
+            self._apply_tags(dish, payload.tag_ids)
+            self._apply_seasonality(dish, payload.seasonality)
+            try:
+                self.db.commit()
+                self.db.refresh(dish)
+                return self.get_dish(dish.id)
+            except IntegrityError:
+                self.db.rollback()
+                if attempt == 4:
+                    raise HTTPException(
+                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        detail="Could not generate unique dish public key",
+                    ) from None
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Could not generate unique dish public key",
         )
-        self.db.add(dish)
-        self.db.flush()
-        self._apply_tags(dish, payload.tag_ids)
-        self._apply_seasonality(dish, payload.seasonality)
-        self.db.commit()
-        self.db.refresh(dish)
-        return self.get_dish(dish.id)
 
     def update_dish(self, dish_id: int, payload: DishUpdateRequest) -> Dish:
         dish = self.get_dish(dish_id)
@@ -672,27 +694,42 @@ class CatalogService:
         ):
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Recipe variant already exists")
         is_main = payload.is_main if payload.is_main is not None else len(dish.recipes) == 0
-        if is_main:
-            for existing in dish.recipes:
-                existing.is_main = False
         data = payload.model_dump(exclude={"is_thermomix", "is_main"})
         recipe_type = self._resolve_recipe_type(payload.recipe_type, payload.is_thermomix)
-        sequence_number = self._next_recipe_sequence_number(dish_id)
-        recipe = Recipe(
-            dish_id=dish_id,
-            public_key=self._recipe_public_key(dish, sequence_number),
-            sequence_number=sequence_number,
-            is_main=is_main,
-            computed_traits_json={},
-            **data,
+
+        for attempt in range(5):
+            if is_main:
+                for existing in dish.recipes:
+                    existing.is_main = False
+            sequence_number = self._next_recipe_sequence_number(dish_id)
+            recipe = Recipe(
+                dish_id=dish_id,
+                public_key=self._recipe_public_key(dish, sequence_number),
+                sequence_number=sequence_number,
+                is_main=is_main,
+                computed_traits_json={},
+                **data,
+            )
+            self._apply_recipe_type(recipe, recipe_type)
+            self.db.add(recipe)
+            try:
+                self.db.flush()
+                self._refresh_recipe_traits(recipe)
+                self.db.commit()
+                self.db.refresh(recipe)
+                return recipe
+            except IntegrityError:
+                self.db.rollback()
+                dish = self.get_dish(dish_id)
+                if attempt == 4:
+                    raise HTTPException(
+                        status_code=status.HTTP_409_CONFLICT,
+                        detail="Recipe sequence number conflict; retry the request",
+                    ) from None
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Recipe sequence number conflict; retry the request",
         )
-        self._apply_recipe_type(recipe, recipe_type)
-        self.db.add(recipe)
-        self.db.flush()
-        self._refresh_recipe_traits(recipe)
-        self.db.commit()
-        self.db.refresh(recipe)
-        return recipe
 
     def update_recipe(self, recipe_id: int, payload: RecipeUpdateRequest) -> Recipe:
         recipe = self.get_recipe(recipe_id)

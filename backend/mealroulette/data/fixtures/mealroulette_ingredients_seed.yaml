@@ -551,7 +551,6 @@ ingredients:
   - poivron
   - poivrons
   - sweet pepper
-  - pepper
   - bell pepper
   seasonality:
     preferred_months:
@@ -2994,7 +2993,7 @@ ingredients:
   description: Frozen green peas.
   category: frozen
   family: legume_family
-  pantry_item: true
+  pantry_item: false
   default_recipe_unit: g
   preferred_shopping_unit: g
   aggregation_unit: g
@@ -3003,7 +3002,9 @@ ingredients:
   - petits pois surgelés
   - peas frozen
   - frozen peas
-  storage_class: ambient
+  food_group: legume
+  review_status: candidate
+  storage_class: frozen
 - canonical_name: fuet
   display_name: Fuet
   description: 'Catalan cured sausage..

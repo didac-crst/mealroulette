@@ -729,8 +729,8 @@ Full ~2,000-row catalog growth via `batch_plan.yaml` remains a **later explicit 
 **Expansion frozen** per [ADR 001](../adr/001-ingredient-taxonomy-contract.md). Active catalogue reconciled from proposal:
 
 - **412 ingredients** in `mealroulette_ingredients_seed.yaml`
-- **68 families**, **22 food groups**
-- Validator: **0 blockers** (`make validate-taxonomy`)
+- **69 families**, **22 food groups**
+- Validator: **0 blockers**, **0 needs_human_review** (`make validate-taxonomy`)
 
 Reconcile command: `make reconcile-taxonomy`
 

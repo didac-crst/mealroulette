@@ -22,17 +22,6 @@ from mealroulette.services.scheduler.family_vector import (
 
 CARB_HEAVY_THRESHOLD_PCT = 33.0
 
-EMPTY_TRAITS: dict = {
-    "family_vector": {},
-    "food_group_weights": {},
-    "contains_food_groups": [],
-    "contains_meat": False,
-    "vegan": True,
-    "carb_heavy": False,
-    "dominant_carb": None,
-    "dominant_protein": None,
-}
-
 
 def _normalize_weights(totals: dict[str, Decimal]) -> dict[str, float]:
     total = sum(totals.values(), start=Decimal("0"))

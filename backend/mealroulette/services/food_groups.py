@@ -29,8 +29,8 @@ CATEGORY_TO_FOOD_GROUP: dict[str, str] = {
     "stock": "stock",
     "alcohol": "alcohol",
     "pantry": "pantry",
-    "canned": "pantry",
-    "preserved": "pantry",
+    "canned": "other",
+    "preserved": "other",
     "frozen": "other",
 }
 

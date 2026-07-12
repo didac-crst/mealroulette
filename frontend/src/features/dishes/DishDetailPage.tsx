@@ -18,6 +18,7 @@ import { useAuth } from "../auth/AuthContext";
 import { formatRecipeDifficulty, formatRecipeTime } from "./effectiveValues";
 import { DishClassificationSummary } from "./DishClassificationSummary";
 import { dishPlaceholderEmoji } from "./dishVisual";
+import { formatComputedTraits } from "./computedTraits";
 import { PlanForMealDialog } from "../planning/PlanForMealDialog";
 
 type RecipeSummary = {
@@ -138,21 +139,7 @@ export function DishDetailPage() {
             {dish.description ? <p>{dish.description}</p> : null}
             <p className="muted">Public key: {dish.public_key}</p>
             {dish.computed_traits_json ? (
-              <p className="muted">
-                Traits:{" "}
-                {[
-                  dish.computed_traits_json.vegan ? "vegan" : "not vegan",
-                  dish.computed_traits_json.carb_heavy ? "carb-heavy" : null,
-                  dish.computed_traits_json.dominant_protein
-                    ? `protein ${String(dish.computed_traits_json.dominant_protein)}`
-                    : null,
-                  dish.computed_traits_json.dominant_carb
-                    ? `carb ${String(dish.computed_traits_json.dominant_carb)}`
-                    : null,
-                ]
-                  .filter(Boolean)
-                  .join(" · ")}
-              </p>
+              <p className="muted">Traits: {formatComputedTraits(dish.computed_traits_json)}</p>
             ) : null}
           </div>
         </div>

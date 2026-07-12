@@ -55,7 +55,7 @@ Resolved **17** active ingredients previously tagged `needs_human_review`:
 | `approved_exception` for tomato paste condiment rule | tomato_paste |
 | Storage / family confirmations | avocado, canned_chopped_tomatoes, black_olives, capers, coconut_milk, mayonnaise (+ `storage_after_opening`), curry_powder, oregano, cream_cheese, fish_stock, vegetable_stock, white_wine |
 
-Added **`corn_family`** (69 families). Migration **`024`**: `storage_after_opening`, `traits_json` on ingredients.
+Added **`corn_family`** (69 families). Migrations **`024`** (`storage_after_opening`, `traits_json`) and **`025`** (recipe public key width).
 
 ```bash
 cd backend && python -m mealroulette.data.apply_human_review_decisions

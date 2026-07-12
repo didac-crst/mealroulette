@@ -11,6 +11,7 @@ Git tags mark **product versions** users can run. We do not tag individual imple
 | `v0.3.0` | Phase 6 merged — shopping lists, ingredient catalog, unit aggregation — **released** |
 | `v0.4.0` | Phase 7 merged — Telegram reminders, bot commands, recipe links — **released** |
 | `v0.5.0` | Phase 8 merged — explainable scheduler, family-vector similarity, scheduled roulette — *(ready, PR #8)* — [release notes](releases/v0.5.0.md) |
+| `v0.6.0` | Phase 9 — computed recipe traits, ingredient taxonomy, resolver — *(in progress, PR #9)* — [release notes](releases/v0.6.0.md) |
 
 Use [semantic versioning](https://semver.org/) at the product-version level: `vMAJOR.MINOR.PATCH`. Patch bumps are for fixes on an already-released version line.
 

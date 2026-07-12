@@ -18,6 +18,10 @@ class TaxonomyService:
     def __init__(self, db: Session) -> None:
         self.db = db
 
+    @staticmethod
+    def _family_ids() -> set[str]:
+        return {family.id for family in load_ingredient_families()}
+
     def list_food_groups(self) -> list[FoodGroupPublic]:
         return [
             FoodGroupPublic(id=group.id, label=group.label, description=group.description)
@@ -40,6 +44,7 @@ class TaxonomyService:
         ]
 
     def list_ingredients_for_family(self, family_id: str) -> list[IngredientTaxonomySummary]:
+        family_ids = self._family_ids()
         normalized = family_id.strip().lower()
         ingredients = self.db.scalars(
             select(Ingredient)
@@ -50,7 +55,7 @@ class TaxonomyService:
             )
             .order_by(Ingredient.display_name)
         ).all()
-        return [self._summarize_ingredient(ingredient) for ingredient in ingredients]
+        return [self._summarize_ingredient(ingredient, family_ids) for ingredient in ingredients]
 
     def overview(self) -> IngredientTaxonomyOverview:
         ingredients = list(self.db.scalars(select(Ingredient)))
@@ -94,7 +99,7 @@ class TaxonomyService:
                     missing_metadata_count=0,
                 )
             group_rows[group_id].ingredient_count += 1
-            if not ingredient.family or not ingredient.food_group or ingredient.family not in family_ids:
+            if self._is_missing_family(ingredient, family_ids) or not ingredient.food_group:
                 group_rows[group_id].missing_metadata_count += 1
 
         return IngredientTaxonomyOverview(
@@ -109,7 +114,13 @@ class TaxonomyService:
             food_groups=sorted(group_rows.values(), key=lambda row: row.label),
         )
 
-    def _summarize_ingredient(self, ingredient: Ingredient) -> IngredientTaxonomySummary:
+    @staticmethod
+    def _is_missing_family(ingredient: Ingredient, family_ids: set[str]) -> bool:
+        if not ingredient.family:
+            return True
+        return ingredient.family not in family_ids
+
+    def _summarize_ingredient(self, ingredient: Ingredient, family_ids: set[str]) -> IngredientTaxonomySummary:
         approved = sum(1 for conversion in ingredient.unit_conversions if conversion.approved)
         unapproved = sum(1 for conversion in ingredient.unit_conversions if not conversion.approved)
         return IngredientTaxonomySummary(
@@ -122,6 +133,6 @@ class TaxonomyService:
             alias_count=len(ingredient.aliases),
             approved_conversion_count=approved,
             unapproved_conversion_count=unapproved,
-            missing_family=not ingredient.family,
+            missing_family=self._is_missing_family(ingredient, family_ids),
             missing_food_group=not ingredient.food_group,
         )

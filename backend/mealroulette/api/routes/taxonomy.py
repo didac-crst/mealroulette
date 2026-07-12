@@ -34,9 +34,10 @@ def list_food_group_families(
     _user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> list[IngredientFamilyPublic]:
-    families = TaxonomyService(db).list_families(food_group_id=food_group_id)
+    service = TaxonomyService(db)
+    families = service.list_families(food_group_id=food_group_id)
     if not families:
-        valid = {group.id for group in TaxonomyService(db).list_food_groups()}
+        valid = {group.id for group in service.list_food_groups()}
         if food_group_id.strip().lower() not in valid:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Food group not found")
     return families
@@ -48,10 +49,11 @@ def list_family_ingredients(
     _user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> list[IngredientTaxonomySummary]:
-    valid_families = {family.id for family in TaxonomyService(db).list_families()}
+    service = TaxonomyService(db)
+    valid_families = {family.id for family in service.list_families()}
     if family_id.strip().lower() not in valid_families:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ingredient family not found")
-    return TaxonomyService(db).list_ingredients_for_family(family_id)
+    return service.list_ingredients_for_family(family_id)
 
 
 @router.get("/ingredient-taxonomy/overview", response_model=IngredientTaxonomyOverview)

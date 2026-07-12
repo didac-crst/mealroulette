@@ -189,18 +189,27 @@ Display/filter metadata only — assignment semantics unchanged.
 
 | Schema | New fields |
 | --- | --- |
-| `IngredientPublic` / create / update | `food_group` |
+| `IngredientPublic` / create / update | `food_group`, `storage_class`, `storage_after_opening`, `culinary_category`, `product_form`, `preservation`, `traits_json` |
 | `DishPublic` | `public_key`, `computed_traits_json` |
 | `RecipePublic` | `public_key`, `sequence_number`, `computed_traits_json` |
 | `MealPlanItemPublic` | `computed_traits_json` |
 
-## Migration (`022_computed_traits`)
+## Migrations
+
+| Revision | Purpose |
+| --- | --- |
+| `022_computed_traits` | Food groups, public keys, recipe sequences, computed traits backfill |
+| `023_ingredient_taxonomy_metadata` | `storage_class`, `culinary_category`, `product_form`, `preservation` |
+| `024_ingredient_traits_storage` | `storage_after_opening`, `traits_json` |
+| `025_recipe_public_key_length` | Widen `recipes.public_key` for 4+ digit sequence suffixes |
+
+### `022_computed_traits` backfill steps
 
 1. Add nullable columns.
 2. Backfill food groups from category mapping.
 3. Backfill dish public keys.
-4. Backfill recipe sequence numbers and public keys.
-5. Compute recipe traits.
+4. Backfill recipe sequence numbers and public keys (when dishes exist).
+5. Compute recipe traits (when dishes exist; seeds `g`/`ml` if missing).
 6. Enforce NOT NULL + unique constraints.
 
 ## Scheduler integration
@@ -231,6 +240,8 @@ All existing scheduler and weekly-target tests must pass.
 | Area | Location |
 | --- | --- |
 | Migration + backfill | `backend/alembic/versions/022_computed_traits.py` |
+| Taxonomy metadata | `023_ingredient_taxonomy_metadata.py`, `024_ingredient_traits_storage.py` |
+| Recipe key width | `025_recipe_public_key_length.py` |
 | Public keys | `backend/mealroulette/services/public_keys.py` |
 | Food groups | `backend/mealroulette/services/food_groups.py`, taxonomy YAML under `backend/mealroulette/data/taxonomy/` |
 | Recipe traits | `backend/mealroulette/services/recipe_traits.py` |
@@ -242,4 +253,4 @@ All existing scheduler and weekly-target tests must pass.
 | Frontend | `frontend/src/features/ingredients/IngredientTaxonomyPage.tsx`, catalog/planning types |
 | Tests | `tests/test_computed_traits.py`, `test_recipe_traits.py`, `test_phase9_acceptance.py`, `test_ingredient_resolver.py`, `test_taxonomy_api.py`, `test_taxonomy_loader.py` |
 
-Validation (2026-07-12): `make test-backend` — 177 passed; frontend — 18 passed, build green.
+Validation (2026-07-12): `make test-backend` — 189 passed, 2 skipped; frontend — 18 passed, build green. Taxonomy: `make validate-taxonomy` — 412 auto-accepted, 0 blockers.

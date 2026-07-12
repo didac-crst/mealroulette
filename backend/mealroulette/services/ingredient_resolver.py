@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from difflib import SequenceMatcher
 
 from sqlalchemy import func, or_, select
@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from mealroulette.data.taxonomy_loader import load_food_groups, load_ingredient_families
 from mealroulette.models.catalog import Ingredient, IngredientAlias
-from mealroulette.services.names import normalize_alias, normalize_name
+from mealroulette.services.names import normalize_alias
 
 AUTO_RESOLVE_SCORE = 0.95
 AUTO_RESOLVE_GAP = 0.10
@@ -74,13 +74,23 @@ def _combined_score(query: str, candidate: str) -> float:
 @dataclass
 class IngredientResolverService:
     db: Session
+    _index: list[IndexedName] | None = field(default=None, init=False, repr=False)
+    _lookup: dict[str, IndexedName] | None = field(default=None, init=False, repr=False)
 
-    def _build_index(self) -> list[IndexedName]:
+    def _build_index(self) -> tuple[list[IndexedName], dict[str, IndexedName]]:
+        if self._index is not None and self._lookup is not None:
+            return self._index, self._lookup
+
         entries: list[IndexedName] = []
+        lookup: dict[str, IndexedName] = {}
         ingredients = self.db.scalars(select(Ingredient)).all()
         aliases = self.db.scalars(
             select(IngredientAlias).options(selectinload(IngredientAlias.ingredient))
         ).all()
+
+        def _register(entry: IndexedName) -> None:
+            entries.append(entry)
+            lookup.setdefault(entry.normalized, entry)
 
         for ingredient in ingredients:
             for matched_on, raw in (
@@ -89,7 +99,7 @@ class IngredientResolverService:
             ):
                 normalized = normalize_resolver_text(raw.replace("_", " "))
                 if normalized:
-                    entries.append(
+                    _register(
                         IndexedName(
                             value=raw,
                             normalized=normalized,
@@ -99,7 +109,7 @@ class IngredientResolverService:
                     )
                 compact = _compact(normalized)
                 if compact and compact != normalized:
-                    entries.append(
+                    _register(
                         IndexedName(
                             value=raw,
                             normalized=compact,
@@ -112,7 +122,7 @@ class IngredientResolverService:
             normalized = normalize_resolver_text(alias_row.alias)
             if not normalized:
                 continue
-            entries.append(
+            _register(
                 IndexedName(
                     value=alias_row.alias,
                     normalized=normalized,
@@ -120,11 +130,15 @@ class IngredientResolverService:
                     ingredient=alias_row.ingredient,
                 )
             )
-        return entries
+
+        self._index = entries
+        self._lookup = lookup
+        return entries, lookup
 
     @staticmethod
     def _to_match(ingredient: Ingredient, *, score: float | None = None) -> dict:
         return {
+            "id": ingredient.id,
             "canonical_name": ingredient.canonical_name,
             "display_name": ingredient.display_name,
             "food_group": ingredient.food_group,
@@ -132,22 +146,28 @@ class IngredientResolverService:
             "score": score,
         }
 
+    def _exact_entry(self, proposed_name: str) -> IndexedName | None:
+        normalized = normalize_resolver_text(proposed_name.strip())
+        compact_query = _compact(normalized)
+        _, lookup = self._build_index()
+        return lookup.get(normalized) or lookup.get(compact_query)
+
     def resolve(self, proposed_name: str) -> dict:
         query = proposed_name.strip()
         normalized = normalize_resolver_text(query)
         compact_query = _compact(normalized)
 
-        index = self._build_index()
-        for entry in index:
-            if entry.normalized == normalized or entry.normalized == compact_query:
-                return {
-                    "status": "exact",
-                    "query": query,
-                    "matched_on": entry.matched_on,
-                    "matched_value": entry.value,
-                    "ingredient": self._to_match(entry.ingredient, score=1.0),
-                    "suggestions": [],
-                }
+        index, lookup = self._build_index()
+        exact = lookup.get(normalized) or lookup.get(compact_query)
+        if exact is not None:
+            return {
+                "status": "exact",
+                "query": query,
+                "matched_on": exact.matched_on,
+                "matched_value": exact.value,
+                "ingredient": self._to_match(exact.ingredient, score=1.0),
+                "suggestions": [],
+            }
 
         scored: dict[int, tuple[float, IndexedName]] = {}
         for entry in index:
@@ -239,8 +259,8 @@ class IngredientResolverService:
         family_scores.sort(key=lambda item: item[0], reverse=True)
         ingredient_scores.sort(key=lambda item: item[0], reverse=True)
 
-        resolve_result = self.resolve(name)
-        if resolve_result.get("status") == "exact" and resolve_result.get("ingredient"):
+        exact = self._exact_entry(name)
+        if exact is not None:
             return {
                 "status": "exact",
                 "query": name,
@@ -248,12 +268,12 @@ class IngredientResolverService:
                 "families": [],
                 "ingredients": [
                     {
-                        "canonical_name": resolve_result["ingredient"]["canonical_name"],
-                        "display_name": resolve_result["ingredient"]["display_name"],
-                        "family": resolve_result["ingredient"]["family"],
-                        "food_group": resolve_result["ingredient"]["food_group"],
+                        "canonical_name": exact.ingredient.canonical_name,
+                        "display_name": exact.ingredient.display_name,
+                        "family": exact.ingredient.family,
+                        "food_group": exact.ingredient.food_group,
                         "reason": "Exact catalog match",
-                        "score": resolve_result["ingredient"].get("score"),
+                        "score": 1.0,
                     }
                 ],
                 "draft": None,

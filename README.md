@@ -2,7 +2,7 @@
 
 MealRoulette is a self-hosted household meal planning app for deciding what to eat, planning lunch and dinner, generating shopping lists, sending Telegram reminders, and cooking from structured recipe steps.
 
-**v0.5.0** adds the explainable meal scheduler: generate week, reroll, undo, family-vector similarity, selection reasons, scheduled Friday roulette, and Telegram “New roulette”. See [docs/releases/v0.5.0.md](docs/releases/v0.5.0.md) and [docs/SCHEDULER.md](docs/SCHEDULER.md).
+**v0.5.0** adds the explainable meal scheduler. **v0.6.0** (branch `phase-9/computed-recipe-traits`, PR #9) adds computed recipe traits, ingredient taxonomy, and the resolver — see [docs/releases/v0.6.0.md](docs/releases/v0.6.0.md), [docs/COMPUTED_TRAITS.md](docs/COMPUTED_TRAITS.md), and [docs/TAXONOMY_AND_RESOLVER.md](docs/TAXONOMY_AND_RESOLVER.md).
 
 ## Documentation
 
@@ -122,7 +122,7 @@ alembic upgrade head
 python -m mealroulette.commands.seed_reference_data
 ```
 
-Reference data lives in `backend/mealroulette/data/reference/` (`units.yaml`, `tags.yaml`). Ingredient taxonomy (food groups and families) lives in `backend/mealroulette/data/taxonomy/`. The canonical ingredient seed is `backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml` (aliases, units, conversions; validated against taxonomy on import). The legacy `reference/ingredient_conversions.yaml` is deprecated. Loaders are idempotent: re-running them only inserts missing rows.
+Reference data lives in `backend/mealroulette/data/reference/` (`units.yaml`, `tags.yaml`). Ingredient taxonomy (food groups and families) lives in `backend/mealroulette/data/taxonomy/`. The canonical ingredient seed is `backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml` (aliases, units, conversions; validated against taxonomy on import). The legacy `reference/ingredient_conversions.yaml` is deprecated. Reference loaders (`units.yaml`, `tags.yaml`) are idempotent and only insert missing rows. The ingredient seed importer upserts existing ingredients and updates their seeded taxonomy fields on every run.
 
 Unit compatibility and aggregation rules (when to merge g + kg, when to keep "2 onions" and "200 g onion" separate, when to use approved ingredient conversions) live in `mealroulette.services.quantities`. Shopping lists and exports must use that module — see SPECS §9.
 

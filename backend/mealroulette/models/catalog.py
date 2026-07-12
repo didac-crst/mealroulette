@@ -236,7 +236,7 @@ class Recipe(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     dish_id: Mapped[int] = mapped_column(ForeignKey("dishes.id", ondelete="CASCADE"), index=True)
-    public_key: Mapped[str] = mapped_column(String(36), unique=True, index=True)
+    public_key: Mapped[str] = mapped_column(String(40), unique=True, index=True)
     sequence_number: Mapped[int] = mapped_column(Integer)
     variant_name: Mapped[str] = mapped_column(String(128))
     description: Mapped[str | None] = mapped_column(Text, nullable=True)

@@ -349,8 +349,6 @@ def reconcile_catalogue(
     _enforce_alias_ownership(catalogue)
 
     # Drop merged-away canonicals if still present
-    for absorbed in set(PROPOSAL_MERGE_INTO.values()) | set(PROPOSAL_TO_ACTIVE.values()):
-        pass  # keep survivors only
     for drop in list(catalogue):
         if drop in PROPOSAL_MERGE_INTO and PROPOSAL_MERGE_INTO[drop] in catalogue and drop != PROPOSAL_MERGE_INTO[drop]:
             del catalogue[drop]
