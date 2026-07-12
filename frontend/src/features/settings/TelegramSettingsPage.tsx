@@ -12,8 +12,8 @@ import {
   type TelegramSubscriber,
 } from "../../api/telegram";
 import { ApiError } from "../../api/client";
-import { ButtonLink } from "../../components/ButtonLink";
 import { useAuth } from "../auth/AuthContext";
+import { SettingsPageShell } from "./SettingsPageShell";
 
 function timeInputValue(value: string): string {
   return value.slice(0, 5);
@@ -146,26 +146,14 @@ export function TelegramSettingsPage() {
 
   if (loading) {
     return (
-      <section className="card">
-        <p className="muted">Loading Telegram settings…</p>
-      </section>
+      <SettingsPageShell title="Telegram" subtitle="Reminders and bot commands.">
+        <p className="muted">Loading…</p>
+      </SettingsPageShell>
     );
   }
 
   return (
-    <section className="card stack">
-      <div className="row-between">
-        <h2>Telegram reminders</h2>
-        <ButtonLink to="/review" variant="secondary">
-          Back
-        </ButtonLink>
-      </div>
-
-      <p className="muted">
-        Daily reminders and <strong>Send reminder now</strong> send the same HTML message as{" "}
-        <code>/reminder</code> in Telegram (meal plan + ingredient breakdown). Pantry items are always
-        included; the window is today through the next N−1 days in your timezone.
-      </p>
+    <SettingsPageShell title="Telegram" subtitle="Daily reminders and on-demand bot commands.">
 
       <p className="muted">
         Set <code>TELEGRAM_BOT_TOKEN</code> in <code>.env</code>, restart Docker, then message your bot with{" "}
@@ -281,6 +269,6 @@ export function TelegramSettingsPage() {
           </div>
         </div>
       </form>
-    </section>
+    </SettingsPageShell>
   );
 }

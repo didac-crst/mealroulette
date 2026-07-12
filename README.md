@@ -245,7 +245,7 @@ The **worker** also runs the scheduled weekly roulette when enabled. The **API**
 
 #### Quick start
 
-1. As admin, open **Scheduler** in the app header (`/settings/scheduler`).
+1. As admin, open **Settings** (mobile: **More** tab) → **Weekly targets** for fish/meat/pasta counts, or **Auto roulette** (`/settings/scheduler`).
 2. Enable the job, set weekday/time/timezone (default Friday 18:00), and `target_week_offset` (default `1` = next Mon–Sun).
 3. Use **Run now** to test, or wait for the worker cron (same minute poll as Telegram reminders).
 4. Optionally enable **Notify Telegram** to broadcast a **“New roulette”** HTML plan to subscribers after a successful generate.

@@ -1126,3 +1126,133 @@ legend {
   color: #0f7b4b;
   margin: 0;
 }
+
+.settings-page h2 {
+  margin: 0;
+}
+
+.settings-page-subtitle {
+  margin: 0.35rem 0 0;
+  font-size: 0.9rem;
+}
+
+.settings-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.settings-back-link {
+  align-self: flex-start;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.85rem;
+}
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.settings-group-title {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #627d98;
+}
+
+.settings-link-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.settings-link-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #d9e2ec;
+  border-radius: 0.5rem;
+  background: white;
+  text-decoration: none;
+  color: inherit;
+  min-height: 3.25rem;
+}
+
+.settings-link-card:active {
+  background: #f0f4f8;
+}
+
+.settings-link-title {
+  font-weight: 700;
+  color: #102a43;
+}
+
+.settings-link-description {
+  font-size: 0.85rem;
+  color: #627d98;
+  line-height: 1.35;
+}
+
+.target-row {
+  padding: 0.85rem;
+  border: 1px solid #d9e2ec;
+  border-radius: 0.5rem;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.target-row-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.target-row-hint {
+  font-size: 0.8rem;
+}
+
+.target-row-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.8fr) minmax(0, 0.8fr);
+  gap: 0.5rem;
+  align-items: end;
+}
+
+.target-row-remove {
+  width: 100%;
+  min-height: 2.5rem;
+}
+
+.target-add-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  align-items: end;
+}
+
+@media (max-width: 520px) {
+  .target-row-fields {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .target-row-fields label:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .target-row-remove {
+    grid-column: 1 / -1;
+  }
+
+  .app-tab {
+    font-size: 0.78rem;
+    padding: 0.45rem 0.25rem;
+  }
+}

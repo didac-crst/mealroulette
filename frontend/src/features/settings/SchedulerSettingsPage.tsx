@@ -10,8 +10,8 @@ import {
   type SchedulerSettingsInput,
 } from "../../api/scheduler";
 import { ApiError } from "../../api/client";
-import { ButtonLink } from "../../components/ButtonLink";
 import { useAuth } from "../auth/AuthContext";
+import { SettingsPageShell } from "./SettingsPageShell";
 
 function timeInputValue(value: string): string {
   return value.slice(0, 5);
@@ -129,26 +129,17 @@ export function SchedulerSettingsPage() {
 
   if (loading) {
     return (
-      <section className="card">
-        <p className="muted">Loading scheduler settings…</p>
-      </section>
+      <SettingsPageShell title="Auto roulette" subtitle="Scheduled week generation.">
+        <p className="muted">Loading…</p>
+      </SettingsPageShell>
     );
   }
 
   return (
-    <section className="card stack">
-      <div className="row-between">
-        <h2>Scheduled roulette</h2>
-        <ButtonLink to="/review" variant="secondary">
-          Back
-        </ButtonLink>
-      </div>
-
-      <p className="muted">
-        The worker checks every minute. When enabled, it generates the target week (default: next
-        Mon–Sun) at the configured weekday and time, then optionally broadcasts a{" "}
-        <strong>New roulette</strong> Telegram message with the meal plan.
-      </p>
+    <SettingsPageShell
+      title="Auto roulette"
+      subtitle="Generate next week on a schedule; optional Telegram “New roulette”."
+    >
 
       {settings?.last_roulette_at ? (
         <p className="muted">Last roulette: {new Date(settings.last_roulette_at).toLocaleString()}</p>
@@ -250,6 +241,6 @@ export function SchedulerSettingsPage() {
           </button>
         </div>
       </form>
-    </section>
+    </SettingsPageShell>
   );
 }

@@ -3,24 +3,22 @@ import { NavLink, Outlet } from "react-router-dom";
 import { NavButtonLink } from "../components/ButtonLink";
 import { useAuth } from "../features/auth/AuthContext";
 
-const TAB_ROUTES = [
+const CORE_TAB_ROUTES = [
   { to: "/plan", label: "Plan" },
   { to: "/review", label: "Review" },
   { to: "/shopping", label: "List" },
   { to: "/dishes", label: "Dishes" },
 ] as const;
 
+const ADMIN_MORE_TAB = { to: "/settings", label: "More" } as const;
+
+const DESKTOP_ADMIN_LINK = { to: "/settings", label: "Settings" } as const;
+
 export function AppLayout() {
   const { user, logout, isAdmin } = useAuth();
 
-  const tabRoutes = isAdmin
-    ? [
-        ...TAB_ROUTES,
-        { to: "/ingredients", label: "Ingredients" } as const,
-        { to: "/settings/telegram", label: "Telegram" } as const,
-        { to: "/settings/scheduler", label: "Scheduler" } as const,
-      ]
-    : TAB_ROUTES;
+  const mobileTabRoutes = isAdmin ? [...CORE_TAB_ROUTES, ADMIN_MORE_TAB] : CORE_TAB_ROUTES;
+  const desktopNavRoutes = isAdmin ? [...CORE_TAB_ROUTES, DESKTOP_ADMIN_LINK] : CORE_TAB_ROUTES;
 
   return (
     <div className="app-frame">
@@ -39,7 +37,7 @@ export function AppLayout() {
           </div>
         </div>
         <nav className="app-header-nav-desktop" aria-label="Primary navigation">
-          {tabRoutes.map(({ to, label }) => (
+          {desktopNavRoutes.map(({ to, label }) => (
             <NavButtonLink key={to} to={to}>
               {label}
             </NavButtonLink>
@@ -62,8 +60,13 @@ export function AppLayout() {
       </main>
 
       <nav className="app-tab-bar" aria-label="Primary navigation (mobile)">
-        {tabRoutes.map(({ to, label }) => (
-          <NavLink key={to} to={to} className={({ isActive }) => `app-tab${isActive ? " app-tab-active" : ""}`}>
+        {mobileTabRoutes.map(({ to, label }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={to !== "/settings"}
+            className={({ isActive }) => `app-tab${isActive ? " app-tab-active" : ""}`}
+          >
             {label}
           </NavLink>
         ))}
