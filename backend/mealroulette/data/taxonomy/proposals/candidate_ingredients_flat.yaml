@@ -1,0 +1,5652 @@
+version: 1
+name: MealRoulette candidate ingredient backlog
+description: Flat candidate list for broad ingredient discovery before promotion into canonical taxonomy.
+status: unclassified_candidates
+ingredients:
+  - name: tomato
+    source_cuisines: [france, spain, mediterranean]
+    priority: core
+    likely_food_group: vegetable
+    likely_family: tomato_family
+    aliases: [tomate, tomates, tomàquet]
+    notes: Generic fresh tomato.
+    risk_flags: []
+    review_status: candidate
+  - name: cherry tomato
+    source_cuisines: [france, spain, mediterranean]
+    priority: core
+    likely_food_group: vegetable
+    likely_family: tomato_family
+    aliases: [tomates cerises, tomate cherry]
+    notes: Small fresh tomatoes.
+    risk_flags: []
+    review_status: candidate
+  - name: coeur de boeuf tomato
+    source_cuisines: [france]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: tomato_family
+    aliases: [cœur de bœuf, beefsteak tomato]
+    notes: Large ribbed tomato.
+    risk_flags: []
+    review_status: candidate
+  - name: canned chopped tomatoes
+    source_cuisines: [france, spain, pantry]
+    priority: core
+    likely_food_group: pantry
+    likely_family: tomato_family
+    aliases: [tomate triturado, tomates concassées]
+    notes: Canned tomato product.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: passata
+    source_cuisines: [italy, europe, pantry]
+    priority: common
+    likely_food_group: pantry
+    likely_family: tomato_family
+    aliases: [tomato passata, coulis de tomate]
+    notes: Smooth tomato puree.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: tomato paste
+    source_cuisines: [france, spain, pantry]
+    priority: core
+    likely_food_group: condiment
+    likely_family: tomato_family
+    aliases: [concentré de tomate, tomate concentrado]
+    notes: Concentrated tomato paste.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: sun dried tomato
+    source_cuisines: [mediterranean, pantry]
+    priority: common
+    likely_food_group: condiment
+    likely_family: tomato_family
+    aliases: [tomates séchées, tomates secos]
+    notes: Dried tomato condiment.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: yellow onion
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: vegetable
+    likely_family: onion_family
+    aliases: [onion, oignon, cebolla]
+    notes: Generic cooking onion.
+    risk_flags: []
+    review_status: candidate
+  - name: red onion
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: vegetable
+    likely_family: onion_family
+    aliases: [cebolla roja, oignon rouge]
+    notes: Red onion.
+    risk_flags: []
+    review_status: candidate
+  - name: shallot
+    source_cuisines: [france]
+    priority: core
+    likely_food_group: vegetable
+    likely_family: onion_family
+    aliases: [échalote, chalota]
+    notes: Small allium.
+    risk_flags: []
+    review_status: candidate
+  - name: leek
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: vegetable
+    likely_family: onion_family
+    aliases: [poireau, puerro]
+    notes: Leek.
+    risk_flags: []
+    review_status: candidate
+  - name: spring onion
+    source_cuisines: [asian_europe, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: onion_family
+    aliases: [scallion, cebolleta, oignon nouveau]
+    notes: Green onion.
+    risk_flags: []
+    review_status: candidate
+  - name: garlic
+    source_cuisines: [france, spain, mediterranean]
+    priority: core
+    likely_food_group: vegetable
+    likely_family: garlic_family
+    aliases: [ail, ajo]
+    notes: Fresh garlic.
+    risk_flags: []
+    review_status: candidate
+  - name: black garlic
+    source_cuisines: [asian_europe, europe]
+    priority: optional
+    likely_food_group: vegetable
+    likely_family: garlic_family
+    aliases: [ail noir, ajo negro]
+    notes: Fermented black garlic.
+    risk_flags: []
+    review_status: candidate
+  - name: red bell pepper
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: vegetable
+    likely_family: pepper_family
+    aliases: [poivron rouge, pimiento rojo]
+    notes: Sweet red pepper.
+    risk_flags: []
+    review_status: candidate
+  - name: green bell pepper
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: vegetable
+    likely_family: pepper_family
+    aliases: [poivron vert, pimiento verde]
+    notes: Sweet green pepper.
+    risk_flags: []
+    review_status: candidate
+  - name: piquillo pepper
+    source_cuisines: [spain]
+    priority: core
+    likely_food_group: vegetable
+    likely_family: pepper_family
+    aliases: [pimiento del piquillo, poivron piquillo]
+    notes: Spanish preserved red pepper.
+    risk_flags: [preserved_but_not_pantry_trait]
+    review_status: needs_human_review
+  - name: nora pepper
+    source_cuisines: [spain]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: pepper_family
+    aliases: [ñora, pimiento ñora]
+    notes: Dried Spanish pepper.
+    risk_flags: [ambiguous_spice_or_vegetable]
+    review_status: needs_human_review
+  - name: aubergine
+    source_cuisines: [france, spain, mediterranean]
+    priority: core
+    likely_food_group: vegetable
+    likely_family: aubergine_family
+    aliases: [eggplant, berenjena]
+    notes: Aubergine.
+    risk_flags: []
+    review_status: candidate
+  - name: courgette
+    source_cuisines: [france, spain, mediterranean]
+    priority: core
+    likely_food_group: vegetable
+    likely_family: courgette_family
+    aliases: [zucchini, calabacín]
+    notes: Courgette.
+    risk_flags: []
+    review_status: candidate
+  - name: cucumber
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: vegetable
+    likely_family: cucumber_family
+    aliases: [concombre, pepino]
+    notes: Fresh cucumber.
+    risk_flags: []
+    review_status: candidate
+  - name: carrot
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: vegetable
+    likely_family: carrot_family
+    aliases: [carotte, zanahoria]
+    notes: Carrot.
+    risk_flags: []
+    review_status: candidate
+  - name: celery
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: vegetable
+    likely_family: root_vegetable_family
+    aliases: [céleri, apio]
+    notes: Celery stalks.
+    risk_flags: [family_review]
+    review_status: needs_human_review
+  - name: celeriac
+    source_cuisines: [france]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: root_vegetable_family
+    aliases: [céleri rave, apionabo]
+    notes: Celeriac root.
+    risk_flags: []
+    review_status: candidate
+  - name: beetroot
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: root_vegetable_family
+    aliases: [betterave, remolacha]
+    notes: Beetroot.
+    risk_flags: []
+    review_status: candidate
+  - name: turnip
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: root_vegetable_family
+    aliases: [navet, nabo]
+    notes: Turnip.
+    risk_flags: []
+    review_status: candidate
+  - name: parsnip
+    source_cuisines: [france, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: root_vegetable_family
+    aliases: [panais, chirivía]
+    notes: Parsnip.
+    risk_flags: []
+    review_status: candidate
+  - name: radish
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: root_vegetable_family
+    aliases: [radis, rábano]
+    notes: Radish.
+    risk_flags: []
+    review_status: candidate
+  - name: spinach
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: vegetable
+    likely_family: leafy_green_family
+    aliases: [épinards, espinacas]
+    notes: Spinach.
+    risk_flags: []
+    review_status: candidate
+  - name: chard
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: leafy_green_family
+    aliases: [blette, acelga]
+    notes: Swiss chard.
+    risk_flags: []
+    review_status: candidate
+  - name: rocket
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: leafy_green_family
+    aliases: [arugula, roquette, rúcula]
+    notes: Rocket salad.
+    risk_flags: []
+    review_status: candidate
+  - name: lettuce
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: vegetable
+    likely_family: leafy_green_family
+    aliases: [laitue, lechuga]
+    notes: Lettuce.
+    risk_flags: []
+    review_status: candidate
+  - name: watercress
+    source_cuisines: [france]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: leafy_green_family
+    aliases: [cresson, berro]
+    notes: Watercress.
+    risk_flags: []
+    review_status: candidate
+  - name: broccoli
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: vegetable
+    likely_family: brassica_family
+    aliases: [brocoli, brócoli]
+    notes: Broccoli.
+    risk_flags: []
+    review_status: candidate
+  - name: cauliflower
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: vegetable
+    likely_family: brassica_family
+    aliases: [chou fleur, coliflor]
+    notes: Cauliflower.
+    risk_flags: []
+    review_status: candidate
+  - name: white cabbage
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: brassica_family
+    aliases: [chou blanc, repollo]
+    notes: White cabbage.
+    risk_flags: []
+    review_status: candidate
+  - name: red cabbage
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: brassica_family
+    aliases: [chou rouge, lombarda]
+    notes: Red cabbage.
+    risk_flags: []
+    review_status: candidate
+  - name: kale
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: brassica_family
+    aliases: [chou kale, col kale]
+    notes: Kale.
+    risk_flags: []
+    review_status: candidate
+  - name: brussels sprouts
+    source_cuisines: [france, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: brassica_family
+    aliases: [choux de Bruxelles, coles de Bruselas]
+    notes: Brussels sprouts.
+    risk_flags: []
+    review_status: candidate
+  - name: green beans
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: vegetable
+    likely_family: green_bean_family
+    aliases: [haricots verts, judías verdes]
+    notes: Fresh green beans.
+    risk_flags: []
+    review_status: candidate
+  - name: broad beans
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [fèves, habas]
+    notes: Broad beans.
+    risk_flags: [fresh_or_dry_review]
+    review_status: needs_human_review
+  - name: peas
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [petits pois, guisantes]
+    notes: Peas.
+    risk_flags: [fresh_or_frozen_review]
+    review_status: needs_human_review
+  - name: artichoke
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: artichoke_family
+    aliases: [artichaut, alcachofa]
+    notes: Globe artichoke.
+    risk_flags: []
+    review_status: candidate
+  - name: asparagus
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: asparagus_family
+    aliases: [asperge, espárrago]
+    notes: Asparagus.
+    risk_flags: []
+    review_status: candidate
+  - name: fennel bulb
+    source_cuisines: [france, mediterranean]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: root_vegetable_family
+    aliases: [fenouil, hinojo]
+    notes: Fennel bulb.
+    risk_flags: [family_review]
+    review_status: needs_human_review
+  - name: pumpkin
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: courgette_family
+    aliases: [potiron, calabaza]
+    notes: Pumpkin/squash.
+    risk_flags: [family_review]
+    review_status: needs_human_review
+  - name: butternut squash
+    source_cuisines: [france, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: courgette_family
+    aliases: [courge butternut, calabaza butternut]
+    notes: Butternut squash.
+    risk_flags: [family_review]
+    review_status: needs_human_review
+  - name: sweetcorn
+    source_cuisines: [europe, mexican_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: other_grain_family
+    aliases: [maïs doux, maíz dulce]
+    notes: Sweet corn.
+    risk_flags: [food_group_review]
+    review_status: needs_human_review
+  - name: avocado
+    source_cuisines: [spain, mexican_europe]
+    priority: common
+    likely_food_group: fruit
+    likely_family: orchard_fruit_family
+    aliases: [avocat, aguacate]
+    notes: Avocado.
+    risk_flags: [family_review]
+    review_status: needs_human_review
+  - name: lemon
+    source_cuisines: [france, spain, mediterranean]
+    priority: core
+    likely_food_group: fruit
+    likely_family: citrus_family
+    aliases: [citron, limón]
+    notes: Lemon.
+    risk_flags: []
+    review_status: candidate
+  - name: lime
+    source_cuisines: [mexican_europe, asian_europe]
+    priority: core
+    likely_food_group: fruit
+    likely_family: citrus_family
+    aliases: [citron vert, lima]
+    notes: Lime.
+    risk_flags: []
+    review_status: candidate
+  - name: orange
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: fruit
+    likely_family: citrus_family
+    aliases: [orange, naranja]
+    notes: Orange.
+    risk_flags: []
+    review_status: candidate
+  - name: apple
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: fruit
+    likely_family: orchard_fruit_family
+    aliases: [pomme, manzana]
+    notes: Apple.
+    risk_flags: []
+    review_status: candidate
+  - name: pear
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: fruit
+    likely_family: orchard_fruit_family
+    aliases: [poire, pera]
+    notes: Pear.
+    risk_flags: []
+    review_status: candidate
+  - name: quince
+    source_cuisines: [france, spain]
+    priority: optional
+    likely_food_group: fruit
+    likely_family: orchard_fruit_family
+    aliases: [coing, membrillo]
+    notes: Quince.
+    risk_flags: []
+    review_status: candidate
+  - name: strawberry
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: fruit
+    likely_family: berry_family
+    aliases: [fraise, fresa]
+    notes: Strawberry.
+    risk_flags: []
+    review_status: candidate
+  - name: raisin
+    source_cuisines: [france, spain, middle_east_europe]
+    priority: common
+    likely_food_group: fruit
+    likely_family: dried_fruit_family
+    aliases: [raisins secs, pasas]
+    notes: Dried grape.
+    risk_flags: []
+    review_status: candidate
+  - name: date
+    source_cuisines: [middle_east_europe, north_africa_europe]
+    priority: common
+    likely_food_group: fruit
+    likely_family: dried_fruit_family
+    aliases: [datte, dátil]
+    notes: Date fruit.
+    risk_flags: []
+    review_status: candidate
+  - name: spaghetti
+    source_cuisines: [france, spain, italy_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: pasta_family
+    aliases: [espaguetis, spaghettis]
+    notes: Long dry pasta.
+    risk_flags: []
+    review_status: candidate
+  - name: macaroni
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: pasta_family
+    aliases: [macaronis]
+    notes: Short tube pasta.
+    risk_flags: []
+    review_status: candidate
+  - name: penne
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: pasta_family
+    aliases: [plumas]
+    notes: Penne pasta.
+    risk_flags: []
+    review_status: candidate
+  - name: tagliatelle
+    source_cuisines: [france, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: pasta_family
+    aliases: [tallarines]
+    notes: Ribbon pasta.
+    risk_flags: []
+    review_status: candidate
+  - name: ravioli
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: pasta_family
+    aliases: [raviolis]
+    notes: Stuffed pasta.
+    risk_flags: []
+    review_status: candidate
+  - name: fiorelli pasta
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: pasta_family
+    aliases: [fiorelli]
+    notes: Short flower-shaped pasta.
+    risk_flags: []
+    review_status: candidate
+  - name: fideua noodles
+    source_cuisines: [spain]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: pasta_family
+    aliases: [fideo, fideos, fideus]
+    notes: Short pasta for fideua.
+    risk_flags: []
+    review_status: candidate
+  - name: bomba rice
+    source_cuisines: [spain]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: rice_family
+    aliases: [arroz bomba, paella rice]
+    notes: Spanish short-grain rice.
+    risk_flags: []
+    review_status: candidate
+  - name: arborio rice
+    source_cuisines: [france, italy_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: rice_family
+    aliases: [risotto rice, riz arborio]
+    notes: Risotto rice.
+    risk_flags: []
+    review_status: candidate
+  - name: jasmine rice
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: rice_family
+    aliases: [arroz jazmin, riz jasmin]
+    notes: Fragrant long-grain rice.
+    risk_flags: []
+    review_status: candidate
+  - name: basmati rice
+    source_cuisines: [asian_europe, middle_east_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: rice_family
+    aliases: [arroz basmati, riz basmati]
+    notes: Long-grain aromatic rice.
+    risk_flags: []
+    review_status: candidate
+  - name: long grain rice
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: rice_family
+    aliases: [riz long, arroz largo]
+    notes: Generic long-grain rice.
+    risk_flags: []
+    review_status: candidate
+  - name: potato
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: potato_family
+    aliases: [patata, pomme de terre]
+    notes: Potato.
+    risk_flags: []
+    review_status: candidate
+  - name: sweet potato
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: potato_family
+    aliases: [boniato, patate douce]
+    notes: Sweet potato.
+    risk_flags: []
+    review_status: candidate
+  - name: couscous
+    source_cuisines: [france, spain, north_africa_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: wheat_semolina_family
+    aliases: [cuscús, semoule couscous]
+    notes: Couscous.
+    risk_flags: []
+    review_status: candidate
+  - name: bulgur
+    source_cuisines: [middle_east_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: wheat_semolina_family
+    aliases: [boulgour, bulgur wheat]
+    notes: Bulgur wheat.
+    risk_flags: []
+    review_status: candidate
+  - name: semolina
+    source_cuisines: [france, spain, north_africa_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: wheat_semolina_family
+    aliases: [semoule, sémola]
+    notes: Semolina.
+    risk_flags: []
+    review_status: candidate
+  - name: quinoa
+    source_cuisines: [europe, latin_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: other_grain_family
+    aliases: [quinua]
+    notes: Quinoa.
+    risk_flags: []
+    review_status: candidate
+  - name: barley
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: other_grain_family
+    aliases: [orge, cebada]
+    notes: Barley.
+    risk_flags: []
+    review_status: candidate
+  - name: polenta
+    source_cuisines: [france, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: other_grain_family
+    aliases: [cornmeal, semoule de maïs]
+    notes: Cornmeal/polenta.
+    risk_flags: []
+    review_status: candidate
+  - name: flour tortilla
+    source_cuisines: [mexican_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_pastry_family
+    aliases: [tortilla de trigo]
+    notes: Wheat tortilla.
+    risk_flags: []
+    review_status: candidate
+  - name: corn tortilla
+    source_cuisines: [mexican_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_pastry_family
+    aliases: [tortilla de maíz]
+    notes: Corn tortilla.
+    risk_flags: []
+    review_status: candidate
+  - name: puff pastry
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_pastry_family
+    aliases: [pâte feuilletée, hojaldre]
+    notes: Puff pastry.
+    risk_flags: []
+    review_status: candidate
+  - name: shortcrust pastry
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_pastry_family
+    aliases: [pâte brisée, masa quebrada]
+    notes: Shortcrust pastry.
+    risk_flags: []
+    review_status: candidate
+  - name: pizza dough
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_pastry_family
+    aliases: [pâte à pizza, masa de pizza]
+    notes: Pizza dough.
+    risk_flags: []
+    review_status: candidate
+  - name: breadcrumbs
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_pastry_family
+    aliases: [chapelure, pan rallado]
+    notes: Breadcrumbs.
+    risk_flags: []
+    review_status: candidate
+  - name: rice noodles
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: asian_noodle_family
+    aliases: [nouilles de riz, fideos de arroz]
+    notes: Rice noodles.
+    risk_flags: []
+    review_status: candidate
+  - name: ramen noodles
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: asian_noodle_family
+    aliases: [ramen, nouilles ramen]
+    notes: Ramen noodles.
+    risk_flags: []
+    review_status: candidate
+  - name: udon noodles
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: asian_noodle_family
+    aliases: [udon, nouilles udon]
+    notes: Udon noodles.
+    risk_flags: []
+    review_status: candidate
+  - name: soba noodles
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: asian_noodle_family
+    aliases: [soba, buckwheat noodles]
+    notes: Soba noodles.
+    risk_flags: []
+    review_status: candidate
+  - name: glass noodles
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: asian_noodle_family
+    aliases: [cellophane noodles, vermicelles de soja]
+    notes: Glass noodles.
+    risk_flags: []
+    review_status: candidate
+  - name: rice paper
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: asian_wrappers_family
+    aliases: [feuilles de riz, obleas de arroz]
+    notes: Rice paper wrappers.
+    risk_flags: []
+    review_status: candidate
+  - name: wonton wrappers
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: asian_wrappers_family
+    aliases: [wonton skins]
+    notes: Wonton wrappers.
+    risk_flags: []
+    review_status: candidate
+  - name: gyoza wrappers
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: asian_wrappers_family
+    aliases: [dumpling wrappers]
+    notes: Gyoza wrappers.
+    risk_flags: []
+    review_status: candidate
+  - name: chicken breast
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: meat
+    likely_family: chicken_family
+    aliases: [pechuga de pollo, blanc de poulet]
+    notes: Chicken breast.
+    risk_flags: []
+    review_status: candidate
+  - name: chicken thigh
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: meat
+    likely_family: chicken_family
+    aliases: [muslo de pollo, haut de cuisse de poulet]
+    notes: Chicken thigh.
+    risk_flags: []
+    review_status: candidate
+  - name: whole chicken
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: meat
+    likely_family: chicken_family
+    aliases: [pollo entero, poulet entier]
+    notes: Whole chicken.
+    risk_flags: []
+    review_status: candidate
+  - name: turkey breast
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: meat
+    likely_family: turkey_family
+    aliases: [pechuga de pavo, blanc de dinde]
+    notes: Turkey breast.
+    risk_flags: []
+    review_status: candidate
+  - name: pork shoulder
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [épaule de porc, paleta de cerdo]
+    notes: Pork shoulder.
+    risk_flags: []
+    review_status: candidate
+  - name: pork belly
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [poitrine de porc, panceta]
+    notes: Pork belly.
+    risk_flags: []
+    review_status: candidate
+  - name: bacon
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [bacon, beicon]
+    notes: Bacon.
+    risk_flags: []
+    review_status: candidate
+  - name: lardons
+    source_cuisines: [france]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [lardons, taquitos de bacon]
+    notes: Lardons.
+    risk_flags: []
+    review_status: candidate
+  - name: serrano ham
+    source_cuisines: [spain]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [jamón serrano, jambon serrano]
+    notes: Serrano ham.
+    risk_flags: []
+    review_status: candidate
+  - name: iberico ham
+    source_cuisines: [spain]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [jamón ibérico, jambon ibérique]
+    notes: Iberico ham.
+    risk_flags: []
+    review_status: candidate
+  - name: chorizo
+    source_cuisines: [spain]
+    priority: core
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [chorizo sausage]
+    notes: Spanish chorizo.
+    risk_flags: []
+    review_status: candidate
+  - name: sobrasada
+    source_cuisines: [spain]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [soubressade]
+    notes: Sobrasada.
+    risk_flags: []
+    review_status: candidate
+  - name: morcilla
+    source_cuisines: [spain]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [boudin noir espagnol]
+    notes: Spanish blood sausage.
+    risk_flags: []
+    review_status: candidate
+  - name: beef mince
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: meat
+    likely_family: beef_family
+    aliases: [ground beef, carne picada, boeuf haché]
+    notes: Minced beef.
+    risk_flags: []
+    review_status: candidate
+  - name: stewing beef
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: meat
+    likely_family: beef_family
+    aliases: [boeuf à mijoter, carne para guisar]
+    notes: Stewing beef.
+    risk_flags: []
+    review_status: candidate
+  - name: veal
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: meat
+    likely_family: beef_family
+    aliases: [veau, ternera]
+    notes: Veal.
+    risk_flags: []
+    review_status: candidate
+  - name: lamb shoulder
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: meat
+    likely_family: lamb_family
+    aliases: [épaule d agneau, paletilla de cordero]
+    notes: Lamb shoulder.
+    risk_flags: []
+    review_status: candidate
+  - name: duck breast
+    source_cuisines: [france]
+    priority: common
+    likely_food_group: meat
+    likely_family: duck_family
+    aliases: [magret de canard, magret de pato]
+    notes: Duck breast.
+    risk_flags: []
+    review_status: candidate
+  - name: duck confit
+    source_cuisines: [france]
+    priority: common
+    likely_food_group: meat
+    likely_family: duck_family
+    aliases: [confit de canard, confit de pato]
+    notes: Duck confit.
+    risk_flags: []
+    review_status: candidate
+  - name: rabbit
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: meat
+    likely_family: rabbit_family
+    aliases: [lapin, conejo]
+    notes: Rabbit.
+    risk_flags: []
+    review_status: candidate
+  - name: hake
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: fish
+    likely_family: white_fish_family
+    aliases: [merluza, merlu, colin]
+    notes: Mild white fish.
+    risk_flags: []
+    review_status: candidate
+  - name: cod
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: fish
+    likely_family: white_fish_family
+    aliases: [bacalao, cabillaud, morue]
+    notes: Cod; bacalao may imply salted cod.
+    risk_flags: [regional_name_ambiguous]
+    review_status: needs_human_review
+  - name: salt cod
+    source_cuisines: [spain, france]
+    priority: common
+    likely_food_group: fish
+    likely_family: white_fish_family
+    aliases: [bacalao salado, morue salée]
+    notes: Salted cod.
+    risk_flags: []
+    review_status: candidate
+  - name: monkfish
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: fish
+    likely_family: white_fish_family
+    aliases: [lotte, rape]
+    notes: Monkfish.
+    risk_flags: []
+    review_status: candidate
+  - name: sea bass
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: fish
+    likely_family: white_fish_family
+    aliases: [bar, lubina]
+    notes: Sea bass.
+    risk_flags: []
+    review_status: candidate
+  - name: sole
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: fish
+    likely_family: white_fish_family
+    aliases: [sole, lenguado]
+    notes: Sole.
+    risk_flags: []
+    review_status: candidate
+  - name: salmon
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: fish
+    likely_family: oily_fish_family
+    aliases: [saumon, salmón]
+    notes: Salmon.
+    risk_flags: []
+    review_status: candidate
+  - name: tuna
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: fish
+    likely_family: oily_fish_family
+    aliases: [thon, atún]
+    notes: Tuna.
+    risk_flags: []
+    review_status: candidate
+  - name: canned tuna
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: fish
+    likely_family: oily_fish_family
+    aliases: [thon en boîte, atún en lata]
+    notes: Canned tuna.
+    risk_flags: []
+    review_status: candidate
+  - name: sardines
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: fish
+    likely_family: oily_fish_family
+    aliases: [sardines, sardinas]
+    notes: Sardines.
+    risk_flags: []
+    review_status: candidate
+  - name: anchovies
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: fish
+    likely_family: oily_fish_family
+    aliases: [anchois, anchoas]
+    notes: Anchovies.
+    risk_flags: []
+    review_status: candidate
+  - name: mackerel
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: fish
+    likely_family: oily_fish_family
+    aliases: [maquereau, caballa]
+    notes: Mackerel.
+    risk_flags: []
+    review_status: candidate
+  - name: mussels
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: seafood
+    likely_family: shellfish_family
+    aliases: [moules, mejillones]
+    notes: Mussels.
+    risk_flags: []
+    review_status: candidate
+  - name: clams
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: seafood
+    likely_family: shellfish_family
+    aliases: [palourdes, almejas]
+    notes: Clams.
+    risk_flags: []
+    review_status: candidate
+  - name: prawns
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: seafood
+    likely_family: shellfish_family
+    aliases: [crevettes, gambas, langostinos]
+    notes: Prawns/shrimp.
+    risk_flags: []
+    review_status: candidate
+  - name: scallops
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: seafood
+    likely_family: shellfish_family
+    aliases: [coquilles Saint-Jacques, vieiras]
+    notes: Scallops.
+    risk_flags: []
+    review_status: candidate
+  - name: squid
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: seafood
+    likely_family: cephalopod_family
+    aliases: [calamar, calamares, encornet]
+    notes: Squid.
+    risk_flags: []
+    review_status: candidate
+  - name: cuttlefish
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: seafood
+    likely_family: cephalopod_family
+    aliases: [seiche, sepia]
+    notes: Cuttlefish.
+    risk_flags: []
+    review_status: candidate
+  - name: octopus
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: seafood
+    likely_family: cephalopod_family
+    aliases: [poulpe, pulpo]
+    notes: Octopus.
+    risk_flags: []
+    review_status: candidate
+  - name: egg
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: egg
+    likely_family: egg_family
+    aliases: [huevo, oeuf, œuf]
+    notes: Chicken egg.
+    risk_flags: []
+    review_status: candidate
+  - name: quail egg
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: egg
+    likely_family: egg_family
+    aliases: [huevo de codorniz, oeuf de caille]
+    notes: Quail egg.
+    risk_flags: []
+    review_status: candidate
+  - name: lentils
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [lentejas, lentilles]
+    notes: Lentils.
+    risk_flags: []
+    review_status: candidate
+  - name: red lentils
+    source_cuisines: [europe, middle_east_europe]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [lentilles corail, lentejas rojas]
+    notes: Red lentils.
+    risk_flags: []
+    review_status: candidate
+  - name: chickpeas
+    source_cuisines: [france, spain, middle_east_europe]
+    priority: core
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [garbanzos, pois chiches]
+    notes: Chickpeas.
+    risk_flags: []
+    review_status: candidate
+  - name: white beans
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [haricots blancs, alubias blancas]
+    notes: White beans.
+    risk_flags: []
+    review_status: candidate
+  - name: black beans
+    source_cuisines: [mexican_europe]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [frijoles negros, haricots noirs]
+    notes: Black beans.
+    risk_flags: []
+    review_status: candidate
+  - name: kidney beans
+    source_cuisines: [europe, mexican_europe]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [haricots rouges, alubias rojas]
+    notes: Kidney beans.
+    risk_flags: []
+    review_status: candidate
+  - name: butter beans
+    source_cuisines: [spain, europe]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [lima beans, judiones]
+    notes: Butter beans.
+    risk_flags: []
+    review_status: candidate
+  - name: firm tofu
+    source_cuisines: [asian_europe]
+    priority: core
+    likely_food_group: plant_protein
+    likely_family: soy_family
+    aliases: [tofu ferme, tofu firme]
+    notes: Firm tofu.
+    risk_flags: []
+    review_status: candidate
+  - name: silken tofu
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: plant_protein
+    likely_family: soy_family
+    aliases: [tofu soyeux, tofu sedoso]
+    notes: Silken tofu.
+    risk_flags: []
+    review_status: candidate
+  - name: tempeh
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: plant_protein
+    likely_family: soy_family
+    aliases: [tempe]
+    notes: Tempeh.
+    risk_flags: []
+    review_status: candidate
+  - name: edamame
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: plant_protein
+    likely_family: soy_family
+    aliases: [fèves de soja, habas de soja]
+    notes: Green soybeans.
+    risk_flags: []
+    review_status: candidate
+  - name: seitan
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: plant_protein
+    likely_family: seitan_family
+    aliases: [seitán]
+    notes: Seitan.
+    risk_flags: []
+    review_status: candidate
+  - name: milk
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: dairy
+    likely_family: dairy_family
+    aliases: [lait, leche]
+    notes: Milk.
+    risk_flags: []
+    review_status: candidate
+  - name: butter
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: dairy
+    likely_family: dairy_family
+    aliases: [beurre, mantequilla]
+    notes: Butter.
+    risk_flags: []
+    review_status: candidate
+  - name: heavy cream
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: dairy
+    likely_family: dairy_family
+    aliases: [crème entière, nata para montar]
+    notes: High-fat cream.
+    risk_flags: []
+    review_status: candidate
+  - name: creme fraiche
+    source_cuisines: [france]
+    priority: common
+    likely_food_group: dairy
+    likely_family: dairy_family
+    aliases: [crème fraîche, crema fresca]
+    notes: Creme fraiche.
+    risk_flags: []
+    review_status: candidate
+  - name: yogurt
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: dairy
+    likely_family: dairy_family
+    aliases: [yaourt, yogur]
+    notes: Yogurt.
+    risk_flags: []
+    review_status: candidate
+  - name: feta
+    source_cuisines: [europe, mediterranean]
+    priority: common
+    likely_food_group: cheese
+    likely_family: fresh_cheese_family
+    aliases: [queso feta]
+    notes: Feta cheese.
+    risk_flags: []
+    review_status: candidate
+  - name: ricotta
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: fresh_cheese_family
+    aliases: [requesón]
+    notes: Ricotta.
+    risk_flags: []
+    review_status: candidate
+  - name: mozzarella
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: fresh_cheese_family
+    aliases: [mozzarella]
+    notes: Mozzarella.
+    risk_flags: []
+    review_status: candidate
+  - name: goat cheese
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: cheese
+    likely_family: fresh_cheese_family
+    aliases: [chèvre, queso de cabra]
+    notes: Goat cheese.
+    risk_flags: [ambiguous_name]
+    review_status: needs_human_review
+  - name: brie
+    source_cuisines: [france]
+    priority: common
+    likely_food_group: cheese
+    likely_family: soft_cheese_family
+    aliases: [brie]
+    notes: Brie.
+    risk_flags: []
+    review_status: candidate
+  - name: camembert
+    source_cuisines: [france]
+    priority: common
+    likely_food_group: cheese
+    likely_family: soft_cheese_family
+    aliases: [camembert]
+    notes: Camembert.
+    risk_flags: []
+    review_status: candidate
+  - name: manchego
+    source_cuisines: [spain]
+    priority: common
+    likely_food_group: cheese
+    likely_family: hard_cheese_family
+    aliases: [queso manchego]
+    notes: Manchego.
+    risk_flags: []
+    review_status: candidate
+  - name: comte
+    source_cuisines: [france]
+    priority: common
+    likely_food_group: cheese
+    likely_family: hard_cheese_family
+    aliases: [comté]
+    notes: Comte.
+    risk_flags: []
+    review_status: candidate
+  - name: gruyere
+    source_cuisines: [france, europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: hard_cheese_family
+    aliases: [gruyère]
+    notes: Gruyere.
+    risk_flags: []
+    review_status: candidate
+  - name: parmesan
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: hard_cheese_family
+    aliases: [parmigiano, parmesano]
+    notes: Parmesan.
+    risk_flags: []
+    review_status: candidate
+  - name: roquefort
+    source_cuisines: [france]
+    priority: common
+    likely_food_group: cheese
+    likely_family: blue_cheese_family
+    aliases: [roquefort]
+    notes: Roquefort.
+    risk_flags: []
+    review_status: candidate
+  - name: cabrales
+    source_cuisines: [spain]
+    priority: common
+    likely_food_group: cheese
+    likely_family: blue_cheese_family
+    aliases: [queso cabrales]
+    notes: Cabrales.
+    risk_flags: []
+    review_status: candidate
+  - name: olive oil
+    source_cuisines: [france, spain, mediterranean]
+    priority: core
+    likely_food_group: fat
+    likely_family: olive_oil_family
+    aliases: [aceite de oliva, huile d olive]
+    notes: Olive oil.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: sunflower oil
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: fat
+    likely_family: other_oil_family
+    aliases: [huile de tournesol, aceite de girasol]
+    notes: Sunflower oil.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: duck fat
+    source_cuisines: [france]
+    priority: common
+    likely_food_group: fat
+    likely_family: animal_fat_family
+    aliases: [graisse de canard, grasa de pato]
+    notes: Duck fat.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: red wine vinegar
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: condiment
+    likely_family: vinegar_family
+    aliases: [vinaigre de vin rouge, vinagre de vino tinto]
+    notes: Red wine vinegar.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: sherry vinegar
+    source_cuisines: [spain]
+    priority: common
+    likely_food_group: condiment
+    likely_family: vinegar_family
+    aliases: [vinaigre de xérès, vinagre de Jerez]
+    notes: Sherry vinegar.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: dijon mustard
+    source_cuisines: [france]
+    priority: common
+    likely_food_group: condiment
+    likely_family: mustard_family
+    aliases: [moutarde de Dijon, mostaza Dijon]
+    notes: Dijon mustard.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: capers
+    source_cuisines: [mediterranean]
+    priority: common
+    likely_food_group: condiment
+    likely_family: olive_pickle_family
+    aliases: [câpres, alcaparras]
+    notes: Capers.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: green olives
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: condiment
+    likely_family: olive_pickle_family
+    aliases: [olives vertes, aceitunas verdes]
+    notes: Green olives.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: black olives
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: condiment
+    likely_family: olive_pickle_family
+    aliases: [olives noires, aceitunas negras]
+    notes: Black olives.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: preserved lemon
+    source_cuisines: [middle_east_europe, north_africa_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: olive_pickle_family
+    aliases: [citron confit, limón encurtido]
+    notes: Preserved lemon.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: soy sauce
+    source_cuisines: [asian_europe]
+    priority: core
+    likely_food_group: condiment
+    likely_family: soy_sauce_family
+    aliases: [sauce soja, salsa de soja]
+    notes: Soy sauce.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: tamari
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: soy_sauce_family
+    aliases: [sauce tamari, salsa tamari]
+    notes: Tamari.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: fish sauce
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: asian_sauce_family
+    aliases: [nuoc mam, sauce poisson, salsa de pescado]
+    notes: Fish sauce.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: oyster sauce
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: asian_sauce_family
+    aliases: [sauce huître, salsa de ostras]
+    notes: Oyster sauce.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: hoisin sauce
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: asian_sauce_family
+    aliases: [sauce hoisin, salsa hoisin]
+    notes: Hoisin sauce.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: sriracha
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: asian_sauce_family
+    aliases: [sauce sriracha, salsa sriracha]
+    notes: Sriracha.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: gochujang
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: asian_sauce_family
+    aliases: [korean chili paste, pasta gochujang]
+    notes: Korean chili paste.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: white miso
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: miso_family
+    aliases: [shiro miso, miso blanc]
+    notes: White miso.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: red miso
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: miso_family
+    aliases: [aka miso, miso rouge]
+    notes: Red miso.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: thai red curry paste
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: curry_paste_family
+    aliases: [red curry paste, pâte de curry rouge]
+    notes: Thai red curry paste.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: thai green curry paste
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: curry_paste_family
+    aliases: [green curry paste, pâte de curry vert]
+    notes: Thai green curry paste.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: coconut milk
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: coconut_family
+    aliases: [lait de coco, leche de coco]
+    notes: Coconut milk.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: coconut cream
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: coconut_family
+    aliases: [crème de coco, crema de coco]
+    notes: Coconut cream.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: salsa verde
+    source_cuisines: [mexican_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: mexican_sauce_family
+    aliases: [green salsa]
+    notes: Mexican green salsa.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: chipotle in adobo
+    source_cuisines: [mexican_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: mexican_sauce_family
+    aliases: [chipotle adobado, chipotle en adobo]
+    notes: Chipotle chilies in adobo.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: tahini
+    source_cuisines: [middle_east_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: middle_eastern_sauce_family
+    aliases: [tahina, tahin]
+    notes: Sesame paste.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: harissa
+    source_cuisines: [north_africa_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: middle_eastern_sauce_family
+    aliases: [harissa paste]
+    notes: Harissa.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: parsley
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [persil, perejil]
+    notes: Parsley.
+    risk_flags: []
+    review_status: candidate
+  - name: coriander leaves
+    source_cuisines: [spain, asian_europe, mexican_europe]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [cilantro, coriandre, cilantro fresco]
+    notes: Fresh coriander.
+    risk_flags: []
+    review_status: candidate
+  - name: basil
+    source_cuisines: [mediterranean]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [basilic, albahaca]
+    notes: Basil.
+    risk_flags: []
+    review_status: candidate
+  - name: thyme
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [thym, tomillo]
+    notes: Thyme.
+    risk_flags: []
+    review_status: candidate
+  - name: rosemary
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [romarin, romero]
+    notes: Rosemary.
+    risk_flags: []
+    review_status: candidate
+  - name: bay leaf
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [laurier, laurel]
+    notes: Bay leaf.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: mint
+    source_cuisines: [middle_east_europe, europe]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [menthe, menta]
+    notes: Mint.
+    risk_flags: []
+    review_status: candidate
+  - name: fresh ginger
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: ginger_family
+    aliases: [gingembre, jengibre]
+    notes: Fresh ginger.
+    risk_flags: []
+    review_status: candidate
+  - name: galangal
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: ginger_family
+    aliases: [galanga]
+    notes: Galangal.
+    risk_flags: []
+    review_status: candidate
+  - name: lemongrass
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: herb
+    likely_family: lemongrass_family
+    aliases: [citronnelle, hierba limón]
+    notes: Lemongrass.
+    risk_flags: []
+    review_status: candidate
+  - name: saffron
+    source_cuisines: [france, spain]
+    priority: core
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [safran, azafrán]
+    notes: Saffron.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: smoked paprika
+    source_cuisines: [spain]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [pimentón ahumado, paprika fumé]
+    notes: Smoked paprika.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: sweet paprika
+    source_cuisines: [spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [pimentón dulce, paprika doux]
+    notes: Sweet paprika.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: cumin
+    source_cuisines: [spain, middle_east_europe, mexican_europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [cumin, comino]
+    notes: Cumin.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: cinnamon
+    source_cuisines: [europe, middle_east_europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [cannelle, canela]
+    notes: Cinnamon.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: ras el hanout
+    source_cuisines: [north_africa_europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [ras-el-hanout]
+    notes: North African spice blend.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: zaatar
+    source_cuisines: [middle_east_europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [za atar, zaatar spice]
+    notes: Zaatar.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: sumac
+    source_cuisines: [middle_east_europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [sumac spice]
+    notes: Sumac.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: dried chili flakes
+    source_cuisines: [europe, asian_europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: chili_spice_family
+    aliases: [piment concassé, copos de chile]
+    notes: Chili flakes.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: jalapeno
+    source_cuisines: [mexican_europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: pepper_family
+    aliases: [jalapeño, piment jalapeño]
+    notes: Jalapeno pepper.
+    risk_flags: []
+    review_status: candidate
+  - name: almonds
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: nut_seed
+    likely_family: nut_family
+    aliases: [amandes, almendras]
+    notes: Almonds.
+    risk_flags: []
+    review_status: candidate
+  - name: hazelnuts
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: nut_seed
+    likely_family: nut_family
+    aliases: [noisettes, avellanas]
+    notes: Hazelnuts.
+    risk_flags: []
+    review_status: candidate
+  - name: walnuts
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: nut_seed
+    likely_family: nut_family
+    aliases: [noix, nueces]
+    notes: Walnuts.
+    risk_flags: []
+    review_status: candidate
+  - name: pine nuts
+    source_cuisines: [mediterranean]
+    priority: common
+    likely_food_group: nut_seed
+    likely_family: nut_family
+    aliases: [pignons, piñones]
+    notes: Pine nuts.
+    risk_flags: []
+    review_status: candidate
+  - name: peanuts
+    source_cuisines: [asian_europe, mexican_europe]
+    priority: common
+    likely_food_group: nut_seed
+    likely_family: nut_family
+    aliases: [cacahuètes, cacahuetes]
+    notes: Peanuts.
+    risk_flags: []
+    review_status: candidate
+  - name: sesame seeds
+    source_cuisines: [asian_europe, middle_east_europe]
+    priority: common
+    likely_food_group: nut_seed
+    likely_family: seed_family
+    aliases: [graines de sésame, semillas de sésamo]
+    notes: Sesame seeds.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: toasted sesame oil
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: fat
+    likely_family: seed_family
+    aliases: [huile de sésame grillé, aceite de sésamo tostado]
+    notes: Toasted sesame oil.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: nori
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: seaweed_family
+    aliases: [feuilles de nori, alga nori]
+    notes: Nori seaweed.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: wakame
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: seaweed_family
+    aliases: [algue wakame, alga wakame]
+    notes: Wakame seaweed.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: sugar
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: sweetener
+    likely_family: sweetener_family
+    aliases: [sucre, azúcar]
+    notes: Sugar.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: honey
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: sweetener
+    likely_family: sweetener_family
+    aliases: [miel]
+    notes: Honey.
+    risk_flags: [pantry_item, vegan_edge_case]
+    review_status: needs_human_review
+  - name: maple syrup
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: sweetener
+    likely_family: sweetener_family
+    aliases: [sirop d érable, jarabe de arce]
+    notes: Maple syrup.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: vegetable stock
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: stock
+    likely_family: stock_family
+    aliases: [bouillon de légumes, caldo de verduras]
+    notes: Vegetable stock.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: chicken stock
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: stock
+    likely_family: stock_family
+    aliases: [bouillon de volaille, caldo de pollo]
+    notes: Chicken stock.
+    risk_flags: [pantry_item, vegan_edge_case]
+    review_status: needs_human_review
+  - name: fish stock
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: stock
+    likely_family: stock_family
+    aliases: [fumet de poisson, caldo de pescado]
+    notes: Fish stock.
+    risk_flags: [pantry_item, vegan_edge_case]
+    review_status: needs_human_review
+  - name: white wine
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: alcohol
+    likely_family: wine_family
+    aliases: [vin blanc, vino blanco]
+    notes: White wine.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: red wine
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: alcohol
+    likely_family: wine_family
+    aliases: [vin rouge, vino tinto]
+    notes: Red wine.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: sherry
+    source_cuisines: [spain]
+    priority: common
+    likely_food_group: alcohol
+    likely_family: wine_family
+    aliases: [xérès, jerez]
+    notes: Sherry.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: beer
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: alcohol
+    likely_family: beer_cider_family
+    aliases: [bière, cerveza]
+    notes: Beer.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+
+# Supplemental generated candidates
+  - name: endive
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: leafy_green_family
+    aliases: [endive, chicorée, endivia]
+    notes: Endive/chicory leaves.
+    risk_flags: []
+    review_status: candidate
+  - name: escarole
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: leafy_green_family
+    aliases: [scarole, escarola]
+    notes: Escarole salad green.
+    risk_flags: []
+    review_status: candidate
+  - name: radicchio
+    source_cuisines: [europe]
+    priority: optional
+    likely_food_group: vegetable
+    likely_family: leafy_green_family
+    aliases: [chicorée rouge]
+    notes: Radicchio.
+    risk_flags: []
+    review_status: candidate
+  - name: pak choi
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: brassica_family
+    aliases: [bok choy, pak choï]
+    notes: Asian cabbage.
+    risk_flags: []
+    review_status: candidate
+  - name: chinese cabbage
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: brassica_family
+    aliases: [napa cabbage, chou chinois]
+    notes: Chinese cabbage.
+    risk_flags: []
+    review_status: candidate
+  - name: bean sprouts
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: green_bean_family
+    aliases: [sprouts, germes de soja, brotes de soja]
+    notes: Bean sprouts.
+    risk_flags: [family_review]
+    review_status: needs_human_review
+  - name: okra
+    source_cuisines: [middle_east_europe, north_africa_europe]
+    priority: optional
+    likely_food_group: vegetable
+    likely_family: green_bean_family
+    aliases: [gombo, quimbombó]
+    notes: Okra.
+    risk_flags: [family_review]
+    review_status: needs_human_review
+  - name: plantain
+    source_cuisines: [latin_europe, african_europe]
+    priority: optional
+    likely_food_group: carbohydrate
+    likely_family: orchard_fruit_family
+    aliases: [plátano macho, banane plantain]
+    notes: Cooking plantain.
+    risk_flags: [food_group_review]
+    review_status: needs_human_review
+  - name: green plantain
+    source_cuisines: [latin_europe]
+    priority: optional
+    likely_food_group: carbohydrate
+    likely_family: orchard_fruit_family
+    aliases: [plátano verde]
+    notes: Green cooking plantain.
+    risk_flags: [food_group_review]
+    review_status: needs_human_review
+  - name: mango
+    source_cuisines: [asian_europe, latin_europe]
+    priority: common
+    likely_food_group: fruit
+    likely_family: orchard_fruit_family
+    aliases: [mangue]
+    notes: Mango.
+    risk_flags: []
+    review_status: candidate
+  - name: pomegranate
+    source_cuisines: [middle_east_europe, spain]
+    priority: common
+    likely_food_group: fruit
+    likely_family: orchard_fruit_family
+    aliases: [grenade, granada]
+    notes: Pomegranate.
+    risk_flags: []
+    review_status: candidate
+  - name: fig
+    source_cuisines: [france, spain, middle_east_europe]
+    priority: common
+    likely_food_group: fruit
+    likely_family: dried_fruit_family
+    aliases: [figue, higo]
+    notes: Fig.
+    risk_flags: [fresh_or_dried_review]
+    review_status: needs_human_review
+  - name: dried apricot
+    source_cuisines: [middle_east_europe, france]
+    priority: common
+    likely_food_group: fruit
+    likely_family: dried_fruit_family
+    aliases: [abricot sec, orejones]
+    notes: Dried apricot.
+    risk_flags: []
+    review_status: candidate
+  - name: prune
+    source_cuisines: [france]
+    priority: common
+    likely_food_group: fruit
+    likely_family: dried_fruit_family
+    aliases: [pruneau, ciruela pasa]
+    notes: Dried plum.
+    risk_flags: []
+    review_status: candidate
+  - name: coconut flakes
+    source_cuisines: [asian_europe, pantry]
+    priority: common
+    likely_food_group: condiment
+    likely_family: coconut_family
+    aliases: [noix de coco râpée, coco rallado]
+    notes: Desiccated coconut.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: banana
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: fruit
+    likely_family: orchard_fruit_family
+    aliases: [banane, plátano]
+    notes: Banana.
+    risk_flags: []
+    review_status: candidate
+  - name: pineapple
+    source_cuisines: [asian_europe, latin_europe]
+    priority: common
+    likely_food_group: fruit
+    likely_family: orchard_fruit_family
+    aliases: [ananas, piña]
+    notes: Pineapple.
+    risk_flags: []
+    review_status: candidate
+  - name: andouille sausage
+    source_cuisines: [france]
+    priority: optional
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [andouille]
+    notes: French pork sausage.
+    risk_flags: []
+    review_status: candidate
+  - name: andouillette
+    source_cuisines: [france]
+    priority: optional
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [andouillette sausage]
+    notes: French tripe sausage.
+    risk_flags: [regional_specialty]
+    review_status: needs_human_review
+  - name: boudin noir
+    source_cuisines: [france]
+    priority: optional
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [black pudding, morcilla francesa]
+    notes: French blood sausage.
+    risk_flags: []
+    review_status: candidate
+  - name: boudin blanc
+    source_cuisines: [france]
+    priority: optional
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [white pudding]
+    notes: French white sausage.
+    risk_flags: []
+    review_status: candidate
+  - name: botifarra
+    source_cuisines: [spain, catalonia]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [butifarra]
+    notes: Catalan sausage.
+    risk_flags: []
+    review_status: candidate
+  - name: fuet
+    source_cuisines: [spain, catalonia]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [fuet sausage]
+    notes: Catalan cured sausage.
+    risk_flags: []
+    review_status: candidate
+  - name: merguez
+    source_cuisines: [france, north_africa_europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: lamb_family
+    aliases: [merguez sausage]
+    notes: North African-style spicy sausage.
+    risk_flags: [meat_family_review]
+    review_status: needs_human_review
+  - name: lamb mince
+    source_cuisines: [middle_east_europe, france, spain]
+    priority: common
+    likely_food_group: meat
+    likely_family: lamb_family
+    aliases: [agneau haché, cordero picado]
+    notes: Minced lamb.
+    risk_flags: []
+    review_status: candidate
+  - name: pork mince
+    source_cuisines: [france, spain, asian_europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [porc haché, cerdo picado]
+    notes: Minced pork.
+    risk_flags: []
+    review_status: candidate
+  - name: chicken wings
+    source_cuisines: [france, spain, asian_europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: chicken_family
+    aliases: [ailes de poulet, alitas de pollo]
+    notes: Chicken wings.
+    risk_flags: []
+    review_status: candidate
+  - name: duck leg
+    source_cuisines: [france]
+    priority: common
+    likely_food_group: meat
+    likely_family: duck_family
+    aliases: [cuisse de canard, muslo de pato]
+    notes: Duck leg.
+    risk_flags: []
+    review_status: candidate
+  - name: foie gras
+    source_cuisines: [france]
+    priority: optional
+    likely_food_group: meat
+    likely_family: duck_family
+    aliases: [foie gras de canard]
+    notes: Foie gras.
+    risk_flags: [regional_specialty]
+    review_status: needs_human_review
+  - name: trout
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: fish
+    likely_family: oily_fish_family
+    aliases: [truite, trucha]
+    notes: Trout.
+    risk_flags: []
+    review_status: candidate
+  - name: sea bream
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: fish
+    likely_family: white_fish_family
+    aliases: [dorade, dorada]
+    notes: Sea bream.
+    risk_flags: []
+    review_status: candidate
+  - name: pollock
+    source_cuisines: [france, spain]
+    priority: optional
+    likely_food_group: fish
+    likely_family: white_fish_family
+    aliases: [colin d Alaska]
+    notes: Pollock.
+    risk_flags: []
+    review_status: candidate
+  - name: smoked salmon
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: fish
+    likely_family: oily_fish_family
+    aliases: [saumon fumé, salmón ahumado]
+    notes: Smoked salmon.
+    risk_flags: []
+    review_status: candidate
+  - name: smoked trout
+    source_cuisines: [france]
+    priority: optional
+    likely_food_group: fish
+    likely_family: oily_fish_family
+    aliases: [truite fumée]
+    notes: Smoked trout.
+    risk_flags: []
+    review_status: candidate
+  - name: crab
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: seafood
+    likely_family: shellfish_family
+    aliases: [crabe, cangrejo]
+    notes: Crab.
+    risk_flags: []
+    review_status: candidate
+  - name: lobster
+    source_cuisines: [france, spain]
+    priority: optional
+    likely_food_group: seafood
+    likely_family: shellfish_family
+    aliases: [homard, bogavante]
+    notes: Lobster.
+    risk_flags: []
+    review_status: candidate
+  - name: langoustine
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: seafood
+    likely_family: shellfish_family
+    aliases: [langoustine, cigala]
+    notes: Langoustine.
+    risk_flags: []
+    review_status: candidate
+  - name: razor clams
+    source_cuisines: [spain, france]
+    priority: optional
+    likely_food_group: seafood
+    likely_family: shellfish_family
+    aliases: [couteaux, navajas]
+    notes: Razor clams.
+    risk_flags: []
+    review_status: candidate
+  - name: cockles
+    source_cuisines: [spain, france]
+    priority: optional
+    likely_food_group: seafood
+    likely_family: shellfish_family
+    aliases: [coques, berberechos]
+    notes: Cockles.
+    risk_flags: []
+    review_status: candidate
+  - name: emmental
+    source_cuisines: [france, europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: hard_cheese_family
+    aliases: [emmenthal]
+    notes: Emmental cheese.
+    risk_flags: []
+    review_status: candidate
+  - name: raclette cheese
+    source_cuisines: [france]
+    priority: common
+    likely_food_group: cheese
+    likely_family: soft_cheese_family
+    aliases: [raclette]
+    notes: Raclette cheese.
+    risk_flags: []
+    review_status: candidate
+  - name: reblochon
+    source_cuisines: [france]
+    priority: optional
+    likely_food_group: cheese
+    likely_family: soft_cheese_family
+    aliases: [reblochon cheese]
+    notes: Reblochon.
+    risk_flags: []
+    review_status: candidate
+  - name: tomme
+    source_cuisines: [france]
+    priority: optional
+    likely_food_group: cheese
+    likely_family: hard_cheese_family
+    aliases: [tomme de Savoie]
+    notes: Tomme cheese.
+    risk_flags: [ambiguous_name]
+    review_status: needs_human_review
+  - name: ossau iraty
+    source_cuisines: [france]
+    priority: optional
+    likely_food_group: cheese
+    likely_family: hard_cheese_family
+    aliases: [ossau-iraty]
+    notes: Basque sheep cheese.
+    risk_flags: []
+    review_status: candidate
+  - name: idiazabal
+    source_cuisines: [spain]
+    priority: optional
+    likely_food_group: cheese
+    likely_family: hard_cheese_family
+    aliases: [queso idiazabal]
+    notes: Basque smoked sheep cheese.
+    risk_flags: []
+    review_status: candidate
+  - name: tetilla cheese
+    source_cuisines: [spain]
+    priority: optional
+    likely_food_group: cheese
+    likely_family: soft_cheese_family
+    aliases: [queso tetilla]
+    notes: Galician soft cheese.
+    risk_flags: []
+    review_status: candidate
+  - name: queso fresco
+    source_cuisines: [mexican_europe, spain]
+    priority: common
+    likely_food_group: cheese
+    likely_family: fresh_cheese_family
+    aliases: [fresh cheese, fromage frais]
+    notes: Fresh cheese.
+    risk_flags: [ambiguous_name]
+    review_status: needs_human_review
+  - name: halloumi
+    source_cuisines: [middle_east_europe, europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: fresh_cheese_family
+    aliases: [haloumi]
+    notes: Halloumi.
+    risk_flags: []
+    review_status: candidate
+  - name: labneh
+    source_cuisines: [middle_east_europe]
+    priority: common
+    likely_food_group: dairy
+    likely_family: dairy_family
+    aliases: [labne, labneh cheese]
+    notes: Strained yogurt.
+    risk_flags: []
+    review_status: candidate
+  - name: sour cream
+    source_cuisines: [mexican_europe, europe]
+    priority: common
+    likely_food_group: dairy
+    likely_family: dairy_family
+    aliases: [crème aigre, nata agria]
+    notes: Sour cream.
+    risk_flags: []
+    review_status: candidate
+  - name: cream cheese
+    source_cuisines: [europe, mexican_europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: fresh_cheese_family
+    aliases: [fromage à tartiner, queso crema]
+    notes: Cream cheese.
+    risk_flags: [cream_ambiguity]
+    review_status: needs_human_review
+  - name: black sesame seeds
+    source_cuisines: [asian_europe]
+    priority: optional
+    likely_food_group: nut_seed
+    likely_family: seed_family
+    aliases: [graines de sésame noir, sésamo negro]
+    notes: Black sesame seeds.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: peanut butter
+    source_cuisines: [asian_europe, american_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: nut_family
+    aliases: [beurre de cacahuète, mantequilla de cacahuete]
+    notes: Peanut butter.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: cashews
+    source_cuisines: [asian_europe, europe]
+    priority: common
+    likely_food_group: nut_seed
+    likely_family: nut_family
+    aliases: [noix de cajou, anacardos]
+    notes: Cashews.
+    risk_flags: []
+    review_status: candidate
+  - name: pistachios
+    source_cuisines: [middle_east_europe, europe]
+    priority: common
+    likely_food_group: nut_seed
+    likely_family: nut_family
+    aliases: [pistaches, pistachos]
+    notes: Pistachios.
+    risk_flags: []
+    review_status: candidate
+  - name: pumpkin seeds
+    source_cuisines: [europe, mexican_europe]
+    priority: common
+    likely_food_group: nut_seed
+    likely_family: seed_family
+    aliases: [pepitas, graines de courge]
+    notes: Pumpkin seeds.
+    risk_flags: []
+    review_status: candidate
+  - name: sunflower seeds
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: nut_seed
+    likely_family: seed_family
+    aliases: [graines de tournesol, pipas]
+    notes: Sunflower seeds.
+    risk_flags: []
+    review_status: candidate
+  - name: chia seeds
+    source_cuisines: [mexican_europe, europe]
+    priority: common
+    likely_food_group: nut_seed
+    likely_family: seed_family
+    aliases: [graines de chia, semillas de chía]
+    notes: Chia seeds.
+    risk_flags: []
+    review_status: candidate
+  - name: flax seeds
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: nut_seed
+    likely_family: seed_family
+    aliases: [graines de lin, semillas de lino]
+    notes: Flax seeds.
+    risk_flags: []
+    review_status: candidate
+  - name: kimchi
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: asian_sauce_family
+    aliases: [kimchi cabbage]
+    notes: Korean fermented vegetables.
+    risk_flags: [family_review, pantry_item]
+    review_status: needs_human_review
+  - name: mirin
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: alcohol
+    likely_family: wine_family
+    aliases: [mirin rice wine]
+    notes: Sweet Japanese cooking wine.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: rice vinegar
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: vinegar_family
+    aliases: [vinaigre de riz, vinagre de arroz]
+    notes: Rice vinegar.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: dashi stock
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: stock
+    likely_family: stock_family
+    aliases: [dashi, bouillon dashi]
+    notes: Japanese stock.
+    risk_flags: [vegan_edge_case, pantry_item]
+    review_status: needs_human_review
+  - name: kombu
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: seaweed_family
+    aliases: [konbu]
+    notes: Kombu seaweed.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: togarashi
+    source_cuisines: [asian_europe]
+    priority: optional
+    likely_food_group: spice
+    likely_family: chili_spice_family
+    aliases: [shichimi togarashi]
+    notes: Japanese chili blend.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: five spice
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [cinq épices, cinco especias]
+    notes: Chinese five spice.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: garam masala
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [garam masala spice]
+    notes: Indian spice blend.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: curry powder
+    source_cuisines: [asian_europe, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [poudre de curry, curry en polvo]
+    notes: Curry powder.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: tortilla chips
+    source_cuisines: [mexican_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_pastry_family
+    aliases: [nachos, chips de tortilla]
+    notes: Corn tortilla chips.
+    risk_flags: []
+    review_status: candidate
+  - name: masa harina
+    source_cuisines: [mexican_europe]
+    priority: optional
+    likely_food_group: carbohydrate
+    likely_family: other_grain_family
+    aliases: [corn masa flour]
+    notes: Nixtamalized corn flour.
+    risk_flags: []
+    review_status: candidate
+  - name: chipotle powder
+    source_cuisines: [mexican_europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: chili_spice_family
+    aliases: [poudre de chipotle]
+    notes: Chipotle powder.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: ancho chili
+    source_cuisines: [mexican_europe]
+    priority: optional
+    likely_food_group: spice
+    likely_family: chili_spice_family
+    aliases: [chile ancho]
+    notes: Ancho dried chili.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: tomatillo
+    source_cuisines: [mexican_europe]
+    priority: optional
+    likely_food_group: vegetable
+    likely_family: tomato_family
+    aliases: [tomatillo verde]
+    notes: Tomatillo.
+    risk_flags: [family_review]
+    review_status: needs_human_review
+  - name: coriander seed
+    source_cuisines: [middle_east_europe, asian_europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [graines de coriandre, semillas de cilantro]
+    notes: Coriander seed.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: cardamom
+    source_cuisines: [middle_east_europe, asian_europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [cardamome, cardamomo]
+    notes: Cardamom.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: turmeric
+    source_cuisines: [asian_europe, middle_east_europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [curcuma]
+    notes: Turmeric.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: fenugreek
+    source_cuisines: [middle_east_europe, asian_europe]
+    priority: optional
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [fenugrec, alholva]
+    notes: Fenugreek.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: tahini sauce
+    source_cuisines: [middle_east_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: middle_eastern_sauce_family
+    aliases: [sauce tahini]
+    notes: Prepared tahini sauce.
+    risk_flags: [pantry_item, merge_review]
+    review_status: needs_human_review
+  - name: pomegranate molasses
+    source_cuisines: [middle_east_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: middle_eastern_sauce_family
+    aliases: [mélasse de grenade, melaza de granada]
+    notes: Pomegranate molasses.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: rose water
+    source_cuisines: [middle_east_europe]
+    priority: optional
+    likely_food_group: condiment
+    likely_family: middle_eastern_sauce_family
+    aliases: [eau de rose, agua de rosas]
+    notes: Rose water.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: orange blossom water
+    source_cuisines: [middle_east_europe, france]
+    priority: optional
+    likely_food_group: condiment
+    likely_family: middle_eastern_sauce_family
+    aliases: [eau de fleur d oranger, agua de azahar]
+    notes: Orange blossom water.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: freekeh
+    source_cuisines: [middle_east_europe]
+    priority: optional
+    likely_food_group: carbohydrate
+    likely_family: other_grain_family
+    aliases: [frikeh]
+    notes: Green wheat grain.
+    risk_flags: []
+    review_status: candidate
+  - name: pita bread
+    source_cuisines: [middle_east_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_pastry_family
+    aliases: [pain pita, pan pita]
+    notes: Pita bread.
+    risk_flags: []
+    review_status: candidate
+  - name: flatbread
+    source_cuisines: [middle_east_europe, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_pastry_family
+    aliases: [pain plat, pan plano]
+    notes: Flatbread.
+    risk_flags: [ambiguous_name]
+    review_status: needs_human_review
+
+# Catalogue assessment MVP essentials batch
+  - name: button mushroom
+    source_cuisines: [france, spain, europe]
+    priority: core
+    likely_food_group: fungus
+    likely_family: mushroom_family
+    aliases: [champignon de Paris, champiñón]
+    notes: Common white button mushroom.
+    risk_flags: []
+    review_status: candidate
+  - name: brown button mushroom
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fungus
+    likely_family: mushroom_family
+    aliases: [cremini mushroom, chestnut mushroom, champignon brun]
+    notes: Brown button mushroom.
+    risk_flags: []
+    review_status: candidate
+  - name: portobello mushroom
+    source_cuisines: [europe]
+    priority: common
+    likely_food_group: fungus
+    likely_family: mushroom_family
+    aliases: [portobello, portobella]
+    notes: Large mature mushroom.
+    risk_flags: []
+    review_status: candidate
+  - name: oyster mushroom
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fungus
+    likely_family: mushroom_family
+    aliases: [pleurote, seta de ostra]
+    notes: Oyster mushroom.
+    risk_flags: []
+    review_status: candidate
+  - name: porcini
+    source_cuisines: [france, spain, italy_europe]
+    priority: common
+    likely_food_group: fungus
+    likely_family: mushroom_family
+    aliases: [cèpe, boletus, bolet]
+    notes: Porcini/cep mushroom.
+    risk_flags: []
+    review_status: candidate
+  - name: dried porcini
+    source_cuisines: [france, spain, italy_europe]
+    priority: common
+    likely_food_group: fungus
+    likely_family: mushroom_family
+    aliases: [cèpes séchés, boletus secos]
+    notes: Dried porcini mushroom.
+    risk_flags: [product_state_separate_ok]
+    review_status: needs_human_review
+  - name: chanterelle
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: fungus
+    likely_family: mushroom_family
+    aliases: [girolle, rossinyol]
+    notes: Chanterelle mushroom.
+    risk_flags: []
+    review_status: candidate
+  - name: morel
+    source_cuisines: [france]
+    priority: optional
+    likely_food_group: fungus
+    likely_family: mushroom_family
+    aliases: [morille, colmenilla]
+    notes: Morel mushroom.
+    risk_flags: []
+    review_status: candidate
+  - name: black trumpet mushroom
+    source_cuisines: [france, spain]
+    priority: optional
+    likely_food_group: fungus
+    likely_family: mushroom_family
+    aliases: [trompette de la mort, trompeta de la muerte]
+    notes: Black trumpet mushroom.
+    risk_flags: []
+    review_status: candidate
+  - name: mixed wild mushrooms
+    source_cuisines: [france, spain]
+    priority: common
+    likely_food_group: fungus
+    likely_family: mushroom_family
+    aliases: [mélange de champignons, setas variadas]
+    notes: Mixed wild mushrooms.
+    risk_flags: [composite_review]
+    review_status: needs_human_review
+  - name: black truffle
+    source_cuisines: [france, spain]
+    priority: optional
+    likely_food_group: fungus
+    likely_family: mushroom_family
+    aliases: [truffe noire, trufa negra]
+    notes: Black truffle.
+    risk_flags: []
+    review_status: candidate
+  - name: truffle paste
+    source_cuisines: [france, spain]
+    priority: optional
+    likely_food_group: condiment
+    likely_family: mushroom_family
+    aliases: [pâte de truffe, pasta de trufa]
+    notes: Prepared truffle paste.
+    risk_flags: [prepared_product]
+    review_status: needs_human_review
+  - name: shiitake mushroom
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: fungus
+    likely_family: asian_mushroom_family
+    aliases: [shiitake, champignon shiitake]
+    notes: Shiitake mushroom.
+    risk_flags: []
+    review_status: candidate
+  - name: dried shiitake mushroom
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: fungus
+    likely_family: asian_mushroom_family
+    aliases: [dried shiitake, shiitake séché]
+    notes: Dried shiitake mushroom.
+    risk_flags: [product_state_separate_ok]
+    review_status: needs_human_review
+  - name: enoki mushroom
+    source_cuisines: [asian_europe]
+    priority: optional
+    likely_food_group: fungus
+    likely_family: asian_mushroom_family
+    aliases: [enoki, enokitake]
+    notes: Enoki mushroom.
+    risk_flags: []
+    review_status: candidate
+  - name: king oyster mushroom
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: fungus
+    likely_family: asian_mushroom_family
+    aliases: [eringi, pleurote du panicaut]
+    notes: King oyster mushroom.
+    risk_flags: []
+    review_status: candidate
+  - name: shimeji mushroom
+    source_cuisines: [asian_europe]
+    priority: optional
+    likely_food_group: fungus
+    likely_family: asian_mushroom_family
+    aliases: [shimeji]
+    notes: Shimeji mushroom.
+    risk_flags: []
+    review_status: candidate
+  - name: wood ear mushroom
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: fungus
+    likely_family: asian_mushroom_family
+    aliases: [black fungus, oreille de Judas, oreja de madera]
+    notes: Wood ear mushroom.
+    risk_flags: []
+    review_status: candidate
+  - name: white onion
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: onion_family
+    aliases: [oignon blanc, cebolla blanca]
+    notes: White onion.
+    risk_flags: []
+    review_status: candidate
+  - name: yellow bell pepper
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: pepper_family
+    aliases: [poivron jaune, pimiento amarillo]
+    notes: Yellow bell pepper.
+    risk_flags: []
+    review_status: candidate
+  - name: orange bell pepper
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: pepper_family
+    aliases: [poivron orange, pimiento naranja]
+    notes: Orange bell pepper.
+    risk_flags: []
+    review_status: candidate
+  - name: roasted red pepper
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: pepper_family
+    aliases: [poivron rouge grillé, pimiento rojo asado]
+    notes: Roasted red pepper.
+    risk_flags: [prepared_or_base_review]
+    review_status: needs_human_review
+  - name: padron pepper
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: pepper_family
+    aliases: [pimiento de padrón, pimientos de padrón]
+    notes: Padron pepper.
+    risk_flags: []
+    review_status: candidate
+  - name: guindilla pepper
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: pepper_family
+    aliases: [guindilla, piment guindilla]
+    notes: Guindilla pepper.
+    risk_flags: []
+    review_status: candidate
+  - name: espelette pepper
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: chili_spice_family
+    aliases: [piment d Espelette, pimiento de Espelette]
+    notes: Espelette pepper spice.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: mild green frying pepper
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: pepper_family
+    aliases: [pimiento italiano, poivron vert long]
+    notes: Mild green frying pepper.
+    risk_flags: []
+    review_status: candidate
+  - name: romanesco
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: brassica_family
+    aliases: [chou romanesco]
+    notes: Romanesco.
+    risk_flags: []
+    review_status: candidate
+  - name: savoy cabbage
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: brassica_family
+    aliases: [chou de Milan, col de Saboya]
+    notes: Savoy cabbage.
+    risk_flags: []
+    review_status: candidate
+  - name: pointed cabbage
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: brassica_family
+    aliases: [chou pointu, col picuda]
+    notes: Pointed cabbage.
+    risk_flags: []
+    review_status: candidate
+  - name: kohlrabi
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: brassica_family
+    aliases: [chou rave, colirrábano]
+    notes: Kohlrabi.
+    risk_flags: []
+    review_status: candidate
+  - name: collard greens
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: leafy_green_family
+    aliases: [berza, couve]
+    notes: Collard greens.
+    risk_flags: []
+    review_status: candidate
+  - name: lambs lettuce
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: leafy_green_family
+    aliases: [mâche, canónigos]
+    notes: Lambs lettuce.
+    risk_flags: []
+    review_status: candidate
+  - name: sorrel
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: leafy_green_family
+    aliases: [oseille, acedera]
+    notes: Sorrel.
+    risk_flags: []
+    review_status: candidate
+  - name: purslane
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: leafy_green_family
+    aliases: [pourpier, verdolaga]
+    notes: Purslane.
+    risk_flags: []
+    review_status: candidate
+  - name: white asparagus
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: asparagus_family
+    aliases: [asperge blanche, espárrago blanco]
+    notes: White asparagus.
+    risk_flags: []
+    review_status: candidate
+  - name: green asparagus
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: asparagus_family
+    aliases: [asperge verte, espárrago verde]
+    notes: Green asparagus.
+    risk_flags: []
+    review_status: candidate
+  - name: snow peas
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: green_bean_family
+    aliases: [pois mangetout, tirabeques]
+    notes: Snow peas.
+    risk_flags: []
+    review_status: candidate
+  - name: sugar snap peas
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: green_bean_family
+    aliases: [pois sugar snap, guisantes sugar snap]
+    notes: Sugar snap peas.
+    risk_flags: []
+    review_status: candidate
+  - name: flat green beans
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: green_bean_family
+    aliases: [haricots plats, judías planas]
+    notes: Flat green beans.
+    risk_flags: []
+    review_status: candidate
+  - name: cardoon
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: artichoke_family
+    aliases: [cardon, cardo]
+    notes: Cardoon.
+    risk_flags: []
+    review_status: candidate
+  - name: jerusalem artichoke
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: artichoke_family
+    aliases: [topinambour, tupinambo]
+    notes: Jerusalem artichoke.
+    risk_flags: [food_group_review]
+    review_status: needs_human_review
+  - name: rutabaga
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: root_vegetable_family
+    aliases: [swede, rutabaga]
+    notes: Rutabaga.
+    risk_flags: []
+    review_status: candidate
+  - name: daikon
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: root_vegetable_family
+    aliases: [radis blanc, rábano daikon]
+    notes: Daikon.
+    risk_flags: []
+    review_status: candidate
+  - name: horseradish
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: root_vegetable_family
+    aliases: [raifort, rábano picante]
+    notes: Horseradish root.
+    risk_flags: []
+    review_status: candidate
+  - name: chestnut squash
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: squash_family
+    aliases: [potimarron]
+    notes: Chestnut squash.
+    risk_flags: []
+    review_status: candidate
+  - name: acorn squash
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: squash_family
+    aliases: [courge poivrée]
+    notes: Acorn squash.
+    risk_flags: []
+    review_status: candidate
+  - name: spaghetti squash
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: squash_family
+    aliases: [courge spaghetti]
+    notes: Spaghetti squash.
+    risk_flags: []
+    review_status: candidate
+  - name: baguette
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_family
+    aliases: [baguette]
+    notes: Baguette.
+    risk_flags: []
+    review_status: candidate
+  - name: country bread
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_family
+    aliases: [pain de campagne, pan de pueblo]
+    notes: Country bread.
+    risk_flags: []
+    review_status: candidate
+  - name: sandwich bread
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_family
+    aliases: [pain de mie, pan de molde]
+    notes: Sandwich bread.
+    risk_flags: []
+    review_status: candidate
+  - name: wholemeal bread
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_family
+    aliases: [pain complet, pan integral]
+    notes: Wholemeal bread.
+    risk_flags: []
+    review_status: candidate
+  - name: rye bread
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_family
+    aliases: [pain de seigle, pan de centeno]
+    notes: Rye bread.
+    risk_flags: []
+    review_status: candidate
+  - name: sourdough bread
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_family
+    aliases: [pain au levain, pan de masa madre]
+    notes: Sourdough bread.
+    risk_flags: []
+    review_status: candidate
+  - name: brioche
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_family
+    aliases: [brioche]
+    notes: Brioche.
+    risk_flags: []
+    review_status: candidate
+  - name: burger bun
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_family
+    aliases: [pain burger, pan de hamburguesa]
+    notes: Burger bun.
+    risk_flags: []
+    review_status: candidate
+  - name: panko breadcrumbs
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_family
+    aliases: [panko, chapelure panko]
+    notes: Panko breadcrumbs.
+    risk_flags: []
+    review_status: candidate
+  - name: croutons
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_family
+    aliases: [croûtons, picatostes]
+    notes: Croutons.
+    risk_flags: []
+    review_status: candidate
+  - name: generic dry pasta
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: pasta_family
+    aliases: [dry pasta, pasta seca]
+    notes: Generic dry pasta.
+    risk_flags: []
+    review_status: candidate
+  - name: fresh pasta
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: pasta_family
+    aliases: [pâtes fraîches, pasta fresca]
+    notes: Fresh pasta.
+    risk_flags: []
+    review_status: candidate
+  - name: lasagne sheets
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: pasta_family
+    aliases: [feuilles de lasagne, placas de lasaña]
+    notes: Lasagne sheets.
+    risk_flags: []
+    review_status: candidate
+  - name: cannelloni
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: pasta_family
+    aliases: [canelones]
+    notes: Cannelloni pasta.
+    risk_flags: []
+    review_status: candidate
+  - name: fusilli
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: pasta_family
+    aliases: [fusilli]
+    notes: Fusilli.
+    risk_flags: []
+    review_status: candidate
+  - name: farfalle
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: pasta_family
+    aliases: [farfalle]
+    notes: Farfalle.
+    risk_flags: []
+    review_status: candidate
+  - name: rigatoni
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: pasta_family
+    aliases: [rigatoni]
+    notes: Rigatoni.
+    risk_flags: []
+    review_status: candidate
+  - name: linguine
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: pasta_family
+    aliases: [linguine]
+    notes: Linguine.
+    risk_flags: []
+    review_status: candidate
+  - name: gnocchi
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: pasta_family
+    aliases: [gnocchis]
+    notes: Gnocchi.
+    risk_flags: [could_be_potato_or_pasta]
+    review_status: needs_human_review
+  - name: orzo
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: pasta_family
+    aliases: [risoni]
+    notes: Orzo pasta.
+    risk_flags: []
+    review_status: candidate
+  - name: vermicelli
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: pasta_family
+    aliases: [vermicelles, fideos finos]
+    notes: Vermicelli pasta.
+    risk_flags: []
+    review_status: candidate
+  - name: wheat flour
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: flour_starch_family
+    aliases: [farine de blé, harina de trigo]
+    notes: Wheat flour.
+    risk_flags: []
+    review_status: candidate
+  - name: bread flour
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: flour_starch_family
+    aliases: [farine à pain, harina de fuerza]
+    notes: Bread flour.
+    risk_flags: []
+    review_status: candidate
+  - name: buckwheat flour
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: flour_starch_family
+    aliases: [farine de sarrasin, harina de trigo sarraceno]
+    notes: Buckwheat flour.
+    risk_flags: []
+    review_status: candidate
+  - name: cornflour
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: flour_starch_family
+    aliases: [cornstarch, maïzena, maicena]
+    notes: Cornstarch/cornflour.
+    risk_flags: []
+    review_status: candidate
+  - name: potato starch
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: flour_starch_family
+    aliases: [fécule de pomme de terre, fécula de patata]
+    notes: Potato starch.
+    risk_flags: []
+    review_status: candidate
+  - name: tapioca starch
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: flour_starch_family
+    aliases: [fécule de tapioca, almidón de tapioca]
+    notes: Tapioca starch.
+    risk_flags: []
+    review_status: candidate
+  - name: rice flour
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: flour_starch_family
+    aliases: [farine de riz, harina de arroz]
+    notes: Rice flour.
+    risk_flags: []
+    review_status: candidate
+  - name: chickpea flour
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: flour_starch_family
+    aliases: [farine de pois chiche, harina de garbanzo]
+    notes: Chickpea flour.
+    risk_flags: []
+    review_status: candidate
+  - name: rolled oats
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: other_grain_family
+    aliases: [flocons d avoine, copos de avena]
+    notes: Rolled oats.
+    risk_flags: []
+    review_status: candidate
+  - name: spelt
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: other_grain_family
+    aliases: [épeautre, espelta]
+    notes: Spelt.
+    risk_flags: []
+    review_status: candidate
+  - name: millet
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: other_grain_family
+    aliases: [millet, mijo]
+    notes: Millet.
+    risk_flags: []
+    review_status: candidate
+  - name: fresh yeast
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: pantry
+    likely_family: leavening_family
+    aliases: [levure fraîche, levadura fresca]
+    notes: Fresh yeast.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: dry yeast
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: pantry
+    likely_family: leavening_family
+    aliases: [levure sèche, levadura seca]
+    notes: Dry yeast.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: baking powder
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: pantry
+    likely_family: leavening_family
+    aliases: [levure chimique, polvo de hornear]
+    notes: Baking powder.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: baking soda
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: pantry
+    likely_family: leavening_family
+    aliases: [bicarbonate de soude, bicarbonato]
+    notes: Baking soda.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: chicken drumstick
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: chicken_family
+    aliases: [pilons de poulet, jamoncitos de pollo]
+    notes: Chicken drumstick.
+    risk_flags: []
+    review_status: candidate
+  - name: chicken leg
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: chicken_family
+    aliases: [cuisse de poulet, pierna de pollo]
+    notes: Chicken leg.
+    risk_flags: []
+    review_status: candidate
+  - name: chicken mince
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: chicken_family
+    aliases: [poulet haché, pollo picado]
+    notes: Chicken mince.
+    risk_flags: []
+    review_status: candidate
+  - name: chicken liver
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: chicken_family
+    aliases: [foie de volaille, higaditos de pollo]
+    notes: Chicken liver.
+    risk_flags: []
+    review_status: candidate
+  - name: cooked chicken
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: chicken_family
+    aliases: [poulet cuit, pollo cocido]
+    notes: Cooked chicken.
+    risk_flags: [product_state_review]
+    review_status: needs_human_review
+  - name: turkey mince
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: turkey_family
+    aliases: [dinde hachée, pavo picado]
+    notes: Turkey mince.
+    risk_flags: []
+    review_status: candidate
+  - name: turkey escalope
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: turkey_family
+    aliases: [escalope de dinde, filete de pavo]
+    notes: Turkey escalope.
+    risk_flags: []
+    review_status: candidate
+  - name: pork loin
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [longe de porc, lomo de cerdo]
+    notes: Pork loin.
+    risk_flags: []
+    review_status: candidate
+  - name: pork tenderloin
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [filet mignon de porc, solomillo de cerdo]
+    notes: Pork tenderloin.
+    risk_flags: []
+    review_status: candidate
+  - name: pork chop
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [côte de porc, chuleta de cerdo]
+    notes: Pork chop.
+    risk_flags: []
+    review_status: candidate
+  - name: pork ribs
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [travers de porc, costillas de cerdo]
+    notes: Pork ribs.
+    risk_flags: []
+    review_status: candidate
+  - name: pork sausage
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [saucisse de porc, salchicha de cerdo]
+    notes: Pork sausage.
+    risk_flags: []
+    review_status: candidate
+  - name: toulouse sausage
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [saucisse de Toulouse]
+    notes: Toulouse sausage.
+    risk_flags: []
+    review_status: candidate
+  - name: fresh chorizo
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [chorizo fresco]
+    notes: Fresh cooking chorizo.
+    risk_flags: [do_not_merge_with_cured_chorizo]
+    review_status: needs_human_review
+  - name: cooked ham
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [jambon cuit, jamón cocido]
+    notes: Cooked ham.
+    risk_flags: []
+    review_status: candidate
+  - name: cured ham
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [jambon cru, jamón curado]
+    notes: Cured ham.
+    risk_flags: []
+    review_status: candidate
+  - name: bayonne ham
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [jambon de Bayonne]
+    notes: Bayonne ham.
+    risk_flags: []
+    review_status: candidate
+  - name: coppa
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [capocollo]
+    notes: Coppa.
+    risk_flags: []
+    review_status: candidate
+  - name: pancetta
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: pork_family
+    aliases: [pancetta]
+    notes: Pancetta.
+    risk_flags: []
+    review_status: candidate
+  - name: beef steak
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: beef_family
+    aliases: [steak de boeuf, filete de ternera]
+    notes: Beef steak.
+    risk_flags: []
+    review_status: candidate
+  - name: sirloin steak
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: beef_family
+    aliases: [faux-filet, sirloin]
+    notes: Sirloin steak.
+    risk_flags: []
+    review_status: candidate
+  - name: beef chuck
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: beef_family
+    aliases: [paleron, aguja de ternera]
+    notes: Beef chuck.
+    risk_flags: []
+    review_status: candidate
+  - name: beef brisket
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: beef_family
+    aliases: [poitrine de boeuf, falda de ternera]
+    notes: Beef brisket.
+    risk_flags: []
+    review_status: candidate
+  - name: oxtail
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: beef_family
+    aliases: [queue de boeuf, rabo de toro]
+    notes: Oxtail.
+    risk_flags: []
+    review_status: candidate
+  - name: beef cheek
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: beef_family
+    aliases: [joue de boeuf, carrillera de ternera]
+    notes: Beef cheek.
+    risk_flags: []
+    review_status: candidate
+  - name: veal escalope
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: veal_family
+    aliases: [escalope de veau, escalope de ternera]
+    notes: Veal escalope.
+    risk_flags: []
+    review_status: candidate
+  - name: veal mince
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: veal_family
+    aliases: [veau haché, ternera picada]
+    notes: Veal mince.
+    risk_flags: []
+    review_status: candidate
+  - name: veal shank
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: veal_family
+    aliases: [jarret de veau, ossobuco de ternera]
+    notes: Veal shank.
+    risk_flags: []
+    review_status: candidate
+  - name: lamb leg
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: lamb_family
+    aliases: [gigot d agneau, pierna de cordero]
+    notes: Lamb leg.
+    risk_flags: []
+    review_status: candidate
+  - name: lamb chops
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: lamb_family
+    aliases: [côtelettes d agneau, chuletas de cordero]
+    notes: Lamb chops.
+    risk_flags: []
+    review_status: candidate
+  - name: lamb shank
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: lamb_family
+    aliases: [souris d agneau, jarrete de cordero]
+    notes: Lamb shank.
+    risk_flags: []
+    review_status: candidate
+  - name: guinea fowl
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: game_poultry_family
+    aliases: [pintade, pintada]
+    notes: Guinea fowl.
+    risk_flags: []
+    review_status: candidate
+  - name: quail
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: game_poultry_family
+    aliases: [caille, codorniz]
+    notes: Quail.
+    risk_flags: []
+    review_status: candidate
+  - name: goose
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: game_poultry_family
+    aliases: [oie, ganso]
+    notes: Goose.
+    risk_flags: []
+    review_status: candidate
+  - name: snails
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: specialty_animal_family
+    aliases: [escargots, caracoles]
+    notes: Snails.
+    risk_flags: []
+    review_status: candidate
+  - name: frog legs
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: meat
+    likely_family: specialty_animal_family
+    aliases: [cuisses de grenouille, ancas de rana]
+    notes: Frog legs.
+    risk_flags: []
+    review_status: candidate
+  - name: fresh anchovies
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fish
+    likely_family: oily_fish_family
+    aliases: [anchois frais, boquerones]
+    notes: Fresh anchovies.
+    risk_flags: [do_not_merge_with_anchovy_fillets]
+    review_status: needs_human_review
+  - name: anchovy fillets in oil
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fish
+    likely_family: oily_fish_family
+    aliases: [anchois à l huile, anchoas en aceite]
+    notes: Anchovy fillets in oil.
+    risk_flags: [product_state_separate_ok]
+    review_status: needs_human_review
+  - name: canned sardines
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fish
+    likely_family: oily_fish_family
+    aliases: [sardines en boîte, sardinas en lata]
+    notes: Canned sardines.
+    risk_flags: [product_state_separate_ok]
+    review_status: needs_human_review
+  - name: smoked mackerel
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fish
+    likely_family: oily_fish_family
+    aliases: [maquereau fumé, caballa ahumada]
+    notes: Smoked mackerel.
+    risk_flags: [product_state_separate_ok]
+    review_status: needs_human_review
+  - name: haddock
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fish
+    likely_family: white_fish_family
+    aliases: [eglefin, abadejo]
+    notes: Haddock.
+    risk_flags: []
+    review_status: candidate
+  - name: smoked haddock
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fish
+    likely_family: white_fish_family
+    aliases: [haddock fumé]
+    notes: Smoked haddock.
+    risk_flags: [product_state_separate_ok]
+    review_status: needs_human_review
+  - name: whiting
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fish
+    likely_family: white_fish_family
+    aliases: [merlan, pescadilla]
+    notes: Whiting.
+    risk_flags: []
+    review_status: candidate
+  - name: red mullet
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fish
+    likely_family: white_fish_family
+    aliases: [rouget, salmonete]
+    notes: Red mullet.
+    risk_flags: []
+    review_status: candidate
+  - name: turbot
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fish
+    likely_family: white_fish_family
+    aliases: [turbot, rodaballo]
+    notes: Turbot.
+    risk_flags: []
+    review_status: candidate
+  - name: skate
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fish
+    likely_family: white_fish_family
+    aliases: [raie, raya]
+    notes: Skate.
+    risk_flags: []
+    review_status: candidate
+  - name: swordfish
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fish
+    likely_family: oily_fish_family
+    aliases: [espadon, pez espada]
+    notes: Swordfish.
+    risk_flags: []
+    review_status: candidate
+  - name: bonito
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fish
+    likely_family: oily_fish_family
+    aliases: [bonite, bonito del norte]
+    notes: Bonito.
+    risk_flags: []
+    review_status: candidate
+  - name: bottarga
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fish
+    likely_family: oily_fish_family
+    aliases: [boutargue, botarga]
+    notes: Cured fish roe.
+    risk_flags: [specialty]
+    review_status: needs_human_review
+  - name: surimi
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: seafood
+    likely_family: shellfish_family
+    aliases: [surimi sticks, palitos de cangrejo]
+    notes: Surimi.
+    risk_flags: [processed_product]
+    review_status: needs_human_review
+  - name: oysters
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: seafood
+    likely_family: shellfish_family
+    aliases: [huîtres, ostras]
+    notes: Oysters.
+    risk_flags: []
+    review_status: candidate
+  - name: whelks
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: seafood
+    likely_family: shellfish_family
+    aliases: [bulots, bígaros]
+    notes: Whelks.
+    risk_flags: []
+    review_status: candidate
+  - name: squid rings
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: seafood
+    likely_family: cephalopod_family
+    aliases: [anneaux de calamar, anillas de calamar]
+    notes: Squid rings.
+    risk_flags: [product_state_review]
+    review_status: needs_human_review
+  - name: egg yolk
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: egg
+    likely_family: egg_family
+    aliases: [jaune d oeuf, yema de huevo]
+    notes: Egg yolk.
+    risk_flags: []
+    review_status: candidate
+  - name: egg white
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: egg
+    likely_family: egg_family
+    aliases: [blanc d oeuf, clara de huevo]
+    notes: Egg white.
+    risk_flags: []
+    review_status: candidate
+  - name: whole milk
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: dairy
+    likely_family: dairy_family
+    aliases: [lait entier, leche entera]
+    notes: Whole milk.
+    risk_flags: []
+    review_status: candidate
+  - name: semi skimmed milk
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: dairy
+    likely_family: dairy_family
+    aliases: [lait demi-écrémé, leche semidesnatada]
+    notes: Semi-skimmed milk.
+    risk_flags: [variant_review]
+    review_status: needs_human_review
+  - name: evaporated milk
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: dairy
+    likely_family: dairy_family
+    aliases: [lait évaporé, leche evaporada]
+    notes: Evaporated milk.
+    risk_flags: []
+    review_status: candidate
+  - name: condensed milk
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: dairy
+    likely_family: dairy_family
+    aliases: [lait concentré sucré, leche condensada]
+    notes: Condensed milk.
+    risk_flags: []
+    review_status: candidate
+  - name: buttermilk
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: dairy
+    likely_family: dairy_family
+    aliases: [babeurre, suero de leche]
+    notes: Buttermilk.
+    risk_flags: []
+    review_status: candidate
+  - name: whipping cream
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: dairy
+    likely_family: dairy_family
+    aliases: [crème à fouetter, nata para montar]
+    notes: Whipping cream.
+    risk_flags: []
+    review_status: candidate
+  - name: single cream
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: dairy
+    likely_family: dairy_family
+    aliases: [crème liquide légère, nata ligera]
+    notes: Single cream.
+    risk_flags: [locale_variant_review]
+    review_status: needs_human_review
+  - name: double cream
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: dairy
+    likely_family: dairy_family
+    aliases: [crème double, nata doble]
+    notes: Double cream.
+    risk_flags: [locale_variant_review]
+    review_status: needs_human_review
+  - name: mascarpone
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: fresh_cheese_family
+    aliases: [mascarpone]
+    notes: Mascarpone.
+    risk_flags: []
+    review_status: candidate
+  - name: fromage blanc
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: dairy
+    likely_family: dairy_family
+    aliases: [fromage blanc, queso fresco batido]
+    notes: Fromage blanc.
+    risk_flags: []
+    review_status: candidate
+  - name: greek yogurt
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: dairy
+    likely_family: dairy_family
+    aliases: [yaourt grec, yogur griego]
+    notes: Greek yogurt.
+    risk_flags: []
+    review_status: candidate
+  - name: kefir
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: dairy
+    likely_family: dairy_family
+    aliases: [kéfir]
+    notes: Kefir.
+    risk_flags: []
+    review_status: candidate
+  - name: soft goat cheese
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: fresh_cheese_family
+    aliases: [chèvre frais, queso de cabra fresco]
+    notes: Soft goat cheese.
+    risk_flags: []
+    review_status: candidate
+  - name: goat cheese log
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: fresh_cheese_family
+    aliases: [bûche de chèvre, rulo de cabra]
+    notes: Goat cheese log.
+    risk_flags: []
+    review_status: candidate
+  - name: grated cheese
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: hard_cheese_family
+    aliases: [fromage râpé, queso rallado]
+    notes: Generic grated cheese.
+    risk_flags: [generic_product]
+    review_status: needs_human_review
+  - name: melting cheese
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: soft_cheese_family
+    aliases: [fromage à fondre, queso para fundir]
+    notes: Generic melting cheese.
+    risk_flags: [generic_product]
+    review_status: needs_human_review
+  - name: saint nectaire
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: soft_cheese_family
+    aliases: [saint-nectaire]
+    notes: Saint-Nectaire cheese.
+    risk_flags: []
+    review_status: candidate
+  - name: cantal
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: hard_cheese_family
+    aliases: [cantal cheese]
+    notes: Cantal cheese.
+    risk_flags: []
+    review_status: candidate
+  - name: beaufort
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: hard_cheese_family
+    aliases: [beaufort cheese]
+    notes: Beaufort cheese.
+    risk_flags: []
+    review_status: candidate
+  - name: morbier
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: soft_cheese_family
+    aliases: [morbier cheese]
+    notes: Morbier cheese.
+    risk_flags: []
+    review_status: candidate
+  - name: fourme d ambert
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: blue_cheese_family
+    aliases: [fourme d Ambert]
+    notes: Fourme d Ambert.
+    risk_flags: []
+    review_status: candidate
+  - name: bleu d auvergne
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: blue_cheese_family
+    aliases: [bleu d Auvergne]
+    notes: Bleu d Auvergne.
+    risk_flags: []
+    review_status: candidate
+  - name: mahon cheese
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: hard_cheese_family
+    aliases: [mahón, queso mahón]
+    notes: Mahon cheese.
+    risk_flags: []
+    review_status: candidate
+  - name: queso de burgos
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: fresh_cheese_family
+    aliases: [queso Burgos]
+    notes: Queso de Burgos.
+    risk_flags: []
+    review_status: candidate
+  - name: green lentils
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [lentilles vertes, lentejas verdes]
+    notes: Green lentils.
+    risk_flags: []
+    review_status: candidate
+  - name: puy lentils
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [lentilles du Puy]
+    notes: Puy lentils.
+    risk_flags: []
+    review_status: candidate
+  - name: brown lentils
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [lentilles brunes, lentejas pardinas]
+    notes: Brown lentils.
+    risk_flags: []
+    review_status: candidate
+  - name: black lentils
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [beluga lentils, lentejas negras]
+    notes: Black lentils.
+    risk_flags: []
+    review_status: candidate
+  - name: split peas
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [pois cassés, guisantes partidos]
+    notes: Split peas.
+    risk_flags: []
+    review_status: candidate
+  - name: yellow split peas
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [pois cassés jaunes, guisantes amarillos partidos]
+    notes: Yellow split peas.
+    risk_flags: []
+    review_status: candidate
+  - name: cannellini beans
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [haricots cannellini, alubias cannellini]
+    notes: Cannellini beans.
+    risk_flags: []
+    review_status: candidate
+  - name: flageolet beans
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [flageolets]
+    notes: Flageolet beans.
+    risk_flags: []
+    review_status: candidate
+  - name: borlotti beans
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [haricots borlotti, alubias borlotti]
+    notes: Borlotti beans.
+    risk_flags: []
+    review_status: candidate
+  - name: pinto beans
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [frijoles pintos]
+    notes: Pinto beans.
+    risk_flags: []
+    review_status: candidate
+  - name: black eyed peas
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [cornilles, carillas]
+    notes: Black-eyed peas.
+    risk_flags: []
+    review_status: candidate
+  - name: mung beans
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [haricots mungo, judía mungo]
+    notes: Mung beans.
+    risk_flags: []
+    review_status: candidate
+  - name: canned chickpeas
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [pois chiches en boîte, garbanzos en lata]
+    notes: Canned chickpeas.
+    risk_flags: [product_state_review]
+    review_status: needs_human_review
+  - name: canned beans
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [haricots en boîte, alubias en lata]
+    notes: Canned beans.
+    risk_flags: [product_state_review]
+    review_status: needs_human_review
+  - name: flat leaf parsley
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [persil plat, perejil plano]
+    notes: Flat-leaf parsley.
+    risk_flags: []
+    review_status: candidate
+  - name: curly parsley
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [persil frisé, perejil rizado]
+    notes: Curly parsley.
+    risk_flags: []
+    review_status: candidate
+  - name: chives
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [ciboulette, cebollino]
+    notes: Chives.
+    risk_flags: []
+    review_status: candidate
+  - name: tarragon
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [estragon, estragón]
+    notes: Tarragon.
+    risk_flags: []
+    review_status: candidate
+  - name: dill
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [aneth, eneldo]
+    notes: Dill.
+    risk_flags: []
+    review_status: candidate
+  - name: oregano
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [origan, orégano]
+    notes: Oregano.
+    risk_flags: [fresh_or_dry_review]
+    review_status: needs_human_review
+  - name: marjoram
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [marjolaine, mejorana]
+    notes: Marjoram.
+    risk_flags: []
+    review_status: candidate
+  - name: sage
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [sauge, salvia]
+    notes: Sage.
+    risk_flags: []
+    review_status: candidate
+  - name: chervil
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [cerfeuil, perifollo]
+    notes: Chervil.
+    risk_flags: []
+    review_status: candidate
+  - name: herbes de provence
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [herbes de Provence, hierbas provenzales]
+    notes: Herb blend.
+    risk_flags: [blend]
+    review_status: needs_human_review
+  - name: bouquet garni
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [bouquet garni]
+    notes: Herb bundle/blend.
+    risk_flags: [blend]
+    review_status: needs_human_review
+  - name: thai basil
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [basilic thaï, albahaca tailandesa]
+    notes: Thai basil.
+    risk_flags: []
+    review_status: candidate
+  - name: makrut lime leaves
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [kaffir lime leaves, feuilles de combava]
+    notes: Makrut lime leaves.
+    risk_flags: []
+    review_status: candidate
+  - name: curry leaves
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [feuilles de curry, hojas de curry]
+    notes: Curry leaves.
+    risk_flags: []
+    review_status: candidate
+  - name: salt
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: salt_family
+    aliases: [sel, sal]
+    notes: Salt.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: sea salt
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: salt_family
+    aliases: [sel marin, sal marina]
+    notes: Sea salt.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: coarse salt
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: salt_family
+    aliases: [gros sel, sal gruesa]
+    notes: Coarse salt.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: fleur de sel
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: salt_family
+    aliases: [flor de sal]
+    notes: Fleur de sel.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: black pepper
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: pepper_spice_family
+    aliases: [poivre noir, pimienta negra]
+    notes: Black pepper.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: white pepper
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: pepper_spice_family
+    aliases: [poivre blanc, pimienta blanca]
+    notes: White pepper.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: peppercorns
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: pepper_spice_family
+    aliases: [grains de poivre, granos de pimienta]
+    notes: Peppercorns.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: sichuan pepper
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: pepper_spice_family
+    aliases: [poivre du Sichuan, pimienta de Sichuan]
+    notes: Sichuan pepper.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: nutmeg
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [muscade, nuez moscada]
+    notes: Nutmeg.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: cloves
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [clous de girofle, clavos]
+    notes: Cloves.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: star anise
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [anis étoilé, anís estrellado]
+    notes: Star anise.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: fennel seeds
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [graines de fenouil, semillas de hinojo]
+    notes: Fennel seeds.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: mustard seeds
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [graines de moutarde, semillas de mostaza]
+    notes: Mustard seeds.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: juniper berries
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [baies de genièvre, bayas de enebro]
+    notes: Juniper berries.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: vanilla extract
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: vanilla_family
+    aliases: [extrait de vanille, extracto de vainilla]
+    notes: Vanilla extract.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: ground ginger
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [gingembre moulu, jengibre molido]
+    notes: Ground ginger.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: garlic powder
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [ail en poudre, ajo en polvo]
+    notes: Garlic powder.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: onion powder
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [oignon en poudre, cebolla en polvo]
+    notes: Onion powder.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: cayenne pepper
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: chili_spice_family
+    aliases: [piment de Cayenne, cayena]
+    notes: Cayenne pepper.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: aleppo pepper
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: chili_spice_family
+    aliases: [piment d Alep, chile aleppo]
+    notes: Aleppo pepper.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: hot paprika
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: chili_spice_family
+    aliases: [pimentón picante, paprika fort]
+    notes: Hot paprika.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: extra virgin olive oil
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fat
+    likely_family: olive_oil_family
+    aliases: [huile d olive vierge extra, aceite de oliva virgen extra]
+    notes: Extra virgin olive oil.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: neutral oil
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fat
+    likely_family: other_oil_family
+    aliases: [huile neutre, aceite neutro]
+    notes: Neutral oil.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: rapeseed oil
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fat
+    likely_family: other_oil_family
+    aliases: [huile de colza, aceite de colza]
+    notes: Rapeseed oil.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: peanut oil
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fat
+    likely_family: other_oil_family
+    aliases: [huile d arachide, aceite de cacahuete]
+    notes: Peanut oil.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: coconut oil
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fat
+    likely_family: other_oil_family
+    aliases: [huile de coco, aceite de coco]
+    notes: Coconut oil.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: walnut oil
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fat
+    likely_family: other_oil_family
+    aliases: [huile de noix, aceite de nuez]
+    notes: Walnut oil.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: lard
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fat
+    likely_family: animal_fat_family
+    aliases: [saindoux, manteca de cerdo]
+    notes: Lard.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: goose fat
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fat
+    likely_family: animal_fat_family
+    aliases: [graisse d oie, grasa de oca]
+    notes: Goose fat.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: ghee
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fat
+    likely_family: animal_fat_family
+    aliases: [clarified butter, beurre clarifié, mantequilla clarificada]
+    notes: Ghee/clarified butter.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: white wine vinegar
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: vinegar_family
+    aliases: [vinaigre de vin blanc, vinagre de vino blanco]
+    notes: White wine vinegar.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: cider vinegar
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: vinegar_family
+    aliases: [vinaigre de cidre, vinagre de sidra]
+    notes: Cider vinegar.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: balsamic vinegar
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: vinegar_family
+    aliases: [vinaigre balsamique, vinagre balsámico]
+    notes: Balsamic vinegar.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: mayonnaise
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: prepared_sauce_family
+    aliases: [mayonnaise, mayonesa]
+    notes: Mayonnaise.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: aioli
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: prepared_sauce_family
+    aliases: [aïoli, alioli]
+    notes: Aioli.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: ketchup
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: prepared_sauce_family
+    aliases: [ketchup]
+    notes: Ketchup.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: worcestershire sauce
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: prepared_sauce_family
+    aliases: [sauce Worcestershire, salsa Worcestershire]
+    notes: Worcestershire sauce.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: gelatin
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: pantry
+    likely_family: leavening_family
+    aliases: [gélatine, gelatina]
+    notes: Gelatin.
+    risk_flags: [pantry_item, vegan_edge_case]
+    review_status: needs_human_review
+  - name: agar agar
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: pantry
+    likely_family: leavening_family
+    aliases: [agar-agar]
+    notes: Agar agar.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: cocoa powder
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: sweetener
+    likely_family: chocolate_cocoa_family
+    aliases: [cacao en poudre, cacao puro]
+    notes: Cocoa powder.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: dark chocolate
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: sweetener
+    likely_family: chocolate_cocoa_family
+    aliases: [chocolat noir, chocolate negro]
+    notes: Dark chocolate.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: milk chocolate
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: sweetener
+    likely_family: chocolate_cocoa_family
+    aliases: [chocolat au lait, chocolate con leche]
+    notes: Milk chocolate.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: brown sugar
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: sweetener
+    likely_family: sweetener_family
+    aliases: [sucre roux, azúcar moreno]
+    notes: Brown sugar.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: icing sugar
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: sweetener
+    likely_family: sweetener_family
+    aliases: [sucre glace, azúcar glas]
+    notes: Icing sugar.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: caster sugar
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: sweetener
+    likely_family: sweetener_family
+    aliases: [sucre en poudre, azúcar extrafino]
+    notes: Caster sugar.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: molasses
+    source_cuisines: [middle_east_europe, north_africa_europe]
+    priority: common
+    likely_food_group: sweetener
+    likely_family: sweetener_family
+    aliases: [mélasse, melaza]
+    notes: Molasses.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: agave syrup
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: sweetener
+    likely_family: sweetener_family
+    aliases: [sirop d agave, sirope de agave]
+    notes: Agave syrup.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: date syrup
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: sweetener
+    likely_family: sweetener_family
+    aliases: [sirop de dattes, sirope de dátil]
+    notes: Date syrup.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: vanilla sugar
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: sweetener
+    likely_family: vanilla_family
+    aliases: [sucre vanillé, azúcar vainillado]
+    notes: Vanilla sugar.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: romesco sauce
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: prepared_composite_family
+    aliases: [salsa romesco]
+    notes: Romesco sauce.
+    risk_flags: [prepared_composite]
+    review_status: needs_human_review
+  - name: sofrito
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: prepared_composite_family
+    aliases: [sofregit, sofrito preparado]
+    notes: Prepared sofrito.
+    risk_flags: [prepared_composite]
+    review_status: needs_human_review
+  - name: fried tomato sauce
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: tomato_family
+    aliases: [tomate frito, sauce tomate frite]
+    notes: Spanish fried tomato sauce.
+    risk_flags: [prepared_composite]
+    review_status: needs_human_review
+  - name: quince paste
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: dried_fruit_family
+    aliases: [membrillo, pâte de coing]
+    notes: Quince paste.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: nora paste
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: pepper_family
+    aliases: [pasta de ñora]
+    notes: Nora pepper paste.
+    risk_flags: [prepared_composite]
+    review_status: needs_human_review
+  - name: roasted pepper strips
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: pepper_family
+    aliases: [tiras de pimiento asado]
+    notes: Roasted pepper strips.
+    risk_flags: [prepared_or_base_review]
+    review_status: needs_human_review
+  - name: pickled guindillas
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: pepper_family
+    aliases: [guindillas encurtidas]
+    notes: Pickled guindillas.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: caperberries
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: olive_pickle_family
+    aliases: [câprons, alcaparrones]
+    notes: Caperberries.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: stuffed olives
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: olive_pickle_family
+    aliases: [olives farcies, aceitunas rellenas]
+    notes: Stuffed olives.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: wholegrain mustard
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: mustard_family
+    aliases: [moutarde à l ancienne, mostaza antigua]
+    notes: Wholegrain mustard.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: cornichons
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: olive_pickle_family
+    aliases: [cornichons, pepinillos]
+    notes: Cornichons.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: tapenade
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: prepared_composite_family
+    aliases: [tapenade]
+    notes: Tapenade.
+    risk_flags: [prepared_composite]
+    review_status: needs_human_review
+  - name: anchovy paste
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: oily_fish_family
+    aliases: [pâte d anchois, pasta de anchoas]
+    notes: Anchovy paste.
+    risk_flags: [prepared_composite, vegan_edge_case]
+    review_status: needs_human_review
+  - name: veal stock
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: stock
+    likely_family: stock_family
+    aliases: [fond de veau, caldo de ternera]
+    notes: Veal stock.
+    risk_flags: [pantry_item, vegan_edge_case]
+    review_status: needs_human_review
+  - name: beef stock
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: stock
+    likely_family: stock_family
+    aliases: [fond de boeuf, caldo de carne]
+    notes: Beef stock.
+    risk_flags: [pantry_item, vegan_edge_case]
+    review_status: needs_human_review
+  - name: fish fumet
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: stock
+    likely_family: stock_family
+    aliases: [fumet de poisson]
+    notes: Fish fumet.
+    risk_flags: [pantry_item, vegan_edge_case]
+    review_status: needs_human_review
+  - name: sushi rice
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: rice_family
+    aliases: [riz sushi, arroz sushi]
+    notes: Sushi rice.
+    risk_flags: []
+    review_status: candidate
+  - name: sake
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: alcohol
+    likely_family: wine_family
+    aliases: [saké]
+    notes: Sake.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: bonito flakes
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fish
+    likely_family: oily_fish_family
+    aliases: [katsuobushi, flocons de bonite]
+    notes: Bonito flakes.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: furikake
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: asian_sauce_family
+    aliases: [furikake seasoning]
+    notes: Furikake.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: wasabi paste
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: asian_sauce_family
+    aliases: [wasabi]
+    notes: Wasabi paste.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: pickled ginger
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: ginger_family
+    aliases: [gari, gingembre mariné]
+    notes: Pickled ginger.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: japanese mayonnaise
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: prepared_sauce_family
+    aliases: [kewpie mayonnaise]
+    notes: Japanese mayonnaise.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: ponzu
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: asian_sauce_family
+    aliases: [sauce ponzu]
+    notes: Ponzu sauce.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: teriyaki sauce
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: asian_sauce_family
+    aliases: [sauce teriyaki]
+    notes: Teriyaki sauce.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: light soy sauce
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: soy_sauce_family
+    aliases: [sauce soja claire, salsa de soja clara]
+    notes: Light soy sauce.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: dark soy sauce
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: soy_sauce_family
+    aliases: [sauce soja foncée, salsa de soja oscura]
+    notes: Dark soy sauce.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: shaoxing wine
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: alcohol
+    likely_family: wine_family
+    aliases: [vin Shaoxing, vino Shaoxing]
+    notes: Shaoxing wine.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: chinese black vinegar
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: vinegar_family
+    aliases: [vinaigre noir chinois, vinagre negro chino]
+    notes: Chinese black vinegar.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: chili crisp
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: asian_sauce_family
+    aliases: [crispy chili oil]
+    notes: Chili crisp.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: doubanjiang
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: asian_sauce_family
+    aliases: [toban djan, fermented chili bean paste]
+    notes: Doubanjiang.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: fermented black beans
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: asian_sauce_family
+    aliases: [douchi, haricots noirs fermentés]
+    notes: Fermented black beans.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: bamboo shoots
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: sprout_family
+    aliases: [pousses de bambou, brotes de bambú]
+    notes: Bamboo shoots.
+    risk_flags: [family_review]
+    review_status: needs_human_review
+  - name: water chestnuts
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: root_vegetable_family
+    aliases: [châtaignes d eau, castañas de agua]
+    notes: Water chestnuts.
+    risk_flags: [family_review]
+    review_status: needs_human_review
+  - name: baby corn
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: other_grain_family
+    aliases: [mini maïs, mazorquitas]
+    notes: Baby corn.
+    risk_flags: [food_group_review]
+    review_status: needs_human_review
+  - name: yellow curry paste
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: curry_paste_family
+    aliases: [pâte de curry jaune, pasta de curry amarillo]
+    notes: Yellow curry paste.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: massaman curry paste
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: curry_paste_family
+    aliases: [pâte massaman, pasta massaman]
+    notes: Massaman curry paste.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: panang curry paste
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: curry_paste_family
+    aliases: [pâte panang, pasta panang]
+    notes: Panang curry paste.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: shrimp paste
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: asian_sauce_family
+    aliases: [pâte de crevettes, pasta de camarón]
+    notes: Shrimp paste.
+    risk_flags: [pantry_item, vegan_edge_case]
+    review_status: needs_human_review
+  - name: tamarind paste
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: asian_sauce_family
+    aliases: [pâte de tamarin, pasta de tamarindo]
+    notes: Tamarind paste.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: palm sugar
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: sweetener
+    likely_family: sweetener_family
+    aliases: [sucre de palme, azúcar de palma]
+    notes: Palm sugar.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: gochugaru
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: chili_spice_family
+    aliases: [korean chili flakes]
+    notes: Korean chili flakes.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: doenjang
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: miso_family
+    aliases: [korean soybean paste]
+    notes: Doenjang.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: korean rice cakes
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: rice_family
+    aliases: [tteok, garaetteok]
+    notes: Korean rice cakes.
+    risk_flags: []
+    review_status: candidate
+  - name: paneer
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: cheese
+    likely_family: fresh_cheese_family
+    aliases: [panir]
+    notes: Paneer.
+    risk_flags: []
+    review_status: candidate
+  - name: naan
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_family
+    aliases: [naan bread]
+    notes: Naan.
+    risk_flags: []
+    review_status: candidate
+  - name: chapati
+    source_cuisines: [asian_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_family
+    aliases: [roti, chapatti]
+    notes: Chapati.
+    risk_flags: []
+    review_status: candidate
+  - name: mango chutney
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: prepared_composite_family
+    aliases: [chutney de mangue]
+    notes: Mango chutney.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: tikka paste
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: curry_paste_family
+    aliases: [pâte tikka, pasta tikka]
+    notes: Tikka paste.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: korma paste
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: curry_paste_family
+    aliases: [pâte korma, pasta korma]
+    notes: Korma paste.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: taco shells
+    source_cuisines: [mexican_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_family
+    aliases: [coquilles taco, tacos shells]
+    notes: Taco shells.
+    risk_flags: []
+    review_status: candidate
+  - name: refried beans
+    source_cuisines: [mexican_europe]
+    priority: common
+    likely_food_group: legume
+    likely_family: legume_family
+    aliases: [frijoles refritos]
+    notes: Refried beans.
+    risk_flags: [prepared_composite]
+    review_status: needs_human_review
+  - name: pickled jalapenos
+    source_cuisines: [mexican_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: pepper_family
+    aliases: [jalapeños encurtidos]
+    notes: Pickled jalapenos.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: guajillo chili
+    source_cuisines: [mexican_europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: chili_spice_family
+    aliases: [chile guajillo]
+    notes: Guajillo chili.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: pasilla chili
+    source_cuisines: [mexican_europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: chili_spice_family
+    aliases: [chile pasilla]
+    notes: Pasilla chili.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: chili powder blend
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: chili_spice_family
+    aliases: [chili powder]
+    notes: Chili powder blend.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: mexican oregano
+    source_cuisines: [mexican_europe]
+    priority: common
+    likely_food_group: herb
+    likely_family: herb_family
+    aliases: [orégano mexicano]
+    notes: Mexican oregano.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: salsa roja
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: mexican_sauce_family
+    aliases: [red salsa]
+    notes: Salsa roja.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: pico de gallo
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: prepared_composite_family
+    aliases: [salsa fresca]
+    notes: Pico de gallo.
+    risk_flags: [prepared_composite]
+    review_status: needs_human_review
+  - name: enchilada sauce
+    source_cuisines: [mexican_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: mexican_sauce_family
+    aliases: [salsa enchilada]
+    notes: Enchilada sauce.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: mole paste
+    source_cuisines: [mexican_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: mexican_sauce_family
+    aliases: [mole poblano paste]
+    notes: Mole paste.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: achiote paste
+    source_cuisines: [mexican_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: mexican_sauce_family
+    aliases: [annatto paste, pasta de achiote]
+    notes: Achiote paste.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: crema
+    source_cuisines: [mexican_europe]
+    priority: common
+    likely_food_group: dairy
+    likely_family: dairy_family
+    aliases: [mexican crema, crema mexicana]
+    notes: Mexican crema.
+    risk_flags: [locale_variant_review]
+    review_status: needs_human_review
+  - name: lavash
+    source_cuisines: [middle_east_europe, north_africa_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_family
+    aliases: [lavash bread]
+    notes: Lavash.
+    risk_flags: []
+    review_status: candidate
+  - name: filo pastry
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: bread_pastry_family
+    aliases: [pâte filo, masa filo]
+    notes: Filo pastry.
+    risk_flags: []
+    review_status: candidate
+  - name: hummus
+    source_cuisines: [middle_east_europe, north_africa_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: prepared_composite_family
+    aliases: [houmous]
+    notes: Hummus.
+    risk_flags: [prepared_composite]
+    review_status: needs_human_review
+  - name: baba ganoush
+    source_cuisines: [middle_east_europe, north_africa_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: prepared_composite_family
+    aliases: [baba ghanoush]
+    notes: Baba ganoush.
+    risk_flags: [prepared_composite]
+    review_status: needs_human_review
+  - name: harissa powder
+    source_cuisines: [middle_east_europe, north_africa_europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: chili_spice_family
+    aliases: [harissa sèche]
+    notes: Harissa powder.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: grape molasses
+    source_cuisines: [middle_east_europe, north_africa_europe]
+    priority: common
+    likely_food_group: sweetener
+    likely_family: sweetener_family
+    aliases: [mélasse de raisin, melaza de uva]
+    notes: Grape molasses.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: pomegranate seeds
+    source_cuisines: [france, spain, europe]
+    priority: common
+    likely_food_group: fruit
+    likely_family: orchard_fruit_family
+    aliases: [graines de grenade, semillas de granada]
+    notes: Pomegranate seeds.
+    risk_flags: []
+    review_status: candidate
+  - name: nigella seeds
+    source_cuisines: [middle_east_europe, north_africa_europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: seed_family
+    aliases: [nigelle, semillas de nigella]
+    notes: Nigella seeds.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: baharat
+    source_cuisines: [middle_east_europe, north_africa_europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [baharat spice]
+    notes: Baharat.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: dukkah
+    source_cuisines: [middle_east_europe, north_africa_europe]
+    priority: common
+    likely_food_group: spice
+    likely_family: spice_family
+    aliases: [duqqa]
+    notes: Dukkah.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: pickled turnip
+    source_cuisines: [middle_east_europe, north_africa_europe]
+    priority: common
+    likely_food_group: condiment
+    likely_family: root_vegetable_family
+    aliases: [navet mariné, nabo encurtido]
+    notes: Pickled turnip.
+    risk_flags: [pantry_item]
+    review_status: needs_human_review
+  - name: vine leaves
+    source_cuisines: [middle_east_europe, north_africa_europe]
+    priority: common
+    likely_food_group: vegetable
+    likely_family: leafy_green_family
+    aliases: [feuilles de vigne, hojas de parra]
+    notes: Vine leaves.
+    risk_flags: [preserved_or_fresh_review]
+    review_status: needs_human_review
+  - name: giant couscous
+    source_cuisines: [middle_east_europe, north_africa_europe]
+    priority: common
+    likely_food_group: carbohydrate
+    likely_family: wheat_semolina_family
+    aliases: [maftoul, ptitim]
+    notes: Giant couscous.
+    risk_flags: []
+    review_status: candidate

@@ -2,7 +2,9 @@ from datetime import datetime
 from decimal import Decimal
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+from mealroulette.data.taxonomy_loader import food_group_ids
 
 from mealroulette.models.enums import (
     AggregationStrategy,
@@ -18,6 +20,17 @@ from mealroulette.models.enums import (
     UnitDimension,
     VegetableLevel,
 )
+
+_VALID_FOOD_GROUPS = food_group_ids()
+
+
+def _validate_food_group_value(value: str | None) -> str | None:
+    if value is None:
+        return value
+    normalized = value.strip().lower()
+    if normalized not in _VALID_FOOD_GROUPS:
+        raise ValueError(f"Unknown food_group: {value}")
+    return normalized
 
 
 class UnitPublic(BaseModel):
@@ -67,6 +80,13 @@ class IngredientPublic(BaseModel):
     canonical_name: str
     display_name: str
     category: str | None
+    food_group: str | None
+    storage_class: str | None = None
+    storage_after_opening: str | None = None
+    culinary_category: str | None = None
+    product_form: str | None = None
+    preservation: str | None = None
+    traits_json: dict | None = None
     family: str | None
     default_unit_id: int | None
     default_dimension: UnitDimension | None
@@ -108,6 +128,11 @@ class IngredientCreateRequest(BaseModel):
     canonical_name: str = Field(min_length=1, max_length=128)
     display_name: str = Field(min_length=1, max_length=128)
     category: str | None = Field(default=None, max_length=64)
+    food_group: str | None = Field(default=None, max_length=64)
+    storage_class: str | None = Field(default=None, max_length=32)
+    culinary_category: str | None = Field(default=None, max_length=64)
+    product_form: str | None = Field(default=None, max_length=32)
+    preservation: str | None = Field(default=None, max_length=32)
     family: str | None = Field(default=None, max_length=64)
     default_unit_id: int | None = None
     default_dimension: UnitDimension | None = None
@@ -120,10 +145,20 @@ class IngredientCreateRequest(BaseModel):
     notes: str | None = None
     aliases: list[str] = Field(default_factory=list)
 
+    @field_validator("food_group")
+    @classmethod
+    def validate_food_group(cls, value: str | None) -> str | None:
+        return _validate_food_group_value(value)
+
 
 class IngredientUpdateRequest(BaseModel):
     display_name: str | None = Field(default=None, min_length=1, max_length=128)
     category: str | None = Field(default=None, max_length=64)
+    food_group: str | None = Field(default=None, max_length=64)
+    storage_class: str | None = Field(default=None, max_length=32)
+    culinary_category: str | None = Field(default=None, max_length=64)
+    product_form: str | None = Field(default=None, max_length=32)
+    preservation: str | None = Field(default=None, max_length=32)
     family: str | None = Field(default=None, max_length=64)
     default_unit_id: int | None = None
     default_dimension: UnitDimension | None = None
@@ -134,6 +169,11 @@ class IngredientUpdateRequest(BaseModel):
     season_start_month: int | None = Field(default=None, ge=1, le=12)
     season_end_month: int | None = Field(default=None, ge=1, le=12)
     notes: str | None = None
+
+    @field_validator("food_group")
+    @classmethod
+    def validate_food_group(cls, value: str | None) -> str | None:
+        return _validate_food_group_value(value)
 
 
 class IngredientUnitConversionCreateRequest(BaseModel):
@@ -186,6 +226,9 @@ class IngredientResolveRequest(BaseModel):
 
 class IngredientResolveResponse(BaseModel):
     status: str
+    query: str | None = None
+    matched_on: str | None = None
+    matched_value: str | None = None
     ingredient: IngredientPublic | None = None
     suggestions: list[IngredientPublic] = Field(default_factory=list)
 
@@ -299,6 +342,8 @@ class RecipePublic(BaseModel):
 
     id: int
     dish_id: int
+    public_key: str
+    sequence_number: int
     variant_name: str
     description: str | None
     recipe_type: RecipeType
@@ -310,6 +355,7 @@ class RecipePublic(BaseModel):
     prep_time_minutes: int | None
     cook_time_minutes: int | None
     difficulty: DifficultyLevel | None
+    computed_traits_json: dict | None
     notes: str | None
     created_at: datetime
     updated_at: datetime
@@ -349,6 +395,7 @@ class DishPublic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    public_key: str
     name: str
     description: str | None
     default_servings: int | None
@@ -370,6 +417,7 @@ class DishPublic(BaseModel):
     created_at: datetime
     updated_at: datetime
     tag_ids: list[int] = Field(default_factory=list)
+    computed_traits_json: dict | None = None
     seasonality: SeasonalityPublic | None = None
 
 

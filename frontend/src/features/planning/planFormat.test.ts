@@ -41,6 +41,7 @@ function item(overrides: Partial<MealPlanItem>): MealPlanItem {
     skip_comment: null,
     leftover_source_item_id: null,
     selection_reasons_json: null,
+    computed_traits_json: null,
     review_saved_at: null,
     created_at: "",
     updated_at: "",

@@ -78,8 +78,8 @@ export function IngredientDetailPage() {
       <p className="muted">{detail.canonical_name}</p>
       {detail.notes ? <p>{detail.notes}</p> : null}
       <p>
-        Category: {detail.category ?? "—"} · Family: {detail.family ?? "—"} · Strategy:{" "}
-        {detail.aggregation_strategy ?? "—"}
+        Category: {detail.category ?? "—"} · Food group: {detail.food_group ?? "—"} · Family:{" "}
+        {detail.family ?? "—"} · Strategy: {detail.aggregation_strategy ?? "—"}
       </p>
       <h3>Aliases</h3>
       <ul className="bulleted-list">

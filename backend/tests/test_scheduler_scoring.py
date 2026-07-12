@@ -41,6 +41,7 @@ def _candidate(
         carb_tags=frozenset(),
         style_tags=frozenset(),
         vector=vector or {"vegetables": 0.5, "grains": 0.5},
+        computed_traits_json=None,
         average_rating=None,
         seasonality_mode=SeasonalityMode.all_year,
         preferred_months=frozenset(),

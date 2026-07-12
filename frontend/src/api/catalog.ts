@@ -14,6 +14,7 @@ export type SeasonalityPublic = {
 
 export type Dish = {
   id: number;
+  public_key: string;
   name: string;
   description: string | null;
   default_servings: number | null;
@@ -35,6 +36,7 @@ export type Dish = {
   created_at: string;
   updated_at: string;
   tag_ids: number[];
+  computed_traits_json: Record<string, unknown> | null;
   seasonality: SeasonalityPublic | null;
 };
 
@@ -56,6 +58,8 @@ export type Tag = {
 export type Recipe = {
   id: number;
   dish_id: number;
+  public_key: string;
+  sequence_number: number;
   variant_name: string;
   description: string | null;
   recipe_type: "standard" | "thermomix" | "other_appliance";
@@ -67,6 +71,7 @@ export type Recipe = {
   prep_time_minutes: number | null;
   cook_time_minutes: number | null;
   difficulty: "easy" | "medium" | "hard" | null;
+  computed_traits_json: Record<string, unknown> | null;
   notes: string | null;
 };
 
@@ -86,6 +91,7 @@ export type Ingredient = {
   canonical_name: string;
   display_name: string;
   category: string | null;
+  food_group: string | null;
   family: string | null;
   default_unit_id: number | null;
   default_dimension: "mass" | "volume" | "count" | null;
@@ -141,6 +147,7 @@ export type IngredientInput = {
   canonical_name?: string;
   display_name: string;
   category?: string | null;
+  food_group?: string | null;
   family?: string | null;
   default_unit_id?: number | null;
   default_dimension?: Ingredient["default_dimension"];

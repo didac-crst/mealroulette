@@ -5,8 +5,8 @@ Execution tracker for what has been built, what is in progress, and what comes n
 This file is the **status board**. It does not replace the product spec or build plan:
 
 - [SPECS.md](../SPECS.md) — product requirements and long-term version roadmap (v0.1 → v1.0)
-- [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) — implementation phases (Phase 0 → Phase 12)
-- [docs/LOCALIZATION.md](LOCALIZATION.md) — multilingual content design (Phase 11; documented early, implement later)
+- [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) — implementation phases (Phase 0 → Phase 13)
+- [docs/LOCALIZATION.md](LOCALIZATION.md) — multilingual content design (Phase 12; documented early, implement later)
 - [docs/MVP.md](MVP.md) — MVP scope and acceptance test
 
 Update this file when a phase or version milestone lands.
@@ -15,9 +15,11 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Phase 8 complete** on branch `phase-8/scheduler` — explainable scheduler ready for merge and **`v0.5.0`** tag (pending your review). PR #8.
+**Phase 9 implementation complete** on branch `phase-9/computed-recipe-traits` — stable public keys, ingredient food groups, computed recipe traits, taxonomy APIs, ingredient resolver, and taxonomy navigator UI (**target `v0.6.0`**, pending merge and release tag).
 
-See [CURSOR_ROADMAP.md](CURSOR_ROADMAP.md#phase-8---explainable-scheduler) and [releases/v0.5.0.md](releases/v0.5.0.md).
+See [CURSOR_ROADMAP.md § Phase 9](CURSOR_ROADMAP.md#phase-9---computed-recipe-traits--catalog-keys).
+
+**v0.5 shipped** as [`v0.5.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.5.0) — explainable scheduler, settings hub, weekly targets UI.
 
 ---
 
@@ -48,7 +50,8 @@ Use one branch per milestone, then merge via pull request:
 - `phase-5/planning` — manual meal planning (merged in PR #4, `v0.2.0`)
 - `phase-6/shopping` — shopping lists, ingredient catalog seed, ingredient admin UI (merged in PR #5, `v0.3.0`)
 - `phase-7/telegram-review` — Telegram bot, reminders, on-demand commands, recipe links (merged in PR #7, `v0.4.0`)
-- `phase-8/scheduler` — explainable scheduler, family-vector similarity, scheduled roulette (**ready for merge**, `v0.5.0`, PR #8)
+- `phase-8/scheduler` — explainable scheduler, family-vector similarity, scheduled roulette (merged, `v0.5.0`, PR #8)
+- `phase-9/computed-recipe-traits` — public keys, food groups, computed recipe traits, taxonomy & resolver (**implementation complete**, target `v0.6.0`)
 
 ---
 
@@ -62,16 +65,13 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.2** | Manual planning — weekly plan, review flow, meal actions, ratings, lightweight leftovers | **Done** ([`v0.2.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.2.0), merge `fb20858`, PR #4) |
 | **v0.3** | Shopping list — generation, aggregation, pantry filter, UI, ingredient catalog | **Done** ([`v0.3.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.3.0), merge `88d2675`, PR #5) |
 | **v0.4** | Telegram reminders — settings, scheduled and manual send, bot commands | **Done** ([`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0), merge `a560e7a`, PR #7) |
-| **v0.5** | Automatic scheduler — explainable weekly generation, reroll | **Ready for merge** (branch `phase-8/scheduler`, PR #8) |
-| **v0.6** | LLM-assisted entry — draft enrichment, review before save | Not started |
+| **v0.5** | Automatic scheduler — explainable weekly generation, reroll | **Done** ([`v0.5.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.5.0)) |
+| **v0.6** | Catalog keys & computed traits — public keys, food groups, recipe trait metadata | **Implementation complete** (branch `phase-9/computed-recipe-traits`, pending release tag) |
+| **v0.7** | LLM-assisted entry — draft enrichment, review before save | Not started |
 | **Future** | Composable meals — complete / half / dessert roles, paired halves, manual desserts | Backlog only (see below) |
 | **v1.0** | Stable home version — mobile UI, backups, auth, scheduler, cooking mode | Not started |
 
-> **v0.4 shipped** as [`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0). Telegram bot commands, scheduled HTML reminders, recipe deep links, and admin settings. Release notes: [docs/releases/v0.4.0.md](releases/v0.4.0.md).
-
-> **v0.5** is implemented on branch `phase-8/scheduler` (PR #8). Explainable scheduler, plan roulette UI, scheduled job, Telegram “New roulette”. Release notes draft: [docs/releases/v0.5.0.md](releases/v0.5.0.md). Tag after merge approval.
-
-> **v0.2 shipped** as [`v0.2.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.2.0). Plan and review lunch/dinner for the week, record what was eaten, rate meals, and track lightweight leftovers. Release notes: [docs/releases/v0.2.0.md](releases/v0.2.0.md).
+> **v0.5 shipped** as [`v0.5.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.5.0). Explainable scheduler, plan roulette UI, scheduled job, Telegram “New roulette”, settings hub. Release notes: [docs/releases/v0.5.0.md](releases/v0.5.0.md).
 
 ### v0.1 — Foundation
 
@@ -164,7 +164,54 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [x] Scheduled roulette worker job + admin settings UI (`/settings/scheduler`)
 - [x] Telegram “New roulette” notification (configurable planning days)
 
-### v0.6 — LLM-Assisted Entry
+### v0.6 — Catalog Keys & Computed Traits
+
+**Branch:** `phase-9/computed-recipe-traits`. Must remain compatible with v0.5 scheduler, weekly targets UI, shopping, planning, and Telegram.
+
+**Additive first:** computed traits are a parallel metadata layer. Weekly target matching (`fish`, `meat`, `pasta`, `rice`, `vegetarian`, `soup`) keeps using **dish tags** until an explicit later migration step with tests.
+
+- [x] Document Phase 9 spec (`docs/COMPUTED_TRAITS.md`, `docs/TAXONOMY_AND_RESOLVER.md`)
+- [x] Taxonomy YAML split under `backend/mealroulette/data/taxonomy/` + loader validation
+- [x] Migration: `ingredients.food_group`, `dishes.public_key`, `recipes.public_key`, `recipes.sequence_number`, `recipes.computed_traits_json`
+- [x] Backfill food groups from category mapping; backfill public keys and recipe sequences; compute traits
+- [x] Stable dish public keys (`<slug>-<random>`, length 32, immutable on rename)
+- [x] Stable recipe public keys (`<dish_public_key>-001`, min 3-digit sequence; grows for 1000+)
+- [x] Ingredient food-group vocabulary + centralized category→group mapping module
+- [x] Recipe trait computation service (family vector, food groups, vegan, carb_heavy, dominant carb/protein)
+- [x] Explicit trait refresh on recipe/ingredient/conversion changes
+- [x] API: expose `food_group`, `public_key`, `computed_traits_json` on ingredients, dishes, recipes, meal-plan items
+- [x] Dish effective traits = main recipe traits; meal-plan item = selected recipe traits (or main recipe fallback)
+- [x] Scheduler: add `computed_traits_json` to `DishCandidate`; **do not** replace `dish_matches_weekly_target` in first pass
+- [x] Ingredient resolver (exact/alias/fuzzy) + taxonomy browsing APIs — see [TAXONOMY_AND_RESOLVER.md](TAXONOMY_AND_RESOLVER.md)
+- [x] Frontend: TypeScript types, ingredient food-group field, trait display, taxonomy navigator (`/ingredients/taxonomy`)
+- [x] Tests: key generation, trait rules, migration backfill, resolver, taxonomy API, scheduler/weekly-target regression
+- [x] Release notes `v0.6.0.md` (draft — finalize date on tag)
+
+**Out of scope for v0.6 initial pass (later explicit steps):**
+
+- [ ] Migrate weekly target matching from tags to computed traits (with opt-in fallback + mapping tests)
+- [ ] Remove dish tags or tag editor
+- [ ] Trait-based Telegram output
+- [ ] Configurable trait thresholds (hard-code `CARB_HEAVY_THRESHOLD_PCT = 33.0` for now)
+
+**Catalogue expansion (post–v0.6, proposal-driven):**
+
+- [x] Import expanded taxonomy **proposals** under `data/taxonomy/proposals/` (627 candidates — not active truth)
+- [x] Document MVP target 500–700 ingredients — [docs/taxonomy/catalogue_assessment_and_mvp_plan.md](taxonomy/catalogue_assessment_and_mvp_plan.md)
+- [x] ADR 001 taxonomy contract — [docs/adr/001-ingredient-taxonomy-contract.md](adr/001-ingredient-taxonomy-contract.md)
+- [x] Deterministic validator + exception report — `make validate-taxonomy`
+- [x] Reconcile active seed — **412 ingredients**, **0 blockers** — [docs/taxonomy/RECONCILIATION_LOG.md](taxonomy/RECONCILIATION_LOG.md)
+- [x] Migration `023` — `storage_class`, `culinary_category`, `product_form`, `preservation`
+- [x] Migration `024` — `storage_after_opening`, `traits_json`
+- [x] Migration `025` — widen `recipes.public_key` for long sequence suffixes
+- [x] Human review batch — 17 active ingredients resolved (see [RECONCILIATION_LOG.md](taxonomy/RECONCILIATION_LOG.md))
+- [x] CodeRabbit review findings addressed (PR #9)
+- [ ] Re-import reconciled seed into running DB (`import_ingredient_seed` after deploy)
+- [ ] LLM semantic validation batches — [llm_taxonomy_review_prompt.md](taxonomy/llm_taxonomy_review_prompt.md)
+- [ ] Recipe-driven validation (≥95% auto-resolve target)
+- [ ] Promote remaining reviewed proposal rows in batches when evidence supports
+
+### v0.7 — LLM-Assisted Entry
 
 - [ ] LLM dish enrichment
 - [ ] Suggest ingredients
@@ -175,7 +222,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 
 ### Future — composable meals (meal role)
 
-**Status:** Backlog only — do not implement until v0.5 scheduler is stable. Captures product intent for “one slot = one complete meal **or** two half meals”; desserts planned manually only.
+**Status:** Backlog only — do not implement until v0.6 catalog traits are stable. Captures product intent for “one slot = one complete meal **or** two half meals”; desserts planned manually only.
 
 **Meal role** (exactly one per dish/recipe — name TBD in spec):
 
@@ -237,11 +284,12 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 5 | Manual meal planning | v0.2 | Done (PR #4, `v0.2.0`) |
 | 6 | Shopping lists | v0.3 | Done (PR #5, `v0.3.0`) |
 | 7 | Telegram reminders | v0.4 | Done (PR #7, `v0.4.0`) |
-| 8 | Explainable scheduler | v0.5 | Ready for merge (PR #8) |
-| 9 | Cooking mode | v1.0 | Not started |
-| 10 | Backup, export, and import | v1.0 | Not started |
-| 11 | LLM-assisted entry | v0.6 | Not started |
-| 12 | v1 hardening | v1.0 | Not started |
+| 8 | Explainable scheduler | v0.5 | Done (`v0.5.0`) |
+| 9 | Computed recipe traits & catalog keys | v0.6 | Done (branch, pending `v0.6.0` tag) |
+| 10 | Cooking mode | v1.0 | Not started |
+| 11 | Backup, export, and import | v1.0 | Not started |
+| 12 | LLM-assisted entry & localization | v0.7 | Not started |
+| 13 | v1 hardening | v1.0 | Not started |
 
 ### Phase 0 — Project bootstrap ✅
 
@@ -326,7 +374,7 @@ Merged in `fb20858` (PR #4, `v0.2.0`).
 
 ### Dev tooling — YAML fixtures
 
-Supports local testing; distinct from Phase 10 full JSON export/import.
+Supports local testing; distinct from Phase 11 full JSON export/import.
 
 - [x] `sample_dishes.yaml` fixture format (symbolic tags, units, ingredient names)
 - [x] `import_sample_dishes` CLI — idempotent import via catalog service
@@ -349,7 +397,7 @@ Branch: `phase-6/shopping`.
 - [x] Ingredient seed import and conversion approval bootstrap
 - [x] Ingredient conversions CRUD API (unique triplet constraint, migration `018`)
 - [x] Ingredient admin UI — catalog list, edit aliases/conversions/unit behavior
-- [x] Localization design documented ([LOCALIZATION.md](LOCALIZATION.md)); implementation deferred to Phase 11
+- [x] Localization design documented ([LOCALIZATION.md](LOCALIZATION.md)); implementation deferred to Phase 12
 
 ### Phase 7 — Telegram reminders ✅
 
@@ -370,7 +418,7 @@ Branch: merged in PR #7 (`v0.4.0`).
 
 ### Phase 8 — Explainable scheduler ✅
 
-Branch: `phase-8/scheduler` (target `v0.5.0`, PR #8). Full plan: [CURSOR_ROADMAP.md § Phase 8](CURSOR_ROADMAP.md#phase-8---explainable-scheduler). Vector math: [SCHEDULER.md](SCHEDULER.md).
+Shipped as [`v0.5.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.5.0). Full plan: [CURSOR_ROADMAP.md § Phase 8](CURSOR_ROADMAP.md#phase-8---explainable-scheduler). Vector math: [SCHEDULER.md](SCHEDULER.md).
 
 - [x] Migration `020` — `planning_rules`, `scheduler_settings`
 - [x] Migration `021` — `meal_plans.last_roulette_undo_json`
@@ -382,9 +430,35 @@ Branch: `phase-8/scheduler` (target `v0.5.0`, PR #8). Full plan: [CURSOR_ROADMAP
 - [x] Scheduled roulette worker + `ScheduledRouletteService`
 - [x] Telegram “New roulette” notification
 - [x] Admin UI `/settings/scheduler`
+- [x] Settings hub (`/settings`), weekly targets UI, household timezone clock
 - [x] Acceptance API tests + release notes `v0.5.0.md`
 
-### Phases 9–12
+### Phase 9 — Computed recipe traits & catalog keys ✅
+
+Branch: `phase-9/computed-recipe-traits` (target `v0.6.0`). Full plan: [CURSOR_ROADMAP.md § Phase 9](CURSOR_ROADMAP.md#phase-9---computed-recipe-traits--catalog-keys). Specs: [COMPUTED_TRAITS.md](COMPUTED_TRAITS.md), [TAXONOMY_AND_RESOLVER.md](TAXONOMY_AND_RESOLVER.md).
+
+**Authoritative taxonomy files** (not the superseded single-YAML proposal):
+
+- `backend/mealroulette/data/taxonomy/food_groups.yaml`
+- `backend/mealroulette/data/taxonomy/ingredient_families.yaml`
+- `backend/mealroulette/data/taxonomy/batch_plan.yaml`
+
+**Ingredient seed (single file):** `backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml` — validated against taxonomy on import. The duplicate `taxonomy/ingredients_seed.yaml` and embedded `ingredient_families` block in the fixtures file were removed.
+
+- [x] Migration `022`–`025` + backfill (food groups, public keys, recipe sequences, computed traits, taxonomy metadata)
+- [x] Public key generation services + tests
+- [x] Food group mapping module + ingredient API/UI
+- [x] Recipe trait computation + refresh hooks
+- [x] Effective traits on dishes and meal-plan items (API)
+- [x] Scheduler candidate carries `computed_traits_json` (tags unchanged for weekly targets)
+- [x] Frontend types + trait display on dish/recipe detail; food group on ingredient edit/detail
+- [x] Regression: scheduler acceptance, weekly targets settings, shopping unchanged
+- [x] Ingredient resolver (exact/alias/fuzzy/classify-candidate) + taxonomy browsing APIs
+- [x] Taxonomy navigator UI (`/ingredients/taxonomy`)
+- [x] Release notes `v0.6.0.md` (draft)
+- [x] Validation: `make test-backend` (189 passed, 2 skipped), frontend 18 passed, `npm run build` green; `make validate-taxonomy` — 0 blockers
+
+### Phases 10–13
 
 See [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) for full deliverables and acceptance criteria per phase.
 
@@ -433,7 +507,7 @@ Cross-reference for [docs/MVP.md](MVP.md). Checked items are done; the rest trac
 - [ ] JSON export / import
 - [ ] Mounted backup folder (directory exists; backup logic not yet implemented)
 
-**MVP acceptance test** (partially achievable): log in from a phone, create dishes, plan three days, generate a shopping list, send via Telegram, mark meals eaten, rate them. **Still missing:** export a backup (Phase 10).
+**MVP acceptance test** (partially achievable): log in from a phone, create dishes, plan three days, generate a shopping list, send via Telegram, mark meals eaten, rate them. **Still missing:** export a backup (Phase 11).
 
 ---
 

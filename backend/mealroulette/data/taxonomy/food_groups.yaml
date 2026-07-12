@@ -1,0 +1,116 @@
+version: 1
+name: MealRoulette food groups
+description: Canonical high-level ingredient groups used for recipe traits and resolver navigation.
+food_groups:
+- id: vegetable
+  label: Vegetable
+  description: 'Fresh or prepared vegetables used as meal body or garnish. Use carbohydrate for starchy staples when they
+    act as the meal carb.
+
+    '
+- id: carbohydrate
+  label: Carbohydrate
+  description: 'Starchy meal bases and sides such as pasta, rice, grains, bread, pastry, dough, potatoes, couscous, noodles,
+    and wrappers.
+
+    '
+- id: meat
+  label: Meat
+  description: 'Land-animal meat and charcuterie. Do not use for fish or seafood.
+
+    '
+- id: fish
+  label: Fish
+  description: 'Finfish, fresh, frozen, salted, smoked, or canned. Do not use for shellfish or cephalopods.
+
+    '
+- id: seafood
+  label: Seafood
+  description: 'Shellfish, mollusks, cephalopods, and crustaceans. Do not use for finfish.
+
+    '
+- id: egg
+  label: Egg
+  description: 'Eggs and egg products.
+
+    '
+- id: dairy
+  label: Dairy
+  description: 'Milk, cream, yogurt, butter, creme fraiche, and non-cheese dairy products.
+
+    '
+- id: cheese
+  label: Cheese
+  description: 'Fresh, soft, hard, blue, aged, and grated cheeses.
+
+    '
+- id: legume
+  label: Legume
+  description: 'Beans, lentils, chickpeas, peas, broad beans, and similar pulses.
+
+    '
+- id: plant_protein
+  label: Plant protein
+  description: 'Tofu, seitan, tempeh, textured vegetable protein, and similar protein-focused plant products.
+
+    '
+- id: fat
+  label: Fat
+  description: 'Oils and cooking fats. Usually pantry or background ingredients.
+
+    '
+- id: condiment
+  label: Condiment
+  description: 'Sauces, mustards, vinegars, pickles, olives, preserved flavor bases, and table condiments.
+
+    '
+- id: herb
+  label: Herb
+  description: 'Fresh or dried herbs.
+
+    '
+- id: spice
+  label: Spice
+  description: 'Dry spices and spice blends.
+
+    '
+- id: stock
+  label: Stock
+  description: 'Stocks, broths, bouillons, fumets, and cooking liquids.
+
+    '
+- id: fruit
+  label: Fruit
+  description: 'Fresh, dried, preserved, and citrus fruits.
+
+    '
+- id: fungus
+  label: Fungus
+  description: 'Mushrooms and truffles.
+
+    '
+- id: alcohol
+  label: Alcohol
+  description: 'Wine, sherry, brandy, beer, cider, spirits, and cooking alcohols.
+
+    '
+- id: nut_seed
+  label: Nut and seed
+  description: 'Nuts and seeds used as ingredients, garnishes, pastes, or meal components.
+
+    '
+- id: sweetener
+  label: Sweetener
+  description: 'Sugar, honey, syrups, molasses, and sweetening products.
+
+    '
+- id: pantry
+  label: Pantry
+  description: 'Generic pantry items that should usually not dominate recipe trait percentages.
+
+    '
+- id: other
+  label: Other
+  description: 'Fallback group for ingredients that need later classification.
+
+    '

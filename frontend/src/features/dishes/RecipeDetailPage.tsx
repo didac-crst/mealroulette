@@ -25,6 +25,7 @@ import {
   formatRecipeDifficulty,
   formatRecipeTime,
 } from "./effectiveValues";
+import { formatComputedTraits } from "./computedTraits";
 
 export function RecipeDetailPage() {
   const { dishId, recipeId } = useParams();
@@ -110,6 +111,12 @@ export function RecipeDetailPage() {
             {recipe.is_main ? <span className="muted"> · Main recipe</span> : null}
           </h2>
           {recipe.description ? <p>{recipe.description}</p> : null}
+          <p className="muted">
+            Key: {recipe.public_key} · Sequence {recipe.sequence_number}
+          </p>
+          {recipe.computed_traits_json ? (
+            <p className="muted">Traits: {formatComputedTraits(recipe.computed_traits_json)}</p>
+          ) : null}
         </div>
         <div className="row-actions">
           <ButtonLink to={`/dishes/${dish.id}`} variant="secondary">

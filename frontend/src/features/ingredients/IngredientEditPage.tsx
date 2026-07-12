@@ -34,10 +34,34 @@ const AGGREGATION_STRATEGIES = [
 
 const CONFIDENCE_OPTIONS = ["exact", "high", "medium", "low", "not_recommended", "approximate", "measured"] as const;
 
+const FOOD_GROUPS = [
+  "vegetable",
+  "carbohydrate",
+  "meat",
+  "fish",
+  "seafood",
+  "egg",
+  "dairy",
+  "cheese",
+  "legume",
+  "plant_protein",
+  "fat",
+  "condiment",
+  "herb",
+  "spice",
+  "stock",
+  "fruit",
+  "fungus",
+  "alcohol",
+  "pantry",
+  "other",
+] as const;
+
 const emptyForm: IngredientInput = {
   canonical_name: "",
   display_name: "",
   category: "",
+  food_group: "",
   family: "",
   default_unit_id: null,
   preferred_shopping_unit_id: null,
@@ -54,6 +78,7 @@ function ingredientToForm(ingredient: IngredientDetail): IngredientInput {
   return {
     display_name: ingredient.display_name,
     category: ingredient.category,
+    food_group: ingredient.food_group,
     family: ingredient.family,
     default_unit_id: ingredient.default_unit_id,
     preferred_shopping_unit_id: ingredient.preferred_shopping_unit_id,
@@ -348,6 +373,26 @@ export function IngredientEditPage() {
                   {form.category &&
                     !categories.some((category) => category.id === form.category) && (
                       <option value={form.category}>{form.category}</option>
+                    )}
+                </select>
+              </label>
+              <label>
+                Food group
+                <select
+                  value={form.food_group ?? ""}
+                  onChange={(event) =>
+                    setForm({ ...form, food_group: event.target.value || null })
+                  }
+                >
+                  <option value="">Auto from category</option>
+                  {FOOD_GROUPS.map((group) => (
+                    <option key={group} value={group}>
+                      {group}
+                    </option>
+                  ))}
+                  {form.food_group &&
+                    !FOOD_GROUPS.includes(form.food_group as (typeof FOOD_GROUPS)[number]) && (
+                      <option value={form.food_group}>{form.food_group}</option>
                     )}
                 </select>
               </label>

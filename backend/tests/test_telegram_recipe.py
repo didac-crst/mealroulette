@@ -5,6 +5,7 @@ from unittest.mock import MagicMock
 import pytest
 from sqlalchemy import select
 
+from mealroulette.services.public_keys import generate_dish_public_key, generate_recipe_public_key
 from mealroulette.models.catalog import Dish, Ingredient, Recipe, RecipeIngredient, RecipeStep, Unit
 from mealroulette.models.enums import DifficultyLevel, DishCourse, DishStatus, MealPlanItemStatus, MealSlot, RecipeType
 from mealroulette.schemas.planning import MealPlanItemPublic
@@ -65,7 +66,12 @@ def test_format_planning_message_html_links_assigned_recipes():
 
 @pytest.mark.integration
 def test_format_recipe_message_html_from_catalog(db_session, catalog_seed):
-    dish = Dish(name="Telegram Soup", course=DishCourse.main, status=DishStatus.active)
+    dish = Dish(
+        public_key=generate_dish_public_key("Telegram Soup"),
+        name="Telegram Soup",
+        course=DishCourse.main,
+        status=DishStatus.active,
+    )
     db_session.add(dish)
     db_session.flush()
 
@@ -80,6 +86,8 @@ def test_format_recipe_message_html_from_catalog(db_session, catalog_seed):
 
     recipe = Recipe(
         dish_id=dish.id,
+        public_key=generate_recipe_public_key(dish.public_key, 1),
+        sequence_number=1,
         variant_name="main",
         recipe_type=RecipeType.standard,
         is_main=True,
@@ -126,11 +134,18 @@ def test_format_recipe_message_html_from_catalog(db_session, catalog_seed):
 def test_start_recipe_link_sends_html_recipe(db_session, catalog_seed, monkeypatch):
     monkeypatch.setenv("TELEGRAM_BOT_USERNAME", "mealroulette_bot")
 
-    dish = Dish(name="Link Soup", course=DishCourse.main, status=DishStatus.active)
+    dish = Dish(
+        public_key=generate_dish_public_key("Link Soup"),
+        name="Link Soup",
+        course=DishCourse.main,
+        status=DishStatus.active,
+    )
     db_session.add(dish)
     db_session.flush()
     recipe = Recipe(
         dish_id=dish.id,
+        public_key=generate_recipe_public_key(dish.public_key, 1),
+        sequence_number=1,
         variant_name="main",
         recipe_type=RecipeType.standard,
         is_main=True,

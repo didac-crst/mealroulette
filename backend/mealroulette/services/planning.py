@@ -10,6 +10,7 @@ from mealroulette.models.enums import MealPlanItemStatus, MealPlanStatus, MealSl
 from mealroulette.models.planning import MealPlan, MealPlanItem, MealRating
 from mealroulette.services.household_time import household_local_today
 from mealroulette.services.scheduler.undo import clear_undo_snapshot
+from mealroulette.services.recipe_traits import effective_traits_for_meal_plan_item
 from mealroulette.schemas.planning import (
     MealPlanCreateRequest,
     MealPlanItemPublic,
@@ -67,6 +68,10 @@ class PlanningService:
             skip_comment=item.skip_comment,
             leftover_source_item_id=item.leftover_source_item_id,
             selection_reasons_json=item.selection_reasons_json,
+            computed_traits_json=effective_traits_for_meal_plan_item(
+                recipe=item.recipe,
+                dish_recipes=item.dish.recipes if item.dish is not None else None,
+            ),
             review_saved_at=item.review_saved_at,
             created_at=item.created_at,
             updated_at=item.updated_at,
@@ -90,7 +95,7 @@ class PlanningService:
             select(MealPlan)
             .where(MealPlan.id == plan_id)
             .options(
-                selectinload(MealPlan.items).selectinload(MealPlanItem.dish),
+                selectinload(MealPlan.items).selectinload(MealPlanItem.dish).selectinload(Dish.recipes),
                 selectinload(MealPlan.items).selectinload(MealPlanItem.recipe),
             )
         )
@@ -103,7 +108,7 @@ class PlanningService:
             select(MealPlanItem)
             .where(MealPlanItem.id == item_id)
             .options(
-                selectinload(MealPlanItem.dish),
+                selectinload(MealPlanItem.dish).selectinload(Dish.recipes),
                 selectinload(MealPlanItem.recipe),
                 selectinload(MealPlanItem.meal_rating),
             )
@@ -144,7 +149,7 @@ class PlanningService:
             select(MealPlan)
             .where(MealPlan.week_start_date == week_start)
             .options(
-                selectinload(MealPlan.items).selectinload(MealPlanItem.dish),
+                selectinload(MealPlan.items).selectinload(MealPlanItem.dish).selectinload(Dish.recipes),
                 selectinload(MealPlan.items).selectinload(MealPlanItem.recipe),
             )
         )
@@ -459,7 +464,10 @@ class PlanningService:
                     ]
                 )
             )
-            .options(selectinload(MealPlanItem.dish), selectinload(MealPlanItem.recipe))
+            .options(
+                selectinload(MealPlanItem.dish).selectinload(Dish.recipes),
+                selectinload(MealPlanItem.recipe),
+            )
             .order_by(MealPlanItem.date.desc(), MealPlanItem.meal_slot.desc())
             .limit(limit)
         )
