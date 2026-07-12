@@ -15,7 +15,7 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Phase 10 — Cooking mode** on branch `phase-10/cooking-mode` (from `main` after `v0.6.0`).
+**Phase 10 — Cooking mode** — PR [#10](https://github.com/didac-crst/mealroulette/pull/10) open on `phase-10/cooking-mode` (from `main` after `v0.6.0`).
 
 Spec: [COOKING_MODE.md](COOKING_MODE.md). See [CURSOR_ROADMAP.md § Phase 10](CURSOR_ROADMAP.md#phase-10---cooking-mode).
 
@@ -268,8 +268,8 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [ ] Auth and roles
 - [ ] Scheduler reliable enough for real use
 - [x] Telegram reminders
-- [ ] Recipe cooking mode
-- [x] Today home with Cook / Review entry (Phase 10, in progress)
+- [x] Recipe cooking mode (Phase 10, PR #10)
+- [x] Today home with Cook / Review entry (Phase 10, PR #10)
 
 ---
 
@@ -473,11 +473,25 @@ Branch: `phase-10/cooking-mode`. Spec: [COOKING_MODE.md](COOKING_MODE.md).
 - [x] Collapsible full ingredient list
 - [x] Step countdown timers (optional minutes per step in recipe edit)
 - [x] Telegram alert when cooking timer ends (subscribers; worker)
+- [x] Browser timer chime + dismiss-at-zero UX
+- [x] Dish library real-time search (client-side)
 - [x] Frontend tests (navigation, boundaries, no-step fallback)
 - [x] Manual mobile QA
 - [ ] Merge PR and tag when v1.0 slice complete
 
 Deferred (not first pass): Thermomix layout, persistent sessions, Telegram entry.
+
+**PR [#10](https://github.com/didac-crst/mealroulette/pull/10) review follow-ups (CodeRabbit, 2026-07-12)** — tracked so deferred items are not lost:
+
+- [ ] **Worker:** commit each cooking timer alert immediately after send/update in `process_due` (one failure must not block the rest)
+- [ ] **Test:** `test_process_due` failure path when Telegram `send_message` raises (assert `failed` status + `last_error`)
+- [ ] **Frontend:** batch or bundled recipe variant names for dish search (replace per-dish `fetchRecipes` in `DishListPage` when catalog grows)
+- [ ] **Frontend:** surface save/add errors in `RecipeEditPage` step editor (catch API failures instead of silent `finally`-only)
+- [ ] **Refactor:** dedupe action buttons in `CookingStepTimer` compact vs full layout
+- [ ] **Docs:** vary acceptance-criteria wording in `CURSOR_ROADMAP.md` Phase 10 (cosmetic)
+- [ ] **Repo:** docstring coverage threshold (CodeRabbit pre-merge warning; not Phase 10-specific)
+
+Addressed in PR #10 commit `cee1ae0`: Telegram schedule/cancel race, today Review without dish, timer label helper, BACKLOG wording, timer tick side effects, test mocks.
 
 ### Phases 11–13
 
