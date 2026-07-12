@@ -11,6 +11,15 @@ def test_household_timezone_defaults_to_paris(db_session, scheduler_seed):
     assert str(zone) == "Europe/Paris"
 
 
+def test_household_timezone_uses_default_when_timezone_is_null(db_session, scheduler_seed):
+    row = db_session.get(SchedulerSettings, SCHEDULER_SETTINGS_ID)
+    assert row is not None
+    row.timezone = None
+
+    zone = household_timezone(db_session)
+    assert str(zone) == "Europe/Paris"
+
+
 def test_household_local_today_uses_scheduler_timezone(db_session, scheduler_seed):
     row = db_session.get(SchedulerSettings, SCHEDULER_SETTINGS_ID)
     assert row is not None

@@ -12,7 +12,9 @@ DEFAULT_HOUSEHOLD_TIMEZONE = "Europe/Paris"
 
 def household_timezone(db: Session) -> ZoneInfo:
     row = db.get(SchedulerSettings, SCHEDULER_SETTINGS_ID)
-    timezone_name = row.timezone if row is not None else DEFAULT_HOUSEHOLD_TIMEZONE
+    timezone_name = (
+        row.timezone if row is not None and row.timezone else DEFAULT_HOUSEHOLD_TIMEZONE
+    )
     try:
         return ZoneInfo(timezone_name)
     except Exception:

@@ -43,10 +43,13 @@ def _future_item(plan, *, client=None, user_headers=None):
             return item
     if client is not None and user_headers is not None:
         week_start = date.fromisoformat(plan["week_start_date"])
-        next_plan = client.get(
+        response = client.get(
             f"/api/meal-plans/{(week_start + timedelta(days=7)).isoformat()}",
             headers=user_headers,
-        ).json()
+        )
+        if response.status_code != 200:
+            pytest.fail("expected at least one future meal slot")
+        next_plan = response.json()
         for item in next_plan["items"]:
             if date.fromisoformat(item["date"]) > today:
                 return item

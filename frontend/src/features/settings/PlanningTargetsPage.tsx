@@ -39,7 +39,7 @@ function rowsToTargets(rows: TargetRow[]): Record<string, WeeklyTargetSpec> {
 }
 
 export function PlanningTargetsPage() {
-  const { accessToken, isAdmin } = useAuth();
+  const { accessToken, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [baseRules, setBaseRules] = useState<PlanningRulesConfig | null>(null);
   const [rows, setRows] = useState<TargetRow[]>([]);
@@ -51,10 +51,10 @@ export function PlanningTargetsPage() {
   const [newPreset, setNewPreset] = useState<string>(TARGET_PRESETS[0]);
 
   useEffect(() => {
-    if (!isAdmin) {
+    if (!authLoading && !isAdmin) {
       navigate("/review");
     }
-  }, [isAdmin, navigate]);
+  }, [isAdmin, authLoading, navigate]);
 
   useEffect(() => {
     if (!accessToken) {
@@ -152,6 +152,18 @@ export function PlanningTargetsPage() {
       setSaving(false);
     }
   };
+
+  if (authLoading) {
+    return (
+      <SettingsPageShell title="Weekly targets" subtitle="Meals per week by food type.">
+        <p className="muted">Loading…</p>
+      </SettingsPageShell>
+    );
+  }
+
+  if (!isAdmin) {
+    return null;
+  }
 
   if (loading) {
     return (
