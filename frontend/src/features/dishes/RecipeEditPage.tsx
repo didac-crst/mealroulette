@@ -32,6 +32,7 @@ import {
 import { ApiError } from "../../api/client";
 import { ButtonLink } from "../../components/ButtonLink";
 import { useAuth } from "../auth/AuthContext";
+import { formatStepTimerLabel, timerMinutesFromSeconds, timerSecondsFromMinutesInput } from "./recipeCooking";
 import { RECIPE_TYPE_OPTIONS } from "./classification";
 import { DIFFICULTY_OPTIONS } from "./constants";
 import { DishInheritedContext } from "./DishClassificationSummary";
@@ -496,6 +497,7 @@ function StepEditorRow({
 }) {
   const [editing, setEditing] = useState(false);
   const [instruction, setInstruction] = useState(step.instruction);
+  const [timerMinutes, setTimerMinutes] = useState(() => timerMinutesFromSeconds(step.timer_seconds));
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSave() {
@@ -504,7 +506,10 @@ function StepEditorRow({
     }
     setSubmitting(true);
     try {
-      await updateRecipeStep(accessToken, step.id, { instruction: instruction.trim() });
+      await updateRecipeStep(accessToken, step.id, {
+        instruction: instruction.trim(),
+        timer_seconds: timerSecondsFromMinutesInput(timerMinutes),
+      });
       setEditing(false);
       onChanged();
     } finally {
@@ -522,6 +527,11 @@ function StepEditorRow({
     }
   }
 
+  const timerLabel =
+    step.timer_seconds != null && step.timer_seconds > 0
+      ? formatStepTimerLabel(step.timer_seconds)
+      : null;
+
   if (editing) {
     return (
       <li>
@@ -530,6 +540,19 @@ function StepEditorRow({
             Step {step.step_number}
             <textarea value={instruction} onChange={(event) => setInstruction(event.target.value)} rows={3} required />
           </label>
+          <label>
+            Timer (minutes, optional)
+            <input
+              type="number"
+              min={1}
+              step={1}
+              inputMode="numeric"
+              value={timerMinutes}
+              onChange={(event) => setTimerMinutes(event.target.value)}
+              placeholder="e.g. 5"
+            />
+          </label>
+          <p className="muted">Leave empty if this step has no countdown timer in cooking mode.</p>
           <div className="row-actions">
             <button type="button" className="button" disabled={submitting} onClick={() => void handleSave()}>
               Save
@@ -547,6 +570,7 @@ function StepEditorRow({
     <li className="list-item-row">
       <span>
         {step.step_number}. {step.instruction}
+        {timerLabel ? <span className="muted"> · {timerLabel}</span> : null}
       </span>
       <div className="row-actions">
         <button type="button" className="button button-secondary" onClick={() => setEditing(true)}>
@@ -574,6 +598,7 @@ function AddStepEditor({
   onCancel: () => void;
 }) {
   const [instruction, setInstruction] = useState("");
+  const [timerMinutes, setTimerMinutes] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   async function handleAdd() {
@@ -582,7 +607,11 @@ function AddStepEditor({
     }
     setSubmitting(true);
     try {
-      await createRecipeStep(accessToken, recipeId, { step_number: nextStep, instruction: instruction.trim() });
+      await createRecipeStep(accessToken, recipeId, {
+        step_number: nextStep,
+        instruction: instruction.trim(),
+        timer_seconds: timerSecondsFromMinutesInput(timerMinutes),
+      });
       onAdded();
     } finally {
       setSubmitting(false);
@@ -594,6 +623,18 @@ function AddStepEditor({
       <label>
         Step {nextStep}
         <textarea value={instruction} onChange={(event) => setInstruction(event.target.value)} rows={3} required />
+      </label>
+      <label>
+        Timer (minutes, optional)
+        <input
+          type="number"
+          min={1}
+          step={1}
+          inputMode="numeric"
+          value={timerMinutes}
+          onChange={(event) => setTimerMinutes(event.target.value)}
+          placeholder="e.g. 5"
+        />
       </label>
       <div className="row-actions">
         <button type="button" className="button" disabled={submitting} onClick={() => void handleAdd()}>

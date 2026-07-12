@@ -35,6 +35,7 @@ import {
   statusClassName,
   swappableMeals,
 } from "./planFormat";
+import { canOpenCookMode } from "./todayMeals";
 import { SelectionReasons } from "./SelectionReasons";
 import { StarRating } from "./StarRating";
 import { SwapSlotDialog } from "./SwapSlotDialog";
@@ -46,8 +47,12 @@ type Props = {
   leftoverSources: MealPlanItem[];
   sourceLookupItems?: MealPlanItem[];
   accessToken: string;
-  mode: "plan" | "review";
+  mode: "plan" | "review" | "today";
   rouletteBusy?: boolean;
+  cookRecipeId?: number | null;
+  cookRecipesLoading?: boolean;
+  reviewExpanded?: boolean;
+  onReviewToggle?: () => void;
   onChanged: (item: MealPlanItem) => void;
   onError: (message: string) => void;
   onReroll?: (item: MealPlanItem) => void;
@@ -63,6 +68,10 @@ export function MealSlotCard({
   accessToken,
   mode,
   rouletteBusy = false,
+  cookRecipeId = null,
+  cookRecipesLoading = false,
+  reviewExpanded = true,
+  onReviewToggle,
   onChanged,
   onError,
   onReroll,
@@ -84,10 +93,14 @@ export function MealSlotCard({
 
   const isFuture = isFutureMealDate(item.date);
   const sourceItems = sourceLookupItems ?? leftoverSources;
-  const isReviewed = mode === "review" && item.status !== "planned";
-  const statusLabel = mode === "review" ? formatReviewStatus(item) : formatStatus(item.status);
-  const statusClass = mode === "review" ? reviewStatusClassName(item) : statusClassName(item.status);
-  const showUndo = mode === "review" && showUndoStatus(item);
+  const isReviewed = (mode === "review" || mode === "today") && item.status !== "planned";
+  const statusLabel = mode === "review" || mode === "today" ? formatReviewStatus(item) : formatStatus(item.status);
+  const statusClass =
+    mode === "review" || mode === "today" ? reviewStatusClassName(item) : statusClassName(item.status);
+  const showUndo = (mode === "review" || mode === "today") && showUndoStatus(item);
+  const showTodayReviewPanel = mode !== "today" || reviewExpanded;
+  const showReviewPanel =
+    (mode === "review" && !isFuture) || (mode === "today" && showTodayReviewPanel);
   const actionBusy = busy || rouletteBusy;
   const swapTargets = swappableMeals(item, planItems);
   const showReroll = mode === "plan" && onReroll && canRerollMeal(item);
@@ -338,11 +351,36 @@ export function MealSlotCard({
         </>
       ) : null}
 
+      {mode === "today" && item.dish_id ? (
+        <div className="meal-slot-actions meal-slot-actions-primary today-meal-primary-actions">
+          {canOpenCookMode(item) ? (
+            cookRecipeId ? (
+              <Link to={`/recipes/${cookRecipeId}/cook`} className="button">
+                Cook
+              </Link>
+            ) : cookRecipesLoading ? (
+              <button type="button" className="button" disabled>
+                Cook
+              </button>
+            ) : (
+              <span className="muted">No recipe to cook</span>
+            )
+          ) : (
+            <span className="muted">Leftovers — no cooking steps</span>
+          )}
+          {showReviewExecutionActions(item) && onReviewToggle ? (
+            <button type="button" className="button button-secondary" onClick={onReviewToggle}>
+              {reviewExpanded ? "Hide review" : "Review"}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+
       {mode === "review" && isFuture ? (
         <p className="muted meal-slot-future-note">Future meal — review after it happens</p>
       ) : null}
 
-      {mode === "review" && !isFuture ? (
+      {showReviewPanel ? (
         <>
           {showReviewExecutionActions(item) && !skipFormOpen ? (
             <div className="meal-slot-actions meal-slot-actions-primary">

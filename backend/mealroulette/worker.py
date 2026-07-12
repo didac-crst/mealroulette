@@ -9,6 +9,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from mealroulette.core.config import get_settings
+from mealroulette.services.cooking_timer_alerts import CookingTimerAlertService
 from mealroulette.services.telegram_reminder import TelegramReminderService
 from mealroulette.services.scheduled_roulette import ScheduledRouletteService
 from mealroulette.services.telegram_updates import TelegramUpdateService
@@ -56,6 +57,16 @@ def run_scheduled_roulette() -> None:
             logger.exception("Scheduled meal roulette failed")
 
 
+def run_cooking_timer_alerts() -> None:
+    with _session_factory() as db:
+        try:
+            processed = CookingTimerAlertService(db).process_due()
+            if processed:
+                logger.info("Processed %s cooking timer alert(s)", processed)
+        except Exception:
+            logger.exception("Cooking timer alert processing failed")
+
+
 def main() -> None:
     stop_event = threading.Event()
     if get_settings().telegram_bot_token:
@@ -67,6 +78,7 @@ def main() -> None:
     scheduler = BlockingScheduler(timezone="UTC")
     scheduler.add_job(run_scheduled_reminder, trigger="cron", minute="*", id="telegram_daily_reminder")
     scheduler.add_job(run_scheduled_roulette, trigger="cron", minute="*", id="scheduled_meal_roulette")
+    scheduler.add_job(run_cooking_timer_alerts, trigger="interval", seconds=2, id="cooking_timer_alerts")
     logger.info("MealRoulette worker started")
 
     def shutdown(_signum: int, _frame: object) -> None:

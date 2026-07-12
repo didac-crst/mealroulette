@@ -21,7 +21,9 @@ import {
   weekStartForDate,
   canRerollMeal,
   canSwapMeal,
+  countNeedsReviewForDate,
   swappableMeals,
+  todayMealSlots,
 } from "./planFormat";
 
 function item(overrides: Partial<MealPlanItem>): MealPlanItem {
@@ -177,5 +179,21 @@ describe("planFormat", () => {
         item({ id: 3, date: todayIso(), status: "planned", is_locked: false }),
       ]).map((entry) => entry.id),
     ).toEqual([3]);
+  });
+
+  it("builds today lunch and dinner slots", () => {
+    const today = todayIso();
+    const slots = todayMealSlots(
+      [
+        item({ id: 1, date: today, meal_slot: "dinner", dish_name: "Pasta" }),
+        item({ id: 2, date: "2020-01-01", meal_slot: "lunch" }),
+      ],
+      today,
+    );
+    expect(slots.map((slot) => [slot.meal_slot, slot.item?.id ?? null])).toEqual([
+      ["lunch", null],
+      ["dinner", 1],
+    ]);
+    expect(countNeedsReviewForDate([item({ date: today, status: "planned" })], today)).toBe(1);
   });
 });

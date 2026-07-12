@@ -282,6 +282,17 @@ button:disabled {
   margin-top: 0.5rem;
 }
 
+.dish-search {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 1rem;
+}
+
+.dish-search-meta {
+  margin: 0.35rem 0 0;
+}
+
 .dish-card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -1276,4 +1287,224 @@ legend {
     font-size: 0.78rem;
     padding: 0.45rem 0.25rem;
   }
+}
+
+.cooking-mode {
+  min-height: calc(100dvh - 8rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.cooking-mode-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.cooking-mode-context {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #5c6570;
+}
+
+.cooking-mode-title {
+  margin: 0.25rem 0 0;
+  font-size: 1.35rem;
+  line-height: 1.25;
+}
+
+.cooking-mode-exit {
+  flex-shrink: 0;
+}
+
+.cooking-mode-ingredients {
+  border: 1px solid #e4e7eb;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #fbfdff;
+}
+
+.cooking-mode-ingredients summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.cooking-mode-ingredient-list {
+  margin: 0.75rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.cooking-mode-step-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1rem 0;
+}
+
+.cooking-mode-step-counter {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #5c6570;
+}
+
+.cooking-mode-instruction {
+  margin: 0;
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+  line-height: 1.45;
+}
+
+.cooking-mode-step-meta {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+}
+
+.cooking-mode-timer {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  border: 1px solid #e4e7eb;
+  border-radius: 0.5rem;
+  background: #fbfdff;
+  text-align: center;
+}
+
+.cooking-mode-timer-display {
+  margin: 0;
+  font-size: clamp(2rem, 8vw, 3rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.cooking-mode-timer-done {
+  margin: 0.5rem 0 0;
+  font-weight: 700;
+  color: #0b6b3a;
+}
+
+.cooking-mode-timer-finished .cooking-mode-timer-display {
+  color: #0b6b3a;
+}
+
+.cooking-mode-timer-finished {
+  border-color: #7bc89a;
+  background: #eefbf3;
+  animation: cooking-timer-pulse 1.2s ease-in-out infinite;
+}
+
+.cooking-mode-timer-acknowledged {
+  border-color: #d9e2ec;
+  background: #fbfdff;
+}
+
+.cooking-active-timer-row.cooking-mode-timer-acknowledged {
+  border: 1px solid #d9e2ec;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+
+@keyframes cooking-timer-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(11, 107, 58, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 0.45rem rgba(11, 107, 58, 0.15);
+  }
+}
+
+.cooking-mode-timer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.cooking-active-timers {
+  border: 1px solid #d6e4ff;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #f3f8ff;
+}
+
+.cooking-active-timers-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.cooking-active-timer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.cooking-active-timer-row + .cooking-active-timer-row {
+  border-top: 1px solid #e4e7eb;
+}
+
+.cooking-active-timer-label {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #5c6570;
+}
+
+.cooking-active-timer-time {
+  margin: 0.15rem 0 0;
+  font-size: 1.35rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.cooking-mode-controls {
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  background: linear-gradient(transparent, #f5f7fa 30%);
+}
+
+@media (max-width: 520px) {
+  .cooking-mode-title {
+    font-size: 1.15rem;
+  }
+
+  .cooking-mode-controls {
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0));
+  }
+}
+
+.today-page {
+  gap: 1rem;
+}
+
+.today-header h2 {
+  margin: 0;
+}
+
+.today-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.95rem;
+}
+
+.today-meal-primary-actions {
+  margin-top: 0.25rem;
+}
+
+.today-empty-slot {
+  opacity: 0.85;
+}
+
+.today-empty-day {
+  align-items: flex-start;
 }

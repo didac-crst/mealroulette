@@ -797,19 +797,30 @@ Do **not** in Phase 9 unless explicitly approved later:
 
 ### Phase 10 - Cooking Mode
 
-Deliverables:
+**Status:** Implemented on `phase-10/cooking-mode` (PR pending). Spec: [COOKING_MODE.md](COOKING_MODE.md).
 
-- Step-by-step recipe viewer
-- Previous/next controls
-- Optional timer
-- Thermomix metadata display
-- Ingredient reference panel
-- Mobile-readable layout
+First pass (frontend-only, no DB migrations):
+
+- **`/today` home** — today's lunch/dinner cards; default route after login
+- **Cook** and **Review** on each today card (Review expands inline; week Review tab unchanged)
+- Route `/recipes/:recipeId/cook` and **Cook** entry from recipe detail
+- Step-by-step read-only viewer with Previous / Next
+- Optional **step timer** (minutes on each step in recipe edit → countdown in cooking mode)
+- Full recipe ingredient list in a collapsible panel
+- Mobile-first layout; local step index only (no persistent session)
+
+Deferred to later Phase 10+ slices (see spec):
+
+- Thermomix step badges and appliance layout
+- Persistent cooking sessions, voice, Telegram deep links
 
 Acceptance criteria:
 
-- User can cook a recipe from a phone without editing data.
-- Timers can be started from steps that define timer metadata.
+- User lands on Today and can cook or review today's meals from a phone.
+- User can open cooking mode from Today or recipe detail and return to it.
+- User can walk through steps and see ingredients on a phone-sized viewport.
+- Recipe detail/edit flows and backend behaviour unchanged.
+- Frontend tests and build pass.
 
 ### Phase 11 - Backup, Export, and Import
 

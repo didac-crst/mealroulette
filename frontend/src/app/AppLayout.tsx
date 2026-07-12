@@ -4,6 +4,7 @@ import { NavButtonLink } from "../components/ButtonLink";
 import { useAuth } from "../features/auth/AuthContext";
 
 const CORE_TAB_ROUTES = [
+  { to: "/today", label: "Today" },
   { to: "/plan", label: "Plan" },
   { to: "/review", label: "Review" },
   { to: "/shopping", label: "List" },

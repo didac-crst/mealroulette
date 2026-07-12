@@ -11,6 +11,7 @@ from mealroulette.models.catalog import (
     Tag,
     Unit,
 )
+from mealroulette.models.cooking import CookingTimerAlert, CookingTimerAlertStatus
 from mealroulette.models.enums import (
     ConversionConfidence,
     MealPlanItemStatus,
@@ -29,6 +30,8 @@ from mealroulette.models.user import RefreshToken, User, UserRole
 
 __all__ = [
     "ConversionConfidence",
+    "CookingTimerAlert",
+    "CookingTimerAlertStatus",
     "Dish",
     "DishSeasonality",
     "DishTag",
