@@ -37,6 +37,7 @@ class MealPlanPublic(BaseModel):
     week_start_date: date
     status: MealPlanStatus
     items: list[MealPlanItemPublic] = Field(default_factory=list)
+    roulette_undo_available: bool = False
     created_at: datetime
     updated_at: datetime
 
@@ -63,6 +64,22 @@ class MealPlanItemSkipRequest(BaseModel):
 
 class MealPlanItemAteLeftoversRequest(BaseModel):
     leftover_source_item_id: int | None = None
+
+
+class MealPlanItemSwapRequest(BaseModel):
+    target_item_id: int
+
+
+class MealPlanItemSwapResponse(BaseModel):
+    source: MealPlanItemPublic
+    target: MealPlanItemPublic
+
+
+class MealPlanSlotAssignRequest(BaseModel):
+    date: date
+    meal_slot: MealSlot
+    dish_id: int
+    recipe_id: int | None = None
 
 
 class MealRatingPublic(BaseModel):

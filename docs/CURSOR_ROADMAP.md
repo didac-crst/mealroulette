@@ -479,24 +479,96 @@ Acceptance criteria:
 
 ### Phase 8 - Explainable Scheduler
 
-Deliverables:
+**Status:** Complete on branch `phase-8/scheduler` (v0.5.0, PR #8) — pending merge approval.
 
-- Planning rules
-- Rule-based meal similarity
-- Seasonality scoring
-- Rating scoring
-- Recent dish avoidance
-- Weekly target scoring
-- 50-attempt candidate plan generation
-- Reroll one meal
-- Selection reasons persisted on meal plan items
+#### Product behaviour
 
-Acceptance criteria:
+Three roulette triggers share one engine (`SchedulerService`):
+
+| Trigger | Scope | Locked meals | Dates |
+| --- | --- | --- | --- |
+| **Reroll** | One slot, user-initiated | Preserved | Today and future only |
+| **Generate week** | All unlocked/auto-eligible slots in a week | Preserved | Configurable week (default: next Mon–Sun) |
+| **Scheduled roulette** | Same as generate week | Preserved | Worker job (e.g. Friday 18:00 → following week) |
+
+- **Undo:** snapshot dish/recipe/reasons before reroll or generate; restore last action from Plan UI.
+- **No reroll** for yesterday or earlier — past meals stay as review/history.
+- **Manual assign** sets `manually_selected=true` and clears auto reasons; scheduler skips those slots unless user unlocks/regenerates.
+
+#### Tags vs vectors (separation of concerns)
+
+| Mechanism | Used for |
+| --- | --- |
+| **Dish tags** (`protein`, `carb`, `style`, …) | Weekly targets, hard/soft constraints, selection reasons |
+| **Family vector** | Similarity only — avoid repeating the same *kind* of meal recently |
+
+Do **not** use ML embeddings (per SPECS §10). Vectors are sparse proportion dicts built **on the fly** from the main recipe. **Full calculation rules:** [docs/SCHEDULER.md](SCHEDULER.md).
+
+#### Family vector (summary)
+
+See **[SCHEDULER.md](SCHEDULER.md)** for the authoritative spec. Summary:
+
+1. Main-recipe lines → **grams** (mass / volume / count rules).
+2. **Count:** approved unit→g conversion if present; else **default 100 g × count** (never skip the line).
+3. **Volume:** ml path when possible; else **1 ml ≈ 1 g** reference.
+4. Roll up to `ingredient.family` (fallback: category, canonical name).
+5. Exclude `pantry_item` and lines &lt; 5 g before rollup.
+6. L1-normalize to **percentages** (sparse dict).
+7. **Cosine similarity** for distance `1 - cosine` vs recent **eaten** meals; same dish in window = hard exclude.
+
+Configurable defaults in `planning_rules.rules_json`: `default_grams_per_count` (100), `vector_min_grams` (5).
+
+**History profile:** built at roulette time from `meal_history` — no stored embedding table.
+
+#### Scoring (soft)
+
+Combine: seasonality for slot date, rating boost/penalty, weekly target progress (with **tolerance** in `planning_rules.rules_json`), history similarity penalty, weighted random among top candidates (50 plan attempts per SPECS §12.5).
+
+#### Scheduled roulette + Telegram
+
+Singleton **`scheduler_settings`** (mirror Telegram settings pattern):
+
+- `enabled`, `run_weekday` (e.g. 4 = Friday), `run_time`, `timezone`
+- `target_week_offset` (default `1` = next Mon–Sun, time to shop before the week)
+- `notify_telegram`, `notify_planning_days` (default 7)
+
+Worker minute poll (same as daily reminder). On success, broadcast **“New roulette”** + HTML planning message to subscribers (reuse `format_planning_message_html`).
+
+#### Deliverables
+
+- Migration `020`: `planning_rules`, `scheduler_settings`, optional undo snapshot storage
+- `services/scheduler/` — vector builder, cosine similarity, constraints, scoring, generator
+- `SchedulerService` — generate week, reroll, undo
+- `SchedulerSettingsService` + admin UI `/settings/scheduler`
+- API: `POST /meal-plans/{id}/generate`, `POST /meal-plan-items/{id}/reroll`, `POST /meal-plans/{id}/undo-roulette`
+- Plan UI: Generate week, Reroll, Undo, show selection reasons
+- Tests: vector math, constraints, locked meals, date guards, scheduled job, Telegram notify
+
+#### Acceptance criteria
+
+- Scheduler never modifies locked or manually selected meals (unless user regenerates explicitly).
+- Reroll blocked for past dates.
+- Hard constraints: inactive dishes, same-dish window, weekly target caps (+ tolerance).
+- Each auto item stores human-readable `selection_reasons_json` (targets, seasonality, similarity to recent meals).
+- Scheduled Friday job fills next week and optionally notifies Telegram.
+- Undo restores previous assignments from last roulette action.
+
+#### Suggested commit slices
+
+1. Planning rules + scheduler settings (migration, seed, admin API)
+2. Family vector + cosine similarity + unit tests
+3. Scoring engine + 50-attempt generator
+4. Reroll + generate + undo API + temporal neighbours + swap ✅
+5. Plan UI + reasons display + plan-from-gallery ✅
+6. Worker scheduled job + Telegram “New roulette” ✅
+7. Tests, docs, release notes `v0.5.0.md` ✅
+
+Acceptance criteria (summary):
 
 - Scheduler never modifies locked meals.
 - Scheduler respects hard constraints.
 - Each automatic item stores human-readable selection reasons.
-- Reroll replaces only the selected item.
+- Reroll replaces only the selected item (today/future).
 
 ### Phase 9 - Cooking Mode
 

@@ -10,6 +10,7 @@ from sqlalchemy.orm import sessionmaker
 
 from mealroulette.core.config import get_settings
 from mealroulette.services.telegram_reminder import TelegramReminderService
+from mealroulette.services.scheduled_roulette import ScheduledRouletteService
 from mealroulette.services.telegram_updates import TelegramUpdateService
 
 logging.basicConfig(level=logging.INFO)
@@ -41,6 +42,20 @@ def poll_telegram_updates(stop_event: threading.Event) -> None:
         stop_event.wait(1)
 
 
+def run_scheduled_roulette() -> None:
+    with _session_factory() as db:
+        try:
+            result = ScheduledRouletteService(db).run_scheduled()
+            if result is not None:
+                logger.info(
+                    "Scheduled meal roulette generated %s assignments for week %s",
+                    result.assignments_count,
+                    result.week_start_date,
+                )
+        except Exception:
+            logger.exception("Scheduled meal roulette failed")
+
+
 def main() -> None:
     stop_event = threading.Event()
     if get_settings().telegram_bot_token:
@@ -51,6 +66,7 @@ def main() -> None:
 
     scheduler = BlockingScheduler(timezone="UTC")
     scheduler.add_job(run_scheduled_reminder, trigger="cron", minute="*", id="telegram_daily_reminder")
+    scheduler.add_job(run_scheduled_roulette, trigger="cron", minute="*", id="scheduled_meal_roulette")
     logger.info("MealRoulette worker started")
 
     def shutdown(_signum: int, _frame: object) -> None:

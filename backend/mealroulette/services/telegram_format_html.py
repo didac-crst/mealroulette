@@ -130,9 +130,10 @@ def format_planning_message_html(
     to_date: date,
     days: int,
     bot_username: str | None = None,
+    heading: str = "Planning",
 ) -> str:
     lines = [
-        "<b>Planning</b>",
+        f"<b>{_esc(heading)}</b>",
         f"{_INDENT}<i>{_esc(_format_plan_date(from_date))} → {_esc(_format_plan_date(to_date))} "
         f"({days} day{'s' if days != 1 else ''})</i>",
     ]

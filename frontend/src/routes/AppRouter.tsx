@@ -15,6 +15,9 @@ import { PlanWeekPage } from "../features/planning/PlanWeekPage";
 import { ReviewWeekPage } from "../features/planning/ReviewWeekPage";
 import { ShoppingPage } from "../features/shopping/ShoppingPage";
 import { TelegramSettingsPage } from "../features/settings/TelegramSettingsPage";
+import { SchedulerSettingsPage } from "../features/settings/SchedulerSettingsPage";
+import { AdminSettingsPage } from "../features/settings/AdminSettingsPage";
+import { PlanningTargetsPage } from "../features/settings/PlanningTargetsPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 
 export function AppRouter() {
@@ -40,7 +43,10 @@ export function AppRouter() {
               <Route path="ingredients/new" element={<IngredientEditPage />} />
               <Route path="ingredients/:ingredientId" element={<IngredientDetailPage />} />
               <Route path="ingredients/:ingredientId/edit" element={<IngredientEditPage />} />
+              <Route path="settings" element={<AdminSettingsPage />} />
+              <Route path="settings/targets" element={<PlanningTargetsPage />} />
               <Route path="settings/telegram" element={<TelegramSettingsPage />} />
+              <Route path="settings/scheduler" element={<SchedulerSettingsPage />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/review" replace />} />

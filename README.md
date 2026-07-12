@@ -2,7 +2,7 @@
 
 MealRoulette is a self-hosted household meal planning app for deciding what to eat, planning lunch and dinner, generating shopping lists, sending Telegram reminders, and cooking from structured recipe steps.
 
-**v0.4.0** adds Telegram reminders: bot commands, scheduled HTML reminders, tap-to-open recipes, and admin settings. The explainable meal scheduler (Phase 8) is not built yet — see [docs/BACKLOG.md](docs/BACKLOG.md).
+**v0.5.0** adds the explainable meal scheduler: generate week, reroll, undo, family-vector similarity, selection reasons, scheduled Friday roulette, and Telegram “New roulette”. See [docs/releases/v0.5.0.md](docs/releases/v0.5.0.md) and [docs/SCHEDULER.md](docs/SCHEDULER.md).
 
 ## Documentation
 
@@ -25,7 +25,7 @@ MealRoulette is a self-hosted household meal planning app for deciding what to e
 
 ```text
 api       FastAPI backend
-worker    APScheduler jobs for Telegram reminders and backups
+worker    APScheduler jobs for Telegram reminders, scheduled roulette, and backups
 frontend  Responsive web UI
 db        PostgreSQL
 ```
@@ -75,7 +75,16 @@ pip install pre-commit
 pre-commit install
 ```
 
-Integration tests expect PostgreSQL at `TEST_DATABASE_URL`. The easiest local setup is `docker compose up db`.
+Integration tests expect PostgreSQL at `TEST_DATABASE_URL` (default: `mealroulette_test` on `localhost:5432`). From the **repository root**:
+
+```bash
+make test-db-setup   # starts db, creates mealroulette_test if needed
+cd backend && python -m pytest -q
+```
+
+Or run everything in one step: `make test-backend`.
+
+If you only run `docker compose up -d db`, ensure Docker/Colima is running and the `db` service is healthy (`docker compose ps`). The init script creates `mealroulette_test` on first volume init; for an existing Postgres volume use `make test-db-setup` once.
 
 ## Database migrations (Alembic)
 
@@ -239,6 +248,45 @@ Broadcasts go to **all subscribers**, not only the admin.
 
 All Telegram admin routes require an **admin** JWT.
 
+### Scheduler (automatic roulette)
+
+The **worker** also runs the scheduled weekly roulette when enabled. The **API** exposes scheduler settings and a manual run endpoint.
+
+#### Quick start
+
+1. As admin, open **Settings** (mobile: **More** tab) → **Weekly targets** for fish/meat/pasta counts, or **Auto roulette** (`/settings/scheduler`).
+2. Enable the job, set weekday/time/timezone (default Friday 18:00), and `target_week_offset` (default `1` = next Mon–Sun).
+3. Use **Run now** to test, or wait for the worker cron (same minute poll as Telegram reminders).
+4. Optionally enable **Notify Telegram** to broadcast a **“New roulette”** HTML plan to subscribers after a successful generate.
+
+#### Admin settings (database)
+
+| Setting | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `enabled` | bool | `false` | When `true`, worker may run on schedule and **Run now** is allowed. |
+| `run_weekday` | int (0–6) | `4` | Local weekday to trigger (0 = Monday, 4 = Friday). |
+| `run_time` | time | `18:00` | Local time in `timezone`. |
+| `timezone` | string | `Europe/Paris` | IANA timezone for schedule. |
+| `target_week_offset` | int | `1` | Which Mon–Sun week to fill (`0` = current week, `1` = next week). |
+| `notify_telegram` | bool | `true` | Send “New roulette” to subscribers after generate. |
+| `notify_planning_days` | int (1–14) | `7` | Days of plan shown in the Telegram message. |
+| `last_roulette_at` | datetime | — | Read-only: last successful scheduled/manual run. |
+| `last_error` | string | — | Read-only: last failure message, if any. |
+
+#### Plan UI roulette
+
+On **Plan** (`/plan`): **Generate week** fills unlocked slots; **Reroll** one meal; **Undo** last action; **Swap** two slots; locked and manual picks are preserved. Selection reasons appear on auto-picked meals.
+
+#### Scheduler admin API
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/scheduler/settings` | Read scheduler settings. |
+| `PUT` | `/api/scheduler/settings` | Update schedule and notify flags. |
+| `POST` | `/api/scheduler/run-roulette` | Run generate now (ignores weekday/time). |
+
+Roulette endpoints (`POST /api/meal-plans/{id}/generate`, reroll, undo, swap, assign) require a normal user JWT. Full API behaviour: [docs/SCHEDULER.md](docs/SCHEDULER.md).
+
 ## Trying the API
 
 After `make up`:
@@ -248,6 +296,8 @@ After `make up`:
 | API docs (Swagger) | http://localhost:8000/docs |
 | Health check | http://localhost:8000/api/health |
 | Frontend | http://localhost:3000 |
+
+On a phone or another device on the same Wi‑Fi, open `http://<this-computer-ip>:3000` — no `VITE_API_URL` or IP config needed; the UI calls `/api` on the same host and Vite proxies to the backend.
 
 ### Login flow in Swagger (`/docs`)
 

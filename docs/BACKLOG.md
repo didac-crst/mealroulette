@@ -15,9 +15,26 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Phase 7 shipped** as [`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0) (merge `a560e7a`, PR #7).
+**Phase 8 complete** on branch `phase-8/scheduler` — explainable scheduler ready for merge and **`v0.5.0`** tag (pending your review). PR #8.
 
-Next up: **Phase 8** — explainable automatic scheduler and meal reroll. See [CURSOR_ROADMAP.md](CURSOR_ROADMAP.md#phase-8---explainable-scheduler).
+See [CURSOR_ROADMAP.md](CURSOR_ROADMAP.md#phase-8---explainable-scheduler) and [releases/v0.5.0.md](releases/v0.5.0.md).
+
+---
+
+## Technical debt watchlist
+
+Track these as opportunistic refactors, not a standalone rewrite. Prefer tackling them when the affected area is already changing for a feature or bug fix.
+
+- [ ] Add CI gates for frontend build/typecheck and backend lint/format, not only test execution.
+- [ ] Split large frontend page components into smaller form sections, data-loading hooks, validation helpers, and reusable controls:
+  - `frontend/src/features/dishes/RecipeEditPage.tsx`
+  - `frontend/src/features/ingredients/IngredientEditPage.tsx`
+  - `frontend/src/features/planning/MealSlotCard.tsx`
+- [ ] Break up large backend services by separating read/query helpers, mutation workflows, serialization helpers, and domain rules:
+  - `backend/mealroulette/services/catalog.py`
+  - `backend/mealroulette/services/shopping.py`
+- [ ] Split `frontend/src/styles/app.css` into feature-level or component-level style files once UI changes become frequent.
+- [ ] Strengthen frontend coverage around edit forms, planning flows, and shopping list behavior.
 
 ---
 
@@ -31,6 +48,7 @@ Use one branch per milestone, then merge via pull request:
 - `phase-5/planning` — manual meal planning (merged in PR #4, `v0.2.0`)
 - `phase-6/shopping` — shopping lists, ingredient catalog seed, ingredient admin UI (merged in PR #5, `v0.3.0`)
 - `phase-7/telegram-review` — Telegram bot, reminders, on-demand commands, recipe links (merged in PR #7, `v0.4.0`)
+- `phase-8/scheduler` — explainable scheduler, family-vector similarity, scheduled roulette (**ready for merge**, `v0.5.0`, PR #8)
 
 ---
 
@@ -44,11 +62,14 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.2** | Manual planning — weekly plan, review flow, meal actions, ratings, lightweight leftovers | **Done** ([`v0.2.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.2.0), merge `fb20858`, PR #4) |
 | **v0.3** | Shopping list — generation, aggregation, pantry filter, UI, ingredient catalog | **Done** ([`v0.3.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.3.0), merge `88d2675`, PR #5) |
 | **v0.4** | Telegram reminders — settings, scheduled and manual send, bot commands | **Done** ([`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0), merge `a560e7a`, PR #7) |
-| **v0.5** | Automatic scheduler — explainable weekly generation, reroll | Not started |
+| **v0.5** | Automatic scheduler — explainable weekly generation, reroll | **Ready for merge** (branch `phase-8/scheduler`, PR #8) |
 | **v0.6** | LLM-assisted entry — draft enrichment, review before save | Not started |
+| **Future** | Composable meals — complete / half / dessert roles, paired halves, manual desserts | Backlog only (see below) |
 | **v1.0** | Stable home version — mobile UI, backups, auth, scheduler, cooking mode | Not started |
 
 > **v0.4 shipped** as [`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0). Telegram bot commands, scheduled HTML reminders, recipe deep links, and admin settings. Release notes: [docs/releases/v0.4.0.md](releases/v0.4.0.md).
+
+> **v0.5** is implemented on branch `phase-8/scheduler` (PR #8). Explainable scheduler, plan roulette UI, scheduled job, Telegram “New roulette”. Release notes draft: [docs/releases/v0.5.0.md](releases/v0.5.0.md). Tag after merge approval.
 
 > **v0.2 shipped** as [`v0.2.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.2.0). Plan and review lunch/dinner for the week, record what was eaten, rate meals, and track lightweight leftovers. Release notes: [docs/releases/v0.2.0.md](releases/v0.2.0.md).
 
@@ -99,7 +120,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [x] Meal ratings (per meal slot, linked to dish/recipe)
 - [x] Review flow (`review_saved_at`, needs-review filter)
 - [x] Mobile polish (bottom tabs, review-first landing, touch-friendly actions)
-- [ ] Reroll / roulette again (deferred to Phase 8 scheduler)
+- [x] Reroll / roulette again (Phase 8 scheduler)
 
 ### v0.3 — Shopping List
 
@@ -129,14 +150,19 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 
 ### v0.5 — Automatic Scheduler
 
-- [ ] Weekly plan generation
-- [ ] Weekly category targets
-- [ ] Seasonality scoring
-- [ ] Rating scoring
-- [ ] Avoid recent dishes
-- [ ] Similarity scoring
-- [ ] Roulette again
-- [ ] Selection reasons
+- [x] Planning rules + weekly targets with tolerance
+- [x] Family-vector similarity ([SCHEDULER.md](SCHEDULER.md): on-the-fly L1 %, count fallback 100 g, cosine distance)
+- [x] History-aware scoring (temporal neighbours: eaten + planned + in-run picks)
+- [x] Seasonality + rating scoring
+- [x] Generate week (unlocked slots only; locked preserved)
+- [x] Reroll one meal (today and future only)
+- [x] Undo last roulette action
+- [x] Meal swap (manual rebalance, no scoring)
+- [x] Plan dish from gallery (calendar day + lunch/dinner)
+- [x] Selection reasons on auto-picked items
+- [x] Plan UI: generate week, reroll, undo, swap, reasons display
+- [x] Scheduled roulette worker job + admin settings UI (`/settings/scheduler`)
+- [x] Telegram “New roulette” notification (configurable planning days)
 
 ### v0.6 — LLM-Assisted Entry
 
@@ -146,6 +172,44 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [ ] Suggest steps
 - [ ] Suggest seasonality
 - [ ] Review before save
+
+### Future — composable meals (meal role)
+
+**Status:** Backlog only — do not implement until v0.5 scheduler is stable. Captures product intent for “one slot = one complete meal **or** two half meals”; desserts planned manually only.
+
+**Meal role** (exactly one per dish/recipe — name TBD in spec):
+
+| Role | Scheduler | Example |
+| --- | --- | --- |
+| **Complete meal** | Auto-assignable as the sole dish for a lunch/dinner slot | Mushroom risotto |
+| **Half meal** | Auto-assignable only as **one of two** components in the same slot | Beans & potatoes; ham croquettes |
+| **Dessert** | **Manual assign only** — never picked by roulette | Fruit crumble |
+
+**Product rules (draft):**
+
+- A lunch/dinner slot is satisfied by either **1× complete** or **2× half** (pair chosen by scheduler).
+- Do **not** model “beans + croquettes” as a single synthetic complete dish — keep real dishes separate for ingredients, ratings, and cooking.
+- Desserts may appear on the plan (for shopping and review) but are **excluded from** `generate_week`, `reroll`, and scheduled roulette.
+- Half-meal pairing should prefer variety/compatibility (shared style, temperature, prep burden — rules TBD).
+
+**Checklist (when scheduled):**
+
+- [ ] Data model: `meal_role` enum (`complete_meal`, `half_meal`, `dessert`) — decide **dish-level vs recipe-level** (today `course` is on `Dish`: `starter` \| `main` \| `dessert`; may replace or coexist).
+- [ ] Migration + catalog UI: required role on save; seed/fixture updates.
+- [ ] **Multi-component slots:** `MealPlanItem` currently has one `dish_id` / `recipe_id` per slot — need components (e.g. child rows or JSON list) without breaking the unique `(plan, date, meal_slot)` constraint.
+- [ ] Scheduler: candidate generation for complete vs compatible half pairs; desserts filtered out of auto pool.
+- [ ] Weekly targets: count **per slot** (one fish dinner), not per component — document edge cases.
+- [ ] Similarity / vectors: score pairs (or each half vs neighbours); avoid double-counting same slot in neighbour logic.
+- [ ] Shopping list: aggregate ingredients from **all** components in a slot.
+- [ ] Plan UI: show two lines per slot when composed; swap/reroll semantics (reroll pair? one half?).
+- [ ] Telegram / cooking mode: display multiple dishes per slot.
+- [ ] Map legacy `course=starter` → half meal or drop starter enum (product decision).
+
+**Open questions:**
+
+- Manual “add second half” on an existing slot vs scheduler-only pairing?
+- Can a half meal be promoted to complete for simple weeks (catalog convenience)?
+- Rating: one rating per slot or per component?
 
 ### v1.0 — Stable Home Version
 
@@ -173,7 +237,7 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 5 | Manual meal planning | v0.2 | Done (PR #4, `v0.2.0`) |
 | 6 | Shopping lists | v0.3 | Done (PR #5, `v0.3.0`) |
 | 7 | Telegram reminders | v0.4 | Done (PR #7, `v0.4.0`) |
-| 8 | Explainable scheduler | v0.5 | Not started |
+| 8 | Explainable scheduler | v0.5 | Ready for merge (PR #8) |
 | 9 | Cooking mode | v1.0 | Not started |
 | 10 | Backup, export, and import | v1.0 | Not started |
 | 11 | LLM-assisted entry | v0.6 | Not started |
@@ -304,7 +368,23 @@ Branch: merged in PR #7 (`v0.4.0`).
 - [x] Logo assets in `frontend/public/`
 - [x] Backend tests (telegram settings, API, reminder, formatters, updates, recipe links)
 
-### Phases 8–12
+### Phase 8 — Explainable scheduler ✅
+
+Branch: `phase-8/scheduler` (target `v0.5.0`, PR #8). Full plan: [CURSOR_ROADMAP.md § Phase 8](CURSOR_ROADMAP.md#phase-8---explainable-scheduler). Vector math: [SCHEDULER.md](SCHEDULER.md).
+
+- [x] Migration `020` — `planning_rules`, `scheduler_settings`
+- [x] Migration `021` — `meal_plans.last_roulette_undo_json`
+- [x] Family vector builder + cosine similarity + unit tests
+- [x] Scoring engine + 50-attempt generator + temporal neighbours
+- [x] `SchedulerService` — generate week, reroll, undo
+- [x] API: generate/reroll/undo/swap/assign + planning rules + scheduler settings
+- [x] Plan UI: generate, reroll, undo, swap, selection reasons, plan-from-gallery
+- [x] Scheduled roulette worker + `ScheduledRouletteService`
+- [x] Telegram “New roulette” notification
+- [x] Admin UI `/settings/scheduler`
+- [x] Acceptance API tests + release notes `v0.5.0.md`
+
+### Phases 9–12
 
 See [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) for full deliverables and acceptance criteria per phase.
 
@@ -347,7 +427,7 @@ Cross-reference for [docs/MVP.md](MVP.md). Checked items are done; the rest trac
 - [x] Weekly meal plan and manual assignment
 - [x] Meal actions (lock, eaten, skip, ate leftovers)
 - [x] Ratings
-- [ ] Meal reroll (deferred to Phase 8)
+- [x] Meal reroll (generate week, reroll, undo — Phase 8)
 - [x] Shopping list generation
 - [x] Telegram settings and reminders
 - [ ] JSON export / import

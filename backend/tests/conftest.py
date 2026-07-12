@@ -125,6 +125,31 @@ def catalog_seed(db_session: Session):
 
 
 @pytest.fixture
+def scheduler_seed(db_session: Session):
+    from mealroulette.data.default_planning_rules import DEFAULT_PLANNING_RULES_JSON, DEFAULT_PLANNING_RULE_NAME
+    from mealroulette.models.scheduler import (
+        DEFAULT_PLANNING_RULE_ID,
+        SCHEDULER_SETTINGS_ID,
+        PlanningRule,
+        SchedulerSettings,
+    )
+
+    if db_session.get(PlanningRule, DEFAULT_PLANNING_RULE_ID) is None:
+        db_session.add(
+            PlanningRule(
+                id=DEFAULT_PLANNING_RULE_ID,
+                name=DEFAULT_PLANNING_RULE_NAME,
+                active=True,
+                rules_json=DEFAULT_PLANNING_RULES_JSON,
+            )
+        )
+    if db_session.get(SchedulerSettings, SCHEDULER_SETTINGS_ID) is None:
+        db_session.add(SchedulerSettings(id=SCHEDULER_SETTINGS_ID))
+    db_session.commit()
+    return db_session
+
+
+@pytest.fixture
 def admin_headers(admin_token: str) -> dict[str, str]:
     return {"Authorization": f"Bearer {admin_token}"}
 

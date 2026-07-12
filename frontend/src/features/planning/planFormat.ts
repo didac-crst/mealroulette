@@ -1,4 +1,5 @@
 import type { MealPlanItem, MealPlanItemStatus, MealSlot } from "../../api/planning";
+import { isoDateFromLocalDate } from "../../lib/datetime";
 
 const DAY_FORMAT = new Intl.DateTimeFormat(undefined, { weekday: "long", month: "short", day: "numeric" });
 
@@ -42,7 +43,7 @@ export function todayIso(): string {
 export function addDays(isoDate: string, days: number): string {
   const date = new Date(`${isoDate}T12:00:00`);
   date.setDate(date.getDate() + days);
-  return date.toISOString().slice(0, 10);
+  return isoDateFromLocalDate(date);
 }
 
 export function addWeeks(weekStart: string, weeks: number): string {
@@ -214,4 +215,45 @@ export function leftoverSourceLabel(item: MealPlanItem, planItems: MealPlanItem[
 
 export function leftoverSourcesFor(item: MealPlanItem, planItems: MealPlanItem[]): MealPlanItem[] {
   return sortMealItems(planItems.filter((candidate) => isLeftoverSourceCandidate(candidate, item)));
+}
+
+export function weekStartForDate(isoDate: string): string {
+  const [year, month, day] = isoDate.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  const weekday = date.getUTCDay();
+  const mondayOffset = (weekday + 6) % 7;
+  date.setUTCDate(date.getUTCDate() - mondayOffset);
+  return date.toISOString().slice(0, 10);
+}
+
+export function selectionReasonsList(item: MealPlanItem): string[] {
+  const payload = item.selection_reasons_json;
+  if (!payload || typeof payload !== "object") {
+    return [];
+  }
+  const reasons = (payload as { reasons?: unknown }).reasons;
+  if (!Array.isArray(reasons)) {
+    return [];
+  }
+  return reasons.filter((reason): reason is string => typeof reason === "string");
+}
+
+export function canRerollMeal(item: MealPlanItem): boolean {
+  return item.status === "planned" && !item.is_locked && item.date >= todayIso();
+}
+
+export function canSwapMeal(item: MealPlanItem): boolean {
+  return item.status === "planned" && !item.is_locked && item.date >= todayIso();
+}
+
+export function swappableMeals(item: MealPlanItem, planItems: MealPlanItem[]): MealPlanItem[] {
+  return sortMealItems(
+    planItems.filter(
+      (candidate) =>
+        candidate.id !== item.id &&
+        candidate.status === "planned" &&
+        !candidate.is_locked &&
+        candidate.date >= todayIso(),
+    ),
+  );
 }

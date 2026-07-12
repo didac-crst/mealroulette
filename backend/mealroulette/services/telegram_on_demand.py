@@ -53,7 +53,7 @@ class TelegramOnDemandService:
         self.settings_service = TelegramSettingsService(db)
         self.shopping_service = ShoppingListService(db)
 
-    def _bot_username(self) -> str | None:
+    def bot_username(self) -> str | None:
         token = (get_settings().telegram_bot_token or "").strip()
         if not token:
             return None
@@ -90,7 +90,7 @@ class TelegramOnDemandService:
             from_date=from_date,
             to_date=to_date,
             days=days,
-            bot_username=self._bot_username(),
+            bot_username=self.bot_username(),
         )
 
     def build_reminder_message(self, days: int) -> str:
@@ -103,7 +103,7 @@ class TelegramOnDemandService:
             from_date=from_date,
             to_date=to_date,
             days=days,
-            bot_username=self._bot_username(),
+            bot_username=self.bot_username(),
         )
 
     def build_recipe_message(self, recipe_id: int) -> str | None:

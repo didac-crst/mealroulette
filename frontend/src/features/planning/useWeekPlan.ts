@@ -81,5 +81,17 @@ export function useWeekPlan(accessToken: string | null) {
     );
   }, []);
 
-  return { plan, dishes, error, loading, load, setPlan, setError, replaceItem };
+  const replaceItems = useCallback((updated: MealPlanItem[]) => {
+    const byId = new Map(updated.map((item) => [item.id, item]));
+    setPlan((current) =>
+      current
+        ? {
+            ...current,
+            items: current.items.map((item) => byId.get(item.id) ?? item),
+          }
+        : current,
+    );
+  }, []);
+
+  return { plan, dishes, error, loading, load, setPlan, setError, replaceItem, replaceItems };
 }
