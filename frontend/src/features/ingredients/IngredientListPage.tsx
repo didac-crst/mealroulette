@@ -61,7 +61,12 @@ export function IngredientListPage() {
           <h2>Ingredients</h2>
           <p className="muted">Canonical ingredient catalog with aliases and unit conversions.</p>
         </div>
-        {isAdmin ? <ButtonLink to="/ingredients/new">Add ingredient</ButtonLink> : null}
+        {isAdmin ? (
+          <>
+            <ButtonLink to="/ingredients/taxonomy">Taxonomy</ButtonLink>
+            <ButtonLink to="/ingredients/new">Add ingredient</ButtonLink>
+          </>
+        ) : null}
       </div>
 
       <form

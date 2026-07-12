@@ -1,0 +1,456 @@
+version: 1
+name: MealRoulette ingredient families
+description: Canonical ingredient families used for similarity vectors, dominant traits, and taxonomy browsing.
+ingredient_families:
+  - id: tomato_family
+    food_group: vegetable
+    label: Tomato family
+    description: >
+      Fresh, preserved, dried, crushed, and concentrated tomato products.
+  - id: onion_family
+    food_group: vegetable
+    label: Onion family
+    description: >
+      Onion, red onion, white onion, shallot, spring onion, leek, and related alliums. Do not use for garlic.
+  - id: garlic_family
+    food_group: vegetable
+    label: Garlic family
+    description: >
+      Fresh garlic, black garlic, garlic paste, garlic powder, and preserved garlic products.
+  - id: pepper_family
+    food_group: vegetable
+    label: Pepper family
+    description: >
+      Bell peppers, piquillo peppers, roasted peppers, nora peppers, chili peppers, and similar capsicums. Use spice_family for ground paprika.
+  - id: aubergine_family
+    food_group: vegetable
+    label: Aubergine family
+    description: >
+      Aubergines and eggplants.
+  - id: courgette_family
+    food_group: vegetable
+    label: Courgette family
+    description: >
+      Courgettes, zucchini, and summer squash.
+  - id: brassica_family
+    food_group: vegetable
+    label: Brassica family
+    description: >
+      Cabbage, kale, cauliflower, broccoli, Brussels sprouts, romanesco, and similar brassicas.
+  - id: carrot_family
+    food_group: vegetable
+    label: Carrot family
+    description: >
+      Carrots and closely related roots used similarly.
+  - id: leafy_green_family
+    food_group: vegetable
+    label: Leafy green family
+    description: >
+      Spinach, chard, lettuce, rocket, watercress, and salad greens.
+  - id: root_vegetable_family
+    food_group: vegetable
+    label: Root vegetable family
+    description: >
+      Turnip, parsnip, beetroot, radish, celeriac, and similar roots. Do not use for potatoes.
+  - id: green_bean_family
+    food_group: vegetable
+    label: Green bean family
+    description: >
+      Green beans, runner beans, flat beans, and similar fresh beans eaten as vegetables.
+  - id: artichoke_family
+    food_group: vegetable
+    label: Artichoke family
+    description: >
+      Globe artichoke, Jerusalem artichoke, and related artichoke ingredients.
+  - id: asparagus_family
+    food_group: vegetable
+    label: Asparagus family
+    description: >
+      Green and white asparagus.
+  - id: cucumber_family
+    food_group: vegetable
+    label: Cucumber family
+    description: >
+      Cucumber, gherkin, and similar cucurbits used fresh or pickled.
+  - id: citrus_family
+    food_group: fruit
+    label: Citrus family
+    description: >
+      Lemon, lime, orange, bitter orange, grapefruit, zest, and similar citrus ingredients.
+  - id: orchard_fruit_family
+    food_group: fruit
+    label: Orchard fruit family
+    description: >
+      Apple, pear, quince, peach, apricot, plum, and similar orchard fruits.
+  - id: dried_fruit_family
+    food_group: fruit
+    label: Dried fruit family
+    description: >
+      Raisins, dates, prunes, dried figs, dried apricots, and similar.
+  - id: berry_family
+    food_group: fruit
+    label: Berry family
+    description: >
+      Strawberries, raspberries, blueberries, blackberries, currants, and similar.
+  - id: mushroom_family
+    food_group: fungus
+    label: Mushroom family
+    description: >
+      Fresh, dried, and preserved mushrooms common in European cooking.
+  - id: asian_mushroom_family
+    food_group: fungus
+    label: Asian mushroom family
+    description: >
+      Shiitake, enoki, shimeji, oyster mushrooms, wood ear mushrooms, and similar Asian mushrooms.
+  - id: pasta_family
+    food_group: carbohydrate
+    label: Pasta family
+    description: >
+      Dry, fresh, stuffed, and specialty European pasta.
+  - id: asian_noodle_family
+    food_group: carbohydrate
+    label: Asian noodle family
+    description: >
+      Rice noodles, ramen, soba, udon, glass noodles, and similar.
+  - id: rice_family
+    food_group: carbohydrate
+    label: Rice family
+    description: >
+      Short, medium, long, bomba, arborio, jasmine, basmati, and other rice types.
+  - id: potato_family
+    food_group: carbohydrate
+    label: Potato family
+    description: >
+      Potato, sweet potato, and potato products when used as starchy meal components.
+  - id: bread_pastry_family
+    food_group: carbohydrate
+    label: Bread and pastry family
+    description: >
+      Bread, dough, pastry, puff pastry, pizza dough, tortillas, wraps, flatbreads, and similar.
+  - id: wheat_semolina_family
+    food_group: carbohydrate
+    label: Wheat and semolina family
+    description: >
+      Couscous, bulgur, semolina, wheat berries, spaetzle, dumplings, and similar.
+  - id: other_grain_family
+    food_group: carbohydrate
+    label: Other grain family
+    description: >
+      Quinoa, barley, oats, buckwheat, millet, cornmeal, polenta, and similar grains.
+  - id: asian_wrappers_family
+    food_group: carbohydrate
+    label: Asian wrappers family
+    description: >
+      Wonton wrappers, gyoza wrappers, spring roll wrappers, rice paper, and similar.
+  - id: chicken_family
+    food_group: meat
+    label: Chicken family
+    description: >
+      Chicken cuts and prepared chicken products.
+  - id: turkey_family
+    food_group: meat
+    label: Turkey family
+    description: >
+      Turkey cuts and prepared turkey products.
+  - id: pork_family
+    food_group: meat
+    label: Pork family
+    description: >
+      Pork cuts, cured pork, bacon, ham, lardons, chorizo, sobrasada, sausages, and similar.
+  - id: beef_family
+    food_group: meat
+    label: Beef family
+    description: >
+      Beef and veal cuts, minced beef, stewing beef, oxtail, and similar.
+  - id: lamb_family
+    food_group: meat
+    label: Lamb family
+    description: >
+      Lamb and mutton cuts.
+  - id: duck_family
+    food_group: meat
+    label: Duck family
+    description: >
+      Duck breast, confit, legs, fat, and related products.
+  - id: rabbit_family
+    food_group: meat
+    label: Rabbit family
+    description: >
+      Rabbit cuts and rabbit products.
+  - id: white_fish_family
+    food_group: fish
+    label: White fish family
+    description: >
+      Mild white finfish such as hake, cod, monkfish, sea bass, sole, haddock, and pollock.
+  - id: oily_fish_family
+    food_group: fish
+    label: Oily fish family
+    description: >
+      Sardine, tuna, mackerel, anchovy, salmon, trout, and similar oily fish.
+  - id: shellfish_family
+    food_group: seafood
+    label: Shellfish family
+    description: >
+      Mussels, clams, prawns, shrimp, scallops, crab, lobster, and langoustines.
+  - id: cephalopod_family
+    food_group: seafood
+    label: Cephalopod family
+    description: >
+      Squid, cuttlefish, and octopus.
+  - id: egg_family
+    food_group: egg
+    label: Egg family
+    description: >
+      Chicken eggs, quail eggs, yolks, whites, and egg products.
+  - id: legume_family
+    food_group: legume
+    label: Legume family
+    description: >
+      Beans, chickpeas, lentils, peas, broad beans, and similar pulses.
+  - id: soy_family
+    food_group: plant_protein
+    label: Soy family
+    description: >
+      Tofu, tempeh, edamame, soy mince, soy curls, and similar soy-based protein ingredients.
+  - id: seitan_family
+    food_group: plant_protein
+    label: Seitan family
+    description: >
+      Seitan and wheat-gluten based plant proteins.
+  - id: dairy_family
+    food_group: dairy
+    label: Dairy family
+    description: >
+      Milk, cream, yogurt, butter, creme fraiche, and non-cheese dairy products.
+  - id: fresh_cheese_family
+    food_group: cheese
+    label: Fresh cheese family
+    description: >
+      Feta, ricotta, queso fresco, fromage frais, mozzarella, goat cheese, and similar.
+  - id: soft_cheese_family
+    food_group: cheese
+    label: Soft cheese family
+    description: >
+      Camembert, brie, reblochon, taleggio, and similar soft cheeses.
+  - id: hard_cheese_family
+    food_group: cheese
+    label: Hard cheese family
+    description: >
+      Manchego, comte, parmesan, gruyere, emmental, pecorino, and similar.
+  - id: blue_cheese_family
+    food_group: cheese
+    label: Blue cheese family
+    description: >
+      Roquefort, bleu d Auvergne, cabrales, fourme d Ambert, and similar.
+  - id: olive_oil_family
+    food_group: fat
+    label: Olive oil family
+    description: >
+      Olive oil, extra virgin olive oil, and similar olive-derived cooking oils.
+  - id: other_oil_family
+    food_group: fat
+    label: Other oil family
+    description: >
+      Sunflower oil, rapeseed oil, peanut oil, coconut oil, and neutral cooking oils.
+  - id: animal_fat_family
+    food_group: fat
+    label: Animal fat family
+    description: >
+      Lard, duck fat, goose fat, beef dripping, and similar animal fats.
+  - id: vinegar_family
+    food_group: condiment
+    label: Vinegar family
+    description: >
+      Wine vinegar, cider vinegar, sherry vinegar, balsamic vinegar, rice vinegar, and similar.
+  - id: mustard_family
+    food_group: condiment
+    label: Mustard family
+    description: >
+      Dijon mustard, wholegrain mustard, mustard powder, and similar.
+  - id: olive_pickle_family
+    food_group: condiment
+    label: Olive and pickle family
+    description: >
+      Olives, capers, cornichons, pickles, preserved lemons, and similar preserved condiments.
+  - id: soy_sauce_family
+    food_group: condiment
+    label: Soy sauce family
+    description: >
+      Soy sauce, light soy sauce, dark soy sauce, tamari, and similar fermented soy condiments.
+  - id: miso_family
+    food_group: condiment
+    label: Miso family
+    description: >
+      White, yellow, red, and mixed miso pastes.
+  - id: asian_sauce_family
+    food_group: condiment
+    label: Asian sauce family
+    description: >
+      Oyster sauce, hoisin, fish sauce, teriyaki, sweet chili sauce, sriracha, gochujang, sambal, and similar.
+  - id: curry_paste_family
+    food_group: condiment
+    label: Curry paste family
+    description: >
+      Thai and Southeast Asian curry pastes and concentrated curry bases.
+  - id: coconut_family
+    food_group: condiment
+    label: Coconut family
+    description: >
+      Coconut milk, coconut cream, desiccated coconut, coconut flakes, and similar cooking coconut products.
+  - id: mexican_sauce_family
+    food_group: condiment
+    label: Mexican sauce family
+    description: >
+      Salsa, chipotle sauce, adobo, mole, hot sauces, and similar Mexican-style condiments.
+  - id: middle_eastern_sauce_family
+    food_group: condiment
+    label: Middle Eastern sauce family
+    description: >
+      Tahini, harissa, preserved lemon paste, zhug, toum, and similar.
+  - id: herb_family
+    food_group: herb
+    label: Herb family
+    description: >
+      Parsley, coriander, thyme, rosemary, bay, tarragon, chives, mint, dill, and similar.
+  - id: ginger_family
+    food_group: vegetable
+    label: Ginger family
+    description: >
+      Fresh ginger, galangal, pickled ginger, ginger paste, and similar rhizomes.
+  - id: lemongrass_family
+    food_group: herb
+    label: Lemongrass family
+    description: >
+      Lemongrass stalks and lemongrass paste.
+  - id: spice_family
+    food_group: spice
+    label: Spice family
+    description: >
+      Paprika, saffron, cumin, pepper, cinnamon, nutmeg, curry powder, ras el hanout, and similar.
+  - id: chili_spice_family
+    food_group: spice
+    label: Chili spice family
+    description: >
+      Dried chilies, chili flakes, cayenne, chipotle powder, and hot pepper spices.
+  - id: stock_family
+    food_group: stock
+    label: Stock family
+    description: >
+      Vegetable, chicken, beef, fish, seafood, mushroom, and bone stocks.
+  - id: wine_family
+    food_group: alcohol
+    label: Wine family
+    description: >
+      Red wine, white wine, sherry, brandy, and cooking wines.
+  - id: beer_cider_family
+    food_group: alcohol
+    label: Beer and cider family
+    description: >
+      Beer, cider, stout, and similar cooking alcohols.
+  - id: nut_family
+    food_group: nut_seed
+    label: Nut family
+    description: >
+      Almonds, walnuts, hazelnuts, pine nuts, peanuts, cashews, pistachios, and similar.
+  - id: seed_family
+    food_group: nut_seed
+    label: Seed family
+    description: >
+      Sesame, sunflower, pumpkin, flax, chia, and similar seeds.
+  - id: seaweed_family
+    food_group: vegetable
+    label: Seaweed family
+    description: >
+      Nori, wakame, kombu, dulse, and similar edible seaweeds.
+  - id: sweetener_family
+    food_group: sweetener
+    label: Sweetener family
+    description: >
+      Sugar, honey, maple syrup, agave syrup, molasses, and similar sweeteners.
+
+# MVP expansion families added after catalogue assessment
+  - id: squash_family
+    food_group: vegetable
+    label: Squash family
+    description: >
+      Pumpkin, butternut squash, chestnut squash, acorn squash, spaghetti squash, and similar winter squashes. Do not use for courgette unless recipe treats it as summer squash.
+  - id: celery_family
+    food_group: vegetable
+    label: Celery family
+    description: >
+      Celery stalks, celery leaves, celery root when used aromatically, and related celery ingredients. Use root_vegetable_family for celeriac if treated as a root vegetable.
+  - id: fennel_family
+    food_group: vegetable
+    label: Fennel family
+    description: >
+      Fennel bulb, fennel fronds, and fresh fennel used as vegetable or aromatic. Use spice_family for fennel seeds.
+  - id: sprout_family
+    food_group: vegetable
+    label: Sprout family
+    description: >
+      Bean sprouts, alfalfa sprouts, mung bean sprouts, and similar fresh sprouts.
+  - id: tropical_fruit_family
+    food_group: fruit
+    label: Tropical fruit family
+    description: >
+      Avocado, mango, pineapple, banana, plantain, coconut as fresh fruit, and similar tropical fruits. Cooking coconut products may use coconut_family.
+  - id: flour_starch_family
+    food_group: carbohydrate
+    label: Flour and starch family
+    description: >
+      Wheat flour, bread flour, buckwheat flour, cornflour, potato starch, tapioca starch, rice flour, chickpea flour, and similar.
+  - id: leavening_family
+    food_group: pantry
+    label: Leavening family
+    description: >
+      Fresh yeast, dry yeast, baking powder, baking soda, and similar leavening agents. Usually pantry/background ingredients.
+  - id: bread_family
+    food_group: carbohydrate
+    label: Bread family
+    description: >
+      Baguette, country bread, sandwich bread, rye bread, sourdough, brioche, buns, panko, croutons, and similar bread products.
+  - id: prepared_sauce_family
+    food_group: condiment
+    label: Prepared sauce family
+    description: >
+      Mayonnaise, aioli, ketchup, Worcestershire sauce, prepared bechamel, demi-glace, and similar bought prepared sauces.
+  - id: salt_family
+    food_group: spice
+    label: Salt family
+    description: >
+      Fine salt, coarse salt, sea salt, fleur de sel, and similar salts. Usually pantry/background ingredient.
+  - id: pepper_spice_family
+    food_group: spice
+    label: Pepper spice family
+    description: >
+      Black pepper, white pepper, peppercorns, Sichuan pepper, and similar pepper spices. Use pepper_family for fresh peppers.
+  - id: vanilla_family
+    food_group: spice
+    label: Vanilla family
+    description: >
+      Vanilla pod, vanilla extract, vanilla sugar, and similar vanilla ingredients.
+  - id: chocolate_cocoa_family
+    food_group: sweetener
+    label: Chocolate and cocoa family
+    description: >
+      Cocoa powder, dark chocolate, milk chocolate, white chocolate, and similar baking chocolate products.
+  - id: prepared_composite_family
+    food_group: condiment
+    label: Prepared composite family
+    description: >
+      Prepared sofrito, romesco, tapenade, hummus, baba ganoush, mole paste, chutney, and similar composite products that can also be made from base ingredients.
+  - id: veal_family
+    food_group: meat
+    label: Veal family
+    description: >
+      Veal cuts and prepared veal products. Separate from beef when cuts and substitutions matter.
+  - id: game_poultry_family
+    food_group: meat
+    label: Game poultry family
+    description: >
+      Guinea fowl, quail, goose, and similar birds common in French or European cooking.
+  - id: specialty_animal_family
+    food_group: meat
+    label: Specialty animal family
+    description: >
+      Snails, frog legs, kid goat, goat meat, and other less common animal proteins.

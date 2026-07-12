@@ -7,6 +7,7 @@ from sqlalchemy import (
     Enum,
     ForeignKey,
     Integer,
+    JSON,
     Numeric,
     String,
     Text,
@@ -69,6 +70,13 @@ class Ingredient(Base):
     canonical_name: Mapped[str] = mapped_column(String(128), unique=True, index=True)
     display_name: Mapped[str] = mapped_column(String(128))
     category: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    food_group: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    storage_class: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    culinary_category: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    product_form: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    preservation: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    storage_after_opening: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    traits_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     default_unit_id: Mapped[int | None] = mapped_column(ForeignKey("units.id"), nullable=True)
     default_dimension: Mapped[UnitDimension | None] = mapped_column(
         Enum(UnitDimension, name="unit_dimension", create_type=False), nullable=True
@@ -151,6 +159,7 @@ class Dish(Base):
     __tablename__ = "dishes"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    public_key: Mapped[str] = mapped_column(String(32), unique=True, index=True)
     name: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     default_servings: Mapped[int | None] = mapped_column(Integer, nullable=True)
@@ -220,10 +229,15 @@ class DishSeasonality(Base):
 
 class Recipe(Base):
     __tablename__ = "recipes"
-    __table_args__ = (UniqueConstraint("dish_id", "variant_name", name="uq_recipes_dish_variant"),)
+    __table_args__ = (
+        UniqueConstraint("dish_id", "variant_name", name="uq_recipes_dish_variant"),
+        UniqueConstraint("dish_id", "sequence_number", name="uq_recipes_dish_sequence"),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     dish_id: Mapped[int] = mapped_column(ForeignKey("dishes.id", ondelete="CASCADE"), index=True)
+    public_key: Mapped[str] = mapped_column(String(36), unique=True, index=True)
+    sequence_number: Mapped[int] = mapped_column(Integer)
     variant_name: Mapped[str] = mapped_column(String(128))
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     recipe_type: Mapped[RecipeType] = mapped_column(
@@ -237,6 +251,7 @@ class Recipe(Base):
     prep_time_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
     cook_time_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
     difficulty: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    computed_traits_json: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(

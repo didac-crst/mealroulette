@@ -71,6 +71,7 @@ def load_dish_candidates(db: Session, *, rules: PlanningRulesConfig) -> list[Dis
                 carb_tags=frozenset(tag.name for tag in dish.tags if tag.family == "carb"),
                 style_tags=frozenset(tag.name for tag in dish.tags if tag.family == "style"),
                 vector=vector_result.weights,
+                computed_traits_json=main_recipe.computed_traits_json,
                 average_rating=ratings.get(dish.id),
                 seasonality_mode=seasonality.seasonality_mode if seasonality else SeasonalityMode.all_year,
                 preferred_months=frozenset(seasonality.preferred_months if seasonality else []),

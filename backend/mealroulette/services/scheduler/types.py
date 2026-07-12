@@ -21,6 +21,7 @@ class DishCandidate:
     preferred_months: frozenset[int]
     suitable_for_lunch: bool | None
     suitable_for_dinner: bool | None
+    computed_traits_json: dict | None = None
 
 
 @dataclass(frozen=True)

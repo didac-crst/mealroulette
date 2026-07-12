@@ -136,6 +136,24 @@ export function DishDetailPage() {
           <div>
             <h2>{dish.name}</h2>
             {dish.description ? <p>{dish.description}</p> : null}
+            <p className="muted">Public key: {dish.public_key}</p>
+            {dish.computed_traits_json ? (
+              <p className="muted">
+                Traits:{" "}
+                {[
+                  dish.computed_traits_json.vegan ? "vegan" : "not vegan",
+                  dish.computed_traits_json.carb_heavy ? "carb-heavy" : null,
+                  dish.computed_traits_json.dominant_protein
+                    ? `protein ${String(dish.computed_traits_json.dominant_protein)}`
+                    : null,
+                  dish.computed_traits_json.dominant_carb
+                    ? `carb ${String(dish.computed_traits_json.dominant_carb)}`
+                    : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
+            ) : null}
           </div>
         </div>
         <div className="row-actions">

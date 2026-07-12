@@ -25,6 +25,7 @@ class MealPlanItemPublic(BaseModel):
     skip_comment: str | None
     leftover_source_item_id: int | None
     selection_reasons_json: dict | None
+    computed_traits_json: dict | None = None
     review_saved_at: datetime | None
     created_at: datetime
     updated_at: datetime

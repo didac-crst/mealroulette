@@ -1,0 +1,83 @@
+version: 1
+name: MealRoulette canonical ingredient seed batch plan
+description: >
+  Proposed batching plan to grow the canonical ingredient taxonomy toward about 2,000 reviewed
+  ingredients for French and Spanish cuisine without pretending that generated conversions are
+  authoritative. New ingredient rows are appended to
+  backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml after each reviewed batch.
+
+batch_plan:
+  target_total_rows: 2000
+  principles:
+    - Add ingredients in reviewed batches by domain.
+    - Prefer correct canonical identity over aggressive aggregation.
+    - Keep aliases broad, but keep canonical ingredients precise.
+    - Mark approximate conversions as approved: false unless manually reviewed.
+    - Include negative guidance in descriptions for ambiguous families and ingredients.
+    - Preserve existing app compatibility: taxonomy enriches catalog data but does not replace weekly target tags yet.
+
+  batches:
+    - id: vegetables_fruits_core
+      target_rows: 250
+      priority: 1
+      notes: Common Spanish/French market produce, citrus, preserved vegetables, and regional pepper/tomato varieties.
+
+    - id: seafood_fish_core
+      target_rows: 180
+      priority: 1
+      notes: Spanish and French fish names need strong aliases because regional names vary.
+
+    - id: meat_charcuterie_core
+      target_rows: 220
+      priority: 1
+      notes: Include cuts and cured products. Avoid over-aggregating different cuts for shopping.
+
+    - id: grains_pasta_bread
+      target_rows: 180
+      priority: 1
+      notes: Rice and pasta varieties should be distinct ingredients but share families.
+
+    - id: cheese_dairy_core
+      target_rows: 250
+      priority: 2
+      notes: French and Spanish cheeses need families by cheese type, not one giant cheese family.
+
+    - id: legumes_nuts_seeds
+      target_rows: 160
+      priority: 2
+      notes: Dry/canned variants may need separate canonical ingredients where shopping units differ.
+
+    - id: oils_condiments_sauces
+      target_rows: 220
+      priority: 2
+      notes: Many should be pantry_item true and excluded from recipe trait percentages.
+
+    - id: spices_herbs
+      target_rows: 220
+      priority: 2
+      notes: Usually pantry_item true; conversions mostly low confidence.
+
+    - id: stocks_alcohol_preserves
+      target_rows: 160
+      priority: 3
+      notes: Useful for shopping, but most should not dominate scheduler traits.
+
+    - id: regional_specialties
+      target_rows: 160
+      priority: 3
+      notes: Add French/Spanish products like ñora, piquillo, espelette, duck confit, boudin, sobrasada, and botifarra.
+
+    - id: europe_common_asian_staples
+      target_rows: 220
+      priority: 2
+      notes: >
+        Asian ingredients commonly available in European supermarkets and used in European home cooking:
+        soy sauce, miso, tofu, tempeh, rice noodles, ramen, udon, curry pastes, coconut milk, fish sauce,
+        oyster sauce, hoisin, sriracha, gochujang, sesame oil, ginger, lemongrass, nori, wakame, shiitake.
+        Descriptions and aliases are especially important because LLMs may confuse sauces, pastes, noodles,
+        and proteins across cuisines.
+
+    - id: validation_alias_cleanup
+      target_rows: 0
+      priority: 4
+      notes: Non-row batch. Review duplicate aliases, ambiguous names, locale conflicts, and over-broad fuzzy matches.

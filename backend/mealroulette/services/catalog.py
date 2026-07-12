@@ -1,4 +1,3 @@
-import re
 from decimal import Decimal
 
 from fastapi import HTTPException, status
@@ -19,6 +18,12 @@ from mealroulette.models.catalog import (
     Unit,
 )
 from mealroulette.models.enums import AggregationStrategy, ConversionSource, DishStatus, RecipeType, SeasonalityMode, SeasonalityStrength
+from mealroulette.services.food_groups import food_group_for_ingredient
+from mealroulette.services.ingredient_resolver import IngredientResolverService
+from mealroulette.services.names import normalize_name
+from mealroulette.services.public_keys import generate_dish_public_key, generate_recipe_public_key
+from mealroulette.services.recipe_traits import refresh_recipe_traits, refresh_recipes_for_ingredient
+from mealroulette.services.scheduler.catalog import load_reference_units
 from mealroulette.schemas.catalog import (
     DishCreateRequest,
     DishPublic,
@@ -49,10 +54,6 @@ from mealroulette.schemas.catalog import (
     TagPublic,
     TagUpdateRequest,
 )
-
-
-def normalize_name(value: str) -> str:
-    return re.sub(r"\s+", " ", value.strip().lower())
 
 
 class CatalogService:
@@ -89,11 +90,46 @@ class CatalogService:
             return None
         return any(recipe.recipe_type == RecipeType.thermomix or recipe.is_thermomix for recipe in recipes)
 
+    def _generate_unique_dish_public_key(self, name: str) -> str:
+        for _ in range(20):
+            public_key = generate_dish_public_key(name)
+            if self.db.scalar(select(Dish.id).where(Dish.public_key == public_key)) is None:
+                return public_key
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Could not generate unique dish public key",
+        )
+
+    def _next_recipe_sequence_number(self, dish_id: int) -> int:
+        current = self.db.scalar(select(func.max(Recipe.sequence_number)).where(Recipe.dish_id == dish_id))
+        return int(current or 0) + 1
+
+    @staticmethod
+    def _recipe_public_key(dish: Dish, sequence_number: int) -> str:
+        return generate_recipe_public_key(dish.public_key, sequence_number)
+
+    def _reference_units(self):
+        return load_reference_units(self.db)
+
+    def _refresh_recipe_traits(self, recipe: Recipe) -> None:
+        gram_unit, ml_unit = self._reference_units()
+        refresh_recipe_traits(self.db, recipe, gram_unit=gram_unit, ml_unit=ml_unit)
+
+    def _refresh_recipes_for_ingredient(self, ingredient_id: int) -> None:
+        gram_unit, ml_unit = self._reference_units()
+        refresh_recipes_for_ingredient(
+            self.db,
+            ingredient_id,
+            gram_unit=gram_unit,
+            ml_unit=ml_unit,
+        )
+
     @classmethod
     def to_dish_public(cls, dish: Dish) -> DishPublic:
         main_recipe = cls._main_recipe(dish)
         return DishPublic(
             id=dish.id,
+            public_key=dish.public_key,
             name=dish.name,
             description=dish.description,
             default_servings=dish.default_servings,
@@ -115,6 +151,7 @@ class CatalogService:
             created_at=dish.created_at,
             updated_at=dish.updated_at,
             tag_ids=[tag.id for tag in dish.tags],
+            computed_traits_json=main_recipe.computed_traits_json if main_recipe else None,
             seasonality=SeasonalityPublic.model_validate(dish.seasonality) if dish.seasonality else None,
         )
 
@@ -248,41 +285,34 @@ class CatalogService:
         return ingredient
 
     def resolve_ingredient(self, proposed_name: str) -> IngredientResolveResponse:
-        normalized = normalize_name(proposed_name)
-        alias = self.db.scalar(
-            select(IngredientAlias)
-            .options(selectinload(IngredientAlias.ingredient))
-            .where(func.lower(IngredientAlias.alias) == normalized)
-        )
-        if alias is not None:
-            return IngredientResolveResponse(
-                status="exact",
-                ingredient=self.to_ingredient_public(alias.ingredient),
+        raw = IngredientResolverService(self.db).resolve(proposed_name)
+        ingredient = None
+        if raw.get("ingredient"):
+            canonical = raw["ingredient"]["canonical_name"]
+            db_ingredient = self.db.scalar(
+                select(Ingredient).where(func.lower(Ingredient.canonical_name) == normalize_name(canonical))
             )
+            if db_ingredient is not None:
+                ingredient = self.to_ingredient_public(db_ingredient)
 
-        exact = self.db.scalar(select(Ingredient).where(func.lower(Ingredient.canonical_name) == normalized))
-        if exact is not None:
-            return IngredientResolveResponse(status="exact", ingredient=self.to_ingredient_public(exact))
-
-        pattern = f"%{normalized}%"
-        suggestions = list(
-            self.db.scalars(
-                select(Ingredient)
-                .where(
-                    or_(
-                        func.lower(Ingredient.canonical_name).like(pattern),
-                        func.lower(Ingredient.display_name).like(pattern),
-                    )
+        suggestions: list[IngredientPublic] = []
+        for item in raw.get("suggestions") or []:
+            db_ingredient = self.db.scalar(
+                select(Ingredient).where(
+                    func.lower(Ingredient.canonical_name) == normalize_name(item["canonical_name"])
                 )
-                .limit(10)
             )
+            if db_ingredient is not None:
+                suggestions.append(self.to_ingredient_public(db_ingredient))
+
+        return IngredientResolveResponse(
+            status=raw["status"],
+            query=raw.get("query"),
+            matched_on=raw.get("matched_on"),
+            matched_value=raw.get("matched_value"),
+            ingredient=ingredient,
+            suggestions=suggestions,
         )
-        if suggestions:
-            return IngredientResolveResponse(
-                status="suggestions",
-                suggestions=[self.to_ingredient_public(item) for item in suggestions],
-            )
-        return IngredientResolveResponse(status="none")
 
     def confirm_ingredient(
         self,
@@ -303,6 +333,7 @@ class CatalogService:
                 canonical_name=normalized,
                 display_name=display_name or proposed_name.strip(),
                 category=category,
+                food_group=food_group_for_ingredient(food_group=None, category=category, family=None),
                 default_unit_id=default_unit_id,
             )
             self.db.add(ingredient)
@@ -333,6 +364,12 @@ class CatalogService:
             canonical_name=canonical,
             display_name=payload.display_name,
             category=payload.category,
+            food_group=payload.food_group
+            or food_group_for_ingredient(
+                food_group=None,
+                category=payload.category,
+                family=payload.family,
+            ),
             family=payload.family,
             default_unit_id=payload.default_unit_id,
             default_dimension=payload.default_dimension,
@@ -355,10 +392,21 @@ class CatalogService:
 
     def update_ingredient(self, ingredient_id: int, payload: IngredientUpdateRequest) -> Ingredient:
         ingredient = self.get_ingredient(ingredient_id)
-        for field, value in payload.model_dump(exclude_unset=True).items():
+        updates = payload.model_dump(exclude_unset=True)
+        trait_fields = {"category", "food_group", "family", "pantry_item"}
+        for field, value in updates.items():
             setattr(ingredient, field, value)
+        if "category" in updates or "food_group" in updates:
+            ingredient.food_group = food_group_for_ingredient(
+                food_group=ingredient.food_group,
+                category=ingredient.category,
+                family=ingredient.family,
+            )
         self.db.commit()
         self.db.refresh(ingredient)
+        if trait_fields.intersection(updates.keys()):
+            self._refresh_recipes_for_ingredient(ingredient.id)
+            self.db.commit()
         return ingredient
 
     def delete_ingredient(self, ingredient_id: int) -> None:
@@ -462,6 +510,9 @@ class CatalogService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to load conversion after create",
             )
+        if loaded.approved:
+            self._refresh_recipes_for_ingredient(loaded.ingredient_id)
+            self.db.commit()
         return loaded
 
     def update_conversion(
@@ -487,13 +538,19 @@ class CatalogService:
             self.db.rollback()
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Conversion already exists") from None
         self.db.refresh(conversion)
+        if {"factor", "approved"}.intersection(payload.model_dump(exclude_unset=True).keys()):
+            self._refresh_recipes_for_ingredient(conversion.ingredient_id)
+            self.db.commit()
         return conversion
 
     def delete_conversion(self, conversion_id: int) -> None:
         conversion = self.db.get(IngredientUnitConversion, conversion_id)
         if conversion is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversion not found")
+        ingredient_id = conversion.ingredient_id
         self.db.delete(conversion)
+        self.db.commit()
+        self._refresh_recipes_for_ingredient(ingredient_id)
         self.db.commit()
 
     def _apply_tags(self, dish: Dish, tag_ids: list[int]) -> None:
@@ -543,6 +600,7 @@ class CatalogService:
         if self.db.scalar(select(Dish).where(Dish.name == payload.name)):
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Dish already exists")
         dish = Dish(
+            public_key=self._generate_unique_dish_public_key(payload.name),
             name=payload.name,
             description=payload.description,
             default_servings=payload.default_servings,
@@ -619,9 +677,19 @@ class CatalogService:
                 existing.is_main = False
         data = payload.model_dump(exclude={"is_thermomix", "is_main"})
         recipe_type = self._resolve_recipe_type(payload.recipe_type, payload.is_thermomix)
-        recipe = Recipe(dish_id=dish_id, is_main=is_main, **data)
+        sequence_number = self._next_recipe_sequence_number(dish_id)
+        recipe = Recipe(
+            dish_id=dish_id,
+            public_key=self._recipe_public_key(dish, sequence_number),
+            sequence_number=sequence_number,
+            is_main=is_main,
+            computed_traits_json={},
+            **data,
+        )
         self._apply_recipe_type(recipe, recipe_type)
         self.db.add(recipe)
+        self.db.flush()
+        self._refresh_recipe_traits(recipe)
         self.db.commit()
         self.db.refresh(recipe)
         return recipe
@@ -742,6 +810,8 @@ class CatalogService:
             notes=payload.notes,
         )
         self.db.add(item)
+        self.db.flush()
+        self._refresh_recipe_traits(self.get_recipe(recipe_id))
         self.db.commit()
         self.db.refresh(item)
         return item
@@ -754,6 +824,7 @@ class CatalogService:
             self.get_unit(payload.unit_id)
         for field, value in payload.model_dump(exclude_unset=True).items():
             setattr(item, field, value)
+        self._refresh_recipe_traits(self.get_recipe(item.recipe_id))
         self.db.commit()
         self.db.refresh(item)
         return item
@@ -762,5 +833,8 @@ class CatalogService:
         item = self.db.get(RecipeIngredient, item_id)
         if item is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recipe ingredient not found")
+        recipe = self.get_recipe(item.recipe_id)
         self.db.delete(item)
+        self.db.flush()
+        self._refresh_recipe_traits(recipe)
         self.db.commit()

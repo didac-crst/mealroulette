@@ -17,6 +17,7 @@ def _candidate(dish_id: int, vector: dict[str, float]) -> DishCandidate:
         carb_tags=frozenset(),
         style_tags=frozenset(),
         vector=vector,
+        computed_traits_json=None,
         average_rating=None,
         seasonality_mode=SeasonalityMode.all_year,
         preferred_months=frozenset(),

@@ -139,6 +139,16 @@ The default commit hook should fail if tests fail. Lint/format hooks may run in 
 
 ## Implementation Phases
 
+Phases 0–8 shipped through **`v0.5.0`**. **Phase 9** (computed traits, **`v0.6.0`**) is **implementation complete** on `phase-9/computed-recipe-traits` (pending merge and release tag). Phases 10–13 cover cooking mode, backup, LLM/localization, and v1 hardening.
+
+| Phase | Name | Target version |
+| --- | --- | --- |
+| 9 | Computed recipe traits & catalog keys | v0.6 |
+| 10 | Cooking mode | v1.0 |
+| 11 | Backup, export, and import | v1.0 |
+| 12 | LLM-assisted entry & localization | v0.7 |
+| 13 | v1 hardening | v1.0 |
+
 ### Phase 0 - Project Bootstrap
 
 Deliverables:
@@ -324,7 +334,7 @@ Implementation notes (v0.2):
 
 **Prerequisite tooling (done on this branch):**
 
-- YAML dish fixture import (`import_sample_dishes`) loads `data/fixtures/sample_dishes.yaml` for realistic catalog data during development. Idempotent by dish name. Not the Phase 10 JSON backup format.
+- YAML dish fixture import (`import_sample_dishes`) loads `data/fixtures/sample_dishes.yaml` for realistic catalog data during development. Idempotent by dish name. Not the Phase 11 JSON backup format.
 - YAML ingredient seed import (`import_ingredient_seed`) loads `data/fixtures/mealroulette_ingredients_seed.yaml` — canonical ingredients, aliases, units, and unit conversions. Idempotent; bootstrap-approves medium-or-better conversions for `allow_approximate_conversion` ingredients unless `approved: false` is set explicitly. Replaces the legacy `reference/ingredient_conversions.yaml` file (now deprecated).
 
 **Recommended bootstrap order** (after `alembic upgrade head`):
@@ -356,7 +366,7 @@ Acceptance criteria:
 - Shopping items show which planned meals require them.
 - Admins can review and approve conversion suggestions from the ingredient dashboard.
 
-**Deferred to Phase 11:** multilingual content translations — design in [LOCALIZATION.md](LOCALIZATION.md).
+**Deferred to Phase 12:** multilingual content translations — design in [LOCALIZATION.md](LOCALIZATION.md).
 
 Implementation notes (v0.3):
 
@@ -365,7 +375,7 @@ Implementation notes (v0.3):
 - `services/quantities`: strategy-aware aggregation; approved conversions only for cross-dimension merge.
 - Ingredient seed: `import_ingredient_seed` + `mealroulette_ingredients_seed.yaml`.
 - Frontend: `/shopping` (List tab), `/ingredients` admin catalog and edit.
-- Localization design documented; implementation deferred to Phase 11.
+- Localization design documented; implementation deferred to Phase 12.
 
 ### Later — Leftover inventory (after shopping lists)
 
@@ -479,7 +489,7 @@ Acceptance criteria:
 
 ### Phase 8 - Explainable Scheduler
 
-**Status:** Complete on branch `phase-8/scheduler` (v0.5.0, PR #8) — pending merge approval.
+**Status:** Done — shipped as [`v0.5.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.5.0) (PR #8).
 
 #### Product behaviour
 
@@ -570,7 +580,222 @@ Acceptance criteria (summary):
 - Each automatic item stores human-readable selection reasons.
 - Reroll replaces only the selected item (today/future).
 
-### Phase 9 - Cooking Mode
+### Phase 9 - Computed Recipe Traits & Catalog Keys
+
+**Status:** Implementation complete on branch `phase-9/computed-recipe-traits`. Target release: **`v0.6.0`** (pending merge and tag).
+
+**Goal:** Add stable public keys, ingredient food groups, and computed recipe traits while keeping v0.5 behaviour intact — especially weekly target settings, scheduler generation/reroll, dish catalog, recipe variants, shopping list, planning UI, and Telegram planning output.
+
+**Compatibility strategy (additive first):**
+
+- Keep dish tags (`tags`, `dish_tags`, tag editor, `DishCandidate.tag_names`, protein/carb/style tag sets).
+- Keep weekly target matching on **dish tags** in the first implementation pass (`dish_matches_weekly_target` unchanged except optional tested fallback later).
+- Computed traits are metadata for display, filtering, and future scheduler migration — not a replacement for tags yet.
+- Shopping list aggregation semantics unchanged.
+- Telegram planning output unchanged (traits in messages = separate future feature).
+
+**Reference:** detailed compatibility rules and JSON shapes will live in `docs/COMPUTED_TRAITS.md` (commit slice 1).
+
+#### Public keys
+
+Keep integer primary keys internally. Add unique public key columns.
+
+Constants:
+
+```text
+DISH_PUBLIC_KEY_LENGTH = 32
+DISH_PUBLIC_KEY_MAX_SLUG_LENGTH = 20
+DISH_PUBLIC_KEY_MIN_RANDOM_LENGTH = 8
+RECIPE_SEQUENCE_WIDTH = 3
+```
+
+- **Dish:** `<slug>-<random_suffix>` — total length 32; slug max 20; random suffix fills remainder (min 8); generated once; **does not change when dish name changes**; globally unique.
+- **Recipe:** `<dish_public_key>-001` — sequence width 3; unique per dish; total length 36.
+- Random alphabet: `0123456789abcdefghjkmnpqrstvwxyz`
+
+#### Ingredient food groups
+
+Add `ingredients.food_group` with controlled vocabulary:
+
+```text
+vegetable, carbohydrate, meat, fish, seafood, egg, dairy, cheese, legume,
+plant_protein, fat, condiment, herb, spice, stock, fruit, fungus, alcohol,
+pantry, other
+```
+
+Centralize category→food-group mapping in one backend module. Unknown category → `other` unless explicit `food_group` is set.
+
+Initial category mapping:
+
+```text
+vegetable -> vegetable
+grain -> carbohydrate
+pasta -> carbohydrate
+bread -> carbohydrate
+pastry -> carbohydrate
+potato -> carbohydrate
+meat -> meat
+fish -> fish
+seafood -> seafood
+egg -> egg
+dairy -> dairy
+cheese -> cheese
+legume -> legume
+plant_protein -> plant_protein
+fruit -> fruit
+fungus -> fungus
+condiment -> condiment
+herb -> herb
+spice -> spice
+stock -> stock
+alcohol -> alcohol
+pantry -> pantry
+canned -> pantry
+frozen -> other
+preserved -> pantry
+```
+
+Explicit `food_group` on an ingredient overrides category inference.
+
+#### Computed recipe traits
+
+Store on `recipes.computed_traits_json`. Example shape:
+
+```json
+{
+  "family_vector": { "rice_family": 62.5, "chicken_family": 37.5 },
+  "food_group_weights": { "carbohydrate": 62.5, "meat": 37.5 },
+  "contains_food_groups": ["carbohydrate", "meat"],
+  "contains_meat": true,
+  "vegan": false,
+  "carb_heavy": true,
+  "dominant_carb": "rice_family",
+  "dominant_protein": "chicken_family"
+}
+```
+
+Rules (Phase 9):
+
+- Exclude `pantry_item=true` ingredients from percentage-based vectors and traits.
+- `vegan=false` if any non-pantry ingredient has food group in `{meat, fish, seafood, egg, dairy, cheese}`.
+- `contains_meat=true` only for food group `meat` (fish/seafood are not meat).
+- `carb_heavy=true` when carbohydrate percentage ≥ **33.0** (`CARB_HEAVY_THRESHOLD_PCT`, hard-coded).
+- `dominant_carb` = highest-weight family among carbohydrate ingredients.
+- `dominant_protein` = highest-weight family among `{meat, fish, seafood, egg, dairy, cheese, legume, plant_protein}`.
+
+Do **not** infer style tags such as `soup` from ingredients in Phase 9.
+
+#### Effective traits (read model)
+
+- **Dish** `computed_traits_json` = main recipe traits.
+- **Meal plan item** `computed_traits_json` = selected recipe traits if `recipe_id` set, else dish main recipe traits (display/filter metadata only; assignment semantics unchanged).
+
+#### Trait refresh
+
+Refresh recipe traits when:
+
+- recipe ingredient is added, updated, or deleted;
+- ingredient `category`, `food_group`, `family`, or `pantry_item` changes;
+- approved unit conversion relevant to recipe quantities changes.
+
+Prefer explicit service-level refresh over hidden ORM events unless the repo already establishes that pattern.
+
+#### Scheduler integration (parallel only)
+
+Add `DishCandidate.computed_traits_json` from main recipe traits. Do **not** change weekly target matching in the first pass. Optional later step: tag-first matching with explicit computed-trait fallback and mapping tests (`fish`→seafood food group, `pasta`/`rice`→dominant/family vector, `soup` stays tag/style-based).
+
+#### Migration plan
+
+New Alembic revision after current latest:
+
+1. Add nullable columns: `ingredients.food_group`, `dishes.public_key`, `recipes.public_key`, `recipes.sequence_number`, `recipes.computed_traits_json`.
+2. Backfill food groups from category mapping.
+3. Backfill dish public keys and recipe sequence numbers (main recipe first if present, then remaining recipes by recipe id).
+4. Backfill recipe public keys.
+5. Compute recipe traits.
+6. Enforce NOT NULL + unique indexes on public keys and per-dish sequence.
+
+#### API exposure
+
+Add fields:
+
+- `IngredientPublic.food_group` (+ create/update requests)
+- `DishPublic.public_key`, `DishPublic.computed_traits_json`
+- `RecipePublic.public_key`, `RecipePublic.sequence_number`, `RecipePublic.computed_traits_json`
+- `MealPlanItemPublic.computed_traits_json`
+
+#### Frontend scope (minimal)
+
+- Update TypeScript API types.
+- Ingredient editor: food group field.
+- Show computed traits only where useful and non-disruptive.
+- Preserve weekly targets settings UI (`/settings/targets`) and tag editor.
+
+#### Test requirements
+
+Backend:
+
+- public key generation (length, uniqueness, stability after dish rename);
+- recipe sequence and public key generation per dish;
+- ingredient food-group mapping from category and explicit override;
+- recipe computed traits (meat, vegan, carb-heavy, dominant carb, dominant protein);
+- dish inherits main recipe traits; meal-plan item uses selected recipe traits;
+- migration/backfill behaviour;
+- **existing scheduler and weekly-target tests still pass**.
+
+Frontend:
+
+- typecheck and build;
+- weekly target add/remove/save still works (`/settings/targets`).
+
+#### Out of scope for initial pass
+
+Do **not** in Phase 9 unless explicitly approved later:
+
+- delete dish tags or remove the tag editor;
+- replace weekly target matching wholesale (optional tag-first fallback only with explicit tests);
+- replace integer primary keys;
+- redesign scheduler UX;
+- make trait thresholds configurable (`CARB_HEAVY_THRESHOLD_PCT` stays hard-coded at 33.0);
+- infer style tags such as `soup` from ingredients;
+- alter shopping-list aggregation semantics;
+- require computed traits for Telegram message formatting.
+
+#### Deliverables
+
+- `docs/COMPUTED_TRAITS.md` — full spec and compatibility statement ✅
+- `docs/TAXONOMY_AND_RESOLVER.md` — taxonomy and resolver spec ✅
+- Migration `022_computed_traits` + backfill + trait computation services ✅
+- Public key generation + tests ✅
+- Ingredient food groups + category mapping ✅
+- Ingredient resolver + taxonomy browsing APIs ✅
+- API and frontend exposure (catalog, planning, taxonomy navigator) ✅
+- Scheduler candidate field (tags unchanged) ✅
+- Release notes `docs/releases/v0.6.0.md` ✅ (draft)
+
+#### Acceptance criteria
+
+- Public keys stable after dish rename; unique; correct lengths.
+- Recipe sequences and public keys correct per dish.
+- Trait computation correct for representative meat, vegan, carb-heavy, dominant carb/protein cases.
+- Dish and meal-plan item expose effective traits as specified.
+- **All existing scheduler and weekly-target tests still pass.**
+- Weekly targets presets (`fish`, `meat`, `vegetarian`, `pasta`, `rice`, `soup`) still match via tags.
+- Shopping list behaviour unchanged.
+- `cd backend && python3.12 -m pytest`, `cd frontend && npm test -- --run`, `npm run build` green.
+
+#### Suggested commit slices
+
+1. Document Phase 9 spec (`docs/COMPUTED_TRAITS.md`)
+2. Add stable public keys for dishes and recipes
+3. Add ingredient food groups
+4. Compute and store recipe traits + refresh hooks
+5. Expose effective dish and meal-plan traits
+6. Add computed traits to scheduler candidates (no tag-target replacement)
+7. Update frontend types and minimal trait display
+8. Update imports, seeds, docs, tests, release notes
+
+### Phase 10 - Cooking Mode
 
 Deliverables:
 
@@ -586,7 +811,7 @@ Acceptance criteria:
 - User can cook a recipe from a phone without editing data.
 - Timers can be started from steps that define timer metadata.
 
-### Phase 10 - Backup, Export, and Import
+### Phase 11 - Backup, Export, and Import
 
 Deliverables:
 
@@ -605,7 +830,7 @@ Acceptance criteria:
 - Backup files are written under `/backups`.
 - Old backups are removed according to retention settings.
 
-### Phase 11 - LLM-Assisted Entry & Localization
+### Phase 12 - LLM-Assisted Entry & Localization
 
 **Status:** Not started. Design spec: [LOCALIZATION.md](LOCALIZATION.md).
 
@@ -636,7 +861,7 @@ Acceptance criteria:
 - Recipe step translation preserves quantities, times, temperatures, units, and appliance terms.
 - Ingredient display translations remain separate from search aliases.
 
-### Phase 12 - v1 Hardening
+### Phase 13 - v1 Hardening
 
 Deliverables:
 

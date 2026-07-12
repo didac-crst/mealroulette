@@ -110,6 +110,23 @@ export function RecipeDetailPage() {
             {recipe.is_main ? <span className="muted"> · Main recipe</span> : null}
           </h2>
           {recipe.description ? <p>{recipe.description}</p> : null}
+          <p className="muted">
+            Key: {recipe.public_key} · Sequence {recipe.sequence_number}
+          </p>
+          {recipe.computed_traits_json ? (
+            <p className="muted">
+              Traits:{" "}
+              {[
+                recipe.computed_traits_json.vegan ? "vegan" : "not vegan",
+                recipe.computed_traits_json.carb_heavy ? "carb-heavy" : null,
+                recipe.computed_traits_json.dominant_protein
+                  ? `protein ${String(recipe.computed_traits_json.dominant_protein)}`
+                  : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+          ) : null}
         </div>
         <div className="row-actions">
           <ButtonLink to={`/dishes/${dish.id}`} variant="secondary">

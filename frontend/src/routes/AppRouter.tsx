@@ -8,6 +8,7 @@ import { DishEditPage } from "../features/dishes/DishEditPage";
 import { DishListPage } from "../features/dishes/DishListPage";
 import { RecipeDetailPage } from "../features/dishes/RecipeDetailPage";
 import { RecipeEditPage } from "../features/dishes/RecipeEditPage";
+import { IngredientTaxonomyPage } from "../features/ingredients/IngredientTaxonomyPage";
 import { IngredientDetailPage } from "../features/ingredients/IngredientDetailPage";
 import { IngredientEditPage } from "../features/ingredients/IngredientEditPage";
 import { IngredientListPage } from "../features/ingredients/IngredientListPage";
@@ -40,6 +41,7 @@ export function AppRouter() {
               <Route path="dishes/:dishId/recipes/:recipeId" element={<RecipeDetailPage />} />
               <Route path="dishes/:dishId/recipes/:recipeId/edit" element={<RecipeEditPage />} />
               <Route path="ingredients" element={<IngredientListPage />} />
+              <Route path="ingredients/taxonomy" element={<IngredientTaxonomyPage />} />
               <Route path="ingredients/new" element={<IngredientEditPage />} />
               <Route path="ingredients/:ingredientId" element={<IngredientDetailPage />} />
               <Route path="ingredients/:ingredientId/edit" element={<IngredientEditPage />} />

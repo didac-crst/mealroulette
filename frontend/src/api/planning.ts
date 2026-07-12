@@ -19,6 +19,7 @@ export type MealPlanItem = {
   skip_comment: string | null;
   leftover_source_item_id: number | null;
   selection_reasons_json: Record<string, unknown> | null;
+  computed_traits_json: Record<string, unknown> | null;
   review_saved_at: string | null;
   created_at: string;
   updated_at: string;

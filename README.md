@@ -122,7 +122,7 @@ alembic upgrade head
 python -m mealroulette.commands.seed_reference_data
 ```
 
-Reference data lives in `backend/mealroulette/data/reference/` (`units.yaml`, `tags.yaml`). Ingredient unit conversions are defined in `backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml` (the legacy `reference/ingredient_conversions.yaml` is deprecated). The loaders are idempotent: re-running them only inserts missing rows, so it is safe after upgrades or when adding new defaults to the YAML files.
+Reference data lives in `backend/mealroulette/data/reference/` (`units.yaml`, `tags.yaml`). Ingredient taxonomy (food groups and families) lives in `backend/mealroulette/data/taxonomy/`. The canonical ingredient seed is `backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml` (aliases, units, conversions; validated against taxonomy on import). The legacy `reference/ingredient_conversions.yaml` is deprecated. Loaders are idempotent: re-running them only inserts missing rows.
 
 Unit compatibility and aggregation rules (when to merge g + kg, when to keep "2 onions" and "200 g onion" separate, when to use approved ingredient conversions) live in `mealroulette.services.quantities`. Shopping lists and exports must use that module — see SPECS §9.
 
@@ -150,7 +150,9 @@ python -m mealroulette.commands.import_ingredient_seed
 python -m mealroulette.commands.import_sample_dishes
 ```
 
-**Ingredient seed:** `backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml`. Use `--no-bootstrap-approve` to import conversion suggestions without auto-approving them for shopping aggregation.
+**Ingredient seed:** `backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml`. Families and food groups are defined in `backend/mealroulette/data/taxonomy/` (not embedded in the seed file). Use `--no-bootstrap-approve` to import conversion suggestions without auto-approving them for shopping aggregation.
+
+**Taxonomy proposals** (627-candidate MVP expansion — not imported until promoted): `backend/mealroulette/data/taxonomy/proposals/`. Validate with `make validate-taxonomy`; see [docs/taxonomy/README.md](docs/taxonomy/README.md).
 
 **Dish fixtures:** `backend/mealroulette/data/fixtures/sample_dishes.yaml` (inside the container: `/app/mealroulette/data/fixtures/sample_dishes.yaml`). Use `--file` only with a path that exists **inside the container**, or omit `--file` for the default. After editing fixtures locally, rebuild the API image: `docker compose up -d --build api`.
 
