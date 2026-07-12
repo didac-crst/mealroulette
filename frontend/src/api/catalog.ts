@@ -314,7 +314,12 @@ export async function fetchRecipeSteps(token: string, recipeId: number): Promise
 export async function createRecipeStep(
   token: string,
   recipeId: number,
-  payload: { step_number: number; instruction: string },
+  payload: {
+    step_number: number;
+    instruction: string;
+    timer_seconds?: number | null;
+    duration_seconds?: number | null;
+  },
 ): Promise<RecipeStep> {
   return apiRequest<RecipeStep>(`/api/recipes/${recipeId}/steps`, {
     method: "POST",
@@ -326,7 +331,12 @@ export async function createRecipeStep(
 export async function updateRecipeStep(
   token: string,
   stepId: number,
-  payload: { step_number?: number; instruction?: string },
+  payload: {
+    step_number?: number;
+    instruction?: string;
+    timer_seconds?: number | null;
+    duration_seconds?: number | null;
+  },
 ): Promise<RecipeStep> {
   return apiRequest<RecipeStep>(`/api/recipe-steps/${stepId}`, {
     method: "PUT",

@@ -94,6 +94,27 @@ export function todayAndTomorrowItems(items: MealPlanItem[]): MealPlanItem[] {
   return sortMealItems(items.filter((item) => item.date === today || item.date === tomorrow));
 }
 
+export function itemsForDate(items: MealPlanItem[], isoDate: string): MealPlanItem[] {
+  return sortMealItems(items.filter((item) => item.date === isoDate));
+}
+
+export type TodayMealSlot = {
+  meal_slot: MealSlot;
+  item: MealPlanItem | null;
+};
+
+export function todayMealSlots(items: MealPlanItem[], isoDate: string): TodayMealSlot[] {
+  const dayItems = items.filter((item) => item.date === isoDate);
+  return (["lunch", "dinner"] as const).map((meal_slot) => ({
+    meal_slot,
+    item: dayItems.find((item) => item.meal_slot === meal_slot) ?? null,
+  }));
+}
+
+export function countNeedsReviewForDate(items: MealPlanItem[], isoDate: string): number {
+  return itemsForDate(items, isoDate).filter(needsReview).length;
+}
+
 export type ReviewFilter = "needs_review" | "all";
 
 export function isExecutionComplete(status: MealPlanItemStatus): boolean {

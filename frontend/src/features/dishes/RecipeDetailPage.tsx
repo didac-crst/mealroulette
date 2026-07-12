@@ -26,6 +26,7 @@ import {
   formatRecipeTime,
 } from "./effectiveValues";
 import { formatComputedTraits } from "./computedTraits";
+import { formatStepTimerLabel, stepTimerDurationSeconds } from "./recipeCooking";
 
 export function RecipeDetailPage() {
   const { dishId, recipeId } = useParams();
@@ -119,6 +120,7 @@ export function RecipeDetailPage() {
           ) : null}
         </div>
         <div className="row-actions">
+          <ButtonLink to={`/recipes/${recipe.id}/cook`}>Cook</ButtonLink>
           <ButtonLink to={`/dishes/${dish.id}`} variant="secondary">
             Back to dish
           </ButtonLink>
@@ -181,11 +183,15 @@ export function RecipeDetailPage() {
           <p className="muted">No steps yet.</p>
         ) : (
           <ol className="editable-list">
-            {steps.map((step) => (
+            {steps.map((step) => {
+              const timerSeconds = stepTimerDurationSeconds(step);
+              return (
               <li key={step.id}>
                 {step.step_number}. {step.instruction}
+                {timerSeconds ? <span className="muted"> · {formatStepTimerLabel(timerSeconds)}</span> : null}
               </li>
-            ))}
+            );
+            })}
           </ol>
         )}
       </div>

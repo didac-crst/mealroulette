@@ -33,15 +33,18 @@ dishes:
     steps:
     - step_number: 1
       instruction: Clean and slice the mushrooms, then saute them with minced garlic, butter, parsley, salt, and pepper until tender.
+      timer_seconds: 480
     - step_number: 2
       instruction: Warm the vegetable stock in a saucepan and keep it at a gentle simmer.
     - step_number: 3
       instruction: Soften the onion in olive oil, add the arborio rice, and stir for 2 minutes until the grains look slightly translucent.
+      timer_seconds: 120
     - step_number: 4
       instruction: Add white wine and let it absorb, then add hot stock one ladle at a time, stirring until the rice is creamy and just tender.
       timer_seconds: 1200
     - step_number: 5
       instruction: Fold in the mushrooms, cream, and parmesan, rest for 2 minutes, then serve hot.
+      timer_seconds: 120
     ingredients:
     - name: arborio rice
       quantity: 250
@@ -2090,3 +2093,36 @@ dishes:
     - name: coriander
       quantity: 1
       unit: bunch
+- name: Timer Test Dish
+  description: Dummy recipe for testing cooking timers and Telegram alerts (10 second step).
+  course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: false
+  freezer_friendly: false
+  kids_friendly: true
+  tags:
+  - protein: cheese_dairy
+  - style: stew
+  - temperature: hot
+  seasonality:
+    seasonality_mode: all_year
+    preferred_months: []
+  recipes:
+  - variant_name: Quick test
+    is_main: true
+    recipe_type: standard
+    servings: 1
+    prep_time_minutes: 0
+    cook_time_minutes: 1
+    difficulty: easy
+    description: Start the timer and wait 10 seconds to test Telegram cooking alerts.
+    source_url:
+    notes: For development testing only.
+    steps:
+    - step_number: 1
+      instruction: Wait ten seconds. When the timer finishes, subscribed Telegram chats should receive an alert.
+      timer_seconds: 10
+    ingredients: []

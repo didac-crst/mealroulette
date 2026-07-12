@@ -15,9 +15,9 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**v0.6 shipped** — stable public keys, ingredient food groups, computed recipe traits, taxonomy APIs, ingredient resolver, and taxonomy navigator UI.
+**Phase 10 — Cooking mode** — PR [#10](https://github.com/didac-crst/mealroulette/pull/10) open on `phase-10/cooking-mode` (from `main` after `v0.6.0`).
 
-See [CURSOR_ROADMAP.md § Phase 9](CURSOR_ROADMAP.md#phase-9---computed-recipe-traits--catalog-keys).
+Spec: [COOKING_MODE.md](COOKING_MODE.md). See [CURSOR_ROADMAP.md § Phase 10](CURSOR_ROADMAP.md#phase-10---cooking-mode).
 
 **v0.6 shipped** as [`v0.6.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.6.0) — catalog keys, computed traits, taxonomy, resolver, taxonomy navigator UI.
 
@@ -52,6 +52,7 @@ Use one branch per milestone, then merge via pull request:
 - `phase-7/telegram-review` — Telegram bot, reminders, on-demand commands, recipe links (merged in PR #7, `v0.4.0`)
 - `phase-8/scheduler` — explainable scheduler, family-vector similarity, scheduled roulette (merged, `v0.5.0`, PR #8)
 - `phase-9/computed-recipe-traits` — public keys, food groups, computed recipe traits, taxonomy & resolver (merged in PR #9, `v0.6.0`)
+- `phase-10/cooking-mode` — interactive cooking mode with step timers & Telegram alerts (PR #10)
 
 ---
 
@@ -105,7 +106,8 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [x] Recipe variant add/edit (basics, ingredients, steps, main-recipe flag)
 - [x] Ingredient resolve/confirm flow in recipe editor
 - [x] Tag selection (protein, carb, style, temperature families)
-- [ ] Dish library search and filters (spec filters — future polish)
+- [x] Dish library search (client-side name / recipe variant filter)
+- [ ] Dish library filters (tags, course — future polish)
 
 ### v0.2 — Manual Planning
 
@@ -119,7 +121,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [x] Meal history API
 - [x] Meal ratings (per meal slot, linked to dish/recipe)
 - [x] Review flow (`review_saved_at`, needs-review filter)
-- [x] Mobile polish (bottom tabs, review-first landing, touch-friendly actions)
+- [x] Mobile polish (bottom tabs, today-first landing (Phase 10), touch-friendly actions)
 - [x] Reroll / roulette again (Phase 8 scheduler)
 
 ### v0.3 — Shopping List
@@ -266,7 +268,8 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [ ] Auth and roles
 - [ ] Scheduler reliable enough for real use
 - [x] Telegram reminders
-- [ ] Recipe cooking mode
+- [x] Recipe cooking mode (Phase 10, PR #10)
+- [x] Today home with Cook / Review entry (Phase 10, PR #10)
 
 ---
 
@@ -286,7 +289,7 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 7 | Telegram reminders | v0.4 | Done (PR #7, `v0.4.0`) |
 | 8 | Explainable scheduler | v0.5 | Done (`v0.5.0`) |
 | 9 | Computed recipe traits & catalog keys | v0.6 | Done (PR #9, `v0.6.0`) |
-| 10 | Cooking mode | v1.0 | Not started |
+| 10 | Cooking mode | v1.0 | In progress |
 | 11 | Backup, export, and import | v1.0 | Not started |
 | 12 | LLM-assisted entry & localization | v0.7 | Not started |
 | 13 | v1 hardening | v1.0 | Not started |
@@ -368,7 +371,7 @@ Merged in `fb20858` (PR #4, `v0.2.0`).
 - [x] Lightweight leftovers: 7-day window, `eaten` sources only, no inventory
 - [x] `review_saved_at` — needs-review filter until rating/skip/leftover source confirmed
 - [x] Plan week UI and Review week UI with `MealSlotCard`
-- [x] Mobile polish: bottom tab bar, review-first landing, compact week nav
+- [x] Mobile polish: bottom tab bar, today-first landing (Phase 10), compact week nav
 - [x] Swagger OAuth2 token endpoint for `/docs`
 - [x] Planning integration and unit tests
 
@@ -458,7 +461,39 @@ Shipped in `v0.6.0` via PR #9. Full plan: [CURSOR_ROADMAP.md § Phase 9](CURSOR_
 - [x] Release notes `v0.6.0.md`
 - [x] Validation: `make test-backend` (189 passed, 2 skipped), frontend 18 passed, `npm run build` green; `make validate-taxonomy` — 0 blockers
 
-### Phases 10–13
+### Phase 10 — Cooking mode 🚧
+
+Branch: `phase-10/cooking-mode`. Spec: [COOKING_MODE.md](COOKING_MODE.md).
+
+- [x] Phase 10 spec (`docs/COOKING_MODE.md`)
+- [x] **`/today` home** — default route; lunch/dinner cards with Cook + Review
+- [x] Route `/recipes/:recipeId/cook` + `RecipeCookingPage`
+- [x] **Cook** button on recipe detail
+- [x] Previous / Next step navigation (local state)
+- [x] Collapsible full ingredient list
+- [x] Step countdown timers (optional minutes per step in recipe edit)
+- [x] Telegram alert when cooking timer ends (subscribers; worker)
+- [x] Browser timer chime + dismiss-at-zero UX
+- [x] Dish library real-time search (client-side)
+- [x] Frontend tests (navigation, boundaries, no-step fallback)
+- [x] Manual mobile QA
+- [ ] Merge PR and tag when v1.0 slice complete
+
+Deferred (not first pass): Thermomix layout, persistent sessions, Telegram entry.
+
+**PR [#10](https://github.com/didac-crst/mealroulette/pull/10) review follow-ups (CodeRabbit, 2026-07-12)** — tracked so deferred items are not lost:
+
+- [ ] **Worker:** commit each cooking timer alert immediately after send/update in `process_due` (one failure must not block the rest)
+- [ ] **Test:** `test_process_due` failure path when Telegram `send_message` raises (assert `failed` status + `last_error`)
+- [ ] **Frontend:** batch or bundled recipe variant names for dish search (replace per-dish `fetchRecipes` in `DishListPage` when catalog grows)
+- [ ] **Frontend:** surface save/add errors in `RecipeEditPage` step editor (catch API failures instead of silent `finally`-only)
+- [ ] **Refactor:** dedupe action buttons in `CookingStepTimer` compact vs full layout
+- [ ] **Docs:** vary acceptance-criteria wording in `CURSOR_ROADMAP.md` Phase 10 (cosmetic)
+- [ ] **Repo:** docstring coverage threshold (CodeRabbit pre-merge warning; not Phase 10-specific)
+
+Addressed in PR #10 commit `cee1ae0`: Telegram schedule/cancel race, today Review without dish, timer label helper, BACKLOG wording, timer tick side effects, test mocks.
+
+### Phases 11–13
 
 See [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) for full deliverables and acceptance criteria per phase.
 
