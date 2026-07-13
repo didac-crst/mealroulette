@@ -11,11 +11,16 @@ import {
 } from "./classification";
 import { formatDifficulty } from "./constants";
 import { buildInferredTraitItems } from "./InferredTraitsSummary";
+import { RecipeCompositionChart } from "./RecipeCompositionChart";
 
 type Props = {
   dish: Dish;
   tags: Tag[];
 };
+
+function inferredTraitItemsWithoutFoodGroups(traits: Dish["computed_traits_json"]) {
+  return buildInferredTraitItems(traits).filter((item) => item.label !== "Food groups");
+}
 
 function joinLabels(values: string[], options: ReadonlyArray<{ value: string; label: string }>): string {
   if (values.length === 0) {
@@ -104,10 +109,14 @@ export function DishClassificationSummary({ dish, tags }: Props) {
             ...(styles.length > 0
               ? [{ label: "Curated style", value: joinLabels(styles, STYLE_OPTIONS) }]
               : []),
-            ...buildInferredTraitItems(dish.computed_traits_json),
+            ...inferredTraitItemsWithoutFoodGroups(dish.computed_traits_json),
           ]}
         />
       </div>
+      <RecipeCompositionChart
+        traits={dish.computed_traits_json}
+        title="Food group composition (main recipe)"
+      />
       <div>
         <h3 className="classification-summary-heading">Planning profile</h3>
         <MetadataList

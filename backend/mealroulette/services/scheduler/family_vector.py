@@ -83,9 +83,6 @@ def build_family_vector(
     count_fallback_lines = 0
 
     for line in lines:
-        if line.pantry_item:
-            continue
-
         family_key = family_key_for_ingredient(
             family=line.family,
             category=line.category,

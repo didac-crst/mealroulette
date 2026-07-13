@@ -20,7 +20,7 @@ export type RecipeCompositionChartProps = {
 export function RecipeCompositionChart({
   traits,
   title = "Food group composition",
-  hint = "Based on non-pantry recipe ingredients by approximate weight.",
+  hint = "Based on recipe ingredients by approximate weight. Very small amounts are omitted.",
   className,
 }: RecipeCompositionChartProps) {
   const weights = traits?.food_group_weights;

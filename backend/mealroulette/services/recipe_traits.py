@@ -62,9 +62,6 @@ def build_recipe_traits(
             family=ingredient.family,
         )
 
-        if line.pantry_item:
-            continue
-
         if group == "meat":
             contains_meat = True
         if group in NON_VEGAN_FOOD_GROUPS:

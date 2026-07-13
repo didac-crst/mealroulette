@@ -529,7 +529,7 @@ See **[features/scheduler.md](features/scheduler.md)** for the authoritative spe
 2. **Count:** approved unit→g conversion if present; else **default 100 g × count** (never skip the line).
 3. **Volume:** ml path when possible; else **1 ml ≈ 1 g** reference.
 4. Roll up to `ingredient.family` (fallback: category, canonical name).
-5. Exclude `pantry_item` and lines &lt; 5 g before rollup.
+5. Omit lines &lt; **`vector_min_grams`** (default **5 g**) before rollup.
 6. L1-normalize to **percentages** (sparse dict).
 7. **Cosine similarity** for distance `1 - cosine` vs recent **eaten** meals; same dish in window = hard exclude.
 
@@ -682,8 +682,8 @@ Store on `recipes.computed_traits_json`. Example shape:
 
 Rules (Phase 9):
 
-- Exclude `pantry_item=true` ingredients from percentage-based vectors and traits.
-- `vegan=false` if any non-pantry ingredient has food group in `{meat, fish, seafood, egg, dairy, cheese}`.
+- Include all recipe ingredients in percentage-based vectors and traits; omit lines below **`vector_min_grams`** (default **5 g**).
+- `vegan=false` if any ingredient has food group in `{meat, fish, seafood, egg, dairy, cheese}`.
 - `contains_meat=true` only for food group `meat` (fish/seafood are not meat).
 - `carb_heavy=true` when carbohydrate percentage ≥ **33.0** (`CARB_HEAVY_THRESHOLD_PCT`, hard-coded).
 - `dominant_carb` = highest-weight family among carbohydrate ingredients.

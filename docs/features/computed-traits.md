@@ -160,12 +160,13 @@ Column: `recipes.computed_traits_json` (JSONB).
 
 ### Computation rules
 
-- Exclude `pantry_item = true` ingredients from percentage-based vectors and trait flags.
+- Include all recipe ingredients in percentage-based vectors and trait flags.
+- Omit lines below **`vector_min_grams`** (default **5 g**) after unit conversion — this keeps pinches of salt, spices, and similar amounts from affecting percentages.
 - Use the same gram/ml conversion rules as scheduler family vectors (`family_vector.py`).
 - `family_vector`: L1-normalized weights (percentages) by ingredient `family`, with category/canonical fallback (same as scheduler).
 - `food_group_weights`: L1-normalized weights by resolved food group.
 - `contains_food_groups`: food groups with non-zero weight after normalization.
-- `vegan = false` if any non-pantry ingredient has food group in `{meat, fish, seafood, egg, dairy, cheese}`; else `true`.
+- `vegan = false` if any ingredient has food group in `{meat, fish, seafood, egg, dairy, cheese}`; else `true`.
 - `contains_meat = true` only for food group `meat` (fish/seafood are not meat).
 - `carb_heavy = true` when carbohydrate percentage ≥ **33.0** (`CARB_HEAVY_THRESHOLD_PCT`, hard-coded).
 - `dominant_carb`: highest gram weight among **carbohydrate** ingredients, keyed by ingredient family (with fallback).
@@ -193,6 +194,11 @@ Prefer explicit service-level refresh (catalog mutations call refresh helpers).
 | `MealPlanItemPublic.computed_traits_json` | Selected recipe traits if `recipe_id` set; else dish main recipe traits |
 
 Display/filter metadata only — assignment semantics unchanged.
+
+### UI
+
+- **Recipe detail** — food group composition donut chart from `RecipePublic.computed_traits_json` (computed on read).
+- **Dish detail** — same chart from `DishPublic.computed_traits_json` (main recipe traits).
 
 ## API fields
 
