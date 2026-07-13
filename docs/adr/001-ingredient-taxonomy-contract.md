@@ -1,5 +1,12 @@
 # ADR 001 — Ingredient taxonomy contract
 
+## Document metadata
+
+- **Purpose:** Durable decisions on ingredient granularity, aliases, and catalogue growth.
+- **Authority:** Canonical for taxonomy contract; feature detail in [features/taxonomy-resolver.md](../features/taxonomy-resolver.md).
+- **Status:** Accepted — frozen decision record.
+- **Update when:** Only via a new ADR superseding this one.
+
 **Status:** Accepted (July 2026)  
 **Context:** Phase 9 catalogue expansion paused at ~627 proposal rows. Priority is a coherent ~500–600 ingredient active catalogue, not 2,000 partially reviewed entries.
 

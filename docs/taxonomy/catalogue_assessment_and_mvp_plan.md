@@ -1,4 +1,13 @@
-# Catalogue Assessment And MVP Expansion Plan
+# Catalogue Assessment and MVP Expansion Plan
+
+## Document metadata
+
+- **Purpose:** Assessment of catalogue size and MVP expansion strategy.
+- **Authority:** Planning proposal — not runtime truth.
+- **Status:** Working proposal.
+- **Update when:** Catalogue growth policy changes.
+
+---
 
 ## Overall Assessment
 

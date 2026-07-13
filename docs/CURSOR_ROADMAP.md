@@ -1,6 +1,15 @@
 # MealRoulette - Cursor Implementation Roadmap
 
-This roadmap is the architectural boilerplate for implementing MealRoulette in Cursor. Treat `SPECS.md` as the product source of truth and this file as the build sequence.
+## Document metadata
+
+- **Purpose:** Build sequence — phase deliverables and acceptance criteria.
+- **Authority:** Canonical for *what to build in which order*; shipment status defers to [BACKLOG.md](BACKLOG.md).
+- **Status:** Living — update when phase scope or acceptance criteria change.
+- **Update when:** A new phase is defined or deliverables change.
+
+---
+
+This roadmap is the architectural boilerplate for implementing MealRoulette in Cursor. Treat [SPECS.md](../SPECS.md) as the product source of truth and this file as the build sequence. Documentation map: [README.md](README.md).
 
 ## Guiding Constraints
 
@@ -63,8 +72,11 @@ mealroulette/
     Dockerfile
     package.json
   docs/
+    README.md
+    features/
+    operations/
     CURSOR_ROADMAP.md
-    LOCALIZATION.md
+    BACKLOG.md
     MVP.md
   SPECS.md
   backups/
@@ -240,7 +252,6 @@ Implementation notes:
 
 ### Phase 4 - Frontend Shell and Dish Library
 
-**Status:** Done — merged in PR #3 (`v0.1.0`, commit `b41cdae`).
 
 Deliverables:
 
@@ -269,7 +280,6 @@ Implementation notes (v0.1):
 
 ### Phase 5 - Manual Meal Planning
 
-**Status:** Done — merged in PR #4 (`v0.2.0`, commit `fb20858`).
 
 Deliverables:
 
@@ -330,7 +340,6 @@ Implementation notes (v0.2):
 
 ### Phase 6 - Shopping Lists
 
-**Status:** Done — merged in PR #5 (`v0.3.0`, commit `88d2675`).
 
 **Prerequisite tooling (done on this branch):**
 
@@ -366,7 +375,7 @@ Acceptance criteria:
 - Shopping items show which planned meals require them.
 - Admins can review and approve conversion suggestions from the ingredient dashboard.
 
-**Deferred to Phase 12:** multilingual content translations — design in [LOCALIZATION.md](LOCALIZATION.md).
+**Deferred to Phase 12:** multilingual content translations — design in [features/localization.md](features/localization.md).
 
 Implementation notes (v0.3):
 
@@ -390,7 +399,6 @@ Deliverables:
 
 ### Phase 7 - Telegram Reminders
 
-**Status:** Released as [`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0) (merge `a560e7a`, PR #7).
 
 Deliverables:
 
@@ -489,7 +497,6 @@ Acceptance criteria:
 
 ### Phase 8 - Explainable Scheduler
 
-**Status:** Done — shipped as [`v0.5.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.5.0) (PR #8).
 
 #### Product behaviour
 
@@ -512,11 +519,11 @@ Three roulette triggers share one engine (`SchedulerService`):
 | **Dish tags** (`protein`, `carb`, `style`, …) | Weekly targets, hard/soft constraints, selection reasons |
 | **Family vector** | Similarity only — avoid repeating the same *kind* of meal recently |
 
-Do **not** use ML embeddings (per SPECS §10). Vectors are sparse proportion dicts built **on the fly** from the main recipe. **Full calculation rules:** [docs/SCHEDULER.md](SCHEDULER.md).
+Do **not** use ML embeddings (per SPECS §10). Vectors are sparse proportion dicts built **on the fly** from the main recipe. **Full calculation rules:** [docs/features/scheduler.md](features/scheduler.md).
 
 #### Family vector (summary)
 
-See **[SCHEDULER.md](SCHEDULER.md)** for the authoritative spec. Summary:
+See **[features/scheduler.md](features/scheduler.md)** for the authoritative spec. Summary:
 
 1. Main-recipe lines → **grams** (mass / volume / count rules).
 2. **Count:** approved unit→g conversion if present; else **default 100 g × count** (never skip the line).
@@ -582,7 +589,6 @@ Acceptance criteria (summary):
 
 ### Phase 9 - Computed Recipe Traits & Catalog Keys
 
-**Status:** Shipped in **`v0.6.0`** via PR #9.
 
 **Goal:** Add stable public keys, ingredient food groups, and computed recipe traits while keeping v0.5 behaviour intact — especially weekly target settings, scheduler generation/reroll, dish catalog, recipe variants, shopping list, planning UI, and Telegram planning output.
 
@@ -594,7 +600,7 @@ Acceptance criteria (summary):
 - Shopping list aggregation semantics unchanged.
 - Telegram planning output unchanged (traits in messages = separate future feature).
 
-**Reference:** detailed compatibility rules and JSON shapes will live in `docs/COMPUTED_TRAITS.md` (commit slice 1).
+**Reference:** detailed compatibility rules and JSON shapes will live in `docs/features/computed-traits.md` (commit slice 1).
 
 #### Public keys
 
@@ -763,8 +769,8 @@ Do **not** in Phase 9 unless explicitly approved later:
 
 #### Deliverables
 
-- `docs/COMPUTED_TRAITS.md` — full spec and compatibility statement ✅
-- `docs/TAXONOMY_AND_RESOLVER.md` — taxonomy and resolver spec ✅
+- `docs/features/computed-traits.md` — full spec and compatibility statement ✅
+- `docs/features/taxonomy-resolver.md` — taxonomy and resolver spec ✅
 - Migration `022_computed_traits` + backfill + trait computation services ✅
 - Public key generation + tests ✅
 - Ingredient food groups + category mapping ✅
@@ -786,7 +792,7 @@ Do **not** in Phase 9 unless explicitly approved later:
 
 #### Suggested commit slices
 
-1. Document Phase 9 spec (`docs/COMPUTED_TRAITS.md`)
+1. Document Phase 9 spec (`docs/features/computed-traits.md`)
 2. Add stable public keys for dishes and recipes
 3. Add ingredient food groups
 4. Compute and store recipe traits + refresh hooks
@@ -797,7 +803,6 @@ Do **not** in Phase 9 unless explicitly approved later:
 
 ### Phase 10 - Cooking Mode
 
-**Status:** Done — [`v0.7.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.7.0), PR [#10](https://github.com/didac-crst/mealroulette/pull/10). Spec: [COOKING_MODE.md](COOKING_MODE.md).
 
 Delivered:
 
@@ -824,7 +829,7 @@ Acceptance criteria:
 
 ### Phase 11 - Taxonomy Hardening + Backup, Export, and Import
 
-**Status:** Done — shipped as [`v0.8.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.8.0), PR [#11](https://github.com/didac-crst/mealroulette/pull/11), merge `f5ec043`. Handoff: [PHASE11_HANDOFF.md](PHASE11_HANDOFF.md). ADR: [002-canonical-taxonomy-before-backup.md](adr/002-canonical-taxonomy-before-backup.md). Backup spec: [BACKUP_EXPORT_IMPORT.md](BACKUP_EXPORT_IMPORT.md).
+References: [archive/phase-11-handoff.md](archive/phase-11-handoff.md) (historical), [adr/002-canonical-taxonomy-before-backup.md](adr/002-canonical-taxonomy-before-backup.md), [features/backup-export-import.md](features/backup-export-import.md). Shipment status: [BACKLOG.md](BACKLOG.md).
 
 **Order of work:**
 
@@ -852,7 +857,7 @@ Acceptance criteria:
 
 ### Phase 12 - LLM-Assisted Entry & Localization
 
-**Status:** Not started. Design spec: [LOCALIZATION.md](LOCALIZATION.md).
+Design spec: [features/localization.md](features/localization.md). Shipment status: [BACKLOG.md](BACKLOG.md).
 
 Deliverables:
 

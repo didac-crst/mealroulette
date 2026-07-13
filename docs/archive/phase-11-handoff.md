@@ -1,4 +1,13 @@
-# Phase 11 handoff — taxonomy hardening before backup
+# Phase 11 Handoff
+
+## Document metadata
+
+- **Purpose:** Phase 11 architecture handoff and blocking decisions (historical context).
+- **Authority:** Historical — durable decisions live in ADRs and [features/backup-export-import.md](../features/backup-export-import.md).
+- **Status:** Archived — Phase 11 shipped as v0.8.0.
+- **Update when:** Do not update except to fix broken links.
+
+---
 
 Date: 2026-07-13  
 Branch: `phase-11/taxonomy-backup`
@@ -27,8 +36,8 @@ Taxonomy hardening lands **before** finalizing the backup format.
 See also:
 
 - [ADR 002 — Canonical taxonomy and computed scheduler targets before backup contract](adr/002-canonical-taxonomy-before-backup.md)
-- [BACKUP_EXPORT_IMPORT.md](BACKUP_EXPORT_IMPORT.md) (backup spec; prerequisites section)
-- [COMPUTED_TRAITS.md](COMPUTED_TRAITS.md), [TAXONOMY_AND_RESOLVER.md](TAXONOMY_AND_RESOLVER.md), [SCHEDULER.md](SCHEDULER.md)
+- [../features/backup-export-import.md](../features/backup-export-import.md) (backup spec; prerequisites section)
+- [../features/computed-traits.md](../features/computed-traits.md), [../features/taxonomy-resolver.md](../features/taxonomy-resolver.md), [../features/scheduler.md](../features/scheduler.md)
 
 ## Required architecture changes
 
@@ -85,7 +94,7 @@ Export must include `food_groups`, `ingredient_families`, canonical ingredients,
 ### Meal composition (catalog metadata)
 
 - `meal_composition` / `simple_dish_part` on `dishes` — migration `027`, API, UI
-- spec: [MEAL_COMPOSITION.md](MEAL_COMPOSITION.md)
+- spec: [../features/meal-composition.md](../features/meal-composition.md)
 
 ### Taxonomy hardening
 
@@ -97,7 +106,7 @@ Export must include `food_groups`, `ingredient_families`, canonical ingredients,
 
 ### Dish classification UI
 
-- Single source of truth on dish edit/detail: `meal_composition` for planner slots; main-recipe computed traits for fish/meat/pasta; curated `style` tags only for non-derivable cases (e.g. soup). See [MEAL_COMPOSITION.md](MEAL_COMPOSITION.md).
+- Single source of truth on dish edit/detail: `meal_composition` for planner slots; main-recipe computed traits for fish/meat/pasta; curated `style` tags only for non-derivable cases (e.g. soup). See [../features/meal-composition.md](../features/meal-composition.md).
 
 ### Backup / export / import
 
@@ -106,7 +115,7 @@ Export must include `food_groups`, `ingredient_families`, canonical ingredients,
 - Worker scheduled backup job (minute poll)
 - Admin UI: Settings → Backups
 - Export snapshots exclude in-flight `backup_runs`; `family_id` integrity validated after backfill
-- Restore notes: [RESTORE.md](RESTORE.md)
+- Restore notes: [../operations/restore.md](../operations/restore.md)
 
 ### Other fixes
 

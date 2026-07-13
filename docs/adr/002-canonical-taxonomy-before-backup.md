@@ -1,5 +1,12 @@
 # ADR 002 — Canonical taxonomy and computed scheduler targets before backup contract
 
+## Document metadata
+
+- **Purpose:** Phase 11 ordering — taxonomy hardening before backup contract.
+- **Authority:** Canonical ADR for that sequencing decision.
+- **Status:** Accepted — frozen decision record.
+- **Update when:** Only via a new ADR superseding this one.
+
 **Status:** Accepted (July 2026)  
 **Context:** Phase 11 was scoped as JSON backup/export/import. The current model mixes string taxonomy on `ingredients`, YAML-defined food groups/families, tag-based weekly targets, and computed recipe traits that are not yet authoritative for scheduling.
 
@@ -22,7 +29,7 @@ Phase 11 is **taxonomy hardening first, then backup**:
 ## Consequences
 
 - Phase 11 delivery order: taxonomy migrations and scheduler target migration → backup export/import implementation.
-- [BACKUP_EXPORT_IMPORT.md](../BACKUP_EXPORT_IMPORT.md) must be updated as taxonomy tables land.
+- [BACKUP_EXPORT_IMPORT.md](../features/backup-export-import.md) must be updated as taxonomy tables land.
 - Product decisions on vegetarian/vegan semantics, fish vs seafood, soup classification, and tag retirement remain **blocking** for final target rules and export shape.
 
 ## Alternatives considered
@@ -32,7 +39,7 @@ Phase 11 is **taxonomy hardening first, then backup**:
 
 ## References
 
-- [PHASE11_HANDOFF.md](../PHASE11_HANDOFF.md)
+- [PHASE11_HANDOFF.md](../archive/phase-11-handoff.md)
 - [ADR 001 — Ingredient taxonomy contract](001-ingredient-taxonomy-contract.md)
-- [COMPUTED_TRAITS.md](../COMPUTED_TRAITS.md)
-- [SCHEDULER.md](../SCHEDULER.md)
+- [COMPUTED_TRAITS.md](../features/computed-traits.md)
+- [SCHEDULER.md](../features/scheduler.md)

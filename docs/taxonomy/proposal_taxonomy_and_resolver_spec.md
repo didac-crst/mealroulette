@@ -1,4 +1,13 @@
-# Phase 9 Taxonomy And Ingredient Resolver Spec
+# Superseded Proposal — Taxonomy and Ingredient Resolver
+
+## Document metadata
+
+- **Purpose:** Phase 9 proposal notes retained for historical context.
+- **Authority:** **Superseded** — canonical spec is [features/taxonomy-resolver.md](../features/taxonomy-resolver.md).
+- **Status:** Frozen proposal — do not treat as current behaviour.
+- **Update when:** Do not update except to fix broken links.
+
+> Canonical feature spec: [features/taxonomy-resolver.md](../features/taxonomy-resolver.md).
 
 ## Purpose
 

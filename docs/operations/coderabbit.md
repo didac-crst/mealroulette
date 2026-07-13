@@ -1,6 +1,15 @@
 # CodeRabbit
 
-This repo uses [CodeRabbit](https://coderabbit.ai/) for PR reviews **on demand only**. Configuration lives in [`.coderabbit.yaml`](../.coderabbit.yaml) at the repo root.
+## Document metadata
+
+- **Purpose:** How to run CodeRabbit reviews on pull requests.
+- **Authority:** Canonical for review workflow configuration.
+- **Status:** Living — update when `.coderabbit.yaml` or review policy changes.
+- **Update when:** CodeRabbit integration changes.
+
+---
+
+This repo uses [CodeRabbit](https://coderabbit.ai/) for PR reviews **on demand only**. Configuration lives in [`.coderabbit.yaml`](../../.coderabbit.yaml) at the repo root.
 
 ## Why manual-only
 

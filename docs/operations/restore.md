@@ -1,4 +1,13 @@
-# Restore procedure (Phase 11)
+# Restore Procedure
+
+## Document metadata
+
+- **Purpose:** Operational runbook for recovering from JSON export or pg_dump.
+- **Authority:** Canonical for restore steps; format detail in [backup-export-import.md](../features/backup-export-import.md).
+- **Status:** Living — update when restore procedure or tooling changes.
+- **Update when:** Import API or deployment layout changes.
+
+---
 
 Operational notes for recovering a MealRoulette household from backups under `./backups` (mounted to `/backups` in Docker).
 

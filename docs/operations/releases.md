@@ -1,6 +1,15 @@
-# Releases and tags
+# Releases and Tags
 
-Git tags mark **product versions** users can run. We do not tag individual implementation phases — only completed versions from the [product roadmap](BACKLOG.md#product-roadmap-long-term).
+## Document metadata
+
+- **Purpose:** When and how to tag product versions.
+- **Authority:** Canonical for release workflow; shipment status in [BACKLOG.md](../BACKLOG.md).
+- **Status:** Living — update when release process changes.
+- **Update when:** Tagging policy or CI release steps change.
+
+---
+
+Git tags mark **product versions** users can run. We do not tag individual implementation phases — only completed versions from the [product roadmap](../BACKLOG.md#product-roadmap-long-term).
 
 ## When to tag
 

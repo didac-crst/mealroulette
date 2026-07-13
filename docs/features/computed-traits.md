@@ -1,8 +1,17 @@
-# Computed Recipe Traits & Catalog Keys
+# Computed Traits and Catalog Keys
 
-Phase 9 specification (`v0.6.0`). This document is the source of truth for public keys, ingredient food groups, computed recipe traits, and backward-compatibility rules with the v0.5 scheduler.
+## Document metadata
 
-See also: [CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) § Phase 9, [SCHEDULER.md](SCHEDULER.md) (family vectors for similarity — separate from traits metadata).
+- **Purpose:** Public keys, food groups, computed recipe traits, and scheduler compatibility rules.
+- **Authority:** Canonical for trait computation semantics; taxonomy structure defers to [taxonomy-resolver.md](taxonomy-resolver.md).
+- **Status:** Living — update when trait keys or computation rules change.
+- **Update when:** `computed_traits` services or catalog keys change.
+
+---
+
+Source of truth for public keys, ingredient food groups, computed recipe traits, and backward-compatibility rules with the scheduler.
+
+See also: [CURSOR_ROADMAP.md](../CURSOR_ROADMAP.md) § Phase 9, [scheduler.md](scheduler.md) (family vectors for similarity — separate from traits metadata).
 
 ## Goals
 
@@ -91,7 +100,7 @@ Column: `ingredients.food_group`.
 
 **Ingredient families:** [ingredient_families.yaml](../backend/mealroulette/data/taxonomy/ingredient_families.yaml) — used for similarity vectors (`ingredient.family`), dominant carb/protein, and top-down resolution.
 
-See [TAXONOMY_AND_RESOLVER.md](TAXONOMY_AND_RESOLVER.md) for the full taxonomy design, resolver strategy, and batch growth plan.
+See [taxonomy-resolver.md](taxonomy-resolver.md) for the full taxonomy design, resolver strategy, and batch growth plan.
 
 ### Vocabulary (summary)
 
