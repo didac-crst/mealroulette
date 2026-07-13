@@ -468,20 +468,27 @@ Per screen: comfortable cards, `PageHeader`, status badges, empty/loading states
 
 ### Phase 4 — Catalog workflows
 
-- Dish list / `DishCard` grid
-- Dish detail / recipe detail
-- Dish and recipe edit forms (`FormSection`, sticky save bar on mobile)
+- [x] Dish list / `DishCard` grid
+- [x] Dish detail / recipe detail
+- [x] Dish and recipe edit forms (`FormSection`, sticky save bar on mobile)
+- [x] `catalog-workflows.css`, `FormStickyActions`
+- [x] Tests updated; `npm test -- --run` and `npm run build` pass
 
 ### Phase 5 — Admin / settings
 
-- `AdminSettingsPage`, ingredients, taxonomy, scheduler, Telegram, backups, planning targets
-- Same tokens and components; compact density allowed; mobile card layouts for tables
+- [x] `AdminSettingsPage`, ingredients, taxonomy, scheduler, Telegram, backups, planning targets
+- [x] Same tokens and components; compact density allowed; mobile card layouts for tables
+- [x] `admin-workflows.css`, updated `SettingsPageShell`
+- [x] Tests updated; `npm test -- --run` and `npm run build` pass
 
 ### Phase 6 — Quality (ongoing / final pass)
 
-- Keyboard navigation audit
-- Translation-length smoke (EN + one long-label locale in tests if feasible)
-- Accessibility pass on migrated screens
+- [x] Keyboard navigation audit — skip link, dialog focus trap, form/control focus rings
+- [x] Translation-length smoke (EN + German long-label fixtures in tests)
+- [x] Accessibility pass on migrated screens — `quality.css`, `useDialogA11y`, `SkipToContent`
+- [x] `useDialogA11y.test.ts`, `longLabels.test.tsx` (Phase 7 primitives), `AppShell` skip-link test
+- [x] `npm run test:visual` Playwright gate @ 375 + 1440 (optional locally; recommended before Phase 7 sign-off)
+- [x] `npm test -- --run` and `npm run build` pass
 - Visual regression optional (not required for first merge)
 
 ---
@@ -496,6 +503,39 @@ Per screen: comfortable cards, `PageHeader`, status badges, empty/loading states
 - Canonical status vocabulary
 - `npm test -- --run` and `npm run build` pass
 - No product behaviour change without approval
+
+---
+
+## Phase 7 — Consumer interaction refinement
+
+Distinct from the structural migration (Phases 1–6). Goal: interaction-first, warm consumer meal app — not restyled CRUD.
+
+### Slice status
+
+| Slice | Scope | Status |
+|-------|--------|--------|
+| 0 | `Breadcrumb`, `PageShell`, `SegmentedControl`, `Switch`, `ChoiceCard`, `ResponsiveActionGroup`, nav icons (bowl + cog), `interaction-primitives.css` | Done |
+| 1 | Global breadcrumbs on all routes; shopping category labels + segmented duration + pantry switch; remove `shopping-preset-active` token drift; `SettingsPageShell` refactor | Done |
+| 2 | Today hero meal cards; shopping config demoted behind disclosure | Done |
+| 3 | `WeekNavigator`; plan `SearchSelect` + overflow; review `ChoiceCard` outcomes; `PlanForMeal` bottom sheet | Done |
+| 4 | Dish grid click-first; detail action hierarchy | Done |
+| 5 | `SettingsTile` landing; admin toggles → `Switch`; scheduler `WeekdayPicker`; `NumberStepper` on admin numeric fields | Done |
+| 6 | Progressive disclosure on edit forms; `FormSaveStatus` | Done |
+| 7 | Screenshot QA @ 375 + 1440; German long-label pass | Done |
+
+**Slice 7 deliverables**
+
+- `npm run test:visual` — Playwright overflow checks + screenshots at 375px and 1440px for Today, Plan, Review, Shopping, Dishes, Settings, Ingredients (mocked API; no backend required)
+- `longLabels.test.tsx` — expanded German long-label smoke for Phase 7 primitives (`Breadcrumb`, `ChoiceCard`, `SegmentedControl`, `DisclosureSection`, `FormSaveStatus`, `SettingsTile`, `PageShell`)
+- Screenshots written to `frontend/e2e/test-results/` per run (review locally; not committed)
+
+### Phase 7 acceptance (when all slices complete)
+
+- No raw category keys in shopping UI
+- Breadcrumbs on every in-app route; ad-hoc “← Back” links removed where superseded
+- High-traffic workflows use segmented controls, switches, and choice cards instead of raw form controls where specified
+- Mobile @ 375px: no horizontal overflow on main routes
+- Screenshot sign-off at 375px and 1440px for Today, Plan, Review, Shopping, Dishes, Settings, Ingredients
 
 ---
 

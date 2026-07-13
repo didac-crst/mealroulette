@@ -192,6 +192,10 @@ const SHORT_DAY_FORMAT = new Intl.DateTimeFormat(undefined, {
   day: "numeric",
 });
 
+export function formatShortPlanDate(isoDate: string): string {
+  return SHORT_DAY_FORMAT.format(new Date(`${isoDate}T12:00:00`));
+}
+
 export function formatLeftoverSourceOption(item: MealPlanItem): string {
   const dateLabel = SHORT_DAY_FORMAT.format(new Date(`${item.date}T12:00:00`));
   return `${dateLabel} · ${formatSlotLabel(item.meal_slot)} — ${item.dish_name ?? "Unknown"}`;

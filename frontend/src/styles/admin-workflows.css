@@ -1,0 +1,465 @@
+/* Phase 5 — admin / settings workflow surfaces */
+
+.admin-page,
+.admin-subpage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.admin-back-link {
+  align-self: flex-start;
+}
+
+.household-clock {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: baseline;
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--brand-teal-50);
+  font-size: var(--font-size-sm);
+}
+
+.household-clock-label {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.household-clock-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.settings-group-title {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.settings-link-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.settings-tile-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.settings-tile {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  text-decoration: none;
+  color: inherit;
+  min-height: var(--control-md);
+  box-shadow: var(--shadow-soft);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.settings-tile:hover {
+  border-color: var(--brand-teal-200);
+  box-shadow: var(--shadow-md);
+}
+
+.settings-tile-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-md);
+  background: var(--brand-teal-50);
+  color: var(--color-interactive);
+}
+
+.settings-tile-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.settings-tile-title {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.settings-tile-description {
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}
+
+.settings-link-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  text-decoration: none;
+  color: inherit;
+  min-height: var(--control-md);
+  box-shadow: var(--shadow-soft);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.settings-link-card:hover {
+  border-color: var(--brand-teal-200);
+  box-shadow: var(--shadow-md);
+}
+
+.settings-link-title {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.settings-link-description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.admin-notice {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+  font-size: var(--font-size-sm);
+}
+
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: var(--space-3);
+}
+
+.admin-stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+}
+
+.admin-stat-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.admin-stat-value {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.admin-data-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-data-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+}
+
+.admin-data-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.admin-subscriber-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-subscriber-item {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  font-size: var(--font-size-sm);
+}
+
+.target-row {
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.target-row-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.target-row-hint {
+  font-size: var(--font-size-sm);
+}
+
+.target-row-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.8fr) minmax(0, 0.8fr);
+  gap: var(--space-3);
+  align-items: end;
+}
+
+.target-row-remove {
+  width: 100%;
+}
+
+.target-add-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.admin-field-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.admin-field-hint {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.admin-switch-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.number-stepper-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.number-stepper-label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.number-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: fit-content;
+}
+
+.number-stepper-value {
+  min-width: 2.5rem;
+  padding: 0 var(--space-2);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.number-stepper-button {
+  min-width: var(--control-md);
+  padding-inline: var(--space-3);
+}
+
+.scheduler-weekday-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.scheduler-weekday-option {
+  flex: 1 1 2.75rem;
+  min-height: var(--control-md);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--surface-card);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.scheduler-weekday-option-active {
+  border-color: var(--color-interactive);
+  background: var(--color-interactive-subtle);
+  color: var(--color-interactive-hover);
+}
+
+.scheduler-weekday-option:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (max-width: 520px) {
+  .target-row-fields {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .target-row-fields label:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .target-row-remove {
+    grid-column: 1 / -1;
+  }
+}
+
+.ingredient-catalog-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ingredient-catalog-header,
+.ingredient-catalog-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 0.75fr 1.25fr;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.ingredient-catalog-header {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  padding: 0 var(--space-2);
+}
+
+.ingredient-catalog-row {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-soft);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ingredient-catalog-row:hover {
+  border-color: var(--brand-teal-200);
+  box-shadow: var(--shadow-md);
+}
+
+.ingredient-canonical {
+  display: block;
+  font-size: var(--font-size-sm);
+}
+
+.admin-mobile-label {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .ingredient-catalog-header {
+    display: none;
+  }
+
+  .ingredient-catalog-row {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+
+  .admin-mobile-label {
+    display: block;
+    margin-bottom: var(--space-1);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+}
+
+.taxonomy-browser {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .taxonomy-browser {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.taxonomy-pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.taxonomy-ingredient-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.taxonomy-ingredient-item {
+  padding: var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  font-size: var(--font-size-sm);
+}

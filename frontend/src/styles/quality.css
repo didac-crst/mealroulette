@@ -1,0 +1,87 @@
+/* Phase 6 — accessibility and quality baseline */
+
+.skip-to-content {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 200;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-interactive);
+  color: #fff;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-150%);
+  transition: transform var(--duration-fast) ease;
+}
+
+.skip-to-content:focus {
+  transform: translateY(0);
+  outline: 2px solid var(--brand-teal-200);
+  outline-offset: 2px;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--brand-teal-200);
+  outline-offset: 2px;
+}
+
+.checkbox-pill:focus-within {
+  outline: 2px solid var(--brand-teal-200);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.dish-card:focus-visible,
+.settings-tile:focus-visible,
+.settings-link-card:focus-visible,
+.ingredient-catalog-row:focus-visible {
+  outline: 2px solid var(--brand-teal-200);
+  outline-offset: 2px;
+}
+
+.dish-card,
+.settings-tile,
+.settings-link-card,
+.ingredient-catalog-row,
+.choice-chip {
+  transition:
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dish-card,
+  .settings-tile,
+  .settings-link-card,
+  .ingredient-catalog-row,
+  .choice-chip,
+  .skip-to-content {
+    transition: none;
+  }
+}
+
+.page-header-title,
+.page-header-subtitle,
+.mobile-bottom-nav-label,
+.settings-tile-title,
+.settings-tile-description,
+.settings-link-title,
+.settings-link-description {
+  overflow-wrap: anywhere;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

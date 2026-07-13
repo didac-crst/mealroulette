@@ -1,5 +1,10 @@
 body {
   margin: 0;
+  overflow-x: clip;
+}
+
+html {
+  overflow-x: clip;
 }
 
 a {
@@ -16,7 +21,9 @@ a {
 .app-main {
   flex: 1;
   width: 100%;
+  min-width: 0;
   box-sizing: border-box;
+  overflow-x: clip;
 }
 
 /* Legacy standalone pages (loading gates) */
@@ -771,12 +778,7 @@ legend {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-}
-
-.shopping-preset-active {
-  border-color: #243b53;
-  background: #243b53;
-  color: #fff;
+  min-width: 0;
 }
 
 .shopping-toggle {

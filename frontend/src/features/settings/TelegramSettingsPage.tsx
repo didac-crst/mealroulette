@@ -12,6 +12,7 @@ import {
   type TelegramSubscriber,
 } from "../../api/telegram";
 import { ApiError } from "../../api/client";
+import { Button, EmptyState, FormSection, FormStickyActions, NumberStepper, Switch } from "../../components/ui";
 import { formatInstantInTimeZone } from "../../lib/datetime";
 import { useAuth } from "../auth/AuthContext";
 import { SettingsPageShell } from "./SettingsPageShell";
@@ -147,30 +148,28 @@ export function TelegramSettingsPage() {
 
   if (loading) {
     return (
-      <SettingsPageShell title="Telegram" subtitle="Reminders and bot commands.">
-        <p className="muted">Loading…</p>
+      <SettingsPageShell title="Telegram" subtitle="Reminders and bot commands." loading>
+        {null}
       </SettingsPageShell>
     );
   }
 
   return (
     <SettingsPageShell title="Telegram" subtitle="Daily reminders and on-demand bot commands.">
-
-      <p className="muted">
+      <p className="muted admin-notice">
         Set <code>TELEGRAM_BOT_TOKEN</code> in <code>.env</code>, restart Docker, then message your bot with{" "}
         <strong>/subscribe</strong> in Telegram. Use <strong>/unsubscribe</strong> to stop.
       </p>
 
       {settings?.has_bot_token ? (
-        <p className="muted">Bot token detected from environment.</p>
+        <p className="muted admin-notice">Bot token detected from environment.</p>
       ) : (
         <p className="error">TELEGRAM_BOT_TOKEN is not set in the API/worker environment.</p>
       )}
 
       {settings?.last_sent_at ? (
-        <p className="muted">
-          Last sent ({settings.timezone}):{" "}
-          {formatInstantInTimeZone(settings.last_sent_at, settings.timezone)}
+        <p className="muted admin-notice">
+          Last sent ({settings.timezone}): {formatInstantInTimeZone(settings.last_sent_at, settings.timezone)}
         </p>
       ) : null}
       {settings?.last_error ? <p className="error">Last error: {settings.last_error}</p> : null}
@@ -179,17 +178,19 @@ export function TelegramSettingsPage() {
           {error}
         </p>
       ) : null}
-      {notice ? <p className="muted">{notice}</p> : null}
+      {notice ? <p className="muted admin-notice">{notice}</p> : null}
       {refreshWarning ? <p className="muted">Saved, but refresh failed: {refreshWarning}</p> : null}
 
-      <fieldset>
-        <legend>Subscribers ({subscribers.length})</legend>
+      <FormSection title={`Subscribers (${subscribers.length})`}>
         {subscribers.length === 0 ? (
-          <p className="muted">No subscribers yet. Send /subscribe to the bot in Telegram.</p>
+          <EmptyState
+            title="No subscribers yet"
+            description="Send /subscribe to the bot in Telegram."
+          />
         ) : (
-          <ul className="bulleted-list">
+          <ul className="admin-subscriber-list">
             {subscribers.map((subscriber) => (
-              <li key={subscriber.id}>
+              <li key={subscriber.id} className="admin-subscriber-item">
                 {subscriber.display_name ?? subscriber.username ?? subscriber.chat_id}
                 {subscriber.username ? <span className="muted"> @{subscriber.username}</span> : null}
                 <span className="muted"> · chat {subscriber.chat_id}</span>
@@ -197,81 +198,76 @@ export function TelegramSettingsPage() {
             ))}
           </ul>
         )}
-      </fieldset>
+      </FormSection>
 
-      <form onSubmit={(event) => void handleSubmit(event)} className="stack">
-        <label className="checkbox-pill">
-          <input
-            type="checkbox"
+      <form onSubmit={(event) => void handleSubmit(event)} className="admin-form">
+        <FormSection title="Daily reminders">
+          <Switch
             checked={form.enabled ?? false}
             onChange={(event) => setForm({ ...form, enabled: event.target.checked })}
+            label="Enable daily reminders"
           />
-          Enable daily reminders
-        </label>
 
-        <div className="grid-2">
-          <label>
-            Daily reminder time
-            <input
-              type="time"
-              value={form.daily_reminder_time ?? "08:00"}
-              onChange={(event) => setForm({ ...form, daily_reminder_time: event.target.value })}
-            />
-          </label>
-          <label>
-            Timezone
-            <input
-              value={form.timezone ?? "Europe/Paris"}
-              onChange={(event) => setForm({ ...form, timezone: event.target.value })}
-            />
-          </label>
-        </div>
+          <div className="grid-2">
+            <label>
+              Daily reminder time
+              <input
+                type="time"
+                value={form.daily_reminder_time ?? "08:00"}
+                onChange={(event) => setForm({ ...form, daily_reminder_time: event.target.value })}
+              />
+            </label>
+            <label>
+              Timezone
+              <input
+                value={form.timezone ?? "Europe/Paris"}
+                onChange={(event) => setForm({ ...form, timezone: event.target.value })}
+              />
+            </label>
+          </div>
 
-        <label>
-          Reminder window (days)
-          <input
-            type="number"
+          <NumberStepper
+            ariaLabel="Reminder window in days"
+            label="Reminder window (days)"
             min={1}
             max={14}
             value={form.shopping_window_days ?? 3}
-            onChange={(event) => setForm({ ...form, shopping_window_days: Number(event.target.value) })}
+            onChange={(shopping_window_days) => setForm({ ...form, shopping_window_days })}
           />
-          <span className="muted">Same as </span>
-          <code>/reminder {form.shopping_window_days ?? 3}</code>
-        </label>
+          <p className="muted admin-field-hint">
+            Same as <code>/reminder {form.shopping_window_days ?? 3}</code>
+          </p>
 
-        <label className="checkbox-pill">
-          <input
-            type="checkbox"
+          <Switch
             checked={Boolean(form.group_by_category)}
             onChange={(event) => setForm({ ...form, group_by_category: event.target.checked })}
+            label="Group ingredients by category when sending a saved shopping list via API"
           />
-          Group ingredients by category when sending a saved shopping list via API
-        </label>
+        </FormSection>
 
-        <div className="row-between">
-          <button type="submit" className="button" disabled={saving}>
-            {saving ? "Saving…" : "Save settings"}
-          </button>
-          <div className="row-actions">
-            <button
-              type="button"
-              className="button button-secondary"
-              disabled={actionBusy !== null}
-              onClick={() => void runAction("test")}
-            >
-              {actionBusy === "test" ? "Sending…" : "Send test"}
-            </button>
-            <button
-              type="button"
-              className="button button-secondary"
-              disabled={actionBusy !== null}
-              onClick={() => void runAction("send")}
-            >
-              {actionBusy === "send" ? "Sending…" : "Send reminder now"}
-            </button>
-          </div>
-        </div>
+        <FormStickyActions>
+          <Button type="submit" loading={saving} disabled={actionBusy !== null}>
+            Save settings
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            loading={actionBusy === "test"}
+            disabled={saving || actionBusy === "send"}
+            onClick={() => void runAction("test")}
+          >
+            Send test
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            loading={actionBusy === "send"}
+            disabled={saving || actionBusy === "test"}
+            onClick={() => void runAction("send")}
+          >
+            Send reminder now
+          </Button>
+        </FormStickyActions>
       </form>
     </SettingsPageShell>
   );

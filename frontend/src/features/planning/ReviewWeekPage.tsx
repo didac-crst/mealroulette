@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { MealPlanItem } from "../../api/planning";
 import { fetchMealHistory } from "../../api/planning";
-import { Button, Card, EmptyState, PageLoadingState } from "../../components/ui";
+import { Button, Card, EmptyState, PageLoadingState, SegmentedControl } from "../../components/ui";
 import { useAuth } from "../auth/AuthContext";
 import { MealSlotCard } from "./MealSlotCard";
 import {
@@ -106,25 +106,19 @@ export function ReviewWeekPage() {
     >
       <Card density="comfortable" className="stack">
         <div className="review-filter-bar">
-          <div className="segmented-control" role="group" aria-label="Review filter">
-            <button
-              type="button"
-              className={`segmented-control-option${reviewFilter === "needs_review" ? " segmented-control-option-active" : ""}`}
-              aria-pressed={reviewFilter === "needs_review"}
-              onClick={() => setReviewFilter("needs_review")}
-            >
-              Needs review
-              {needsReviewCount > 0 ? ` (${needsReviewCount})` : ""}
-            </button>
-            <button
-              type="button"
-              className={`segmented-control-option${reviewFilter === "all" ? " segmented-control-option-active" : ""}`}
-              aria-pressed={reviewFilter === "all"}
-              onClick={() => setReviewFilter("all")}
-            >
-              All meals
-            </button>
-          </div>
+          <SegmentedControl
+            className="segmented-control-full"
+            ariaLabel="Review filter"
+            value={reviewFilter}
+            options={[
+              {
+                value: "needs_review" as const,
+                label: `Needs review${needsReviewCount > 0 ? ` (${needsReviewCount})` : ""}`,
+              },
+              { value: "all" as const, label: "All meals" },
+            ]}
+            onChange={setReviewFilter}
+          />
         </div>
 
         {visibleItems.length === 0 ? (

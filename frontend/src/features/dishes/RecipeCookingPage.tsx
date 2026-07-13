@@ -21,7 +21,7 @@ import {
 } from "../../api/catalog";
 import { ApiError } from "../../api/client";
 import { ButtonLink } from "../../components/ButtonLink";
-import { Button, PageLoadingState } from "../../components/ui";
+import { Button, PageLoadingState, PageShell } from "../../components/ui";
 import { useAuth } from "../auth/AuthContext";
 import { CookingActiveTimersBar } from "./CookingActiveTimersBar";
 import { CookingStepTimer } from "./CookingStepTimer";
@@ -295,15 +295,16 @@ export function RecipeCookingPage() {
 
   return (
     <section className="cooking-mode stack">
-      <header className="cooking-mode-header">
-        <div>
-          <p className="cooking-mode-context">{dish.name}</p>
-          <h1 className="cooking-mode-title">{recipe.variant_name}</h1>
-        </div>
-        <ButtonLink to={recipeDetailPath} variant="secondary" className="cooking-mode-exit">
-          Exit
-        </ButtonLink>
-      </header>
+      <PageShell
+        title="Cook"
+        subtitle={`${dish.name} · ${recipe.variant_name}`}
+        breadcrumbLabels={{ dishId: dish.id, dishName: dish.name }}
+        actions={
+          <ButtonLink to={recipeDetailPath} variant="secondary" className="cooking-mode-exit">
+            Exit
+          </ButtonLink>
+        }
+      />
 
       <CookingActiveTimersBar
         timers={activeTimers}

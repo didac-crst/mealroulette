@@ -8,6 +8,7 @@ import {
   type WeeklyTargetSpec,
 } from "../../api/planningRules";
 import { ApiError } from "../../api/client";
+import { Button, ChoiceChip, EmptyState, FormSection, FormStickyActions, NumberStepper } from "../../components/ui";
 import { useAuth } from "../auth/AuthContext";
 import { SettingsPageShell } from "./SettingsPageShell";
 import { TARGET_PRESETS, targetHint, targetLabel } from "./planningTargetLabels";
@@ -153,24 +154,16 @@ export function PlanningTargetsPage() {
     }
   };
 
-  if (authLoading) {
+  if (authLoading || loading) {
     return (
-      <SettingsPageShell title="Weekly targets" subtitle="Meals per week by food type.">
-        <p className="muted">Loading…</p>
+      <SettingsPageShell title="Weekly targets" subtitle="Meals per week by food type." loading>
+        {null}
       </SettingsPageShell>
     );
   }
 
   if (!isAdmin) {
     return null;
-  }
-
-  if (loading) {
-    return (
-      <SettingsPageShell title="Weekly targets" subtitle="Meals per week by food type.">
-        <p className="muted">Loading…</p>
-      </SettingsPageShell>
-    );
   }
 
   return (
@@ -183,93 +176,96 @@ export function PlanningTargetsPage() {
           {error}
         </p>
       ) : null}
-      {notice ? <p className="muted">{notice}</p> : null}
+      {notice ? <p className="muted admin-notice">{notice}</p> : null}
 
-      <form onSubmit={(event) => void handleSubmit(event)} className="stack">
-        <label>
-          Flexibility (± meals)
-          <input
-            type="number"
+      <form onSubmit={(event) => void handleSubmit(event)} className="admin-form">
+        <FormSection title="Flexibility">
+          <NumberStepper
+            ariaLabel="Flexibility"
+            label="Flexibility (± meals)"
             min={0}
             max={3}
             value={tolerance}
-            onChange={(event) => setTolerance(Number(event.target.value))}
+            onChange={setTolerance}
           />
-          <span className="muted">How far off min/max can the plan be before warnings.</span>
-        </label>
+          <p className="muted admin-field-hint">How far off min/max can the plan be before warnings.</p>
+        </FormSection>
 
-        <div className="stack">
-          <h3 className="section-title">Targets</h3>
-          {rows.length === 0 ? <p className="muted">No targets yet. Add one below.</p> : null}
-          {rows.map((row, index) => (
-            <div key={`${row.key}-${index}`} className="target-row">
-              <div className="target-row-header">
-                <strong>{targetLabel(row.key) || "New target"}</strong>
-                {targetHint(row.key) ? <span className="muted target-row-hint">{targetHint(row.key)}</span> : null}
-              </div>
-              <div className="target-row-fields">
-                <label>
-                  Tag key
-                  <input
-                    value={row.key}
-                    onChange={(event) => updateRow(index, { key: event.target.value })}
-                    placeholder="fish"
-                  />
-                </label>
-                <label>
-                  Min
-                  <input
-                    type="number"
+        <FormSection title="Targets">
+          {rows.length === 0 ? (
+            <EmptyState title="No targets yet" description="Add a target below to guide weekly meal variety." />
+          ) : null}
+          <div className="stack">
+            {rows.map((row, index) => (
+              <div key={`${row.key}-${index}`} className="target-row">
+                <div className="target-row-header">
+                  <strong>{targetLabel(row.key) || "New target"}</strong>
+                  {targetHint(row.key) ? <span className="muted target-row-hint">{targetHint(row.key)}</span> : null}
+                </div>
+                <div className="target-row-fields">
+                  <label>
+                    Tag key
+                    <input
+                      value={row.key}
+                      onChange={(event) => updateRow(index, { key: event.target.value })}
+                      placeholder="fish"
+                    />
+                  </label>
+                  <NumberStepper
+                    ariaLabel={`Minimum ${row.key}`}
+                    label="Min"
                     min={0}
                     max={14}
                     value={row.min}
-                    onChange={(event) => updateRow(index, { min: Number(event.target.value) })}
+                    onChange={(min) => updateRow(index, { min })}
                   />
-                </label>
-                <label>
-                  Max
-                  <input
-                    type="number"
+                  <NumberStepper
+                    ariaLabel={`Maximum ${row.key}`}
+                    label="Max"
                     min={0}
                     max={14}
                     value={row.max}
-                    onChange={(event) => updateRow(index, { max: Number(event.target.value) })}
+                    onChange={(max) => updateRow(index, { max })}
                   />
-                </label>
-                <button
-                  type="button"
-                  className="button button-secondary target-row-remove"
-                  onClick={() => removeRow(index)}
-                  aria-label={`Remove ${row.key} target`}
-                >
-                  Remove
-                </button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="target-row-remove"
+                    onClick={() => removeRow(index)}
+                    aria-label={`Remove ${row.key} target`}
+                  >
+                    Remove
+                  </Button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </FormSection>
 
         {availablePresets.length > 0 ? (
           <div className="target-add-row">
-            <label>
-              Add target
-              <select value={newPreset} onChange={(event) => setNewPreset(event.target.value)}>
-                {availablePresets.map((preset) => (
-                  <option key={preset} value={preset}>
-                    {targetLabel(preset)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button type="button" className="button button-secondary" onClick={addPresetRow}>
-              Add
-            </button>
+            <span className="muted">Add target</span>
+            <div className="catalog-filter-bar">
+              {availablePresets.map((preset) => (
+                <ChoiceChip
+                  key={preset}
+                  label={targetLabel(preset)}
+                  selected={newPreset === preset}
+                  onClick={() => setNewPreset(preset)}
+                />
+              ))}
+            </div>
+            <Button type="button" variant="secondary" onClick={addPresetRow}>
+              Add {targetLabel(newPreset)}
+            </Button>
           </div>
         ) : null}
 
-        <button type="submit" className="button" disabled={saving}>
-          {saving ? "Saving…" : "Save targets"}
-        </button>
+        <FormStickyActions>
+          <Button type="submit" loading={saving}>
+            Save targets
+          </Button>
+        </FormStickyActions>
       </form>
     </SettingsPageShell>
   );

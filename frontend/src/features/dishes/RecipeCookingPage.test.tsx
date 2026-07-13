@@ -148,7 +148,8 @@ describe("RecipeCookingPage", () => {
   it("renders cooking mode for a recipe with steps", async () => {
     renderCookingPage();
 
-    expect(await screen.findByRole("heading", { name: "Standard" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Cook" })).toBeInTheDocument();
+    expect(screen.getByText("Tomato Pasta · Standard")).toBeInTheDocument();
     expect(screen.getByText("Step 1 of 2")).toBeInTheDocument();
     expect(screen.getByText("Boil water.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Exit" })).toHaveAttribute("href", "/dishes/10/recipes/42");

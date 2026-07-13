@@ -54,4 +54,12 @@ describe("AppShell", () => {
     expect(await screen.findByText("Today content")).toBeInTheDocument();
     expect(screen.getByRole("complementary", { name: "Application navigation" })).toBeInTheDocument();
   });
+
+  it("provides skip link and main content landmark", async () => {
+    renderShell();
+
+    expect(await screen.findByText("Today content")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Skip to main content" })).toHaveAttribute("href", "#main-content");
+    expect(screen.getByRole("main")).toHaveAttribute("id", "main-content");
+  });
 });

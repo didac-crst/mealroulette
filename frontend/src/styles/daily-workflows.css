@@ -15,6 +15,142 @@
   gap: var(--space-4);
 }
 
+.meal-hero-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
+
+.meal-hero-top {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+  min-width: 0;
+}
+
+.meal-hero-media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: var(--radius-lg);
+  background: var(--surface-muted);
+  overflow: hidden;
+}
+
+.meal-hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.meal-hero-emoji {
+  font-size: 2.25rem;
+  line-height: 1;
+}
+
+.meal-hero-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.meal-hero-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.meal-hero-title {
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  min-width: 0;
+  flex: 1 1 12rem;
+}
+
+.meal-hero-title:hover {
+  color: var(--color-interactive);
+  text-decoration: underline;
+}
+
+.meal-hero-recipe {
+  font-size: var(--font-size-sm);
+}
+
+.meal-hero-actions {
+  width: 100%;
+}
+
+.meal-hero-actions > .button,
+.meal-hero-actions > a.button {
+  flex: 1 1 8rem;
+}
+
+.meal-hero-undo {
+  margin-top: calc(-1 * var(--space-2));
+}
+
+@media (min-width: 640px) {
+  .meal-hero-top {
+    grid-template-columns: 7rem minmax(0, 1fr);
+  }
+
+  .meal-hero-media {
+    width: 7rem;
+    height: 7rem;
+  }
+}
+
+.shopping-page-header .page-shell {
+  gap: var(--space-3);
+}
+
+.shopping-page-error {
+  margin: 0;
+}
+
+.shopping-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.shopping-category-card .shopping-category {
+  margin: 0;
+  font-size: var(--font-size-md);
+}
+
+.shopping-secondary-panels {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.shopping-options-hint {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+@media (min-width: 768px) {
+  .shopping-secondary-panels {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+}
+
 .today-footer-links {
   display: flex;
   flex-wrap: wrap;
@@ -50,6 +186,70 @@
 
 .today-empty-slot {
   padding: var(--space-5);
+}
+
+.week-shell-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.week-navigator {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.week-navigator-range {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.week-nav {
+  display: flex;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.week-nav-button {
+  min-width: 2.75rem;
+  min-height: var(--control-sm);
+}
+
+.week-nav-today {
+  flex: 1;
+  min-width: 5rem;
+}
+
+.week-nav-label-long {
+  display: none;
+}
+
+.review-outcome-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+}
+
+@media (min-width: 640px) {
+  .week-navigator {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .week-nav-label-long {
+    display: inline;
+  }
+}
+
+@media (min-width: 768px) {
+  .review-outcome-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .week-shell-header {

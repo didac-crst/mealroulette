@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { fetchIngredient, type IngredientDetail } from "../../api/catalog";
 import { ApiError } from "../../api/client";
 import { ButtonLink } from "../../components/ButtonLink";
+import { Card, EmptyState, PageShell } from "../../components/ui";
 import { useAuth } from "../auth/AuthContext";
 
 export function IngredientDetailPage() {
@@ -52,41 +53,57 @@ export function IngredientDetailPage() {
 
   if (loading) {
     return (
-      <section className="card">
-        <p className="muted">Loading ingredient…</p>
-      </section>
+      <div className="admin-page">
+        <PageShell title="Ingredient" loading loadingMessage="Loading ingredient…" />
+      </div>
     );
   }
 
   if (error || !detail) {
     return (
-      <section className="card">
-        <p className="error">{error ?? "Ingredient not found"}</p>
-        <ButtonLink to="/ingredients">Back to list</ButtonLink>
-      </section>
+      <div className="admin-page">
+        <EmptyState
+          title="Ingredient not found"
+          description={error ?? "This ingredient could not be loaded."}
+          action={
+            <ButtonLink to="/ingredients" variant="secondary">
+              Back to list
+            </ButtonLink>
+          }
+        />
+      </div>
     );
   }
 
   return (
-    <section className="card stack">
-      <div className="row-between">
-        <h2>{detail.display_name}</h2>
-        <ButtonLink to="/ingredients" variant="secondary">
-          Back
-        </ButtonLink>
-      </div>
-      <p className="muted">{detail.canonical_name}</p>
+    <div className="admin-page">
+      <PageShell
+        title={detail.display_name}
+        subtitle={detail.canonical_name}
+        breadcrumbLabels={{ ingredientId: detail.id, ingredientName: detail.display_name }}
+      />
+
       {detail.notes ? <p>{detail.notes}</p> : null}
-      <p>
-        Category: {detail.category ?? "—"} · Food group: {detail.food_group ?? "—"} · Family:{" "}
-        {detail.family ?? "—"} · Strategy: {detail.aggregation_strategy ?? "—"}
-      </p>
-      <h3>Aliases</h3>
-      <ul className="bulleted-list">
-        {detail.aliases.map((alias) => (
-          <li key={alias.id}>{alias.alias}</li>
-        ))}
-      </ul>
-    </section>
+
+      <Card density="comfortable">
+        <p>
+          Category: {detail.category ?? "—"} · Food group: {detail.food_group ?? "—"} · Family:{" "}
+          {detail.family ?? "—"} · Strategy: {detail.aggregation_strategy ?? "—"}
+        </p>
+      </Card>
+
+      <Card density="comfortable">
+        <h2 className="catalog-section-title">Aliases</h2>
+        {detail.aliases.length === 0 ? (
+          <EmptyState title="No aliases" description="This ingredient has no alternate names." />
+        ) : (
+          <ul className="bulleted-list">
+            {detail.aliases.map((alias) => (
+              <li key={alias.id}>{alias.alias}</li>
+            ))}
+          </ul>
+        )}
+      </Card>
+    </div>
   );
 }

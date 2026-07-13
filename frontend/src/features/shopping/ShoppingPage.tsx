@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { fetchIngredientCategories } from "../../api/catalog";
 import {
   createShoppingList,
   fetchShoppingList,
@@ -11,7 +12,16 @@ import {
   type ShoppingSourceContribution,
   updateShoppingListItem,
 } from "../../api/shopping";
-import { Button, Card, EmptyState, PageHeader, PageLoadingState } from "../../components/ui";
+import {
+  Button,
+  Card,
+  DisclosureSection,
+  EmptyState,
+  PageShell,
+  SegmentedControl,
+  Switch,
+} from "../../components/ui";
+import { formatShoppingCategory } from "../../lib/formatShoppingCategory";
 import { useAuth } from "../auth/AuthContext";
 import { formatPlanDate, todayIso } from "../planning/planFormat";
 
@@ -65,6 +75,7 @@ export function ShoppingPage() {
   const [days, setDays] = useState<number>(3);
   const [excludePantry, setExcludePantry] = useState(true);
   const [list, setList] = useState<ShoppingList | null>(null);
+  const [categoryLabels, setCategoryLabels] = useState<Map<string, string>>(new Map());
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -116,6 +127,27 @@ export function ShoppingPage() {
       cancelled = true;
     };
   }, [accessToken, loadPreview]);
+
+  useEffect(() => {
+    if (!accessToken) {
+      return;
+    }
+    let cancelled = false;
+    fetchIngredientCategories(accessToken)
+      .then((categories) => {
+        if (!cancelled) {
+          setCategoryLabels(new Map(categories.map((category) => [category.id, category.label])));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setCategoryLabels(new Map());
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [accessToken]);
 
   const grouped = useMemo(() => groupByCategory(list?.items ?? []), [list]);
 
@@ -183,19 +215,22 @@ export function ShoppingPage() {
   const items = list?.items ?? [];
   const checkedCount = items.filter((item) => item.checked).length;
   const totalCount = items.length;
-
-  if (loading && !list) {
-    return <PageLoadingState message="Loading shopping list…" />;
-  }
+  const dayOptions = DAY_PRESETS.map((preset) => ({
+    value: preset,
+    label: `${preset} day${preset === 1 ? "" : "s"}`,
+  }));
+  const windowSummary = `${formatPlanDate(fromDate)}${
+    list ? ` through ${formatPlanDate(list.to_date)}` : ""
+  }`;
 
   return (
     <div className="stack shopping-page">
-      <Card density="comfortable" className="stack">
-        <PageHeader
+      <Card density="comfortable" className="shopping-page-header">
+        <PageShell
           title="Shopping"
-          subtitle={`Ingredients for planned meals from ${formatPlanDate(fromDate)}${
-            list ? ` through ${formatPlanDate(list.to_date)}` : ""
-          }.`}
+          subtitle={`Ingredients for planned meals from ${windowSummary}.`}
+          loading={loading && !list}
+          loadingMessage="Loading shopping list…"
           actions={
             !isSaved ? (
               <Button type="button" disabled={saving || loading} loading={saving} onClick={() => void handleSave()}>
@@ -208,48 +243,13 @@ export function ShoppingPage() {
             )
           }
         />
-
-        <div className="shopping-controls">
-          <div className="shopping-presets" role="group" aria-label="Shopping window">
-            {DAY_PRESETS.map((preset) => (
-              <button
-                key={preset}
-                type="button"
-                className={`button button-secondary${days === preset ? " shopping-preset-active" : ""}`}
-                onClick={() => setDays(preset)}
-              >
-                {preset} day{preset === 1 ? "" : "s"}
-              </button>
-            ))}
-          </div>
-          <label className="shopping-toggle">
-            <input
-              type="checkbox"
-              checked={excludePantry}
-              onChange={(event) => setExcludePantry(event.target.checked)}
-            />
-            Exclude pantry items
-          </label>
-        </div>
-
-        {error ? <p className="error-text">{error}</p> : null}
+        {error ? <p className="error-text shopping-page-error">{error}</p> : null}
       </Card>
 
       {list && totalCount > 0 ? (
         <p className="shopping-progress-bar" role="status">
           {checkedCount} of {totalCount} completed
         </p>
-      ) : null}
-
-      {list && list.planned_meals.length > 0 ? (
-        <Card density="comfortable" className="stack">
-          <h3>Planned meals in window</h3>
-          <ul className="shopping-planned-meals bulleted-list">
-            {list.planned_meals.map((meal) => (
-              <li key={meal.meal_plan_item_id}>{formatPlannedMealLabel(meal)}</li>
-            ))}
-          </ul>
-        </Card>
       ) : null}
 
       {list && list.items.length === 0 ? (
@@ -261,47 +261,87 @@ export function ShoppingPage() {
         </Card>
       ) : null}
 
-      {[...grouped.entries()].map(([category, categoryItems]) => (
-        <Card key={category} density="comfortable" className="stack">
-          <h3 className="shopping-category">{category}</h3>
-          <ul className="shopping-items">
-            {categoryItems.map((item) => {
-              const includesLine = item.approximate ? formatIncludesLine(item.raw_components) : null;
-              return (
-                <li key={`${item.ingredient_id}-${item.unit_id}-${item.quantity}`} className="shopping-item">
-                  <label className="shopping-item-label">
-                    {isSaved && item.id != null ? (
-                      <input
-                        type="checkbox"
-                        checked={item.checked}
-                        onChange={(event) => void handleToggle(item, event.target.checked)}
-                      />
+      <div className="shopping-checklist">
+        {[...grouped.entries()].map(([category, categoryItems]) => (
+          <Card key={category} density="comfortable" className="stack shopping-category-card">
+            <h2 className="shopping-category">{formatShoppingCategory(category, categoryLabels)}</h2>
+            <ul className="shopping-items">
+              {categoryItems.map((item) => {
+                const includesLine = item.approximate ? formatIncludesLine(item.raw_components) : null;
+                return (
+                  <li key={`${item.ingredient_id}-${item.unit_id}-${item.quantity}`} className="shopping-item">
+                    <label className="shopping-item-label">
+                      {isSaved && item.id != null ? (
+                        <input
+                          type="checkbox"
+                          checked={item.checked}
+                          onChange={(event) => void handleToggle(item, event.target.checked)}
+                        />
+                      ) : null}
+                      <span className={item.checked ? "shopping-item-checked" : undefined}>
+                        <strong>
+                          {item.approximate ? "~" : ""}
+                          {formatQuantity(item.quantity)} {item.unit_symbol}
+                        </strong>{" "}
+                        {item.display_name}
+                        {item.optional ? <span className="muted"> (optional)</span> : null}
+                      </span>
+                    </label>
+                    {includesLine ? <p className="muted shopping-item-detail">includes: {includesLine}</p> : null}
+                    {item.source_contributions.length > 0 ? (
+                      <ul className="shopping-item-breakdown bulleted-list">
+                        {item.source_contributions.map((contribution) => (
+                          <li key={`${contribution.meal_plan_item_id}-${contribution.quantity}-${contribution.unit_symbol}`}>
+                            {formatContributionLabel(contribution)}
+                          </li>
+                        ))}
+                      </ul>
                     ) : null}
-                    <span className={item.checked ? "shopping-item-checked" : undefined}>
-                      <strong>
-                        {item.approximate ? "~" : ""}
-                        {formatQuantity(item.quantity)} {item.unit_symbol}
-                      </strong>{" "}
-                      {item.display_name}
-                      {item.optional ? <span className="muted"> (optional)</span> : null}
-                    </span>
-                  </label>
-                  {includesLine ? <p className="muted shopping-item-detail">includes: {includesLine}</p> : null}
-                  {item.source_contributions.length > 0 ? (
-                    <ul className="shopping-item-breakdown bulleted-list">
-                      {item.source_contributions.map((contribution) => (
-                        <li key={`${contribution.meal_plan_item_id}-${contribution.quantity}-${contribution.unit_symbol}`}>
-                          {formatContributionLabel(contribution)}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
-                </li>
-              );
-            })}
-          </ul>
-        </Card>
-      ))}
+                  </li>
+                );
+              })}
+            </ul>
+          </Card>
+        ))}
+      </div>
+
+      {list ? (
+        <div className="shopping-secondary-panels">
+          {list.planned_meals.length > 0 ? (
+            <Card density="comfortable">
+              <DisclosureSection title={`Planned meals in window (${list.planned_meals.length})`}>
+                <ul className="shopping-planned-meals bulleted-list">
+                  {list.planned_meals.map((meal) => (
+                    <li key={meal.meal_plan_item_id}>{formatPlannedMealLabel(meal)}</li>
+                  ))}
+                </ul>
+              </DisclosureSection>
+            </Card>
+          ) : null}
+
+          <Card density="comfortable">
+            <DisclosureSection title="List options">
+              <div className="shopping-controls-panel">
+                <SegmentedControl
+                  className="segmented-control-full"
+                  ariaLabel="Shopping window"
+                  value={days}
+                  options={dayOptions}
+                  onChange={setDays}
+                />
+                <div className="shopping-options-row">
+                  <Switch
+                    checked={excludePantry}
+                    onChange={(event) => setExcludePantry(event.target.checked)}
+                    label="Exclude pantry items"
+                  />
+                </div>
+                <p className="muted shopping-options-hint">Window: {windowSummary}</p>
+              </div>
+            </DisclosureSection>
+          </Card>
+        </div>
+      ) : null}
     </div>
   );
 }

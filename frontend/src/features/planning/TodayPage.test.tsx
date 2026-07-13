@@ -118,6 +118,6 @@ describe("TodayPage", () => {
 
     expect(await screen.findByRole("link", { name: "Cook" })).toHaveAttribute("href", "/recipes/42/cook");
     fireEvent.click(screen.getByRole("button", { name: "Review" }));
-    expect(screen.getByRole("button", { name: "Ate as planned" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Ate as planned/ })).toBeInTheDocument();
   });
 });

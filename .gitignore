@@ -15,6 +15,9 @@ node_modules/
 dist/
 coverage/
 *.tsbuildinfo
+frontend/e2e/test-results/
+frontend/playwright-report/
+frontend/blob-report/
 
 # Environment
 .env

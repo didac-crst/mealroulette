@@ -1,0 +1,326 @@
+/* Phase 4 — catalog workflow surfaces */
+
+.catalog-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.catalog-edit-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-bottom: var(--space-2);
+}
+
+.catalog-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.catalog-search-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.catalog-search-label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.catalog-search-label input {
+  font-weight: 400;
+}
+
+.catalog-search-meta {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.dish-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .dish-card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--space-4);
+  }
+}
+
+.dish-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  transition:
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease;
+}
+
+.dish-card:hover {
+  border-color: var(--brand-teal-200);
+  box-shadow: var(--shadow-md);
+}
+
+.dish-card-link {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.dish-card-link:focus-visible {
+  outline: 2px solid var(--brand-teal-200);
+  outline-offset: 2px;
+}
+
+.dish-card-media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(180deg, var(--brand-teal-50) 0%, var(--surface-muted) 100%);
+}
+
+.dish-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dish-card-emoji {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.dish-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+
+.dish-card-title {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.dish-card-description {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}
+
+.dish-card-meta {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.catalog-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.catalog-detail-hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.catalog-detail-intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .catalog-detail-intro {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.catalog-detail-media {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 12rem;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, var(--brand-teal-50) 0%, var(--surface-muted) 100%);
+  overflow: hidden;
+}
+
+.catalog-detail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.catalog-detail-emoji {
+  font-size: 3.5rem;
+  line-height: 1;
+}
+
+.catalog-detail-title {
+  margin: 0;
+  font-size: clamp(1.5rem, 4vw, 1.875rem);
+  line-height: 1.2;
+}
+
+.catalog-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.catalog-recipe-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.catalog-recipe-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  min-width: 0;
+}
+
+.catalog-recipe-card-link {
+  flex: 1;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.catalog-recipe-card-link:hover .catalog-recipe-card-title {
+  color: var(--color-interactive);
+}
+
+.catalog-recipe-card-link:focus-visible {
+  outline: 2px solid var(--brand-teal-200);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+@media (min-width: 640px) {
+  .catalog-recipe-card {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.catalog-recipe-card-title {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: 600;
+}
+
+.catalog-recipe-card-meta {
+  margin: var(--space-1) 0 0;
+  font-size: var(--font-size-sm);
+}
+
+.catalog-recipe-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: var(--space-3) var(--space-4);
+}
+
+.catalog-section-title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-section-title);
+  font-weight: 600;
+}
+
+.form-sticky-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) 0 max(var(--space-4), env(safe-area-inset-bottom));
+  background: linear-gradient(to top, var(--surface-page) 75%, transparent);
+}
+
+.form-sticky-actions-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.form-sticky-actions .button {
+  min-height: var(--control-md);
+}
+
+.form-save-status {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.form-save-status-unsaved {
+  color: var(--color-text-muted);
+}
+
+.form-save-status-saving {
+  color: var(--color-interactive);
+}
+
+.form-save-status-saved {
+  color: var(--color-success);
+}
+
+.form-save-status-error {
+  color: var(--color-danger);
+}
+
+.catalog-form-disclosure-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+@media (min-width: 768px) {
+  .form-sticky-actions {
+    position: static;
+    padding: 0;
+    background: none;
+  }
+}

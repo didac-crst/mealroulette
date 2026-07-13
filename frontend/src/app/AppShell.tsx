@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
 
 import { ButtonLink } from "../components/ButtonLink";
+import { SkipToContent } from "../components/SkipToContent";
 import { Button } from "../components/ui";
 import { useAuth } from "../features/auth/AuthContext";
 import { useReviewAttentionCount } from "../features/planning/useReviewAttentionCount";
@@ -19,7 +20,9 @@ export function AppShell() {
   const cookingMode = isCookingModePath(location.pathname);
 
   return (
-    <div className={`app-shell-layout${cookingMode ? " app-shell-layout--cooking" : ""}`}>
+    <>
+      {!cookingMode ? <SkipToContent /> : null}
+      <div className={`app-shell-layout${cookingMode ? " app-shell-layout--cooking" : ""}`}>
       {!cookingMode ? (
         <DesktopSidebar
           username={username}
@@ -61,5 +64,6 @@ export function AppShell() {
         {!cookingMode ? <MobileBottomNav reviewAttention={reviewAttention} /> : null}
       </div>
     </div>
+    </>
   );
 }

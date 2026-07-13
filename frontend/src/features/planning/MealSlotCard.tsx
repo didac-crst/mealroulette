@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import type { Dish, Recipe } from "../../api/catalog";
 import { fetchRecipes } from "../../api/catalog";
 import { ApiError } from "../../api/client";
-import { Button, StatusBadge } from "../../components/ui";
+import { Button, ChoiceCard, DisclosureSection, OverflowMenu, ResponsiveActionGroup, SearchSelect, StatusBadge } from "../../components/ui";
+import { dishPlaceholderEmoji } from "../dishes/dishVisual";
 import {
   fetchMealRating,
   lockMealPlanItem,
@@ -26,6 +27,7 @@ import {
   canSwapMeal,
   isFutureMealDate,
   leftoverSourceLabel,
+  selectionReasonsList,
   showLeftoverSourcePicker,
   showLeftoverSourceSummary,
   showReviewExecutionActions,
@@ -36,7 +38,6 @@ import {
 } from "./planFormat";
 import { mealStatusBadgeVariant } from "./mealStatusBadge";
 import { canOpenCookMode } from "./todayMeals";
-import { SelectionReasons } from "./SelectionReasons";
 import { StarRating } from "./StarRating";
 import { SwapSlotDialog } from "./SwapSlotDialog";
 
@@ -104,6 +105,48 @@ export function MealSlotCard({
   const swapTargets = swappableMeals(item, planItems);
   const showReroll = mode === "plan" && onReroll && canRerollMeal(item);
   const showSwap = mode === "plan" && onSwap && canSwapMeal(item);
+  const dish = item.dish_id ? dishes.find((entry) => entry.id === item.dish_id) : undefined;
+  const dishOptions = useMemo(
+    () => dishes.map((entry) => ({ value: String(entry.id), label: entry.name })),
+    [dishes],
+  );
+  const recipeOptions = useMemo(
+    () =>
+      recipes.map((recipe) => ({
+        value: String(recipe.id),
+        label: `${recipe.variant_name}${recipe.is_main ? " (main)" : ""}`,
+      })),
+    [recipes],
+  );
+  const selectionReasons = selectionReasonsList(item);
+  const overflowItems = useMemo(() => {
+    const items: Array<{
+      id: string;
+      label: string;
+      onClick: () => void;
+      disabled?: boolean;
+    }> = [];
+    if (showSwap) {
+      items.push({
+        id: "swap",
+        label: "Swap",
+        disabled: actionBusy,
+        onClick: () => setSwapOpen(true),
+      });
+    }
+    items.push({
+      id: "lock",
+      label: item.is_locked ? "Unlock" : "Lock",
+      disabled: actionBusy || (!item.is_locked && !item.dish_id),
+      onClick: () =>
+        void run(() =>
+          item.is_locked
+            ? unlockMealPlanItem(accessToken, item.id)
+            : lockMealPlanItem(accessToken, item.id),
+        ),
+    });
+    return items;
+  }, [actionBusy, item, showSwap, accessToken]);
 
   useEffect(() => {
     if (mode !== "plan" || !item.dish_id) {
@@ -219,6 +262,7 @@ export function MealSlotCard({
 
   const cardClass = [
     "meal-slot-card",
+    mode === "today" ? "meal-hero-card" : "",
     isFuture && mode === "review" ? "meal-slot-card-future" : "",
     isReviewed ? "meal-slot-card-reviewed" : "",
   ]
@@ -227,69 +271,101 @@ export function MealSlotCard({
 
   return (
     <article className={cardClass}>
-      <div className="meal-slot-header">
-        <div>
-          <p className="meal-slot-label">{formatSlotLabel(item.meal_slot)}</p>
-          {item.dish_id ? (
-            <Link to={`/dishes/${item.dish_id}`} className="meal-slot-dish">
-              {item.dish_name}
-            </Link>
-          ) : (
-            <p className="muted meal-slot-empty">No dish assigned</p>
-          )}
-          {item.recipe_variant_name && !(mode === "plan" && item.dish_id && recipes.length > 0) ? (
-            <p className="muted meal-slot-recipe">{item.recipe_variant_name}</p>
-          ) : null}
+      {mode === "today" ? (
+        <div className="meal-hero-top">
+          <div className="meal-hero-media" aria-hidden={!dish?.image_url}>
+            {dish?.image_url ? (
+              <img src={dish.image_url} alt="" className="meal-hero-image" />
+            ) : (
+              <span className="meal-hero-emoji">{dish ? dishPlaceholderEmoji(dish) : "🍽️"}</span>
+            )}
+          </div>
+          <div className="meal-hero-content">
+            <div className="meal-hero-heading">
+              <p className="meal-slot-label">{formatSlotLabel(item.meal_slot)}</p>
+              <StatusBadge variant={statusBadgeVariant}>{statusLabel}</StatusBadge>
+            </div>
+            {item.dish_id ? (
+              <Link to={`/dishes/${item.dish_id}`} className="meal-hero-title">
+                {item.dish_name}
+              </Link>
+            ) : (
+              <p className="muted meal-slot-empty">No dish assigned</p>
+            )}
+            {item.recipe_variant_name ? (
+              <p className="muted meal-hero-recipe">{item.recipe_variant_name}</p>
+            ) : null}
+          </div>
         </div>
-        <div className="meal-slot-header-aside">
-          <StatusBadge variant={statusBadgeVariant}>{statusLabel}</StatusBadge>
-          {showUndo ? (
-            <button
-              type="button"
-              className="button button-undo"
-              disabled={busy}
-              onClick={() => void run(() => resetMealPlanItemStatus(accessToken, item.id))}
-            >
-              Undo status
-            </button>
-          ) : null}
+      ) : (
+        <div className="meal-slot-header">
+          <div>
+            <p className="meal-slot-label">{formatSlotLabel(item.meal_slot)}</p>
+            {item.dish_id ? (
+              <Link to={`/dishes/${item.dish_id}`} className="meal-slot-dish">
+                {item.dish_name}
+              </Link>
+            ) : (
+              <p className="muted meal-slot-empty">No dish assigned</p>
+            )}
+            {item.recipe_variant_name && !(mode === "plan" && item.dish_id && recipes.length > 0) ? (
+              <p className="muted meal-slot-recipe">{item.recipe_variant_name}</p>
+            ) : null}
+          </div>
+          <div className="meal-slot-header-aside">
+            <StatusBadge variant={statusBadgeVariant}>{statusLabel}</StatusBadge>
+            {showUndo ? (
+              <button
+                type="button"
+                className="button button-undo"
+                disabled={busy}
+                onClick={() => void run(() => resetMealPlanItemStatus(accessToken, item.id))}
+              >
+                Undo status
+              </button>
+            ) : null}
+          </div>
         </div>
-      </div>
+      )}
+
+      {mode === "today" && showUndo ? (
+        <div className="meal-hero-undo">
+          <button
+            type="button"
+            className="button button-undo"
+            disabled={busy}
+            onClick={() => void run(() => resetMealPlanItemStatus(accessToken, item.id))}
+          >
+            Undo status
+          </button>
+        </div>
+      ) : null}
 
       {mode === "plan" ? (
         <>
           <label className="meal-slot-assign">
             <span className="muted">Assign dish</span>
-            <select
-              value={item.dish_id ?? ""}
+            <SearchSelect
+              ariaLabel="Assign dish"
+              value={item.dish_id ? String(item.dish_id) : ""}
+              options={dishOptions}
               disabled={busy || item.is_locked}
-              onChange={(event) => void handleDishChange(event.target.value)}
-            >
-              <option value="">—</option>
-              {dishes.map((dish) => (
-                <option key={dish.id} value={dish.id}>
-                  {dish.name}
-                </option>
-              ))}
-            </select>
+              placeholder="Search dishes…"
+              onChange={(nextValue) => void handleDishChange(nextValue)}
+            />
           </label>
 
           {item.dish_id && recipes.length > 0 ? (
             <label className="meal-slot-assign">
               <span className="muted">Recipe variant</span>
-              <select
-                value={item.recipe_id ?? ""}
+              <SearchSelect
+                ariaLabel="Recipe variant"
+                value={item.recipe_id ? String(item.recipe_id) : ""}
+                options={recipeOptions}
                 disabled={busy || item.is_locked}
-                onChange={(event) => void handleRecipeChange(event.target.value)}
-              >
-                <option value="">—</option>
-                {recipes.map((recipe) => (
-                  <option key={recipe.id} value={recipe.id}>
-                    {recipe.variant_name}
-                    {recipe.is_main ? " (main)" : ""}
-                  </option>
-                ))}
-              </select>
+                placeholder="Search recipes…"
+                onChange={(nextValue) => void handleRecipeChange(nextValue)}
+              />
             </label>
           ) : item.dish_id && recipes.length === 0 && recipesLoading ? (
             <p className="muted meal-slot-recipe">Loading recipes…</p>
@@ -297,9 +373,17 @@ export function MealSlotCard({
             <p className="muted meal-slot-recipe">No recipe for this dish yet.</p>
           ) : null}
 
-          <SelectionReasons item={item} />
+          {selectionReasons.length > 0 ? (
+            <DisclosureSection title="Why this meal">
+              <ul className="selection-reasons-list">
+                {selectionReasons.map((reason, index) => (
+                  <li key={`${index}-${reason}`}>{reason}</li>
+                ))}
+              </ul>
+            </DisclosureSection>
+          ) : null}
 
-          <div className="meal-slot-actions">
+          <div className="meal-slot-actions meal-slot-actions-primary">
             {showReroll ? (
               <Button
                 type="button"
@@ -311,32 +395,7 @@ export function MealSlotCard({
                 Reroll
               </Button>
             ) : null}
-            {showSwap ? (
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                disabled={actionBusy}
-                onClick={() => setSwapOpen(true)}
-              >
-                Swap
-              </Button>
-            ) : null}
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              disabled={actionBusy || (!item.is_locked && !item.dish_id)}
-              onClick={() =>
-                void run(() =>
-                  item.is_locked
-                    ? unlockMealPlanItem(accessToken, item.id)
-                    : lockMealPlanItem(accessToken, item.id),
-                )
-              }
-            >
-              {item.is_locked ? "Unlock" : "Lock"}
-            </Button>
+            <OverflowMenu items={overflowItems} ariaLabel={`More actions for ${formatSlotLabel(item.meal_slot)}`} />
           </div>
           {swapOpen && onSwap ? (
             <SwapSlotDialog
@@ -354,7 +413,7 @@ export function MealSlotCard({
       ) : null}
 
       {mode === "today" && (item.dish_id || showReviewExecutionActions(item)) ? (
-        <div className="meal-slot-actions meal-slot-actions-primary today-meal-primary-actions">
+        <ResponsiveActionGroup className="meal-hero-actions" stackOnMobile>
           {item.dish_id ? (
             canOpenCookMode(item) ? (
               cookRecipeId ? (
@@ -373,11 +432,11 @@ export function MealSlotCard({
             )
           ) : null}
           {showReviewExecutionActions(item) && onReviewToggle ? (
-            <button type="button" className="button button-secondary" onClick={onReviewToggle}>
+            <button type="button" className="button button-ghost" onClick={onReviewToggle}>
               {reviewExpanded ? "Hide review" : "Review"}
             </button>
           ) : null}
-        </div>
+        </ResponsiveActionGroup>
       ) : null}
 
       {mode === "review" && isFuture ? (
@@ -387,31 +446,25 @@ export function MealSlotCard({
       {showReviewPanel ? (
         <>
           {showReviewExecutionActions(item) && !skipFormOpen ? (
-            <div className="meal-slot-actions meal-slot-actions-primary">
-              <button
-                type="button"
-                className="button button-secondary"
+            <div className="review-outcome-grid" role="group" aria-label="How did this meal go?">
+              <ChoiceCard
+                title="Ate as planned"
+                description="Mark this meal as eaten."
                 disabled={busy || !item.dish_id}
                 onClick={() => void run(() => markMealPlanItemEaten(accessToken, item.id))}
-              >
-                Ate as planned
-              </button>
-              <button
-                type="button"
-                className="button button-secondary"
+              />
+              <ChoiceCard
+                title="Skipped"
+                description="Did not eat this meal."
                 disabled={busy}
                 onClick={() => setSkipFormOpen(true)}
-              >
-                Skipped
-              </button>
-              <button
-                type="button"
-                className="button button-secondary"
+              />
+              <ChoiceCard
+                title="Ate leftovers"
+                description="Finished leftovers instead."
                 disabled={busy}
                 onClick={() => void run(() => markMealPlanItemAteLeftovers(accessToken, item.id))}
-              >
-                Ate leftovers
-              </button>
+              />
             </div>
           ) : null}
 

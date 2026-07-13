@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { fetchSchedulerSettings } from "../../api/scheduler";
 import { fetchMealHistory, type MealPlanItem } from "../../api/planning";
 import { ButtonLink } from "../../components/ButtonLink";
-import { Button, Card, EmptyState, PageHeader, PageLoadingState } from "../../components/ui";
+import { Button, Card, EmptyState, PageShell } from "../../components/ui";
 import { todayIsoInTimeZone } from "../../lib/datetime";
 import { useAuth } from "../auth/AuthContext";
 import { TodayMealCard } from "./TodayMealCard";
@@ -104,14 +104,14 @@ export function TodayPage() {
     });
   }
 
-  if (loading && !plan) {
-    return <PageLoadingState message="Loading today…" />;
-  }
-
   return (
     <section className="stack today-page">
-      <PageHeader title="Today" subtitle={subtitleParts.join(" · ")} />
-
+      <PageShell
+        title="Today"
+        subtitle={subtitleParts.join(" · ")}
+        loading={loading && !plan}
+        loadingMessage="Loading today…"
+      >
       {error ? (
         <Card density="comfortable">
           <p className="error" role="alert">
@@ -157,6 +157,7 @@ export function TodayPage() {
         <Link to="/review">View full week</Link>
         <Link to="/plan">Plan week</Link>
       </div>
+      </PageShell>
     </section>
   );
 }
