@@ -304,6 +304,10 @@ export async function fetchRecipe(token: string, recipeId: number): Promise<Reci
   return apiRequest<Recipe>(`/api/recipes/${recipeId}`, withToken(token));
 }
 
+export async function fetchRecipeByPublicKey(token: string, publicKey: string): Promise<Recipe> {
+  return apiRequest<Recipe>(`/api/recipes/by-key/${encodeURIComponent(publicKey)}`, withToken(token));
+}
+
 export async function deleteRecipe(token: string, recipeId: number): Promise<void> {
   return apiRequest<void>(`/api/recipes/${recipeId}`, {
     method: "DELETE",

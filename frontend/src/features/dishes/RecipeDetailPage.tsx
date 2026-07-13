@@ -18,7 +18,7 @@ import {
 } from "../../api/catalog";
 import { ApiError } from "../../api/client";
 import { ButtonLink } from "../../components/ButtonLink";
-import { Card, EmptyState, PageShell } from "../../components/ui";
+import { Card, EmptyState, MetadataList, PageShell } from "../../components/ui";
 import { CookingIngredientList } from "./CookingIngredientList";
 import { useAuth } from "../auth/AuthContext";
 import { RECIPE_TYPE_OPTIONS, formatOptionLabel } from "./classification";
@@ -27,8 +27,9 @@ import {
   formatRecipeDifficulty,
   formatRecipeTime,
 } from "./effectiveValues";
-import { formatComputedTraits } from "./computedTraits";
+import { RecipeCompositionChart } from "./RecipeCompositionChart";
 import { formatStepTimerLabel, stepTimerDurationSeconds } from "./recipeCooking";
+import { buildInferredTraitItems } from "./InferredTraitsSummary";
 import { TechnicalValue } from "../../components/ui";
 
 export function RecipeDetailPage() {
@@ -109,6 +110,9 @@ export function RecipeDetailPage() {
   }
 
   const subtitleParts = [dish.name, recipe.is_main ? "Main recipe" : null].filter(Boolean);
+  const recipeTraitItems = buildInferredTraitItems(recipe.computed_traits_json).filter(
+    (item) => item.label !== "Food groups",
+  );
 
   return (
     <div className="catalog-page">
@@ -124,9 +128,6 @@ export function RecipeDetailPage() {
           <>
             <span>{subtitleParts.join(" · ")}</span>
             {recipe.description ? <span>{recipe.description}</span> : null}
-            {recipe.computed_traits_json ? (
-              <span className="muted">Traits: {formatComputedTraits(recipe.computed_traits_json)}</span>
-            ) : null}
           </>
         }
         actions={
@@ -141,6 +142,13 @@ export function RecipeDetailPage() {
 
       <Card density="comfortable">
         <TechnicalValue label="Public key" value={recipe.public_key} />
+      </Card>
+
+      <Card density="comfortable">
+        <RecipeCompositionChart traits={recipe.computed_traits_json} />
+        {recipeTraitItems.length > 0 ? (
+          <MetadataList className="recipe-trait-metadata" items={recipeTraitItems} />
+        ) : null}
       </Card>
 
       {dish ? <DishInheritedContext dish={dish} tags={tags} /> : null}

@@ -47,9 +47,8 @@ class PlanningService:
             cook = cook if cook is not None else item.dish.default_cook_time_minutes
         return prep, cook
 
-    @classmethod
-    def to_item_public(cls, item: MealPlanItem) -> MealPlanItemPublic:
-        prep_time_minutes, cook_time_minutes = cls._meal_times(item)
+    def to_item_public(self, item: MealPlanItem) -> MealPlanItemPublic:
+        prep_time_minutes, cook_time_minutes = self._meal_times(item)
         return MealPlanItemPublic(
             id=item.id,
             meal_plan_id=item.meal_plan_id,
@@ -69,6 +68,7 @@ class PlanningService:
             leftover_source_item_id=item.leftover_source_item_id,
             selection_reasons_json=item.selection_reasons_json,
             computed_traits_json=effective_traits_for_meal_plan_item(
+                db=self.db,
                 recipe=item.recipe,
                 dish_recipes=item.dish.recipes if item.dish is not None else None,
             ),
@@ -77,14 +77,13 @@ class PlanningService:
             updated_at=item.updated_at,
         )
 
-    @classmethod
-    def to_plan_public(cls, plan: MealPlan) -> MealPlanPublic:
+    def to_plan_public(self, plan: MealPlan) -> MealPlanPublic:
         items = sorted(plan.items, key=lambda item: (item.date, meal_slot_sort_key(item.meal_slot)))
         return MealPlanPublic(
             id=plan.id,
             week_start_date=plan.week_start_date,
             status=plan.status,
-            items=[cls.to_item_public(item) for item in items],
+            items=[self.to_item_public(item) for item in items],
             roulette_undo_available=plan.last_roulette_undo_json is not None,
             created_at=plan.created_at,
             updated_at=plan.updated_at,

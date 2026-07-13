@@ -12,7 +12,6 @@ from mealroulette.services.food_groups import (
     PROTEIN_FOOD_GROUPS,
     food_group_for_ingredient,
 )
-from mealroulette.services.quantities import UnitInfo
 from mealroulette.services.scheduler.family_vector import (
     build_family_vector_for_recipe,
     family_key_for_ingredient,
@@ -131,6 +130,21 @@ def _dominant_family(family_grams: dict[str, Decimal]) -> str | None:
     return max(family_grams.items(), key=lambda item: item[1])[0]
 
 
+def _recipe_has_trait_inputs(recipe: Recipe) -> bool:
+    if not recipe.ingredients:
+        return False
+    first = recipe.ingredients[0]
+    return first.ingredient is not None and first.unit is not None
+
+
+def compute_recipe_traits_now(db: Session, recipe: Recipe) -> dict:
+    from mealroulette.services.scheduler.catalog import load_reference_units
+
+    gram_unit, ml_unit = load_reference_units(db)
+    loaded = recipe if _recipe_has_trait_inputs(recipe) else load_recipe_for_traits(db, recipe.id) or recipe
+    return build_recipe_traits(loaded, gram_unit=gram_unit, ml_unit=ml_unit)
+
+
 def load_recipe_for_traits(db: Session, recipe_id: int) -> Recipe | None:
     return db.scalar(
         select(Recipe)
@@ -177,15 +191,16 @@ def refresh_recipes_for_ingredient(
 
 def effective_traits_for_meal_plan_item(
     *,
+    db: Session,
     recipe: Recipe | None,
     dish_recipes: list[Recipe] | None,
 ) -> dict | None:
-    if recipe is not None and recipe.computed_traits_json is not None:
-        return recipe.computed_traits_json
-    if dish_recipes:
+    target = recipe
+    if target is None and dish_recipes:
         main = next((item for item in dish_recipes if item.is_main), None)
-        if main is None:
+        if main is None and dish_recipes:
             main = min(dish_recipes, key=lambda item: item.id)
-        if main.computed_traits_json is not None:
-            return main.computed_traits_json
-    return None
+        target = main
+    if target is None:
+        return None
+    return compute_recipe_traits_now(db, target)

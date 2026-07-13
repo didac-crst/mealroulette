@@ -9,7 +9,7 @@ from mealroulette.models.catalog import Dish, Ingredient, Recipe, RecipeIngredie
 from mealroulette.models.enums import DishStatus, MealPlanItemStatus, SeasonalityMode
 from mealroulette.models.planning import MealPlanItem, MealRating
 from mealroulette.schemas.scheduler import PlanningRulesConfig
-from mealroulette.services.quantities import UnitInfo
+from mealroulette.services.recipe_traits import compute_recipe_traits_now
 from mealroulette.services.scheduler.family_vector import build_family_vector_for_dish_main_recipe, unit_info_from_model
 from mealroulette.services.scheduler.types import DishCandidate, EatenMealSnapshot
 
@@ -71,7 +71,7 @@ def load_dish_candidates(db: Session, *, rules: PlanningRulesConfig) -> list[Dis
                 carb_tags=frozenset(tag.name for tag in dish.tags if tag.family == "carb"),
                 style_tags=frozenset(tag.name for tag in dish.tags if tag.family == "style"),
                 vector=vector_result.weights,
-                computed_traits_json=main_recipe.computed_traits_json,
+                computed_traits_json=compute_recipe_traits_now(db, main_recipe),
                 average_rating=ratings.get(dish.id),
                 seasonality_mode=seasonality.seasonality_mode if seasonality else SeasonalityMode.all_year,
                 preferred_months=frozenset(seasonality.preferred_months if seasonality else []),
