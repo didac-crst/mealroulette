@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from mealroulette.api.routes.auth import router as auth_router
+from mealroulette.api.routes.backup import router as backup_router
 from mealroulette.api.routes.catalog import router as catalog_router
 from mealroulette.api.routes.cooking import router as cooking_router
 from mealroulette.api.routes.health import router as health_router
@@ -48,6 +49,7 @@ def create_app() -> FastAPI:
     app.include_router(health_router, prefix="/api")
     app.include_router(auth_router, prefix="/api")
     app.include_router(catalog_router, prefix="/api")
+    app.include_router(backup_router, prefix="/api")
     app.include_router(cooking_router, prefix="/api")
     app.include_router(planning_router, prefix="/api")
     app.include_router(shopping_router, prefix="/api")

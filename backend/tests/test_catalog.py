@@ -189,6 +189,8 @@ def test_full_dish_recipe_flow(client, catalog_seed, admin_headers):
     assert detail_body["default_cook_time_minutes"] == 20
     assert detail_body["default_difficulty"] == "easy"
     assert detail_body["thermomix_possible"] is False
+    assert detail_body["meal_composition"] == "main_dish"
+    assert detail_body["simple_dish_part"] is None
 
     steps = client.get(f"/api/recipes/{recipe_id}/steps", headers=admin_headers)
     assert steps.status_code == 200
@@ -224,3 +226,112 @@ def test_delete_ingredient_referenced_by_recipe_returns_409(client, catalog_seed
     response = client.delete(f"/api/ingredients/{salmon['id']}", headers=admin_headers)
 
     assert response.status_code == 409
+
+
+def test_update_ingredient_family_clears_stale_family_id(
+    client, catalog_seed, admin_headers, db_session
+):
+    from sqlalchemy import select
+
+    from mealroulette.models.catalog import Ingredient
+
+    created = client.post(
+        "/api/ingredients",
+        headers=admin_headers,
+        json={
+            "canonical_name": "review beans",
+            "display_name": "Review Beans",
+            "family": "green_bean_family",
+        },
+    )
+    assert created.status_code == 201
+    ingredient = db_session.scalar(
+        select(Ingredient).where(Ingredient.canonical_name == "review beans")
+    )
+    assert ingredient is not None
+    ingredient.family = "bean_vegetable_family"
+    ingredient.family_id = "green_bean_family"
+    db_session.commit()
+
+    updated = client.put(
+        f"/api/ingredients/{ingredient.id}",
+        headers=admin_headers,
+        json={"family": "brassica_family"},
+    )
+    assert updated.status_code == 200
+    body = updated.json()
+    assert body["family"] == "brassica_family"
+    db_session.refresh(ingredient)
+    assert ingredient.family_id == "brassica_family"
+
+
+def test_dish_meal_composition_defaults_to_main_dish(client, catalog_seed, admin_headers):
+    response = client.post(
+        "/api/dishes",
+        headers=admin_headers,
+        json={"name": "Plain Pasta"},
+    )
+    assert response.status_code == 201
+    body = response.json()
+    assert body["meal_composition"] == "main_dish"
+    assert body["simple_dish_part"] is None
+
+
+def test_dish_simple_dish_requires_part(client, catalog_seed, admin_headers):
+    response = client.post(
+        "/api/dishes",
+        headers=admin_headers,
+        json={"name": "Roast Potatoes", "meal_composition": "simple_dish"},
+    )
+    assert response.status_code == 422
+
+
+def test_dish_simple_dish_with_part(client, catalog_seed, admin_headers):
+    response = client.post(
+        "/api/dishes",
+        headers=admin_headers,
+        json={
+            "name": "Roast Potatoes",
+            "meal_composition": "simple_dish",
+            "simple_dish_part": "sidedish",
+        },
+    )
+    assert response.status_code == 201
+    body = response.json()
+    assert body["meal_composition"] == "simple_dish"
+    assert body["simple_dish_part"] == "sidedish"
+
+
+def test_dish_update_clears_simple_dish_part_when_not_simple(client, catalog_seed, admin_headers):
+    created = client.post(
+        "/api/dishes",
+        headers=admin_headers,
+        json={
+            "name": "Ham Croquettes",
+            "meal_composition": "simple_dish",
+            "simple_dish_part": "centerpiece",
+        },
+    ).json()
+
+    updated = client.put(
+        f"/api/dishes/{created['id']}",
+        headers=admin_headers,
+        json={"meal_composition": "main_dish"},
+    )
+    assert updated.status_code == 200
+    body = updated.json()
+    assert body["meal_composition"] == "main_dish"
+    assert body["simple_dish_part"] is None
+
+
+def test_dish_main_dish_rejects_simple_dish_part(client, catalog_seed, admin_headers):
+    response = client.post(
+        "/api/dishes",
+        headers=admin_headers,
+        json={
+            "name": "Risotto",
+            "meal_composition": "main_dish",
+            "simple_dish_part": "centerpiece",
+        },
+    )
+    assert response.status_code == 422

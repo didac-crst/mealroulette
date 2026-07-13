@@ -15,16 +15,16 @@ import { ApiError } from "../../api/client";
 import { ButtonLink } from "../../components/ButtonLink";
 import { useAuth } from "../auth/AuthContext";
 import {
-  CARB_OPTIONS,
-  COURSE_OPTIONS,
+  MEAL_COMPOSITION_OPTIONS,
   MONTH_OPTIONS,
-  PROTEIN_OPTIONS,
   SEASONALITY_MODE_OPTIONS,
+  SIMPLE_DISH_PART_OPTIONS,
   STATUS_OPTIONS,
   STYLE_OPTIONS,
-  TEMPERATURE_OPTIONS,
+  curatedDishTagIds,
   findTagId,
 } from "./classification";
+import { InferredTraitsSummary } from "./InferredTraitsSummary";
 
 const emptySeasonality: SeasonalityInput = {
   seasonality_mode: "all_year",
@@ -36,6 +36,8 @@ const emptyForm: DishInput = {
   description: "",
   image_url: "",
   course: null,
+  meal_composition: "main_dish",
+  simple_dish_part: null,
   status: "active",
   suitable_for_lunch: null,
   suitable_for_dinner: null,
@@ -54,6 +56,8 @@ function dishToForm(dish: Dish): DishInput {
     description: dish.description,
     image_url: dish.image_url ?? "",
     course: dish.course,
+    meal_composition: dish.meal_composition,
+    simple_dish_part: dish.simple_dish_part,
     status: dish.status,
     suitable_for_lunch: dish.suitable_for_lunch,
     suitable_for_dinner: dish.suitable_for_dinner,
@@ -70,6 +74,19 @@ function dishToForm(dish: Dish): DishInput {
         }
       : emptySeasonality,
   };
+}
+
+function deriveCourse(
+  mealComposition: DishInput["meal_composition"],
+  existing: Dish["course"] | null | undefined,
+): Dish["course"] | null {
+  if (mealComposition === "dessert") {
+    return "dessert";
+  }
+  if (existing === "starter") {
+    return "starter";
+  }
+  return "main";
 }
 
 function toggleFamilyTag(tagIds: number[], tags: Tag[], family: string, name: string): number[] {
@@ -163,6 +180,7 @@ export function DishEditPage() {
   const navigate = useNavigate();
   const { accessToken, isAdmin } = useAuth();
   const [form, setForm] = useState<DishInput>(emptyForm);
+  const [dish, setDish] = useState<Dish | null>(null);
   const [tags, setTags] = useState<Tag[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(!isNew);
@@ -189,9 +207,10 @@ export function DishEditPage() {
     }
     let cancelled = false;
     fetchDish(accessToken, Number(dishId))
-      .then((dish) => {
+      .then((loaded) => {
         if (!cancelled) {
-          setForm(dishToForm(dish));
+          setDish(loaded);
+          setForm(dishToForm(loaded));
         }
       })
       .catch((err) => {
@@ -222,7 +241,11 @@ export function DishEditPage() {
         description: form.description || null,
         image_url: form.image_url || null,
         notes: form.notes || null,
-        course: form.course || null,
+        course: deriveCourse(form.meal_composition, dish?.course),
+        meal_composition: form.meal_composition ?? "main_dish",
+        simple_dish_part:
+          form.meal_composition === "simple_dish" ? form.simple_dish_part ?? null : null,
+        tag_ids: curatedDishTagIds(form.tag_ids ?? [], tags),
         seasonality: {
           seasonality_mode: form.seasonality?.seasonality_mode ?? "all_year",
           preferred_months:
@@ -288,15 +311,21 @@ export function DishEditPage() {
             </label>
             <div className="grid-2">
               <label>
-                Course
+                Meal composition
                 <select
-                  value={form.course ?? ""}
-                  onChange={(event) =>
-                    setForm({ ...form, course: (event.target.value || null) as Dish["course"] })
-                  }
+                  value={form.meal_composition ?? "main_dish"}
+                  onChange={(event) => {
+                    const meal_composition = event.target.value as Dish["meal_composition"];
+                    setForm({
+                      ...form,
+                      meal_composition,
+                      simple_dish_part:
+                        meal_composition === "simple_dish" ? form.simple_dish_part : null,
+                    });
+                  }}
                 >
-                  {COURSE_OPTIONS.map((option) => (
-                    <option key={option.value || "unset"} value={option.value}>
+                  {MEAL_COMPOSITION_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
                   ))}
@@ -318,53 +347,54 @@ export function DishEditPage() {
                 </select>
               </label>
             </div>
+            {form.meal_composition === "simple_dish" ? (
+              <label>
+                Simple dish part
+                <select
+                  value={form.simple_dish_part ?? ""}
+                  onChange={(event) =>
+                    setForm({
+                      ...form,
+                      simple_dish_part: (event.target.value || null) as Dish["simple_dish_part"],
+                    })
+                  }
+                  required
+                >
+                  <option value="" disabled>
+                    Select part…
+                  </option>
+                  {SIMPLE_DISH_PART_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
+            <p className="muted field-hint">
+              Controls planner slots: one main dish, or two simple dishes (centerpiece + side).
+              Desserts are manual-only.
+            </p>
           </div>
         </fieldset>
 
         <fieldset>
-          <legend>Food profile</legend>
-          <div className="stack">
-            <div>
-              <h3 className="tag-family-title">Protein / main source</h3>
-              <MultiSelectPills
-                options={PROTEIN_OPTIONS}
-                family="protein"
-                tags={tags}
-                selectedIds={form.tag_ids ?? []}
-                onChange={(tag_ids) => setForm({ ...form, tag_ids })}
-              />
-            </div>
-            <div>
-              <h3 className="tag-family-title">Carb / base</h3>
-              <MultiSelectPills
-                options={CARB_OPTIONS}
-                family="carb"
-                tags={tags}
-                selectedIds={form.tag_ids ?? []}
-                onChange={(tag_ids) => setForm({ ...form, tag_ids })}
-              />
-            </div>
-            <div>
-              <h3 className="tag-family-title">Styles</h3>
-              <MultiSelectPills
-                options={STYLE_OPTIONS}
-                family="style"
-                tags={tags}
-                selectedIds={form.tag_ids ?? []}
-                onChange={(tag_ids) => setForm({ ...form, tag_ids })}
-              />
-            </div>
-            <div>
-              <h3 className="tag-family-title">Temperature</h3>
-              <MultiSelectPills
-                options={TEMPERATURE_OPTIONS}
-                family="temperature"
-                tags={tags}
-                selectedIds={form.tag_ids ?? []}
-                onChange={(tag_ids) => setForm({ ...form, tag_ids })}
-              />
-            </div>
-          </div>
+          <legend>Inferred from main recipe</legend>
+          <InferredTraitsSummary traits={dish?.computed_traits_json} />
+        </fieldset>
+
+        <fieldset>
+          <legend>Curated style (optional)</legend>
+          <p className="muted field-hint">
+            Only for styles the planner cannot infer from ingredients, such as soup.
+          </p>
+          <MultiSelectPills
+            options={STYLE_OPTIONS}
+            family="style"
+            tags={tags}
+            selectedIds={form.tag_ids ?? []}
+            onChange={(tag_ids) => setForm({ ...form, tag_ids })}
+          />
         </fieldset>
 
         <fieldset>

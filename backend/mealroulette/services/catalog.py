@@ -5,6 +5,7 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
+from mealroulette.data.seed_taxonomy import resolve_family_fields
 from mealroulette.models.catalog import (
     Dish,
     DishSeasonality,
@@ -17,7 +18,16 @@ from mealroulette.models.catalog import (
     Tag,
     Unit,
 )
-from mealroulette.models.enums import AggregationStrategy, ConversionSource, DishStatus, RecipeType, SeasonalityMode, SeasonalityStrength
+from mealroulette.models.enums import (
+    AggregationStrategy,
+    ConversionSource,
+    DishStatus,
+    MealComposition,
+    RecipeType,
+    SeasonalityMode,
+    SeasonalityStrength,
+)
+from mealroulette.schemas.catalog import validate_meal_composition_fields
 from mealroulette.services.food_groups import food_group_for_ingredient
 from mealroulette.services.ingredient_resolver import IngredientResolverService
 from mealroulette.services.names import normalize_name
@@ -72,6 +82,13 @@ class CatalogService:
 
     def __init__(self, db: Session):
         self.db = db
+
+    @staticmethod
+    def _validate_dish_meal_composition(dish: Dish) -> None:
+        try:
+            validate_meal_composition_fields(dish.meal_composition, dish.simple_dish_part)
+        except ValueError as exc:
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
 
     @staticmethod
     def _main_recipe(dish: Dish) -> Recipe | None:
@@ -137,6 +154,8 @@ class CatalogService:
             default_cook_time_minutes=main_recipe.cook_time_minutes if main_recipe else None,
             default_difficulty=main_recipe.difficulty if main_recipe else None,
             course=dish.course,
+            meal_composition=dish.meal_composition,
+            simple_dish_part=dish.simple_dish_part,
             status=dish.status,
             image_url=dish.image_url,
             suitable_for_lunch=dish.suitable_for_lunch,
@@ -361,6 +380,23 @@ class CatalogService:
 
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid confirm action")
 
+    def _sync_ingredient_family(self, ingredient: Ingredient) -> None:
+        if not ingredient.family:
+            ingredient.family_id = None
+            return
+        try:
+            family_id, food_group_id = resolve_family_fields(
+                self.db,
+                family=ingredient.family,
+                family_id=ingredient.family_id,
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+        ingredient.family = family_id
+        ingredient.family_id = family_id
+        if food_group_id and not ingredient.food_group:
+            ingredient.food_group = food_group_id
+
     def create_ingredient(self, payload: IngredientCreateRequest) -> Ingredient:
         canonical = normalize_name(payload.canonical_name)
         if self.db.scalar(select(Ingredient).where(func.lower(Ingredient.canonical_name) == canonical)):
@@ -390,6 +426,8 @@ class CatalogService:
             season_end_month=payload.season_end_month,
             notes=payload.notes,
         )
+        if payload.family:
+            self._sync_ingredient_family(ingredient)
         self.db.add(ingredient)
         self.db.flush()
         aliases = {canonical, *(normalize_name(alias) for alias in payload.aliases)}
@@ -402,9 +440,13 @@ class CatalogService:
     def update_ingredient(self, ingredient_id: int, payload: IngredientUpdateRequest) -> Ingredient:
         ingredient = self.get_ingredient(ingredient_id)
         updates = payload.model_dump(exclude_unset=True)
-        trait_fields = {"category", "food_group", "family", "pantry_item"}
+        trait_fields = {"category", "food_group", "family", "family_id", "pantry_item"}
         for field, value in updates.items():
             setattr(ingredient, field, value)
+        if "family" in updates and "family_id" not in updates:
+            ingredient.family_id = None
+        if "family" in updates or "family_id" in updates:
+            self._sync_ingredient_family(ingredient)
         if "category" in updates or "food_group" in updates:
             ingredient.food_group = food_group_for_ingredient(
                 food_group=ingredient.food_group,
@@ -615,6 +657,8 @@ class CatalogService:
                 description=payload.description,
                 default_servings=payload.default_servings,
                 course=payload.course,
+                meal_composition=payload.meal_composition,
+                simple_dish_part=payload.simple_dish_part,
                 status=payload.status,
                 image_url=payload.image_url,
                 suitable_for_lunch=payload.suitable_for_lunch,
@@ -654,6 +698,15 @@ class CatalogService:
         )
         for field, value in updates.items():
             setattr(dish, field, value)
+        if "meal_composition" in payload.model_fields_set and dish.meal_composition != MealComposition.simple_dish:
+            dish.simple_dish_part = None
+        if "simple_dish_part" in payload.model_fields_set and payload.simple_dish_part is None:
+            if dish.meal_composition == MealComposition.simple_dish:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="simple_dish_part is required when meal_composition is simple_dish",
+                )
+        self._validate_dish_meal_composition(dish)
         if "status" in payload.model_fields_set:
             dish.active = dish.status == DishStatus.active
         if "active" in payload.model_fields_set and payload.active is not None:

@@ -10,6 +10,7 @@ MealRoulette is a self-hosted household meal planning app for deciding what to e
 - [Cursor implementation roadmap](docs/CURSOR_ROADMAP.md)
 - [MVP scope](docs/MVP.md)
 - [Development backlog and progress](docs/BACKLOG.md)
+- [Backup, export, and import spec](docs/BACKUP_EXPORT_IMPORT.md)
 - [Releases and git tags](docs/RELEASES.md) — product version tags (`v0.1.0`, `v0.2.0`, …)
 - [CodeRabbit PR reviews](docs/CODERABBIT.md) — manual `@coderabbitai review` after CI is green
 

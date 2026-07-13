@@ -4,7 +4,7 @@ This is the short implementation target. The full specification lives in `SPECS.
 
 ## MVP Goal
 
-Build a self-hosted app that lets a household enter recipes, manually plan lunch and dinner, generate shopping lists, receive Telegram reminders, and cook from step-by-step recipe views. Automatic scheduling and LLM assistance can arrive after the manual flow is reliable.
+Build a self-hosted app that lets a household enter recipes, manually or automatically plan lunch and dinner, generate shopping lists, receive Telegram reminders, cook from step-by-step recipe views, and recover household data from backups. LLM assistance can arrive after the manual flow is reliable.
 
 ## MVP Scope
 
@@ -23,22 +23,23 @@ Build a self-hosted app that lets a household enter recipes, manually plan lunch
 - Ingredient normalization flow.
 - Weekly lunch/dinner meal plan.
 - Manual meal assignment.
-- Lock/unlock, mark eaten, skip, ate leftovers, reroll placeholder.
+- Lock/unlock, mark eaten, skip, ate leftovers, generate week, reroll, and undo.
 - Ratings.
 - Shopping list generation for a selected date window.
 - Compatible unit aggregation.
 - Pantry-item exclusion.
 - Telegram settings and manual test send.
 - Daily Telegram reminder through APScheduler.
+- Step-by-step cooking mode with timers.
+- Basic automatic scheduler using explainable rules.
 - JSON export/import.
 - Mounted backup folder.
+- Scheduled backups.
 
 ### Should Have
 
-- Step-by-step cooking mode with timers.
 - Persisted shopping lists.
-- Scheduled backups.
-- Basic automatic scheduler using explainable rules.
+- PostgreSQL dump backup.
 
 ### Not in MVP
 
@@ -60,9 +61,11 @@ Build a self-hosted app that lets a household enter recipes, manually plan lunch
 5. Add meal plan models and manual planning. ✅
 6. Add shopping list generation. ✅
 7. Add Telegram reminders. ✅ ([`v0.4.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.4.0), PR #7)
-8. Add backups.
-9. Add cooking mode.
+8. Add automatic scheduling. ✅ ([`v0.5.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.5.0))
+9. Add computed recipe traits and taxonomy. ✅ ([`v0.6.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.6.0), PR #9)
+10. Add cooking mode. ✅ ([`v0.7.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.7.0), PR #10)
+11. Add backup, export, and import. See [BACKUP_EXPORT_IMPORT.md](BACKUP_EXPORT_IMPORT.md).
 
 ## MVP Acceptance Test
 
-A user can log in from a phone, create several dishes with normalized ingredients, plan lunch and dinner for the next three days, generate a shopping list, receive or manually send the list through Telegram, mark meals as eaten, and rate them. **Backup export** remains Phase 10.
+A user can log in from a phone, create several dishes with normalized ingredients, plan lunch and dinner for the next three days, generate a shopping list, receive or manually send the list through Telegram, cook a recipe with step timers, mark meals as eaten, rate them, and export a restorable backup (Phase 11 — see [RESTORE.md](RESTORE.md)). Import into an empty database is supported for disaster recovery; merge into a live database is not.

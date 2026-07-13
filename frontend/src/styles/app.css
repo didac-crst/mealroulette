@@ -540,6 +540,7 @@ button:disabled {
 }
 
 .checkbox-pill {
+  display: inline-flex;
   flex-direction: row;
   align-items: center;
   gap: 0.35rem;
@@ -547,6 +548,8 @@ button:disabled {
   border: 1px solid #d9e2ec;
   border-radius: 999px;
   font-size: 0.85rem;
+  cursor: pointer;
+  width: auto;
 }
 
 .inline-form {
@@ -896,6 +899,12 @@ fieldset {
 
 legend {
   padding: 0 0.25rem;
+}
+
+.field-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
 }
 
 .shopping-header {

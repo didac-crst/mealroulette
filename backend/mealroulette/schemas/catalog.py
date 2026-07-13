@@ -13,10 +13,12 @@ from mealroulette.models.enums import (
     DifficultyLevel,
     DishCourse,
     DishStatus,
+    MealComposition,
     RecipeType,
     SeasonalityMode,
     SeasonalityStrength,
     ServingTemperature,
+    SimpleDishPart,
     UnitDimension,
     VegetableLevel,
 )
@@ -31,6 +33,17 @@ def _validate_food_group_value(value: str | None) -> str | None:
     if normalized not in _VALID_FOOD_GROUPS:
         raise ValueError(f"Unknown food_group: {value}")
     return normalized
+
+
+def validate_meal_composition_fields(
+    meal_composition: MealComposition | None,
+    simple_dish_part: SimpleDishPart | None,
+) -> None:
+    if meal_composition == MealComposition.simple_dish:
+        if simple_dish_part is None:
+            raise ValueError("simple_dish_part is required when meal_composition is simple_dish")
+    elif simple_dish_part is not None:
+        raise ValueError("simple_dish_part is only allowed when meal_composition is simple_dish")
 
 
 class UnitPublic(BaseModel):
@@ -403,6 +416,8 @@ class DishPublic(BaseModel):
     default_cook_time_minutes: int | None
     default_difficulty: DifficultyLevel | None
     course: DishCourse | None
+    meal_composition: MealComposition
+    simple_dish_part: SimpleDishPart | None
     status: DishStatus
     image_url: str | None
     suitable_for_lunch: bool | None
@@ -433,6 +448,8 @@ class DishCreateRequest(BaseModel):
     default_cook_time_minutes: int | None = Field(default=None, ge=0)
     default_difficulty: DifficultyLevel | None = None
     course: DishCourse | None = None
+    meal_composition: MealComposition = MealComposition.main_dish
+    simple_dish_part: SimpleDishPart | None = None
     status: DishStatus = DishStatus.active
     image_url: str | None = Field(default=None, max_length=512)
     suitable_for_lunch: bool | None = None
@@ -446,6 +463,11 @@ class DishCreateRequest(BaseModel):
     tag_ids: list[int] = Field(default_factory=list)
     seasonality: SeasonalityUpsertRequest | None = None
 
+    @model_validator(mode="after")
+    def validate_meal_composition(self) -> "DishCreateRequest":
+        validate_meal_composition_fields(self.meal_composition, self.simple_dish_part)
+        return self
+
 
 class DishUpdateRequest(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=255)
@@ -455,6 +477,8 @@ class DishUpdateRequest(BaseModel):
     default_cook_time_minutes: int | None = Field(default=None, ge=0)
     default_difficulty: DifficultyLevel | None = None
     course: DishCourse | None = None
+    meal_composition: MealComposition | None = None
+    simple_dish_part: SimpleDishPart | None = None
     status: DishStatus | None = None
     image_url: str | None = Field(default=None, max_length=512)
     suitable_for_lunch: bool | None = None

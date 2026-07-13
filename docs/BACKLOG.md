@@ -15,9 +15,9 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Phase 11 — Backup, export, and import** on `main` (from `v0.7.0`).
+**Phase 11 — Taxonomy hardening + backup** on branch `phase-11/taxonomy-backup` (from `v0.7.0`).
 
-See [CURSOR_ROADMAP.md § Phase 11](CURSOR_ROADMAP.md#phase-11---backup-export-and-import).
+Taxonomy and scheduler target semantics must settle **before** the JSON backup contract is finalized. See [PHASE11_HANDOFF.md](PHASE11_HANDOFF.md), [ADR 002](adr/002-canonical-taxonomy-before-backup.md), and [BACKUP_EXPORT_IMPORT.md](BACKUP_EXPORT_IMPORT.md).
 
 **v0.7 shipped** as [`v0.7.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.7.0) — Today home, cooking mode, step timers, Telegram cooking alerts, dish search. Release notes: [docs/releases/v0.7.0.md](releases/v0.7.0.md).
 
@@ -231,31 +231,32 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [ ] Suggest seasonality
 - [ ] Review before save
 
-### Future — composable meals (meal role)
+### Future — composable meals (meal composition)
 
-**Status:** Backlog only — do not implement until v0.6 catalog traits are stable. Captures product intent for “one slot = one complete meal **or** two half meals”; desserts planned manually only.
+**Status:** Catalog metadata implemented in Phase 11 (`meal_composition`, `simple_dish_part` on `dishes`). Scheduler pairing and multi-component slots remain backlog.
 
-**Meal role** (exactly one per dish/recipe — name TBD in spec):
+See [MEAL_COMPOSITION.md](MEAL_COMPOSITION.md).
 
-| Role | Scheduler | Example |
+| Composition | Scheduler | Example |
 | --- | --- | --- |
-| **Complete meal** | Auto-assignable as the sole dish for a lunch/dinner slot | Mushroom risotto |
-| **Half meal** | Auto-assignable only as **one of two** components in the same slot | Beans & potatoes; ham croquettes |
-| **Dessert** | **Manual assign only** — never picked by roulette | Fruit crumble |
+| **`main_dish`** | Auto-assignable as the sole dish for a lunch/dinner slot | Mushroom risotto |
+| **`simple_dish`** | Auto-assignable only as **one of two** components in the same slot | Beans & potatoes; ham croquettes |
+| **`dessert`** | **Manual assign only** — never picked by roulette | Fruit crumble |
+
+When `meal_composition = simple_dish`, **`simple_dish_part`** is required: `centerpiece` or `sidedish`.
 
 **Product rules (draft):**
 
-- A lunch/dinner slot is satisfied by either **1× complete** or **2× half** (pair chosen by scheduler).
-- Do **not** model “beans + croquettes” as a single synthetic complete dish — keep real dishes separate for ingredients, ratings, and cooking.
-- Desserts may appear on the plan (for shopping and review) but are **excluded from** `generate_week`, `reroll`, and scheduled roulette.
-- Half-meal pairing should prefer variety/compatibility (shared style, temperature, prep burden — rules TBD).
+- A lunch/dinner slot is satisfied by either **1× main_dish** or **2× simple_dish** (centerpiece + sidedish).
+- Do **not** model “beans + croquettes” as a single synthetic dish — keep real dishes separate.
+- Desserts may appear on the plan but are **excluded from** auto generation.
+- Half-meal pairing should prefer variety/compatibility (rules TBD).
 
 **Checklist (when scheduled):**
 
-- [ ] Data model: `meal_role` enum (`complete_meal`, `half_meal`, `dessert`) — decide **dish-level vs recipe-level** (today `course` is on `Dish`: `starter` \| `main` \| `dessert`; may replace or coexist).
-- [ ] Migration + catalog UI: required role on save; seed/fixture updates.
-- [ ] **Multi-component slots:** `MealPlanItem` currently has one `dish_id` / `recipe_id` per slot — need components (e.g. child rows or JSON list) without breaking the unique `(plan, date, meal_slot)` constraint.
-- [ ] Scheduler: candidate generation for complete vs compatible half pairs; desserts filtered out of auto pool.
+- [x] Data model: `meal_composition` + `simple_dish_part` on `dishes` (migration `027`, catalog UI).
+- [ ] **Multi-component slots:** `MealPlanItem` currently has one `dish_id` / `recipe_id` per slot — need components without breaking the unique `(plan, date, meal_slot)` constraint.
+- [ ] Scheduler: candidate generation for main vs compatible simple-dish pairs; desserts filtered out of auto pool.
 - [ ] Weekly targets: count **per slot** (one fish dinner), not per component — document edge cases.
 - [ ] Similarity / vectors: score pairs (or each half vs neighbours); avoid double-counting same slot in neighbour logic.
 - [ ] Shopping list: aggregate ingredients from **all** components in a slot.
@@ -299,7 +300,7 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 8 | Explainable scheduler | v0.5 | Done (`v0.5.0`) |
 | 9 | Computed recipe traits & catalog keys | v0.6 | Done (PR #9, `v0.6.0`) |
 | 10 | Cooking mode | v0.7 | Done (PR #10, `v0.7.0`) |
-| 11 | Backup, export, and import | v1.0 | Not started |
+| 11 | Taxonomy hardening + backup, export, import | v1.0 | Ready for PR (`phase-11/taxonomy-backup`) |
 | 12 | LLM-assisted entry & localization | v0.8 | Not started |
 | 13 | v1 hardening | v1.0 | Not started |
 
@@ -548,10 +549,10 @@ Cross-reference for [docs/MVP.md](MVP.md). Checked items are done; the rest trac
 - [x] Meal reroll (generate week, reroll, undo — Phase 8)
 - [x] Shopping list generation
 - [x] Telegram settings and reminders
-- [ ] JSON export / import
-- [ ] Mounted backup folder (directory exists; backup logic not yet implemented)
+- [x] JSON export / import (Phase 11 — admin API, scheduled backups, restore docs)
+- [x] Mounted backup folder (`./backups` volume; retention cleanup)
 
-**MVP acceptance test** (partially achievable): log in from a phone, create dishes, plan three days, generate a shopping list, send via Telegram, mark meals eaten, rate them. **Still missing:** export a backup (Phase 11).
+**MVP acceptance test:** log in from a phone, create dishes, plan three days, generate a shopping list, send via Telegram, mark meals eaten, rate them, and export a restorable JSON backup (admin → Backups or `GET /api/export/full`). Optional `pg_dump` when enabled in backup settings.
 
 ---
 

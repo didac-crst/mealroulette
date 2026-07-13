@@ -29,6 +29,11 @@ const INTEGRATION_LINKS: SettingsLink[] = [
     title: "Telegram",
     description: "Daily reminders, bot commands, subscribers.",
   },
+  {
+    to: "/settings/backups",
+    title: "Backups",
+    description: "JSON export, schedule, retention, and manual runs.",
+  },
 ];
 
 const CATALOG_LINKS: SettingsLink[] = [

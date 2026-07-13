@@ -13,6 +13,8 @@ const dish = (overrides: Partial<Dish> = {}): Dish => ({
   default_cook_time_minutes: null,
   default_difficulty: null,
   course: null,
+  meal_composition: "main_dish",
+  simple_dish_part: null,
   status: "active",
   image_url: null,
   suitable_for_lunch: null,

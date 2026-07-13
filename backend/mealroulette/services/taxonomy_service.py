@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session, selectinload
 
-from mealroulette.data.taxonomy_loader import load_food_groups, load_ingredient_families
 from mealroulette.models.catalog import Ingredient, IngredientAlias, IngredientUnitConversion
+from mealroulette.models.taxonomy import FoodGroup, IngredientFamily
 from mealroulette.schemas.taxonomy import (
     FoodGroupOverview,
     FoodGroupPublic,
@@ -18,29 +18,30 @@ class TaxonomyService:
     def __init__(self, db: Session) -> None:
         self.db = db
 
-    @staticmethod
-    def _family_ids() -> set[str]:
-        return {family.id for family in load_ingredient_families()}
+    def _family_ids(self) -> set[str]:
+        return set(self.db.scalars(select(IngredientFamily.id)))
 
     def list_food_groups(self) -> list[FoodGroupPublic]:
+        rows = self.db.scalars(select(FoodGroup).order_by(FoodGroup.label)).all()
         return [
-            FoodGroupPublic(id=group.id, label=group.label, description=group.description)
-            for group in load_food_groups()
+            FoodGroupPublic(id=row.id, label=row.label, description=row.description or "")
+            for row in rows
         ]
 
     def list_families(self, *, food_group_id: str | None = None) -> list[IngredientFamilyPublic]:
-        families = load_ingredient_families()
+        query = select(IngredientFamily).order_by(IngredientFamily.label)
         if food_group_id is not None:
             normalized = food_group_id.strip().lower()
-            families = [family for family in families if family.food_group == normalized]
+            query = query.where(IngredientFamily.food_group_id == normalized)
+        rows = self.db.scalars(query).all()
         return [
             IngredientFamilyPublic(
-                id=family.id,
-                food_group=family.food_group,
-                label=family.label,
-                description=family.description,
+                id=row.id,
+                food_group=row.food_group_id,
+                label=row.label,
+                description=row.description or "",
             )
-            for family in families
+            for row in rows
         ]
 
     def list_ingredients_for_family(self, family_id: str) -> list[IngredientTaxonomySummary]:
@@ -48,7 +49,12 @@ class TaxonomyService:
         normalized = family_id.strip().lower()
         ingredients = self.db.scalars(
             select(Ingredient)
-            .where(func.lower(Ingredient.family) == normalized)
+            .where(
+                or_(
+                    Ingredient.family_id == normalized,
+                    func.lower(Ingredient.family) == normalized,
+                )
+            )
             .options(
                 selectinload(Ingredient.aliases),
                 selectinload(Ingredient.unit_conversions),
@@ -62,7 +68,9 @@ class TaxonomyService:
         alias_count = self.db.scalar(select(func.count()).select_from(IngredientAlias)) or 0
         approved = (
             self.db.scalar(
-                select(func.count()).select_from(IngredientUnitConversion).where(IngredientUnitConversion.approved.is_(True))
+                select(func.count())
+                .select_from(IngredientUnitConversion)
+                .where(IngredientUnitConversion.approved.is_(True))
             )
             or 0
         )
@@ -75,15 +83,15 @@ class TaxonomyService:
             or 0
         )
 
-        families = load_ingredient_families()
+        families = list(self.db.scalars(select(IngredientFamily)))
         family_ids = {family.id for family in families}
         group_rows: dict[str, FoodGroupOverview] = {}
 
-        for group in load_food_groups():
+        for group in self.db.scalars(select(FoodGroup).order_by(FoodGroup.label)):
             group_rows[group.id] = FoodGroupOverview(
                 id=group.id,
                 label=group.label,
-                family_count=sum(1 for family in families if family.food_group == group.id),
+                family_count=sum(1 for family in families if family.food_group_id == group.id),
                 ingredient_count=0,
                 missing_metadata_count=0,
             )
@@ -104,7 +112,7 @@ class TaxonomyService:
 
         return IngredientTaxonomyOverview(
             totals={
-                "food_groups": len(load_food_groups()),
+                "food_groups": len(group_rows),
                 "families": len(families),
                 "ingredients": len(ingredients),
                 "aliases": int(alias_count),
@@ -116,6 +124,8 @@ class TaxonomyService:
 
     @staticmethod
     def _is_missing_family(ingredient: Ingredient, family_ids: set[str]) -> bool:
+        if ingredient.family_id:
+            return False
         if not ingredient.family:
             return True
         return ingredient.family not in family_ids
@@ -128,7 +138,7 @@ class TaxonomyService:
             canonical_name=ingredient.canonical_name,
             display_name=ingredient.display_name,
             food_group=ingredient.food_group,
-            family=ingredient.family,
+            family=ingredient.family_id or ingredient.family,
             pantry_item=ingredient.pantry_item,
             alias_count=len(ingredient.aliases),
             approved_conversion_count=approved,

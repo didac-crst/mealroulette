@@ -18,7 +18,6 @@ import { useAuth } from "../auth/AuthContext";
 import { formatRecipeDifficulty, formatRecipeTime } from "./effectiveValues";
 import { DishClassificationSummary } from "./DishClassificationSummary";
 import { dishPlaceholderEmoji } from "./dishVisual";
-import { formatComputedTraits } from "./computedTraits";
 import { PlanForMealDialog } from "../planning/PlanForMealDialog";
 
 type RecipeSummary = {
@@ -138,9 +137,6 @@ export function DishDetailPage() {
             <h2>{dish.name}</h2>
             {dish.description ? <p>{dish.description}</p> : null}
             <p className="muted">Public key: {dish.public_key}</p>
-            {dish.computed_traits_json ? (
-              <p className="muted">Traits: {formatComputedTraits(dish.computed_traits_json)}</p>
-            ) : null}
           </div>
         </div>
         <div className="row-actions">
