@@ -240,12 +240,27 @@
 
 .target-row-header {
   display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.target-row-heading {
+  display: flex;
   flex-direction: column;
   gap: var(--space-1);
+  min-width: 0;
+}
+
+.target-row-label {
+  font-size: var(--font-size-body);
+  font-weight: 600;
 }
 
 .target-row-hint {
+  margin: 0;
   font-size: var(--font-size-sm);
+  line-height: var(--line-height);
 }
 
 .target-row-fields {

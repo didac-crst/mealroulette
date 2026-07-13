@@ -198,12 +198,6 @@
   min-width: 0;
 }
 
-.catalog-detail-danger {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: var(--space-3);
-}
-
 .catalog-recipe-list {
   display: flex;
   flex-direction: column;
@@ -269,6 +263,12 @@
 .catalog-section-title {
   margin: 0 0 var(--space-3);
   font-size: var(--font-size-section-title);
+  font-weight: 600;
+}
+
+.classification-summary-heading {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-card-title);
   font-weight: 600;
 }
 

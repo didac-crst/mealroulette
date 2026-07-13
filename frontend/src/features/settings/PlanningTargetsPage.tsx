@@ -198,11 +198,11 @@ export function PlanningTargetsPage() {
           <div className="stack">
             {rows.map((row, index) => (
               <div key={`${row.key}-${index}`} className="target-row">
-                <div className="target-row-header row-between">
-                  <div>
-                    <strong>{targetLabel(row.key) || "New target"}</strong>
+                <div className="target-row-header">
+                  <div className="target-row-heading">
+                    <strong className="target-row-label">{targetLabel(row.key) || "New target"}</strong>
                     {targetHint(row.key) ? (
-                      <span className="muted target-row-hint">{targetHint(row.key)}</span>
+                      <p className="muted target-row-hint">{targetHint(row.key)}</p>
                     ) : null}
                   </div>
                   <OverflowMenu

@@ -1,5 +1,7 @@
 import { useId, useState } from "react";
 
+import { copyTextToClipboard } from "../../lib/copyTextToClipboard";
+
 export type TechnicalValueProps = {
   label: string;
   value: string;
@@ -9,17 +11,15 @@ export type TechnicalValueProps = {
 
 export function TechnicalValue({ label, value, className, copyLabel = "Copy" }: TechnicalValueProps) {
   const id = useId();
-  const [copied, setCopied] = useState(false);
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
 
   async function handleCopy() {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1200);
-    } catch {
-      setCopied(false);
-    }
+    const copied = await copyTextToClipboard(value);
+    setCopyState(copied ? "copied" : "failed");
+    window.setTimeout(() => setCopyState("idle"), copied ? 1200 : 1800);
   }
+
+  const copyButtonLabel = copyState === "copied" ? "Copied" : copyState === "failed" ? "Copy failed" : copyLabel;
 
   return (
     <div className={["technical-value", className].filter(Boolean).join(" ")}>
@@ -28,8 +28,13 @@ export function TechnicalValue({ label, value, className, copyLabel = "Copy" }: 
       </span>
       <div className="technical-value-field" role="group" aria-labelledby={id}>
         <code className="technical-value-code">{value}</code>
-        <button type="button" className="technical-value-copy" onClick={() => void handleCopy()} aria-label={`Copy ${label}`}>
-          {copied ? "Copied" : copyLabel}
+        <button
+          type="button"
+          className={`technical-value-copy${copyState === "failed" ? " technical-value-copy-failed" : ""}`}
+          onClick={() => void handleCopy()}
+          aria-label={`Copy ${label}`}
+        >
+          {copyButtonLabel}
         </button>
       </div>
     </div>

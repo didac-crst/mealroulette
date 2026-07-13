@@ -726,6 +726,11 @@
   background: var(--color-interactive-subtle);
 }
 
+.technical-value-copy-failed {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
 /* Phase 9 — settings section headers (title + trailing toggle) */
 .settings-section-header {
   display: flex;

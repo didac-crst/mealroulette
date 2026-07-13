@@ -10,7 +10,7 @@ import {
   selectedTagNames,
 } from "./classification";
 import { formatDifficulty } from "./constants";
-import { InferredTraitsSummary } from "./InferredTraitsSummary";
+import { buildInferredTraitItems } from "./InferredTraitsSummary";
 
 type Props = {
   dish: Dish;
@@ -43,7 +43,7 @@ export function DishInheritedContext({ dish, tags }: Props) {
 
   return (
     <aside className="inherited-context stack">
-      <h3 className="section-title">Inherited from dish</h3>
+      <h3 className="classification-summary-heading">Inherited from dish</h3>
       <MetadataList
         items={[
           {
@@ -67,9 +67,9 @@ export function DishInheritedContext({ dish, tags }: Props) {
           },
           { label: "Default difficulty", value: formatDifficulty(dish.default_difficulty) },
           ...(dish.kids_friendly ? [{ label: "Kids-friendly", value: "Yes" }] : []),
+          ...buildInferredTraitItems(dish.computed_traits_json),
         ]}
       />
-      <InferredTraitsSummary traits={dish.computed_traits_json} />
     </aside>
   );
 }
@@ -87,7 +87,7 @@ export function DishClassificationSummary({ dish, tags }: Props) {
   return (
     <Card density="comfortable" className="classification-summary stack">
       <div>
-        <h2 className="catalog-section-title">Classification</h2>
+        <h3 className="classification-summary-heading">Classification</h3>
         <MetadataList
           items={[
             {
@@ -104,12 +104,12 @@ export function DishClassificationSummary({ dish, tags }: Props) {
             ...(styles.length > 0
               ? [{ label: "Curated style", value: joinLabels(styles, STYLE_OPTIONS) }]
               : []),
+            ...buildInferredTraitItems(dish.computed_traits_json),
           ]}
         />
-        <InferredTraitsSummary traits={dish.computed_traits_json} />
       </div>
       <div>
-        <h3 className="section-title">Planning profile</h3>
+        <h3 className="classification-summary-heading">Planning profile</h3>
         <MetadataList
           items={[
             { label: "Suitable for", value: mealSlots.length > 0 ? mealSlots.join(", ") : "Not set" },
@@ -134,7 +134,7 @@ export function DishClassificationSummary({ dish, tags }: Props) {
       </div>
       {dish.seasonality ? (
         <div>
-          <h3 className="section-title">Seasonality</h3>
+          <h3 className="classification-summary-heading">Seasonality</h3>
           <MetadataList
             items={[
               {

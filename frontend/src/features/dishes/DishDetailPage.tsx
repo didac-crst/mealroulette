@@ -160,9 +160,7 @@ export function DishDetailPage() {
               Edit dish
             </ButtonLink>
           ) : null}
-        </ResponsiveActionGroup>
-        {isAdmin ? (
-          <div className="catalog-detail-danger">
+          {isAdmin ? (
             <button
               type="button"
               className="button button-danger-subtle"
@@ -171,8 +169,8 @@ export function DishDetailPage() {
             >
               Delete dish
             </button>
-          </div>
-        ) : null}
+          ) : null}
+        </ResponsiveActionGroup>
       </Card>
 
       {confirmingDelete ? (
