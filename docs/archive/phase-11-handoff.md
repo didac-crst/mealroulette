@@ -1,4 +1,4 @@
-# Phase 11 handoff — taxonomy hardening before backup
+# Phase 11 Handoff
 
 ## Document metadata
 

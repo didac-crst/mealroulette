@@ -1,11 +1,11 @@
-# Phase 9 Taxonomy And Ingredient Resolver Spec
+# Taxonomy and Ingredient Resolver
 
 ## Document metadata
 
 - **Purpose:** Ingredient taxonomy, food groups, families, resolver APIs, and seed structure.
-- **Authority:** Canonical feature spec for taxonomy behaviour; ADR 001/002 for durable decisions. Proposal draft: [taxonomy/proposal_taxonomy_and_resolver_spec.md](../taxonomy/proposal_taxonomy_and_resolver_spec.md) (superseded).
+- **Authority:** Canonical feature spec for taxonomy behaviour; ADR 001/002 for durable decisions. Superseded proposal: [taxonomy/proposal_taxonomy_and_resolver_spec.md](../taxonomy/proposal_taxonomy_and_resolver_spec.md).
 - **Status:** Living — update when taxonomy YAML, APIs, or resolver rules change.
-- **Update when:** Phase 9+ taxonomy or catalog changes ship.
+- **Update when:** Taxonomy or catalog changes ship.
 
 ---
 

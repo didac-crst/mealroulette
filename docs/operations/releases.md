@@ -1,4 +1,4 @@
-# Releases and tags
+# Releases and Tags
 
 ## Document metadata
 

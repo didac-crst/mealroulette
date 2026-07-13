@@ -1,4 +1,4 @@
-# Cooking mode (Phase 10)
+# Cooking Mode
 
 ## Document metadata
 
@@ -9,8 +9,7 @@
 
 ---
 
-**Target product version:** v0.7 (first slice toward v1.0)  
-**Depends on:** v0.6.0 catalog keys, recipe steps, and recipe ingredients APIs
+**Depends on:** catalog keys, recipe steps, and recipe ingredients APIs (v0.6.0+).
 
 ## Goal
 

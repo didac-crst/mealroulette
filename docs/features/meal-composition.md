@@ -1,4 +1,4 @@
-# Meal composition (dish-level planner metadata)
+# Meal Composition
 
 ## Document metadata
 
@@ -9,7 +9,7 @@
 
 ---
 
-Phase 11 catalog field for how a dish participates in lunch/dinner planning. This is separate from **`course`** (`starter` | `main` | `dessert`), which describes menu position within a meal.
+How a dish participates in lunch/dinner planning. Separate from **`course`** (`starter` | `main` | `dessert`), which describes menu position within a meal.
 
 ## Fields
 

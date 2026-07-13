@@ -1,5 +1,14 @@
 # Taxonomy Validation Workflow
 
+## Document metadata
+
+- **Purpose:** Deterministic + LLM + human exception review for ingredient batches.
+- **Authority:** Working spec for validation tooling — not product behaviour.
+- **Status:** Working spec.
+- **Update when:** Validation commands or promotion workflow change.
+
+---
+
 ## Purpose
 
 Support a broad ingredient expansion, potentially around 2,000 candidate ingredients, without requiring

@@ -1,5 +1,7 @@
 # Taxonomy Validation Report
 
+<!-- Generated report — regenerate with `make validate-taxonomy`; do not hand-edit. -->
+
 ## Summary
 
 - Taxonomy: `backend/mealroulette/data/taxonomy`

@@ -1,4 +1,4 @@
-# Scheduler — family vectors and similarity
+# Scheduler
 
 ## Document metadata
 
@@ -9,7 +9,7 @@
 
 ---
 
-Authoritative rules for **Phase 8 / v0.5** automatic meal roulette (extended in Phase 11 for trait-based targets). Implementation lives in `backend/mealroulette/services/scheduler/`. Product behaviour (reroll, generate week, scheduled job, Telegram) is in [CURSOR_ROADMAP.md](../CURSOR_ROADMAP.md#phase-8---explainable-scheduler).
+Rules for automatic meal roulette: family-vector similarity, weekly targets, and scoring. Implementation lives in `backend/mealroulette/services/scheduler/`. Product behaviour (reroll, generate week, scheduled job, Telegram) is in [CURSOR_ROADMAP.md](../CURSOR_ROADMAP.md#phase-8---explainable-scheduler).
 
 **Purpose:** similarity between dishes for history-aware roulette. **Weekly targets** use main-recipe **computed traits** first (`fish`, `meat`, `pasta`, `rice`, `vegetarian`, …), with **curated style tags** as fallback for non-derivable classifications (e.g. `soup`). See `mealroulette.services.scheduler.targets`.
 

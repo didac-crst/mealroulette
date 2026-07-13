@@ -1,4 +1,13 @@
-# Taxonomy reconciliation log
+# Taxonomy Reconciliation Log
+
+## Document metadata
+
+- **Purpose:** Record of taxonomy reconciliation from proposal to active seed (July 2026).
+- **Authority:** Historical log — current seed is runtime truth under `backend/mealroulette/data/`.
+- **Status:** Frozen log.
+- **Update when:** Do not update except to fix broken links.
+
+---
 
 **Date:** 2026-07-12  
 **ADR:** [001-ingredient-taxonomy-contract.md](../adr/001-ingredient-taxonomy-contract.md)

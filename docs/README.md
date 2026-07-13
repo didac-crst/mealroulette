@@ -9,6 +9,17 @@ Where to look for product truth, feature behaviour, operations, and history.
 - **Status:** Living — update when docs move or new feature specs are added.
 - **Update when:** A new feature spec, ADR, or operations runbook is added; or folder layout changes.
 
+## Naming convention
+
+| Location | Filename pattern | Title (H1) |
+| --- | --- | --- |
+| Repo root | `UPPERCASE.md` for conventional docs | Product name or role |
+| `docs/` control docs | `BACKLOG.md`, `CURSOR_ROADMAP.md`, `MVP.md` | Descriptive title |
+| `docs/features/`, `docs/operations/`, `docs/archive/` | `lowercase-kebab-case.md` | Title Case, no phase labels |
+| `docs/adr/` | `NNN-short-kebab-title.md` | `ADR NNN — …` |
+| `docs/releases/` | `vX.Y.Z.md` | `vX.Y.Z — …` |
+| `docs/taxonomy/` | snake_case for working artifacts | Mark proposal/report/log in metadata |
+
 ---
 
 ## Product truth
@@ -30,7 +41,7 @@ Where to look for product truth, feature behaviour, operations, and history.
 | [features/scheduler.md](features/scheduler.md) | Family vectors, similarity, weekly targets |
 | [features/cooking-mode.md](features/cooking-mode.md) | Today home, step-by-step cooking, timers |
 | [features/meal-composition.md](features/meal-composition.md) | Dish `meal_composition` / planner slots |
-| [features/localization.md](features/localization.md) | Multilingual content (Phase 12 design) |
+| [features/localization.md](features/localization.md) | Multilingual content design (not yet implemented) |
 
 Implementation detail for taxonomy YAML and validation workflows: [taxonomy/README.md](taxonomy/README.md).
 

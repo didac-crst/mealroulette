@@ -1,4 +1,4 @@
-# Restore procedure (Phase 11)
+# Restore Procedure
 
 ## Document metadata
 

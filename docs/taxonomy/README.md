@@ -1,6 +1,15 @@
-# Taxonomy documentation
+# Taxonomy Working Files
 
-Phase 9 ingredient taxonomy specs, proposals, and validation reports.
+## Document metadata
+
+- **Purpose:** Index of taxonomy proposals, validation specs, reports, and tooling artifacts.
+- **Authority:** Points to runtime YAML/seed paths and canonical [features/taxonomy-resolver.md](../features/taxonomy-resolver.md).
+- **Status:** Living index.
+- **Update when:** Taxonomy file layout or validation workflow changes.
+
+---
+
+Ingredient taxonomy proposals, validation specs, and generated reports. Runtime truth lives under `backend/mealroulette/data/`.
 
 ## Active truth (runtime)
 
@@ -18,7 +27,7 @@ Expanded MVP catalogue proposal (~627 candidates, 90 families, 22 food groups):
 
 - [backend/mealroulette/data/taxonomy/proposals/](../backend/mealroulette/data/taxonomy/proposals/)
 - [catalogue_assessment_and_mvp_plan.md](catalogue_assessment_and_mvp_plan.md) — target **500–700** ingredients for MVP, not 2,000 immediately
-- [proposal_taxonomy_and_resolver_spec.md](proposal_taxonomy_and_resolver_spec.md) — **superseded** Phase 9 proposal; canonical spec is [features/taxonomy-resolver.md](../features/taxonomy-resolver.md)
+- [proposal_taxonomy_and_resolver_spec.md](proposal_taxonomy_and_resolver_spec.md) — superseded proposal; canonical spec is [features/taxonomy-resolver.md](../features/taxonomy-resolver.md)
 
 **Do not import proposals until validated and promoted.**
 

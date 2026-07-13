@@ -1,5 +1,14 @@
 # LLM Taxonomy Review Prompt
 
+## Document metadata
+
+- **Purpose:** Prompt template for LLM batch review of ingredient candidates.
+- **Authority:** Tooling artifact for future validation workflow.
+- **Status:** Working tooling — not invoked in production yet.
+- **Update when:** Review criteria or prompt structure change.
+
+---
+
 Use this prompt to review one ingredient candidate batch at a time.
 
 ```text

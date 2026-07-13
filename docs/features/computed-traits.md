@@ -1,4 +1,4 @@
-# Computed Recipe Traits & Catalog Keys
+# Computed Traits and Catalog Keys
 
 ## Document metadata
 
@@ -9,7 +9,7 @@
 
 ---
 
-Phase 9 specification (`v0.6.0`). This document is the source of truth for public keys, ingredient food groups, computed recipe traits, and backward-compatibility rules with the scheduler.
+Source of truth for public keys, ingredient food groups, computed recipe traits, and backward-compatibility rules with the scheduler.
 
 See also: [CURSOR_ROADMAP.md](../CURSOR_ROADMAP.md) § Phase 9, [scheduler.md](scheduler.md) (family vectors for similarity — separate from traits metadata).
 
