@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { Button, Card, PageHeader } from "../../components/ui";
 import { addWeeks, formatPlanDate } from "./planFormat";
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
   onNextWeek: () => void;
   error: string | null;
   children: ReactNode;
+  className?: string;
 };
 
 export function WeekPlanShell({
@@ -24,58 +26,63 @@ export function WeekPlanShell({
   onNextWeek,
   error,
   children,
+  className,
 }: Props) {
+  const pageSubtitle = weekStart
+    ? `${subtitle} · Week of ${formatPlanDate(weekStart)}`
+    : subtitle;
+
   return (
-    <div className="stack plan-page">
-      <section className="card">
-        <div className="week-shell-header">
-          <div>
-            <h2>{title}</h2>
-            {weekStart ? (
-              <p className="muted">
-                {subtitle}
-                <br />
-                Week of {formatPlanDate(weekStart)}
-              </p>
-            ) : null}
-          </div>
-          <div className="week-nav" role="group" aria-label="Week navigation">
-            <button
-              type="button"
-              className="button button-secondary week-nav-button"
-              disabled={!weekStart || loading}
-              onClick={onPreviousWeek}
-              aria-label="Previous week"
-            >
-              <span aria-hidden="true">‹</span>
-              <span className="week-nav-label-long">Previous</span>
-            </button>
-            <button
-              type="button"
-              className="button button-secondary week-nav-button week-nav-today"
-              disabled={loading}
-              onClick={onThisWeek}
-            >
-              This week
-            </button>
-            <button
-              type="button"
-              className="button button-secondary week-nav-button"
-              disabled={!weekStart || loading}
-              onClick={onNextWeek}
-              aria-label="Next week"
-            >
-              <span className="week-nav-label-long">Next</span>
-              <span aria-hidden="true">›</span>
-            </button>
-          </div>
-        </div>
+    <div className={["stack", "plan-page", className].filter(Boolean).join(" ")}>
+      <Card density="comfortable">
+        <PageHeader
+          title={title}
+          subtitle={pageSubtitle}
+          actions={
+            <div className="week-nav" role="group" aria-label="Week navigation">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="week-nav-button"
+                disabled={!weekStart || loading}
+                onClick={onPreviousWeek}
+                aria-label="Previous week"
+              >
+                <span aria-hidden="true">‹</span>
+                <span className="week-nav-label-long">Previous</span>
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="week-nav-button week-nav-today"
+                disabled={loading}
+                onClick={onThisWeek}
+              >
+                This week
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="week-nav-button"
+                disabled={!weekStart || loading}
+                onClick={onNextWeek}
+                aria-label="Next week"
+              >
+                <span className="week-nav-label-long">Next</span>
+                <span aria-hidden="true">›</span>
+              </Button>
+            </div>
+          }
+        />
         {error ? (
-          <p className="error" role="alert">
+          <p className="error week-shell-error" role="alert">
             {error}
           </p>
         ) : null}
-      </section>
+      </Card>
       {children}
     </div>
   );

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import type { Dish, Recipe } from "../../api/catalog";
 import { fetchRecipes } from "../../api/catalog";
 import { ApiError } from "../../api/client";
+import { Button, StatusBadge } from "../../components/ui";
 import {
   fetchMealRating,
   lockMealPlanItem,
@@ -25,16 +26,15 @@ import {
   canSwapMeal,
   isFutureMealDate,
   leftoverSourceLabel,
-  reviewStatusClassName,
   showLeftoverSourcePicker,
   showLeftoverSourceSummary,
   showReviewExecutionActions,
   showReviewRating,
   showSkipSummary,
   showUndoStatus,
-  statusClassName,
   swappableMeals,
 } from "./planFormat";
+import { mealStatusBadgeVariant } from "./mealStatusBadge";
 import { canOpenCookMode } from "./todayMeals";
 import { SelectionReasons } from "./SelectionReasons";
 import { StarRating } from "./StarRating";
@@ -95,8 +95,7 @@ export function MealSlotCard({
   const sourceItems = sourceLookupItems ?? leftoverSources;
   const isReviewed = (mode === "review" || mode === "today") && item.status !== "planned";
   const statusLabel = mode === "review" || mode === "today" ? formatReviewStatus(item) : formatStatus(item.status);
-  const statusClass =
-    mode === "review" || mode === "today" ? reviewStatusClassName(item) : statusClassName(item.status);
+  const statusBadgeVariant = mealStatusBadgeVariant(item, mode);
   const showUndo = (mode === "review" || mode === "today") && showUndoStatus(item);
   const showTodayReviewPanel = mode !== "today" || reviewExpanded;
   const showReviewPanel =
@@ -243,7 +242,7 @@ export function MealSlotCard({
           ) : null}
         </div>
         <div className="meal-slot-header-aside">
-          <span className={statusClass}>{statusLabel}</span>
+          <StatusBadge variant={statusBadgeVariant}>{statusLabel}</StatusBadge>
           {showUndo ? (
             <button
               type="button"
@@ -302,28 +301,31 @@ export function MealSlotCard({
 
           <div className="meal-slot-actions">
             {showReroll ? (
-              <button
+              <Button
                 type="button"
-                className="button button-secondary"
+                variant="roulette"
+                size="sm"
                 disabled={actionBusy}
                 onClick={() => onReroll?.(item)}
               >
                 Reroll
-              </button>
+              </Button>
             ) : null}
             {showSwap ? (
-              <button
+              <Button
                 type="button"
-                className="button button-secondary"
+                variant="secondary"
+                size="sm"
                 disabled={actionBusy}
                 onClick={() => setSwapOpen(true)}
               >
                 Swap
-              </button>
+              </Button>
             ) : null}
-            <button
+            <Button
               type="button"
-              className="button button-secondary"
+              variant="secondary"
+              size="sm"
               disabled={actionBusy || (!item.is_locked && !item.dish_id)}
               onClick={() =>
                 void run(() =>
@@ -334,7 +336,7 @@ export function MealSlotCard({
               }
             >
               {item.is_locked ? "Unlock" : "Lock"}
-            </button>
+            </Button>
           </div>
           {swapOpen && onSwap ? (
             <SwapSlotDialog

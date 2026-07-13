@@ -77,7 +77,7 @@ describe("TodayPage", () => {
     renderTodayPage();
 
     expect(await screen.findByRole("heading", { name: "Today" })).toBeInTheDocument();
-    expect(screen.getByText("No meals planned for today.")).toBeInTheDocument();
+    expect(screen.getByText("Nothing planned yet")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Plan this week" })).toHaveAttribute("href", "/plan");
   });
 

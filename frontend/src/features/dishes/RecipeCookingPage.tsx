@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import {
   cancelCookingTimerAlert,
@@ -20,6 +20,8 @@ import {
   type Unit,
 } from "../../api/catalog";
 import { ApiError } from "../../api/client";
+import { ButtonLink } from "../../components/ButtonLink";
+import { Button, PageLoadingState } from "../../components/ui";
 import { useAuth } from "../auth/AuthContext";
 import { CookingActiveTimersBar } from "./CookingActiveTimersBar";
 import { CookingStepTimer } from "./CookingStepTimer";
@@ -273,11 +275,7 @@ export function RecipeCookingPage() {
   }
 
   if (loading) {
-    return (
-      <section className="cooking-mode">
-        <p className="muted">Loading cooking mode…</p>
-      </section>
-    );
+    return <PageLoadingState message="Loading cooking mode…" />;
   }
 
   if (error || !recipe || !dish) {
@@ -286,9 +284,9 @@ export function RecipeCookingPage() {
         <p className="error" role="alert">
           {error ?? "Recipe not found"}
         </p>
-        <Link to="/dishes" className="button button-secondary">
+        <ButtonLink to="/dishes" variant="secondary">
           Back to dishes
-        </Link>
+        </ButtonLink>
       </section>
     );
   }
@@ -302,9 +300,9 @@ export function RecipeCookingPage() {
           <p className="cooking-mode-context">{dish.name}</p>
           <h1 className="cooking-mode-title">{recipe.variant_name}</h1>
         </div>
-        <Link to={recipeDetailPath} className="button button-secondary cooking-mode-exit">
+        <ButtonLink to={recipeDetailPath} variant="secondary" className="cooking-mode-exit">
           Exit
-        </Link>
+        </ButtonLink>
       </header>
 
       <CookingActiveTimersBar
@@ -358,22 +356,23 @@ export function RecipeCookingPage() {
       </div>
 
       <footer className="cooking-mode-controls">
-        <button
+        <Button
           type="button"
-          className="button button-secondary"
+          variant="secondary"
+          size="lg"
           disabled={!canGoPrevious(stepIndex)}
           onClick={() => setStepIndex((index) => previousStepIndex(index))}
         >
           Previous
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
-          className="button"
+          size="lg"
           disabled={!canGoNext(stepIndex, stepCount)}
           onClick={() => setStepIndex((index) => nextStepIndex(index, stepCount))}
         >
-          Next
-        </button>
+          Next step
+        </Button>
       </footer>
     </section>
   );

@@ -449,10 +449,20 @@ Deliverables:
 Order:
 
 1. Today (`TodayPage`, `TodayMealCard`)
-2. Plan (`PlanWeekPage`, `MealSlotCard`, roulette toolbar → orange)
+2. Plan (`PlanWeekPage`, `MealSlotCard`, roulette toolbar)
 3. Review (`ReviewWeekPage`)
 4. Shopping (`ShoppingPage`)
 5. Cooking mode (`RecipeCookingPage` — simplified chrome)
+
+Deliverables:
+
+- [x] `PageHeader`, `PageLoadingState`, `EmptyState`, `StatusBadge` adopted on daily workflow pages.
+- [x] Canonical status copy (`Needs review`, `Ate as planned`) in `planFormat.ts`.
+- [x] Meal cards use `StatusBadge`; plan **Reroll** uses orange `Button`.
+- [x] Shopping: progress header, large check rows, empty state.
+- [x] Cooking mode: hides app chrome on `/recipes/:id/cook`, large controls, sticky footer.
+- [x] Review attention dot on mobile nav via `useReviewAttentionCount`.
+- [x] Tests updated (`55` passing).
 
 Per screen: comfortable cards, `PageHeader`, status badges, empty/loading states, action hierarchy, tests for changed interactions.
 

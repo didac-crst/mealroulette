@@ -5,6 +5,7 @@ import App from "./App";
 import "./styles/tokens.css";
 import "./styles/components.css";
 import "./styles/shell.css";
+import "./styles/daily-workflows.css";
 import "./styles/app.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

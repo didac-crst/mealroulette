@@ -1,0 +1,182 @@
+/* Phase 3 — core daily workflow surfaces */
+
+.today-page,
+.plan-page,
+.review-page,
+.shopping-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.today-meal-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.today-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  font-size: var(--font-size-sm);
+}
+
+.meal-slot-card {
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-soft);
+}
+
+.meal-slot-label {
+  color: var(--color-text-secondary);
+}
+
+.meal-slot-header-aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.meal-slot-actions-primary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.today-empty-slot {
+  padding: var(--space-5);
+}
+
+.week-shell-header {
+  display: contents;
+}
+
+.plan-roulette-toolbar {
+  gap: var(--space-4);
+}
+
+.segmented-control {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--surface-muted);
+}
+
+.segmented-control-option {
+  min-height: var(--control-sm);
+  padding: 0 var(--space-4);
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.segmented-control-option-active {
+  background: var(--surface-card);
+  color: var(--color-interactive);
+  box-shadow: var(--shadow-soft);
+}
+
+.segmented-control-option:focus-visible {
+  outline: 2px solid var(--brand-teal-200);
+  outline-offset: 2px;
+}
+
+.shopping-progress-bar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin: calc(-1 * var(--space-2)) 0 var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--brand-teal-50);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.shopping-item-label {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-height: var(--control-md);
+  padding: var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  cursor: pointer;
+}
+
+.shopping-item-label input[type="checkbox"] {
+  width: 1.35rem;
+  height: 1.35rem;
+  margin-top: 0.1rem;
+  flex-shrink: 0;
+  accent-color: var(--color-success);
+}
+
+.shopping-item-checked {
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}
+
+.shopping-preset-active {
+  border-color: var(--color-interactive);
+  background: var(--color-interactive-subtle);
+  color: var(--color-interactive-hover);
+}
+
+.app-shell-layout--cooking .app-main {
+  max-width: 42rem;
+  padding-bottom: var(--space-6);
+}
+
+.cooking-mode {
+  min-height: calc(100dvh - var(--space-8));
+  gap: var(--space-4);
+}
+
+.cooking-mode-title {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  line-height: 1.2;
+}
+
+.cooking-mode-instruction {
+  font-size: clamp(1.125rem, 3vw, 1.375rem);
+  line-height: 1.45;
+}
+
+.cooking-mode-controls {
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  padding: var(--space-4) 0 max(var(--space-4), env(safe-area-inset-bottom));
+  background: linear-gradient(to top, var(--surface-page) 70%, transparent);
+}
+
+.cooking-mode-controls .button {
+  min-height: var(--control-lg);
+  width: 100%;
+}
+
+.page-loading-message {
+  margin: 0;
+}
+
+.week-shell-error {
+  margin: var(--space-4) 0 0;
+}

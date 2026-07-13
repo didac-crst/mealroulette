@@ -18,7 +18,7 @@ export function formatStatus(status: MealPlanItemStatus): string {
     case "planned":
       return "Planned";
     case "eaten":
-      return "Eaten";
+      return "Ate as planned";
     case "skipped":
       return "Skipped";
     case "ate_leftovers":
@@ -123,7 +123,7 @@ export function isExecutionComplete(status: MealPlanItemStatus): boolean {
 
 export function formatReviewStatus(item: MealPlanItem): string {
   if (item.status === "planned" && !isFutureMealDate(item.date)) {
-    return "Not reviewed";
+    return "Needs review";
   }
   if (item.status === "planned" && isFutureMealDate(item.date)) {
     return item.is_locked ? "Planned · locked" : "Planned";

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { MealPlanItem } from "../../api/planning";
 import { fetchMealHistory } from "../../api/planning";
+import { Button, Card, EmptyState, PageLoadingState } from "../../components/ui";
 import { useAuth } from "../auth/AuthContext";
 import { MealSlotCard } from "./MealSlotCard";
 import {
@@ -75,6 +76,11 @@ export function ReviewWeekPage() {
     [plan],
   );
 
+  const reviewSubtitle =
+    needsReviewCount > 0
+      ? `${needsReviewCount} meal${needsReviewCount === 1 ? "" : "s"} need review`
+      : "You are up to date";
+
   function handleItemChanged(updated: MealPlanItem) {
     replaceItem(updated);
     setSourceCandidates((current) => {
@@ -85,23 +91,20 @@ export function ReviewWeekPage() {
   }
 
   if (loading && !plan) {
-    return (
-      <section className="card">
-        <p className="muted">Loading review…</p>
-      </section>
-    );
+    return <PageLoadingState message="Loading review…" />;
   }
 
   return (
     <WeekPlanShell
       weekStart={plan?.week_start_date ?? null}
       loading={loading}
-      title="Review meals"
-      subtitle="Mark what was eaten, skipped, or eaten as leftovers."
+      title="Review"
+      subtitle={`Mark what was eaten, skipped, or eaten as leftovers. · ${reviewSubtitle}`}
       error={error}
+      className="review-page"
       {...nav}
     >
-      <section className="card stack">
+      <Card density="comfortable" className="stack">
         <div className="review-filter-bar">
           <div className="segmented-control" role="group" aria-label="Review filter">
             <button
@@ -122,25 +125,28 @@ export function ReviewWeekPage() {
               All meals
             </button>
           </div>
-          {reviewFilter === "needs_review" && needsReviewCount === 0 ? (
-            <p className="muted review-filter-empty">All meals reviewed for this week.</p>
-          ) : null}
         </div>
 
         {visibleItems.length === 0 ? (
-          <p className="muted">
-            {reviewFilter === "needs_review"
-              ? "Nothing needs review in this week."
-              : "No meals in this week."}
-            {reviewFilter === "needs_review" ? (
-              <>
-                {" "}
-                <button type="button" className="button button-secondary" onClick={() => setReviewFilter("all")}>
-                  Show all
-                </button>
-              </>
-            ) : null}
-          </p>
+          <EmptyState
+            title={
+              reviewFilter === "needs_review"
+                ? "You are up to date"
+                : "No meals in this week"
+            }
+            description={
+              reviewFilter === "needs_review"
+                ? "No meals need review for this week."
+                : "There are no meals in the selected week."
+            }
+            action={
+              reviewFilter === "needs_review" ? (
+                <Button type="button" variant="secondary" onClick={() => setReviewFilter("all")}>
+                  Show all meals
+                </Button>
+              ) : undefined
+            }
+          />
         ) : (
           <div className="meal-week-grid">
             {dates.map((date) => {
@@ -168,7 +174,7 @@ export function ReviewWeekPage() {
             })}
           </div>
         )}
-      </section>
+      </Card>
     </WeekPlanShell>
   );
 }

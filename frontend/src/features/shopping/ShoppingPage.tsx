@@ -11,6 +11,7 @@ import {
   type ShoppingSourceContribution,
   updateShoppingListItem,
 } from "../../api/shopping";
+import { Button, Card, EmptyState, PageHeader, PageLoadingState } from "../../components/ui";
 import { useAuth } from "../auth/AuthContext";
 import { formatPlanDate, todayIso } from "../planning/planFormat";
 
@@ -179,30 +180,34 @@ export function ShoppingPage() {
   };
 
   const isSaved = list?.id != null;
+  const items = list?.items ?? [];
+  const checkedCount = items.filter((item) => item.checked).length;
+  const totalCount = items.length;
+
+  if (loading && !list) {
+    return <PageLoadingState message="Loading shopping list…" />;
+  }
 
   return (
-    <div className="stack">
-      <section className="card stack">
-        <div className="shopping-header">
-          <div>
-            <h2>Shopping list</h2>
-            <p className="muted">
-              Ingredients for planned meals from {formatPlanDate(fromDate)}
-              {list ? ` through ${formatPlanDate(list.to_date)}` : ""}.
-            </p>
-          </div>
-          <div className="shopping-actions">
-            {!isSaved ? (
-              <button type="button" className="button" disabled={saving || loading} onClick={() => void handleSave()}>
-                {saving ? "Saving…" : "Save list"}
-              </button>
+    <div className="stack shopping-page">
+      <Card density="comfortable" className="stack">
+        <PageHeader
+          title="Shopping"
+          subtitle={`Ingredients for planned meals from ${formatPlanDate(fromDate)}${
+            list ? ` through ${formatPlanDate(list.to_date)}` : ""
+          }.`}
+          actions={
+            !isSaved ? (
+              <Button type="button" disabled={saving || loading} loading={saving} onClick={() => void handleSave()}>
+                Save list
+              </Button>
             ) : (
-              <button type="button" className="button button-secondary" disabled={loading} onClick={() => void handleReloadSaved()}>
+              <Button type="button" variant="secondary" disabled={loading} onClick={() => void handleReloadSaved()}>
                 Refresh
-              </button>
-            )}
-          </div>
-        </div>
+              </Button>
+            )
+          }
+        />
 
         <div className="shopping-controls">
           <div className="shopping-presets" role="group" aria-label="Shopping window">
@@ -228,31 +233,39 @@ export function ShoppingPage() {
         </div>
 
         {error ? <p className="error-text">{error}</p> : null}
-        {loading && !list ? <p className="muted">Loading shopping list…</p> : null}
-      </section>
+      </Card>
+
+      {list && totalCount > 0 ? (
+        <p className="shopping-progress-bar" role="status">
+          {checkedCount} of {totalCount} completed
+        </p>
+      ) : null}
 
       {list && list.planned_meals.length > 0 ? (
-        <section className="card stack">
+        <Card density="comfortable" className="stack">
           <h3>Planned meals in window</h3>
           <ul className="shopping-planned-meals bulleted-list">
             {list.planned_meals.map((meal) => (
               <li key={meal.meal_plan_item_id}>{formatPlannedMealLabel(meal)}</li>
             ))}
           </ul>
-        </section>
+        </Card>
       ) : null}
 
       {list && list.items.length === 0 ? (
-        <section className="card">
-          <p className="muted">No planned meals with recipes in this window, or all slots are empty/skipped.</p>
-        </section>
+        <Card density="comfortable">
+          <EmptyState
+            title="Everything is covered"
+            description="No planned meals with recipes in this window, or all slots are empty or skipped."
+          />
+        </Card>
       ) : null}
 
-      {[...grouped.entries()].map(([category, items]) => (
-        <section key={category} className="card stack">
+      {[...grouped.entries()].map(([category, categoryItems]) => (
+        <Card key={category} density="comfortable" className="stack">
           <h3 className="shopping-category">{category}</h3>
           <ul className="shopping-items">
-            {items.map((item) => {
+            {categoryItems.map((item) => {
               const includesLine = item.approximate ? formatIncludesLine(item.raw_components) : null;
               return (
                 <li key={`${item.ingredient_id}-${item.unit_id}-${item.quantity}`} className="shopping-item">
@@ -287,7 +300,7 @@ export function ShoppingPage() {
               );
             })}
           </ul>
-        </section>
+        </Card>
       ))}
     </div>
   );

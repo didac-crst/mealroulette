@@ -9,7 +9,7 @@ import {
   type MealPlanItem,
   type MealPlanRouletteResponse,
 } from "../../api/planning";
-import { Button } from "../../components/ui";
+import { Button, Card, PageLoadingState } from "../../components/ui";
 import { MealSlotCard } from "./MealSlotCard";
 import { formatPlanDate, groupItemsByDate, weekDates } from "./planFormat";
 import { useWeekPlan } from "./useWeekPlan";
@@ -99,23 +99,19 @@ export function PlanWeekPage() {
   }
 
   if (loading && !plan) {
-    return (
-      <section className="card">
-        <p className="muted">Loading week plan…</p>
-      </section>
-    );
+    return <PageLoadingState message="Loading week plan…" />;
   }
 
   return (
     <WeekPlanShell
       weekStart={plan?.week_start_date ?? null}
       loading={loading || rouletteBusy}
-      title="Plan week"
+      title="Plan"
       subtitle="Assign dishes, run roulette, lock meals, and swap slots."
       error={error}
       {...nav}
     >
-      <section className="card stack plan-roulette-toolbar">
+      <Card density="comfortable" className="stack plan-roulette-toolbar">
         <div className="row-between plan-roulette-actions">
           <div>
             <h3 className="section-title">Meal roulette</h3>
@@ -131,14 +127,14 @@ export function PlanWeekPage() {
             >
               Generate week
             </Button>
-            <button
+            <Button
               type="button"
-              className="button button-undo"
+              variant="ghost"
               disabled={!plan?.roulette_undo_available || rouletteBusy}
               onClick={() => void handleUndoRoulette()}
             >
               Undo roulette
-            </button>
+            </Button>
           </div>
         </div>
         {lastRoulette && lastRoulette.warnings.length > 0 ? (
@@ -172,9 +168,9 @@ export function PlanWeekPage() {
             </ul>
           </div>
         ) : null}
-      </section>
+      </Card>
 
-      <section className="card stack">
+      <Card density="comfortable" className="stack">
         <div className="meal-week-grid">
           {dates.map((date) => {
             const dayItems = grouped.get(date) ?? [];
@@ -203,7 +199,7 @@ export function PlanWeekPage() {
             );
           })}
         </div>
-      </section>
+      </Card>
     </WeekPlanShell>
   );
 }
