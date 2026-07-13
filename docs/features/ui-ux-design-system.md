@@ -402,8 +402,8 @@ Feature pages must not duplicate button/card styles when a shared primitive exis
 | --- | --- | --- |
 | Colour | Blue primary `#0f609b` | Teal primary; orange roulette; green success |
 | Tokens | Ad hoc CSS values | CSS custom properties |
-| Desktop nav | Top header links | Left sidebar |
-| Mobile tabs | Text-only tabs; “List” label | Icon + label; “Shopping”; ≤5 items |
+| Desktop nav | Left sidebar with teal active links | Done (phase 2) |
+| Mobile tabs | Icon + label; “Shopping”; ≤5 tabs | Done (phase 2) |
 | Login logo | 72 px header asset | 144–220 px full logo when asset exists |
 | Components | CSS classes | Shared React primitives |
 | Page headers | Inconsistent per page | `PageHeader` pattern |
@@ -436,11 +436,11 @@ Deliverables:
 
 Deliverables:
 
-- [ ] `AppShell` wrapping `AppLayout` responsibilities.
-- [ ] Mobile bottom nav: labels/icons, teal active state, safe areas; reconcile tab set (Shopping label; admin More).
-- [ ] Desktop sidebar (collapsed option deferred).
-- [ ] Logo sizing rules on login (use best available asset; track full-logo asset task).
-- [ ] Page title area no longer duplicates “MealRoulette” in `app-header` H1 for every view.
+- [x] `AppShell` with `DesktopSidebar` and `MobileBottomNav` (`frontend/src/app/`).
+- [x] Mobile bottom nav: icon + label, teal active state, safe areas; **Shopping** label; five tabs for all users (Dishes retained; admin **Settings** in mobile top bar, not a sixth tab).
+- [x] Desktop sidebar (256px; collapsed option deferred).
+- [x] Login branding: larger logo (`BrandLogo` login variant), welcome copy, pale teal gradient background (full-logo asset still tracked).
+- [x] Authenticated views no longer show “MealRoulette” as the main H1 in a top header; page titles stay on each screen.
 
 ### Phase 3 — Core daily workflows
 

@@ -2,6 +2,7 @@ import { FormEvent, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
 import { ApiError } from "../../api/client";
+import { BrandLogo } from "../../components/BrandLogo";
 import { Button } from "../../components/ui";
 import { useAuth } from "./AuthContext";
 
@@ -32,14 +33,12 @@ export function LoginPage() {
   }
 
   return (
-    <main className="app-shell">
+    <main className="login-page">
       <section className="card login-card">
-        <picture className="login-logo">
-          <source srcSet="/logo-header.webp" type="image/webp" />
-          <img src="/logo-header.png" alt="" width={72} height={72} />
-        </picture>
+        <BrandLogo variant="login" />
         <h1>MealRoulette</h1>
-        <p className="muted">Sign in to manage your household meal library.</p>
+        <p className="login-welcome muted">Welcome back</p>
+        <p className="login-tagline">Plan less. Eat better.</p>
         <form onSubmit={handleSubmit} className="stack">
           <label>
             Username

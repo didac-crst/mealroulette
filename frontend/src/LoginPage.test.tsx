@@ -23,6 +23,8 @@ describe("LoginPage", () => {
     );
 
     expect(screen.getByRole("heading", { name: "MealRoulette" })).toBeInTheDocument();
+    expect(screen.getByText("Welcome back")).toBeInTheDocument();
+    expect(screen.getByText("Plan less. Eat better.")).toBeInTheDocument();
     expect(screen.getByLabelText("Username")).toBeInTheDocument();
     expect(screen.getByLabelText("Password")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Sign in" })).toBeInTheDocument();

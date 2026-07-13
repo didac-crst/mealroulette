@@ -16,120 +16,15 @@ a {
 .app-main {
   flex: 1;
   width: 100%;
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0 1rem 1.25rem;
-  padding-bottom: calc(1.25rem + 3.75rem + env(safe-area-inset-bottom, 0px));
   box-sizing: border-box;
 }
 
+/* Legacy standalone pages (loading gates) */
 .app-shell {
-  max-width: 960px;
+  max-width: var(--content-max);
   margin: 0 auto;
-  padding: max(1.25rem, env(safe-area-inset-top)) 1rem 2rem;
+  padding: max(1.25rem, env(safe-area-inset-top)) var(--page-padding-mobile) 2rem;
   padding-bottom: max(2rem, env(safe-area-inset-bottom));
-}
-
-.app-header {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-  padding: max(0.75rem, env(safe-area-inset-top)) 1rem 0.75rem;
-  max-width: 960px;
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.app-header-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  min-width: 0;
-}
-
-.app-header-logo {
-  flex-shrink: 0;
-  display: block;
-  border-radius: 50%;
-}
-
-.app-header-brand h1 {
-  margin: 0;
-  font-size: 1.25rem;
-}
-
-.app-header-meta {
-  margin: 0.15rem 0 0;
-  font-size: 0.8rem;
-}
-
-.app-header-nav-desktop {
-  display: none;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.app-header-signout-mobile {
-  flex-shrink: 0;
-  padding: 0.4rem 0.65rem;
-  font-size: 0.85rem;
-}
-
-.app-tab-bar {
-  display: flex;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  background: var(--surface-card);
-  border-top: 1px solid var(--border-subtle);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-.app-tab {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 3rem;
-  padding: 0.5rem;
-  color: var(--color-text-muted);
-  text-decoration: none;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.app-tab-active {
-  color: var(--color-interactive);
-  box-shadow: inset 0 -2px 0 var(--color-interactive);
-}
-
-@media (min-width: 768px) {
-  .app-main {
-    padding-bottom: 1.25rem;
-  }
-
-  .app-header-nav-desktop {
-    display: flex;
-  }
-
-  .app-header-signout-mobile {
-    display: none;
-  }
-
-  .app-header-brand h1 {
-    font-size: 1.5rem;
-  }
-
-  .app-tab-bar {
-    display: none;
-  }
 }
 
 @media (max-width: 767px) {
@@ -523,27 +418,6 @@ button:disabled {
   gap: 0.5rem;
   align-items: flex-end;
   margin-top: 0.5rem;
-}
-
-.login-card {
-  max-width: 28rem;
-  margin-top: 3rem;
-  margin-inline: auto;
-}
-
-.login-logo {
-  display: block;
-  margin: 0 auto 0.75rem;
-}
-
-.login-submit {
-  width: 100%;
-}
-
-.login-logo img {
-  display: block;
-  margin: 0 auto;
-  border-radius: 50%;
 }
 
 .plan-page {
@@ -1261,11 +1135,6 @@ legend {
 
   .target-row-remove {
     grid-column: 1 / -1;
-  }
-
-  .app-tab {
-    font-size: 0.78rem;
-    padding: 0.45rem 0.25rem;
   }
 }
 

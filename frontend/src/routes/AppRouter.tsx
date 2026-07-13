@@ -1,6 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
-import { AppLayout } from "../app/AppLayout";
+import { AppShell } from "../app/AppShell";
 import { AuthProvider } from "../features/auth/AuthContext";
 import { LoginPage } from "../features/auth/LoginPage";
 import { DishDetailPage } from "../features/dishes/DishDetailPage";
@@ -32,7 +32,7 @@ export function AppRouter() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route element={<ProtectedRoute />}>
-            <Route element={<AppLayout />}>
+            <Route element={<AppShell />}>
               <Route index element={<Navigate to="/today" replace />} />
               <Route path="today" element={<TodayPage />} />
               <Route path="plan" element={<PlanWeekPage />} />
