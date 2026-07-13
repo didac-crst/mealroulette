@@ -8,6 +8,7 @@ def test_export_full_includes_taxonomy_tables(client, catalog_seed, admin_header
     assert response.status_code == 200
     payload = response.json()
     assert payload["format"] == "mealroulette.full_export"
+    assert payload["schema_revision"] == "030_taxonomy_family_backfill"
     assert "food_groups" in payload["tables"]
     assert "ingredient_families" in payload["tables"]
     assert len(payload["tables"]["food_groups"]) >= 20
@@ -49,6 +50,52 @@ def test_backup_settings_round_trip(client, catalog_seed, admin_headers):
     assert body["enabled"] is True
     assert body["retention_days"] == 14
     assert body["run_time"].startswith("04:30")
+
+
+def test_backup_settings_rejects_invalid_timezone(client, catalog_seed, admin_headers):
+    response = client.put(
+        "/api/backups/settings",
+        headers=admin_headers,
+        json={"timezone": "Not/A/Timezone"},
+    )
+    assert response.status_code == 422
+
+
+def test_backup_settings_rejects_invalid_run_time(client, catalog_seed, admin_headers):
+    response = client.put(
+        "/api/backups/settings",
+        headers=admin_headers,
+        json={"run_time": "25:99:00"},
+    )
+    assert response.status_code == 422
+
+
+def test_backup_settings_rejects_path_outside_backups(client, catalog_seed, admin_headers):
+    response = client.put(
+        "/api/backups/settings",
+        headers=admin_headers,
+        json={"backup_path": "/backups-evil"},
+    )
+    assert response.status_code == 422
+
+
+def test_pg_dump_failure_propagates(client, catalog_seed, admin_headers, db_session, tmp_path, monkeypatch):
+    from mealroulette.services.backup_service import BackupService
+
+    service = BackupService(db_session)
+    settings_row = service.get_settings_row()
+    settings_row.backup_path = str(tmp_path)
+    settings_row.include_json_export = False
+    settings_row.include_pg_dump = True
+    db_session.commit()
+
+    def boom(_path):
+        raise RuntimeError("pg_dump failed")
+
+    monkeypatch.setattr(BackupService, "_execute_pg_dump", staticmethod(boom))
+
+    with pytest.raises(RuntimeError, match="pg_dump failed"):
+        service.run_manual_backup()
 
 
 def test_export_omits_incomplete_backup_runs(client, catalog_seed, admin_headers, db_session, tmp_path, monkeypatch):

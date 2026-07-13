@@ -51,8 +51,10 @@ from mealroulette.schemas.backup import (
 
 EXPORT_FORMAT = "mealroulette.full_export"
 EXPORT_FORMAT_VERSION = 1
-CURRENT_SCHEMA_REVISION = "029_backup_tables"
+CURRENT_SCHEMA_REVISION = "030_taxonomy_family_backfill"
 APP_VERSION = "v0.8.0"
+PG_DUMP_TIMEOUT_SECONDS = 3600
+BACKUPS_ROOT = Path("/backups")
 
 TABLE_SPECS: list[tuple[str, type]] = [
     ("users", User),
@@ -182,8 +184,6 @@ class BackupService:
     def update_settings(self, payload: BackupSettingsUpdateRequest) -> BackupSettingsPublic:
         row = self.get_settings_row()
         updates = payload.model_dump(exclude_unset=True)
-        if "run_time" in updates and updates["run_time"] is not None:
-            row.run_time = time.fromisoformat(updates.pop("run_time"))
         for field, value in updates.items():
             setattr(row, field, value)
         self._validate_backup_path(row.backup_path)
@@ -373,6 +373,7 @@ class BackupService:
             run.error_message = str(exc)
             run.finished_at = datetime.now().astimezone()
             settings_row.last_error = str(exc)
+            raise
         finally:
             self.db.commit()
             self.db.refresh(run)
@@ -398,7 +399,7 @@ class BackupService:
             parsed.username or "mealroulette",
             parsed.path.lstrip("/"),
         ]
-        subprocess.run(command, check=True, env=env, capture_output=True, text=True)
+        subprocess.run(command, check=True, env=env, capture_output=True, text=True, timeout=PG_DUMP_TIMEOUT_SECONDS)
 
     def _validate_table_shapes(self, export: FullExportPayload) -> None:
         for table_name, _model in TABLE_SPECS:
@@ -487,13 +488,14 @@ class BackupService:
     def _resolve_backup_dir(backup_path: str) -> Path:
         path = Path(backup_path)
         if not path.is_absolute():
-            path = Path("/backups") / path
-        return path
+            path = BACKUPS_ROOT / path
+        return path.resolve()
 
     @staticmethod
     def _validate_backup_path(backup_path: str) -> None:
-        normalized = str(BackupService._resolve_backup_dir(backup_path))
-        if not normalized.startswith("/backups"):
+        resolved = BackupService._resolve_backup_dir(backup_path)
+        root = BACKUPS_ROOT.resolve()
+        if resolved != root and root not in resolved.parents:
             raise HTTPException(status_code=422, detail="backup_path must stay under /backups")
 
     @staticmethod

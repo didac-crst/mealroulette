@@ -24,7 +24,9 @@ class IngredientFamily(Base):
     __tablename__ = "ingredient_families"
 
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
-    food_group_id: Mapped[str] = mapped_column(ForeignKey("food_groups.id"), index=True)
+    food_group_id: Mapped[str] = mapped_column(
+        ForeignKey("food_groups.id", ondelete="RESTRICT"), index=True
+    )
     label: Mapped[str] = mapped_column(String(128), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

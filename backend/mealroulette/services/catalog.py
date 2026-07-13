@@ -443,6 +443,8 @@ class CatalogService:
         trait_fields = {"category", "food_group", "family", "family_id", "pantry_item"}
         for field, value in updates.items():
             setattr(ingredient, field, value)
+        if "family" in updates and "family_id" not in updates:
+            ingredient.family_id = None
         if "family" in updates or "family_id" in updates:
             self._sync_ingredient_family(ingredient)
         if "category" in updates or "food_group" in updates:

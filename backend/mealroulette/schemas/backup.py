@@ -1,7 +1,8 @@
-from datetime import datetime
+from datetime import datetime, time
 from typing import Any
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class BackupSettingsPublic(BaseModel):
@@ -20,12 +21,23 @@ class BackupSettingsPublic(BaseModel):
 
 class BackupSettingsUpdateRequest(BaseModel):
     enabled: bool | None = None
-    run_time: str | None = None
+    run_time: time | None = None
     timezone: str | None = None
     retention_days: int | None = Field(default=None, ge=1, le=3650)
     backup_path: str | None = None
     include_json_export: bool | None = None
     include_pg_dump: bool | None = None
+
+    @field_validator("timezone")
+    @classmethod
+    def validate_timezone(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
+        try:
+            ZoneInfo(value)
+        except ZoneInfoNotFoundError as exc:
+            raise ValueError(f"Unknown timezone: {value}") from exc
+        return value
 
 
 class BackupRunPublic(BaseModel):

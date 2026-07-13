@@ -69,7 +69,7 @@ Top-level shape:
   "format": "mealroulette.full_export",
   "format_version": 1,
   "app_version": "v0.7.0+",
-  "schema_revision": "029_backup_tables",
+  "schema_revision": "030_taxonomy_family_backfill",
   "exported_at": "2026-07-13T12:00:00Z",
   "tables": {
     "units": [],
@@ -187,16 +187,16 @@ Defaults:
 
 ## API Surface
 
-All endpoints require authentication. Import, scheduled-backup settings, manual backup execution, and backup listing require admin role.
+All endpoints require authentication. **Admin role is required** for export, import, backup settings, manual backup execution, and backup run listing. Non-admin authenticated users receive `403 Forbidden`.
 
-| Endpoint | Behaviour |
-| --- | --- |
-| `GET /api/export/full` | Return the current full JSON export as a download response. |
-| `POST /api/import/full` | Validate and import a full JSON export into an empty database. |
-| `POST /api/backups/run` | Run the enabled backup types immediately and return created `backup_runs`. |
-| `GET /api/backups` | List backup run records, newest first. |
-| `GET /api/backups/settings` | Return backup settings. |
-| `PUT /api/backups/settings` | Update backup settings. |
+| Endpoint | Auth | Behaviour |
+| --- | --- | --- |
+| `GET /api/export/full` | Admin | Return the current full JSON export (includes password hashes). |
+| `POST /api/import/full` | Admin | Validate and import a full JSON export into an empty database. |
+| `POST /api/backups/run` | Admin | Run the enabled backup types immediately and return created `backup_runs`. |
+| `GET /api/backups` | Admin | List backup run records, newest first. |
+| `GET /api/backups/settings` | Admin | Return backup settings. |
+| `PUT /api/backups/settings` | Admin | Update backup settings. |
 
 The original product spec only lists the first four endpoints. The two settings endpoints are recommended because scheduled backup behaviour otherwise has no admin API equivalent to Telegram and scheduler settings.
 

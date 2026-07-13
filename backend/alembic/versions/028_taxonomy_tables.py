@@ -27,7 +27,12 @@ def upgrade() -> None:
     op.create_table(
         "ingredient_families",
         sa.Column("id", sa.String(length=64), primary_key=True),
-        sa.Column("food_group_id", sa.String(length=64), sa.ForeignKey("food_groups.id"), nullable=False),
+        sa.Column(
+            "food_group_id",
+            sa.String(length=64),
+            sa.ForeignKey("food_groups.id", ondelete="RESTRICT"),
+            nullable=False,
+        ),
         sa.Column("label", sa.String(length=128), nullable=False),
         sa.Column("description", sa.Text(), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
@@ -37,7 +42,12 @@ def upgrade() -> None:
 
     op.add_column(
         "ingredients",
-        sa.Column("family_id", sa.String(length=64), sa.ForeignKey("ingredient_families.id"), nullable=True),
+        sa.Column(
+            "family_id",
+            sa.String(length=64),
+            sa.ForeignKey("ingredient_families.id", ondelete="SET NULL"),
+            nullable=True,
+        ),
     )
     op.create_index("ix_ingredients_family_id", "ingredients", ["family_id"])
 

@@ -86,7 +86,7 @@ function deriveCourse(
   if (existing === "starter") {
     return "starter";
   }
-  return existing ?? "main";
+  return "main";
 }
 
 function toggleFamilyTag(tagIds: number[], tags: Tag[], family: string, name: string): number[] {

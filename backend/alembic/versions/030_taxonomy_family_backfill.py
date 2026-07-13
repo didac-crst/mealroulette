@@ -2,6 +2,9 @@
 
 Revision ID: 030_taxonomy_family_backfill
 Revises: 029_backup_tables
+
+Re-runs seed_taxonomy_data(), which syncs family_id from the active ingredient
+seed YAML by canonical_name and maps legacy family strings through alias tables.
 """
 
 from typing import Sequence, Union

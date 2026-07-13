@@ -65,6 +65,7 @@ def upgrade() -> None:
         sa.Column("error_message", sa.Text(), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
     )
+    op.create_check_constraint("ck_backup_settings_singleton_id", "backup_settings", "id = 1")
 
     op.execute(
         """
@@ -77,6 +78,7 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    op.drop_constraint("ck_backup_settings_singleton_id", "backup_settings", type_="check")
     op.drop_table("backup_runs")
     op.drop_table("backup_settings")
     backup_run_status.drop(op.get_bind(), checkfirst=True)

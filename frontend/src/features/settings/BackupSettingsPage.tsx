@@ -1,5 +1,4 @@
 import { FormEvent, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import {
   fetchBackupRuns,
@@ -21,7 +20,6 @@ function timeInputValue(value: string): string {
 
 export function BackupSettingsPage() {
   const { accessToken, isAdmin } = useAuth();
-  const navigate = useNavigate();
   const [settings, setSettings] = useState<BackupSettings | null>(null);
   const [runs, setRuns] = useState<BackupRun[]>([]);
   const [form, setForm] = useState<BackupSettingsInput>({
@@ -40,13 +38,7 @@ export function BackupSettingsPage() {
   const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isAdmin) {
-      navigate("/review");
-    }
-  }, [isAdmin, navigate]);
-
-  useEffect(() => {
-    if (!accessToken) {
+    if (!accessToken || !isAdmin) {
       return;
     }
     let cancelled = false;
@@ -80,7 +72,7 @@ export function BackupSettingsPage() {
     return () => {
       cancelled = true;
     };
-  }, [accessToken]);
+  }, [accessToken, isAdmin]);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();

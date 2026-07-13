@@ -228,6 +228,43 @@ def test_delete_ingredient_referenced_by_recipe_returns_409(client, catalog_seed
     assert response.status_code == 409
 
 
+def test_update_ingredient_family_clears_stale_family_id(
+    client, catalog_seed, admin_headers, db_session
+):
+    from sqlalchemy import select
+
+    from mealroulette.models.catalog import Ingredient
+
+    created = client.post(
+        "/api/ingredients",
+        headers=admin_headers,
+        json={
+            "canonical_name": "review beans",
+            "display_name": "Review Beans",
+            "family": "green_bean_family",
+        },
+    )
+    assert created.status_code == 201
+    ingredient = db_session.scalar(
+        select(Ingredient).where(Ingredient.canonical_name == "review beans")
+    )
+    assert ingredient is not None
+    ingredient.family = "bean_vegetable_family"
+    ingredient.family_id = "green_bean_family"
+    db_session.commit()
+
+    updated = client.put(
+        f"/api/ingredients/{ingredient.id}",
+        headers=admin_headers,
+        json={"family": "brassica_family"},
+    )
+    assert updated.status_code == 200
+    body = updated.json()
+    assert body["family"] == "brassica_family"
+    db_session.refresh(ingredient)
+    assert ingredient.family_id == "brassica_family"
+
+
 def test_dish_meal_composition_defaults_to_main_dish(client, catalog_seed, admin_headers):
     response = client.post(
         "/api/dishes",

@@ -62,7 +62,7 @@ YAML dishes may set `meal_composition` and `simple_dish_part` explicitly. When o
 | Soup and other non-derivable styles | Curated `style` tags on dish | Yes (style tags only) |
 | Menu course (`starter` / `main` / `dessert`) | Derived from `meal_composition` on save (`dessert` → dessert; otherwise preserved or `main`) | Not shown on dish edit |
 
-Legacy protein/carb dish tags are no longer edited in the UI; the scheduler prefers computed traits and falls back to tags only when traits are missing.
+Legacy protein/carb dish tags are no longer edited in the UI. The scheduler uses main-recipe computed traits first. When traits are missing, legacy protein/carb tags still act as a **temporary fallback for derivable weekly targets** (fish, meat, pasta, rice, vegetarian) until every dish has a main recipe with ingredients; style tags remain the fallback for non-derivable targets such as soup.
 
 ## Related docs
 

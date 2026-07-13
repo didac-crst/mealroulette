@@ -86,7 +86,7 @@ class Ingredient(Base):
     pantry_item: Mapped[bool] = mapped_column(Boolean, default=False)
     family: Mapped[str | None] = mapped_column(String(64), nullable=True)
     family_id: Mapped[str | None] = mapped_column(
-        ForeignKey("ingredient_families.id"), nullable=True, index=True
+        ForeignKey("ingredient_families.id", ondelete="SET NULL"), nullable=True, index=True
     )
     preferred_shopping_unit_id: Mapped[int | None] = mapped_column(ForeignKey("units.id"), nullable=True)
     aggregation_unit_id: Mapped[int | None] = mapped_column(ForeignKey("units.id"), nullable=True)
