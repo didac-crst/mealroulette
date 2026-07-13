@@ -99,6 +99,7 @@ function mealPlanItem(
   date: string,
   mealSlot: "lunch" | "dinner",
   status: "planned" | "eaten" | "skipped" | "ate_leftovers" = "planned",
+  reviewed = false,
 ) {
   return {
     id,
@@ -117,7 +118,7 @@ function mealPlanItem(
     leftover_source_item_id: null,
     selection_reasons_json: null,
     computed_traits_json: null,
-    review_saved_at: null,
+    review_saved_at: reviewed ? TIMESTAMP : null,
     created_at: TIMESTAMP,
     updated_at: TIMESTAMP,
   };
@@ -131,7 +132,7 @@ function buildMealPlan() {
     week_start_date: weekStart,
     status: "active",
     items: [
-      mealPlanItem(1, today, "lunch"),
+      mealPlanItem(1, today, "lunch", "eaten", true),
       mealPlanItem(2, today, "dinner"),
       mealPlanItem(3, addDays(today, 1), "lunch"),
     ],
@@ -212,6 +213,17 @@ async function handleApiRoute(route: Route) {
   }
   if (path.startsWith("/api/meal-history")) {
     return fulfillJson(route, []);
+  }
+  if (/^\/api\/meal-plan-items\/\d+\/rating$/.test(path)) {
+    return fulfillJson(route, {
+      id: 1,
+      meal_plan_item_id: 1,
+      dish_id: 1,
+      recipe_id: 1,
+      rating: 4,
+      comment: "Very good, but use less salt next time",
+      created_at: TIMESTAMP,
+    });
   }
   if (path.startsWith("/api/shopping-list")) {
     return fulfillJson(route, buildShoppingList());

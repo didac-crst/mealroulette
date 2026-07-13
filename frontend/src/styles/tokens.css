@@ -101,6 +101,10 @@
   --page-padding-mobile: 16px;
   --page-padding-tablet: 24px;
   --page-padding-desktop: 40px;
+  /* Phase 9 — page gutters (distinct from card padding) */
+  --page-gutter-mobile: clamp(12px, 4.2vw, 16px);
+  --page-gutter-tablet: 24px;
+  --page-gutter-desktop: 32px;
   --sidebar-width: 256px;
   --content-max: 960px;
   --bp-sm: 480px;

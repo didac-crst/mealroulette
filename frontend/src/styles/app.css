@@ -28,7 +28,7 @@ a {
 .app-shell {
   max-width: var(--content-max);
   margin: 0 auto;
-  padding: max(1.25rem, env(safe-area-inset-top)) var(--page-padding-mobile) 2rem;
+  padding: max(1.25rem, env(safe-area-inset-top)) var(--page-gutter-mobile) 2rem;
   padding-bottom: max(2rem, env(safe-area-inset-bottom));
 }
 
@@ -463,9 +463,32 @@ button:disabled {
   opacity: 0.6;
 }
 
+.star-rating-display {
+  display: inline-flex;
+  gap: 0.15rem;
+}
+
+.star-rating-display-star {
+  color: var(--border-strong);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.star-rating-display-star-filled {
+  color: #f0b429;
+}
+
+.meal-review-readonly {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .meal-week-grid {
   display: grid;
   gap: 1rem;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
 }
 
 @media (min-width: 720px) {
@@ -487,6 +510,8 @@ button:disabled {
 
 .meal-week-day,
 .meal-upcoming-day {
+  width: 100%;
+  min-width: 0;
   padding: 0.75rem;
   border: 1px solid var(--border-subtle);
   border-radius: 0.5rem;

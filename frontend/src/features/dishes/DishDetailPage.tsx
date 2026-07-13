@@ -14,7 +14,7 @@ import {
 } from "../../api/catalog";
 import { ApiError } from "../../api/client";
 import { ButtonLink } from "../../components/ButtonLink";
-import { Button, Card, EmptyState, OverflowMenu, PageShell, ResponsiveActionGroup } from "../../components/ui";
+import { Button, Card, EmptyState, PageShell, ResponsiveActionGroup, TechnicalValue } from "../../components/ui";
 import { useAuth } from "../auth/AuthContext";
 import { formatRecipeDifficulty, formatRecipeTime } from "./effectiveValues";
 import { DishClassificationSummary } from "./DishClassificationSummary";
@@ -143,7 +143,7 @@ export function DishDetailPage() {
             )}
           </div>
           <div>
-            <p className="muted">Public key: {dish.public_key}</p>
+            <TechnicalValue label="Public key" value={dish.public_key} />
           </div>
         </div>
         <ResponsiveActionGroup className="catalog-detail-actions" stackOnMobile>
@@ -160,21 +160,19 @@ export function DishDetailPage() {
               Edit dish
             </ButtonLink>
           ) : null}
-          {isAdmin ? (
-            <OverflowMenu
-              ariaLabel="Dish admin actions"
-              items={[
-                {
-                  id: "delete",
-                  label: "Delete dish",
-                  variant: "danger",
-                  disabled: deleting,
-                  onClick: () => setConfirmingDelete(true),
-                },
-              ]}
-            />
-          ) : null}
         </ResponsiveActionGroup>
+        {isAdmin ? (
+          <div className="catalog-detail-danger">
+            <button
+              type="button"
+              className="button button-danger-subtle"
+              disabled={deleting}
+              onClick={() => setConfirmingDelete(true)}
+            >
+              Delete dish
+            </button>
+          </div>
+        ) : null}
       </Card>
 
       {confirmingDelete ? (
@@ -236,16 +234,9 @@ export function DishDetailPage() {
                     </p>
                   </Link>
                   {isAdmin ? (
-                    <OverflowMenu
-                      ariaLabel={`Actions for ${recipe.variant_name}`}
-                      items={[
-                        {
-                          id: "edit",
-                          label: "Edit recipe",
-                          onClick: () => navigate(`/dishes/${dish.id}/recipes/${recipe.id}/edit`),
-                        },
-                      ]}
-                    />
+                    <ButtonLink to={`/dishes/${dish.id}/recipes/${recipe.id}/edit`} variant="secondary">
+                      Edit recipe
+                    </ButtonLink>
                   ) : null}
                 </li>
               );

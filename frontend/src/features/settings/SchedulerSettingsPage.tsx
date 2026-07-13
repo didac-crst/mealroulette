@@ -16,6 +16,7 @@ import {
   NumberStepper,
   SchedulerWeekdayPicker,
   SegmentedControl,
+  SettingsSectionHeader,
   Switch,
   TimezoneSelect,
 } from "../../components/ui";
@@ -170,10 +171,16 @@ export function SchedulerSettingsPage() {
 
       <form onSubmit={(event) => void handleSubmit(event)} className="admin-form">
         <FormSection title="Schedule">
-          <Switch
-            checked={form.enabled ?? false}
-            onChange={(event) => setForm({ ...form, enabled: event.target.checked })}
-            label="Enable scheduled roulette"
+          <SettingsSectionHeader
+            title="Schedule automatic roulette"
+            description="Automatically generate the plan on selected days."
+            trailing={
+              <Switch
+                checked={form.enabled ?? false}
+                onChange={(event) => setForm({ ...form, enabled: event.target.checked })}
+                label="Enable scheduled roulette"
+              />
+            }
           />
 
           <div className="admin-field-stack">
@@ -216,20 +223,30 @@ export function SchedulerSettingsPage() {
         </FormSection>
 
         <FormSection title="Telegram notification">
-          <Switch
-            checked={form.notify_telegram ?? true}
-            onChange={(event) => setForm({ ...form, notify_telegram: event.target.checked })}
-            label="Notify Telegram subscribers after roulette"
+          <SettingsSectionHeader
+            title="Telegram notification"
+            description="Notify Telegram subscribers after roulette."
+            trailing={
+              <Switch
+                checked={form.notify_telegram ?? true}
+                onChange={(event) => setForm({ ...form, notify_telegram: event.target.checked })}
+                label="Notify Telegram subscribers after roulette"
+              />
+            }
           />
 
           <NumberStepper
             ariaLabel="Planning days in Telegram message"
             label="Planning days in Telegram message"
             min={1}
-            max={14}
+            max={7}
             value={form.notify_planning_days ?? 7}
             onChange={(notify_planning_days) => setForm({ ...form, notify_planning_days })}
           />
+          <p className="muted admin-field-hint">
+            Includes today and the following {Math.max(0, (form.notify_planning_days ?? 7) - 1)} day
+            {(form.notify_planning_days ?? 7) - 1 === 1 ? "" : "s"}.
+          </p>
         </FormSection>
 
         <FormStickyActions>

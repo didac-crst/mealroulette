@@ -38,7 +38,7 @@ import {
 } from "./planFormat";
 import { mealStatusBadgeVariant } from "./mealStatusBadge";
 import { canOpenCookMode } from "./todayMeals";
-import { StarRating } from "./StarRating";
+import { StarRatingDisplay, StarRatingInput } from "./StarRating";
 import { SwapSlotDialog } from "./SwapSlotDialog";
 
 type Props = {
@@ -82,6 +82,9 @@ export function MealSlotCard({
   const [swapOpen, setSwapOpen] = useState(false);
   const [rating, setRating] = useState<number | null>(null);
   const [comment, setComment] = useState("");
+  const [savedRating, setSavedRating] = useState<number | null>(null);
+  const [savedComment, setSavedComment] = useState<string | null>(null);
+  const [reviewEditing, setReviewEditing] = useState(false);
   const [skipReason, setSkipReason] = useState(item.skip_reason ?? "");
   const [skipComment, setSkipComment] = useState(item.skip_comment ?? "");
   const [skipFormOpen, setSkipFormOpen] = useState(false);
@@ -160,19 +163,29 @@ export function MealSlotCard({
         if (cancelled) {
           return;
         }
-        setRating(existing?.rating ?? null);
-        setComment(existing?.comment ?? "");
+        const nextRating = existing?.rating ?? null;
+        const nextComment = existing?.comment ?? "";
+        setRating(nextRating);
+        setComment(nextComment);
+        setSavedRating(nextRating);
+        setSavedComment(existing?.comment ?? null);
       })
       .catch(() => {
         if (!cancelled) {
           setRating(null);
           setComment("");
+          setSavedRating(null);
+          setSavedComment(null);
         }
       });
     return () => {
       cancelled = true;
     };
   }, [accessToken, item.id, item.status]);
+
+  useEffect(() => {
+    setReviewEditing(item.review_saved_at == null);
+  }, [item.review_saved_at]);
 
   useEffect(() => {
     setLeftoverSourceId(item.leftover_source_item_id ? String(item.leftover_source_item_id) : "");
@@ -324,11 +337,22 @@ export function MealSlotCard({
               options={dishOptions}
               disabled={busy || item.is_locked}
               placeholder="Search dishes…"
+              allowEmptyOption
+              emptyLabel="Clear assignment"
               onChange={(nextValue) => void handleDishChange(nextValue)}
             />
           </label>
 
-          {item.dish_id && recipes.length > 0 ? (
+          {item.dish_id && recipesLoading ? (
+            <p className="muted meal-slot-recipe">Loading recipes…</p>
+          ) : item.dish_id && recipes.length === 0 ? (
+            <p className="muted meal-slot-recipe">No recipes for this dish yet.</p>
+          ) : item.dish_id && recipes.length === 1 ? (
+            <p className="muted meal-slot-recipe">
+              Recipe: <strong>{recipes[0]?.variant_name}</strong>
+              {recipes[0]?.is_main ? " (main)" : ""}
+            </p>
+          ) : item.dish_id && recipes.length > 1 ? (
             <label className="meal-slot-assign">
               <span className="muted">Recipe variant</span>
               <SearchSelect
@@ -337,13 +361,11 @@ export function MealSlotCard({
                 options={recipeOptions}
                 disabled={busy || item.is_locked}
                 placeholder="Search recipes…"
+                allowEmptyOption
+                emptyLabel="Main recipe"
                 onChange={(nextValue) => void handleRecipeChange(nextValue)}
               />
             </label>
-          ) : item.dish_id && recipes.length === 0 && recipesLoading ? (
-            <p className="muted meal-slot-recipe">Loading recipes…</p>
-          ) : item.dish_id && recipes.length === 0 && !busy ? (
-            <p className="muted meal-slot-recipe">No recipe for this dish yet.</p>
           ) : null}
 
           {selectionReasons.length > 0 ? (
@@ -575,35 +597,66 @@ export function MealSlotCard({
           {showReviewRating(item) && item.dish_id ? (
             <div className="meal-slot-review-panel stack">
               <p className="section-title">Rate this meal</p>
-              <StarRating value={rating} disabled={busy} onChange={setRating} />
-              <label>
-                Comment
-                <input value={comment} onChange={(event) => setComment(event.target.value)} />
-              </label>
-              <button
-                type="button"
-                className="button"
-                disabled={busy || rating === null}
-                onClick={() => {
-                  if (rating === null) {
-                    return;
-                  }
-                  setBusy(true);
-                  setRatingMessage(null);
-                  upsertMealRating(accessToken, item.id, { rating, comment: comment || null })
-                    .then((result) => {
-                      setRatingMessage("Rating saved");
-                      onChanged(result.item);
-                    })
-                    .catch((err) =>
-                      onError(err instanceof ApiError ? err.message : "Failed to save rating"),
-                    )
-                    .finally(() => setBusy(false));
-                }}
-              >
-                Save rating
-              </button>
-              {ratingMessage ? <p className="muted">{ratingMessage}</p> : null}
+              {item.review_saved_at && !reviewEditing && savedRating ? (
+                <div className="meal-review-readonly stack">
+                  <StarRatingDisplay value={savedRating} />
+                  {savedComment ? <p className="muted">“{savedComment}”</p> : null}
+                  <button type="button" className="button button-secondary" disabled={busy} onClick={() => setReviewEditing(true)}>
+                    Edit review
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <StarRatingInput value={rating} disabled={busy} onChange={setRating} />
+                  <label>
+                    Comment
+                    <input value={comment} onChange={(event) => setComment(event.target.value)} />
+                  </label>
+                  <div className="meal-slot-actions meal-slot-actions-primary">
+                    <button
+                      type="button"
+                      className="button"
+                      disabled={busy || rating === null}
+                      onClick={() => {
+                        if (rating === null) {
+                          return;
+                        }
+                        setBusy(true);
+                        setRatingMessage(null);
+                        upsertMealRating(accessToken, item.id, { rating, comment: comment || null })
+                          .then((result) => {
+                            setRatingMessage("Rating saved");
+                            setSavedRating(rating);
+                            setSavedComment(comment || null);
+                            setReviewEditing(false);
+                            onChanged(result.item);
+                          })
+                          .catch((err) =>
+                            onError(err instanceof ApiError ? err.message : "Failed to save rating"),
+                          )
+                          .finally(() => setBusy(false));
+                      }}
+                    >
+                      Save rating
+                    </button>
+                    {item.review_saved_at ? (
+                      <button
+                        type="button"
+                        className="button button-secondary"
+                        disabled={busy}
+                        onClick={() => {
+                          setRating(savedRating);
+                          setComment(savedComment ?? "");
+                          setReviewEditing(false);
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    ) : null}
+                  </div>
+                  {ratingMessage ? <p className="muted">{ratingMessage}</p> : null}
+                </>
+              )}
             </div>
           ) : null}
         </>

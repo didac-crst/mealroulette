@@ -1,12 +1,12 @@
 import type { KeyboardEvent } from "react";
 
-type Props = {
+type InputProps = {
   value: number | null;
   disabled?: boolean;
   onChange: (value: number) => void;
 };
 
-export function StarRating({ value, disabled = false, onChange }: Props) {
+export function StarRatingInput({ value, disabled = false, onChange }: InputProps) {
   function handleKeyDown(event: KeyboardEvent<HTMLButtonElement>, star: number) {
     if (disabled) {
       return;
@@ -43,6 +43,32 @@ export function StarRating({ value, disabled = false, onChange }: Props) {
           </button>
         );
       })}
+    </div>
+  );
+}
+
+type DisplayProps = {
+  value: number;
+  ariaLabel?: string;
+  className?: string;
+};
+
+export function StarRatingDisplay({ value, ariaLabel, className }: DisplayProps) {
+  return (
+    <div
+      className={["star-rating-display", className].filter(Boolean).join(" ")}
+      role="img"
+      aria-label={ariaLabel ?? `Rated ${value} out of 5`}
+    >
+      {[1, 2, 3, 4, 5].map((star) => (
+        <span
+          key={star}
+          className={`star-rating-display-star${star <= value ? " star-rating-display-star-filled" : ""}`}
+          aria-hidden
+        >
+          ★
+        </span>
+      ))}
     </div>
   );
 }

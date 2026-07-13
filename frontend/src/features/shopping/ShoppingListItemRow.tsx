@@ -20,6 +20,7 @@ export type ShoppingListItemRowProps = {
 export function ShoppingListItemRow({ item, showCheckbox, onToggle }: ShoppingListItemRowProps) {
   const quantityLabel = formatQuantityWithUnit(item.quantity, item.unit_symbol);
   const approximatePrefix = item.approximate ? "~" : "";
+  const usageCount = item.source_contributions.length;
 
   return (
     <div className={`shopping-list-item-row${item.checked ? " shopping-list-item-row-checked" : ""}`}>
@@ -46,16 +47,17 @@ export function ShoppingListItemRow({ item, showCheckbox, onToggle }: ShoppingLi
               {quantityLabel}
             </span>
           </div>
-          {item.source_contributions.length > 0 ? (
-            <p className="shopping-list-item-usage muted">
-              Needed for:{" "}
-              {item.source_contributions.map((contribution, index) => (
-                <span key={`${contribution.meal_plan_item_id}-${contribution.quantity}`}>
-                  {index > 0 ? " · " : ""}
-                  {formatUsageLine(contribution)}
-                </span>
-              ))}
-            </p>
+          {usageCount > 0 ? (
+            <div className="shopping-list-item-usage">
+              <p className="muted shopping-list-item-usage-title">Needed for</p>
+              <ul className="shopping-list-item-usage-list">
+                {item.source_contributions.map((contribution) => (
+                  <li key={`${contribution.meal_plan_item_id}-${contribution.quantity}`} className="muted">
+                    {formatUsageLine(contribution)}
+                  </li>
+                ))}
+              </ul>
+            </div>
           ) : null}
         </div>
       </div>

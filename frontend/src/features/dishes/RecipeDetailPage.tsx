@@ -29,6 +29,7 @@ import {
 } from "./effectiveValues";
 import { formatComputedTraits } from "./computedTraits";
 import { formatStepTimerLabel, stepTimerDurationSeconds } from "./recipeCooking";
+import { TechnicalValue } from "../../components/ui";
 
 export function RecipeDetailPage() {
   const { dishId, recipeId } = useParams();
@@ -107,11 +108,7 @@ export function RecipeDetailPage() {
     );
   }
 
-  const subtitleParts = [
-    dish.name,
-    recipe.is_main ? "Main recipe" : null,
-    `Key: ${recipe.public_key}`,
-  ].filter(Boolean);
+  const subtitleParts = [dish.name, recipe.is_main ? "Main recipe" : null].filter(Boolean);
 
   return (
     <div className="catalog-page">
@@ -141,6 +138,10 @@ export function RecipeDetailPage() {
           </div>
         }
       />
+
+      <Card density="comfortable">
+        <TechnicalValue label="Public key" value={recipe.public_key} />
+      </Card>
 
       {dish ? <DishInheritedContext dish={dish} tags={tags} /> : null}
 

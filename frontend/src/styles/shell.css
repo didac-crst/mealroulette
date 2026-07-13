@@ -237,7 +237,7 @@
   width: 100%;
   max-width: var(--content-max);
   margin: 0 auto;
-  padding: var(--space-4) var(--page-padding-mobile);
+  padding: var(--space-4) var(--page-gutter-mobile);
   padding-bottom: calc(var(--space-6) + 3.75rem + env(safe-area-inset-bottom, 0px));
   box-sizing: border-box;
 }
@@ -245,7 +245,7 @@
 @media (min-width: 768px) {
   .app-shell-layout .app-main {
     max-width: min(var(--content-max), calc(100vw - var(--sidebar-width) - var(--space-8)));
-    padding: var(--space-6) var(--page-padding-desktop);
+    padding: var(--space-6) var(--page-gutter-desktop);
     padding-bottom: var(--space-6);
   }
 }

@@ -95,6 +95,18 @@
   border-color: var(--color-danger-hover);
 }
 
+.button-danger-subtle {
+  border-color: var(--color-danger);
+  background: transparent;
+  color: var(--color-danger);
+}
+
+.button-danger-subtle:hover:not(:disabled) {
+  background: rgb(201 63 63 / 8%);
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
 .button-loading .button-label {
   opacity: 0.85;
 }

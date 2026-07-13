@@ -12,9 +12,9 @@ import {
   type TelegramSubscriber,
 } from "../../api/telegram";
 import { ApiError } from "../../api/client";
-import { Button, EmptyState, FormSection, FormStickyActions, SegmentedControl, Switch, TimezoneSelect } from "../../components/ui";
+import { Button, EmptyState, FormSection, FormStickyActions, NumberStepper, SettingsSectionHeader, Switch, TimezoneSelect } from "../../components/ui";
 import { formatInstantInTimeZone } from "../../lib/datetime";
-import { REMINDER_WINDOW_PRESETS } from "../../lib/timezones";
+// planning window is now a 1–7 day stepper
 import { useAuth } from "../auth/AuthContext";
 import { SettingsPageShell } from "./SettingsPageShell";
 
@@ -203,10 +203,16 @@ export function TelegramSettingsPage() {
 
       <form onSubmit={(event) => void handleSubmit(event)} className="admin-form">
         <FormSection title="Daily reminders">
-          <Switch
-            checked={form.enabled ?? false}
-            onChange={(event) => setForm({ ...form, enabled: event.target.checked })}
-            label="Enable daily reminders"
+          <SettingsSectionHeader
+            title="Daily reminders"
+            description="Send a daily shopping reminder through the household bot."
+            trailing={
+              <Switch
+                checked={form.enabled ?? false}
+                onChange={(event) => setForm({ ...form, enabled: event.target.checked })}
+                label="Enable daily reminders"
+              />
+            }
           />
 
           <div className="grid-2">
@@ -227,18 +233,17 @@ export function TelegramSettingsPage() {
             </label>
           </div>
 
-          <div className="stack">
-            <span className="muted">Reminder window</span>
-            <SegmentedControl
-              className="segmented-control-full"
-              ariaLabel="Reminder window in days"
-              value={form.shopping_window_days ?? 3}
-              options={[...REMINDER_WINDOW_PRESETS]}
-              onChange={(shopping_window_days) => setForm({ ...form, shopping_window_days })}
-            />
-          </div>
+          <NumberStepper
+            ariaLabel="Planning days included"
+            label="Planning days included"
+            min={1}
+            max={7}
+            value={form.shopping_window_days ?? 3}
+            onChange={(shopping_window_days) => setForm({ ...form, shopping_window_days })}
+          />
           <p className="muted admin-field-hint">
-            Same as <code>/reminder {form.shopping_window_days ?? 3}</code>
+            Includes today and the following {Math.max(0, (form.shopping_window_days ?? 3) - 1)} day
+            {(form.shopping_window_days ?? 3) - 1 === 1 ? "" : "s"}.
           </p>
 
           <Switch

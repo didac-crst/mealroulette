@@ -10,7 +10,7 @@ import {
   type BackupSettingsInput,
 } from "../../api/backup";
 import { ApiError } from "../../api/client";
-import { Button, EmptyState, FormSection, FormStickyActions, NumberStepper, Switch, TimezoneSelect } from "../../components/ui";
+import { Button, EmptyState, FormSection, FormStickyActions, NumberStepper, SettingsSectionHeader, Switch, TimezoneSelect } from "../../components/ui";
 import { formatInstantInTimeZone } from "../../lib/datetime";
 import { useAuth } from "../auth/AuthContext";
 import { SettingsPageShell } from "./SettingsPageShell";
@@ -143,10 +143,16 @@ export function BackupSettingsPage() {
 
       <form onSubmit={handleSubmit} className="admin-form">
         <FormSection title="Schedule">
-          <Switch
-            checked={form.enabled === true}
-            onChange={(event) => setForm({ ...form, enabled: event.target.checked })}
-            label="Enable scheduled backups"
+          <SettingsSectionHeader
+            title="Scheduled backups"
+            description="Automatically create recurring backups."
+            trailing={
+              <Switch
+                checked={form.enabled === true}
+                onChange={(event) => setForm({ ...form, enabled: event.target.checked })}
+                label="Enable scheduled backups"
+              />
+            }
           />
           <div className="grid-2">
             <label>
@@ -173,6 +179,9 @@ export function BackupSettingsPage() {
             value={form.retention_days ?? 30}
             onChange={(retention_days) => setForm({ ...form, retention_days })}
           />
+          <p className="muted admin-field-hint">
+            Keeps backups for {form.retention_days ?? 30} days before cleanup. (Applies to scheduled backups.)
+          </p>
           <label>
             Backup path
             <input

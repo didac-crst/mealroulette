@@ -11,6 +11,7 @@ export type SearchSelectProps = {
   onChange: (value: string) => void;
   placeholder?: string;
   emptyLabel?: string;
+  allowEmptyOption?: boolean;
   disabled?: boolean;
   ariaLabel: string;
   className?: string;
@@ -22,6 +23,7 @@ export function SearchSelect({
   onChange,
   placeholder = "Search…",
   emptyLabel = "—",
+  allowEmptyOption = false,
   disabled = false,
   ariaLabel,
   className,
@@ -100,11 +102,18 @@ export function SearchSelect({
       </label>
       {open && !disabled ? (
         <ul id={listId} className="search-select-list" role="listbox">
-          <li>
-            <button type="button" className="search-select-option" role="option" onClick={() => selectOption("")}>
-              {emptyLabel}
-            </button>
-          </li>
+          {allowEmptyOption ? (
+            <li>
+              <button
+                type="button"
+                className="search-select-option"
+                role="option"
+                onClick={() => selectOption("")}
+              >
+                {emptyLabel}
+              </button>
+            </li>
+          ) : null}
           {filteredOptions.length === 0 ? (
             <li className="search-select-empty muted">No matches</li>
           ) : (

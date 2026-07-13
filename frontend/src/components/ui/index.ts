@@ -23,7 +23,9 @@ export { SchedulerWeekdayPicker, type SchedulerWeekdayPickerProps } from "./Sche
 export { SearchSelect, type SearchSelectOption, type SearchSelectProps } from "./SearchSelect";
 export { SegmentedControl, type SegmentedControlProps, type SegmentedOption } from "./SegmentedControl";
 export { SettingsTile, type SettingsTileProps } from "./SettingsTile";
+export { SettingsSectionHeader, type SettingsSectionHeaderProps } from "./SettingsSectionHeader";
 export { StatusBadge, type StatusBadgeProps, type StatusBadgeVariant } from "./StatusBadge";
 export { Switch, type SwitchProps } from "./Switch";
+export { TechnicalValue, type TechnicalValueProps } from "./TechnicalValue";
 export { TimezoneSelect, type TimezoneSelectProps } from "./TimezoneSelect";
 export { WeekdayPicker, type WeekdayPickerProps } from "./WeekdayPicker";

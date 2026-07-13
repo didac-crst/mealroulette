@@ -161,6 +161,7 @@ export function PlanForMealDialog({
               disabled={busy}
               placeholder="Main recipe"
               emptyLabel="Main recipe"
+              allowEmptyOption
               onChange={setRecipeId}
             />
           </label>
