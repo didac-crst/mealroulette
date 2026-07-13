@@ -1,0 +1,127 @@
+:root {
+  /* Brand — teal */
+  --brand-teal-800: #05756f;
+  --brand-teal-700: #078b82;
+  --brand-teal-600: #0aa095;
+  --brand-teal-500: #12b9a5;
+  --brand-teal-200: #bceee7;
+  --brand-teal-100: #dff7f3;
+  --brand-teal-50: #f1fbf9;
+
+  /* Brand — green */
+  --brand-green-600: #67b524;
+  --brand-green-500: #75c62f;
+  --brand-green-100: #edf8df;
+
+  /* Brand — orange */
+  --brand-orange-600: #eb6810;
+  --brand-orange-500: #ff7b1a;
+  --brand-orange-100: #fff0e2;
+
+  /* Ink */
+  --ink-950: #032532;
+  --ink-900: #062c3c;
+  --ink-700: #36515c;
+  --ink-500: #6d7f86;
+
+  /* Surfaces */
+  --surface-page: #f7faf9;
+  --surface-card: #ffffff;
+  --surface-muted: #f1f5f4;
+
+  /* Borders */
+  --border-subtle: #dce7e5;
+  --border-strong: #b9cac7;
+
+  /* Semantic status */
+  --success-600: #4f9b20;
+  --warning-600: #c97800;
+  --danger-600: #c93f3f;
+  --info-600: #257a92;
+
+  /* Semantic aliases (use in components) */
+  --color-text-primary: var(--ink-900);
+  --color-text-secondary: var(--ink-700);
+  --color-text-muted: var(--ink-500);
+  --color-interactive: var(--brand-teal-600);
+  --color-interactive-hover: var(--brand-teal-700);
+  --color-interactive-subtle: var(--brand-teal-100);
+  --color-roulette: var(--brand-orange-500);
+  --color-roulette-hover: var(--brand-orange-600);
+  --color-roulette-subtle: var(--brand-orange-100);
+  --color-success: var(--success-600);
+  --color-success-subtle: var(--brand-green-100);
+  --color-danger: var(--danger-600);
+  --color-danger-hover: #a83232;
+  --color-warning: var(--warning-600);
+  --color-info: var(--info-600);
+
+  /* Typography */
+  --font-family: Inter, system-ui, -apple-system, sans-serif;
+  --font-size-body: 1rem;
+  --font-size-sm: 0.875rem;
+  --font-size-xs: 0.8125rem;
+  --font-size-page-title: 1.75rem;
+  --font-size-section-title: 1.25rem;
+  --font-size-card-title: 1.125rem;
+  --line-height: 1.5;
+
+  /* Spacing (8px scale) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-pill: 999px;
+
+  /* Controls */
+  --control-sm: 36px;
+  --control-md: 44px;
+  --control-lg: 50px;
+
+  /* Layout */
+  --page-padding-mobile: 16px;
+  --page-padding-tablet: 24px;
+  --page-padding-desktop: 40px;
+  --sidebar-width: 256px;
+  --content-max: 960px;
+  --bp-sm: 480px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+
+  /* Motion */
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+
+  /* Shadows */
+  --shadow-soft: 0 1px 2px rgb(6 44 60 / 6%);
+  --shadow-elevated: 0 8px 24px rgb(6 44 60 / 10%);
+
+  color: var(--color-text-primary);
+  background: var(--surface-page);
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+    --duration-slow: 0ms;
+  }
+}

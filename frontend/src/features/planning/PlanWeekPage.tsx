@@ -9,6 +9,7 @@ import {
   type MealPlanItem,
   type MealPlanRouletteResponse,
 } from "../../api/planning";
+import { Button } from "../../components/ui";
 import { MealSlotCard } from "./MealSlotCard";
 import { formatPlanDate, groupItemsByDate, weekDates } from "./planFormat";
 import { useWeekPlan } from "./useWeekPlan";
@@ -121,14 +122,15 @@ export function PlanWeekPage() {
             <p className="muted">Fill open slots automatically. Locked meals stay as they are.</p>
           </div>
           <div className="row-actions">
-            <button
+            <Button
               type="button"
-              className="button"
+              variant="roulette"
               disabled={!plan || rouletteBusy}
+              loading={rouletteBusy}
               onClick={() => void handleGenerateWeek()}
             >
               Generate week
-            </button>
+            </Button>
             <button
               type="button"
               className="button button-undo"

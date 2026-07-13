@@ -1,0 +1,277 @@
+/* Shared UI primitives — see frontend/src/components/ui/ */
+
+/* --- Button --- */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--control-md);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-interactive);
+  border-radius: var(--radius-md);
+  background: var(--color-interactive);
+  color: #fff;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+}
+
+.button:hover:not(:disabled) {
+  background: var(--color-interactive-hover);
+  border-color: var(--color-interactive-hover);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--brand-teal-200);
+  outline-offset: 2px;
+}
+
+.button:disabled,
+.button[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.button-sm {
+  min-height: var(--control-sm);
+  padding: 0 var(--space-3);
+  font-size: var(--font-size-xs);
+}
+
+.button-lg {
+  min-height: var(--control-lg);
+  padding: 0 var(--space-6);
+  font-size: var(--font-size-body);
+}
+
+.button-secondary {
+  border-color: var(--border-strong);
+  background: var(--surface-card);
+  color: var(--color-text-primary);
+}
+
+.button-secondary:hover:not(:disabled) {
+  background: var(--surface-muted);
+  border-color: var(--border-strong);
+}
+
+.button-roulette {
+  border-color: var(--color-roulette);
+  background: var(--color-roulette);
+}
+
+.button-roulette:hover:not(:disabled) {
+  background: var(--color-roulette-hover);
+  border-color: var(--color-roulette-hover);
+}
+
+.button-ghost {
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-interactive);
+}
+
+.button-ghost:hover:not(:disabled) {
+  background: var(--color-interactive-subtle);
+  border-color: transparent;
+}
+
+.button-danger {
+  border-color: var(--color-danger);
+  background: var(--color-danger);
+  color: #fff;
+}
+
+.button-danger:hover:not(:disabled) {
+  background: var(--color-danger-hover);
+  border-color: var(--color-danger-hover);
+}
+
+.button-loading .button-label {
+  opacity: 0.85;
+}
+
+.button-spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgb(255 255 255 / 35%);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: button-spin 0.7s linear infinite;
+}
+
+.button-secondary .button-spinner,
+.button-ghost .button-spinner {
+  border-color: rgb(6 44 60 / 15%);
+  border-top-color: var(--color-interactive);
+}
+
+@keyframes button-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button-spinner {
+    animation: none;
+    border-top-color: transparent;
+  }
+}
+
+/* --- Card --- */
+
+.ui-card {
+  margin-top: var(--space-2);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-soft);
+}
+
+.ui-card-compact {
+  padding: var(--space-3) var(--space-4);
+}
+
+.ui-card-comfortable {
+  padding: var(--space-5) var(--space-6);
+}
+
+/* --- Page header --- */
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.page-header-title {
+  margin: 0;
+  font-size: var(--font-size-page-title);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+
+.page-header-subtitle {
+  margin: var(--space-2) 0 0;
+  font-size: var(--font-size-sm);
+}
+
+.page-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* --- Status badge --- */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.status-badge-default {
+  background: var(--surface-muted);
+  color: var(--color-text-secondary);
+}
+
+.status-badge-success {
+  background: var(--color-success-subtle);
+  color: var(--color-success);
+}
+
+.status-badge-warning {
+  background: var(--color-roulette-subtle);
+  color: var(--color-warning);
+}
+
+.status-badge-danger {
+  background: #fdeaea;
+  color: var(--color-danger);
+}
+
+.status-badge-info {
+  background: var(--color-interactive-subtle);
+  color: var(--color-info);
+}
+
+.status-badge-roulette {
+  background: var(--color-roulette-subtle);
+  color: var(--color-roulette-hover);
+}
+
+.status-badge-muted {
+  background: var(--surface-muted);
+  color: var(--color-text-muted);
+}
+
+/* --- Form section --- */
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.form-section-header h2 {
+  margin: 0;
+  font-size: var(--font-size-section-title);
+  font-weight: 600;
+}
+
+.form-section-header p {
+  margin: var(--space-2) 0 0;
+}
+
+.form-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* --- Empty state --- */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-4);
+  text-align: left;
+}
+
+.empty-state-title {
+  margin: 0;
+  font-size: var(--font-size-card-title);
+  font-weight: 600;
+}
+
+.empty-state-description {
+  margin: 0;
+  max-width: 36rem;
+}
+
+.empty-state-action {
+  margin-top: var(--space-2);
+}

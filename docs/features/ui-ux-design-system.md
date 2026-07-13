@@ -421,11 +421,12 @@ Incremental, reviewable PR slices on `ui-ux/design-system-reconciliation`. **No 
 
 Deliverables:
 
-- [ ] CSS design tokens in `frontend/src/styles/app.css` (colours, spacing, radii, type scale, breakpoints, control heights).
-- [ ] `Button` with variants: primary, roulette, secondary, ghost, destructive; sizes sm/md/lg; loading state.
-- [ ] `Card`, `PageHeader`, `StatusBadge`, `FormSection`, `EmptyState`.
-- [ ] Map existing `.button` / `.button-secondary` / `.button-danger` to token-backed styles (compat layer).
-- [ ] Document token usage in Storybook-free repo: minimal tests for `Button` variants if added.
+- [x] CSS design tokens in `frontend/src/styles/tokens.css` (imported before `app.css`).
+- [x] `Button` with variants: primary, roulette, secondary, ghost, destructive; sizes sm/md/lg; loading state.
+- [x] `Card`, `PageHeader`, `StatusBadge`, `FormSection`, `EmptyState` (`frontend/src/components/ui/`).
+- [x] Token-backed global styles in `components.css`; legacy `.button` classes mapped to primitives.
+- [x] Initial adoption: login `Button`, plan **Generate week** (`roulette` variant); teal replaces blue primary in global CSS.
+- [x] Unit tests for `Button` and `StatusBadge`.
 
 **Explicitly not in phase 1:** full screen rewrites, sidebar, logo asset production.
 

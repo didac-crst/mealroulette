@@ -2,6 +2,7 @@ import { FormEvent, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
 import { ApiError } from "../../api/client";
+import { Button } from "../../components/ui";
 import { useAuth } from "./AuthContext";
 
 export function LoginPage() {
@@ -66,9 +67,9 @@ export function LoginPage() {
               {error}
             </p>
           ) : null}
-          <button type="submit" disabled={submitting || loading}>
+          <Button type="submit" size="lg" loading={submitting} disabled={loading} className="login-submit">
             {submitting ? "Signing in…" : "Sign in"}
-          </button>
+          </Button>
         </form>
       </section>
     </main>
