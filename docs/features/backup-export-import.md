@@ -1,18 +1,27 @@
 # Backup, Export, and Import
 
-Architecture specification for **Phase 11 / v1.0**. This document refines the high-level backup requirements in [SPECS.md](../SPECS.md#310-backup-export-and-import) and the Phase 11 roadmap entry in [CURSOR_ROADMAP.md](CURSOR_ROADMAP.md#phase-11---taxonomy-hardening--backup-export-and-import).
+## Document metadata
+
+- **Purpose:** JSON export/import format, backup settings, validation, and retention.
+- **Authority:** Canonical for backup contract; defers to [SPECS.md](../../SPECS.md) for high-level product requirements.
+- **Status:** Living — update when export schema or backup behaviour changes.
+- **Update when:** Migrations or `backup_service.py` change the portable format.
+
+---
+
+Architecture specification for **Phase 11 / v1.0**. This document refines the high-level backup requirements in [SPECS.md](../../SPECS.md#310-backup-export-and-import) and the Phase 11 roadmap entry in [CURSOR_ROADMAP.md](../CURSOR_ROADMAP.md#phase-11---taxonomy-hardening--backup-export-and-import).
 
 ## Prerequisites (taxonomy hardening)
 
 **Do not finalize the export schema until taxonomy hardening is complete.**
 
-Per [ADR 002](adr/002-canonical-taxonomy-before-backup.md) and [PHASE11_HANDOFF.md](PHASE11_HANDOFF.md), the backup format must reflect:
+Per [ADR 002](../adr/002-canonical-taxonomy-before-backup.md) and [../archive/phase-11-handoff.md](../archive/phase-11-handoff.md), the backup format must reflect:
 
 - first-class `food_groups` and `ingredient_families` tables (not string fields on `ingredients` alone);
 - canonical ingredient references on recipe ingredients;
 - scheduler weekly targets driven by computed traits where derivable, with explicit curated fields for non-derivable classifications (e.g. `soup`);
 - a clear decision on legacy `tags` / `dish_tags` in export (compatibility slice vs retired);
-- dish-level `meal_composition` and `simple_dish_part` fields (see [MEAL_COMPOSITION.md](MEAL_COMPOSITION.md)).
+- dish-level `meal_composition` and `simple_dish_part` fields (see [meal-composition.md](meal-composition.md)).
 
 Implementation order: **taxonomy migrations and target matching → then backup export/import**.
 

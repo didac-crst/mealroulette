@@ -1,13 +1,23 @@
 # MealRoulette Backlog
 
+## Document metadata
+
+- **Purpose:** Status board — what is shipped, in progress, and next.
+- **Authority:** Canonical for phase/version shipment status; product scope defers to [SPECS.md](../SPECS.md).
+- **Status:** Living — update when milestones land.
+- **Update when:** A phase merges, a version is tagged, or focus shifts.
+
+---
+
 Execution tracker for what has been built, what is in progress, and what comes next.
 
 This file is the **status board**. It does not replace the product spec or build plan:
 
 - [SPECS.md](../SPECS.md) — product requirements and long-term version roadmap (v0.1 → v1.0)
-- [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) — implementation phases (Phase 0 → Phase 13)
-- [docs/LOCALIZATION.md](LOCALIZATION.md) — multilingual content design (Phase 12; documented early, implement later)
-- [docs/MVP.md](MVP.md) — MVP scope and acceptance test
+- [CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) — implementation phases (Phase 0 → Phase 13)
+- [README.md](README.md) — documentation authority map
+- [features/localization.md](features/localization.md) — multilingual content design (Phase 12)
+- [MVP.md](MVP.md) — MVP goal and acceptance test
 
 Update this file when a phase or version milestone lands.
 
@@ -17,7 +27,7 @@ Update this file when a phase or version milestone lands.
 
 **Phase 12 — LLM-assisted entry & localization** on `main` (from `v0.8.0`).
 
-Phase 11 shipped taxonomy hardening and backup/export/import as [`v0.8.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.8.0). See [BACKUP_EXPORT_IMPORT.md](BACKUP_EXPORT_IMPORT.md), [RESTORE.md](RESTORE.md), and [ADR 002](adr/002-canonical-taxonomy-before-backup.md).
+Phase 11 shipped taxonomy hardening and backup/export/import as [`v0.8.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.8.0). See [features/backup-export-import.md](features/backup-export-import.md), [operations/restore.md](operations/restore.md), and [ADR 002](adr/002-canonical-taxonomy-before-backup.md).
 
 **v0.8 shipped** as [`v0.8.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.8.0) — taxonomy tables, computed-trait weekly targets, meal composition metadata, JSON backup/import, scheduled backups, restore docs. Release notes: [docs/releases/v0.8.0.md](releases/v0.8.0.md).
 
@@ -59,7 +69,7 @@ Use one branch per milestone, then merge via pull request:
 
 ## Product roadmap (long term)
 
-From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what users can do. **Phases** (below) are how we build them. A version is only *released* when all its phases are done — then tag `vX.Y.Z` per [RELEASES.md](RELEASES.md).
+From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what users can do. **Phases** (below) are how we build them. A version is only *released* when all its phases are done — then tag `vX.Y.Z` per [operations/releases.md](operations/releases.md).
 
 | Version | Theme | Status |
 | --- | --- | --- |
@@ -156,7 +166,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 ### v0.5 — Automatic Scheduler
 
 - [x] Planning rules + weekly targets with tolerance
-- [x] Family-vector similarity ([SCHEDULER.md](SCHEDULER.md): on-the-fly L1 %, count fallback 100 g, cosine distance)
+- [x] Family-vector similarity ([features/scheduler.md](features/scheduler.md): on-the-fly L1 %, count fallback 100 g, cosine distance)
 - [x] History-aware scoring (temporal neighbours: eaten + planned + in-run picks)
 - [x] Seasonality + rating scoring
 - [x] Generate week (unlocked slots only; locked preserved)
@@ -175,7 +185,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 
 **Additive first:** computed traits are a parallel metadata layer. Weekly target matching (`fish`, `meat`, `pasta`, `rice`, `vegetarian`, `soup`) keeps using **dish tags** until an explicit later migration step with tests.
 
-- [x] Document Phase 9 spec (`docs/COMPUTED_TRAITS.md`, `docs/TAXONOMY_AND_RESOLVER.md`)
+- [x] Document Phase 9 spec (`docs/features/computed-traits.md`, `docs/features/taxonomy-resolver.md`)
 - [x] Taxonomy YAML split under `backend/mealroulette/data/taxonomy/` + loader validation
 - [x] Migration: `ingredients.food_group`, `dishes.public_key`, `recipes.public_key`, `recipes.sequence_number`, `recipes.computed_traits_json`
 - [x] Backfill food groups from category mapping; backfill public keys and recipe sequences; compute traits
@@ -187,7 +197,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [x] API: expose `food_group`, `public_key`, `computed_traits_json` on ingredients, dishes, recipes, meal-plan items
 - [x] Dish effective traits = main recipe traits; meal-plan item = selected recipe traits (or main recipe fallback)
 - [x] Scheduler: add `computed_traits_json` to `DishCandidate`; **do not** replace `dish_matches_weekly_target` in first pass
-- [x] Ingredient resolver (exact/alias/fuzzy) + taxonomy browsing APIs — see [TAXONOMY_AND_RESOLVER.md](TAXONOMY_AND_RESOLVER.md)
+- [x] Ingredient resolver (exact/alias/fuzzy) + taxonomy browsing APIs — see [features/taxonomy-resolver.md](features/taxonomy-resolver.md)
 - [x] Frontend: TypeScript types, ingredient food-group field, trait display, taxonomy navigator (`/ingredients/taxonomy`)
 - [x] Tests: key generation, trait rules, migration backfill, resolver, taxonomy API, scheduler/weekly-target regression
 - [x] Release notes `v0.6.0.md`
@@ -250,7 +260,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 
 **Status:** Catalog metadata implemented in Phase 11 (`meal_composition`, `simple_dish_part` on `dishes`). Scheduler pairing and multi-component slots remain backlog.
 
-See [MEAL_COMPOSITION.md](MEAL_COMPOSITION.md).
+See [features/meal-composition.md](features/meal-composition.md).
 
 | Composition | Scheduler | Example |
 | --- | --- | --- |
@@ -425,7 +435,7 @@ Branch: `phase-6/shopping`.
 - [x] Ingredient seed import and conversion approval bootstrap
 - [x] Ingredient conversions CRUD API (unique triplet constraint, migration `018`)
 - [x] Ingredient admin UI — catalog list, edit aliases/conversions/unit behavior
-- [x] Localization design documented ([LOCALIZATION.md](LOCALIZATION.md)); implementation deferred to Phase 12
+- [x] Localization design documented ([features/localization.md](features/localization.md)); implementation deferred to Phase 12
 
 ### Phase 7 — Telegram reminders ✅
 
@@ -446,7 +456,7 @@ Branch: merged in PR #7 (`v0.4.0`).
 
 ### Phase 8 — Explainable scheduler ✅
 
-Shipped as [`v0.5.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.5.0). Full plan: [CURSOR_ROADMAP.md § Phase 8](CURSOR_ROADMAP.md#phase-8---explainable-scheduler). Vector math: [SCHEDULER.md](SCHEDULER.md).
+Shipped as [`v0.5.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.5.0). Full plan: [CURSOR_ROADMAP.md § Phase 8](CURSOR_ROADMAP.md#phase-8---explainable-scheduler). Vector math: [features/scheduler.md](features/scheduler.md).
 
 - [x] Migration `020` — `planning_rules`, `scheduler_settings`
 - [x] Migration `021` — `meal_plans.last_roulette_undo_json`
@@ -463,7 +473,7 @@ Shipped as [`v0.5.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0
 
 ### Phase 9 — Computed recipe traits & catalog keys ✅
 
-Shipped in `v0.6.0` via PR #9. Full plan: [CURSOR_ROADMAP.md § Phase 9](CURSOR_ROADMAP.md#phase-9---computed-recipe-traits--catalog-keys). Specs: [COMPUTED_TRAITS.md](COMPUTED_TRAITS.md), [TAXONOMY_AND_RESOLVER.md](TAXONOMY_AND_RESOLVER.md).
+Shipped in `v0.6.0` via PR #9. Full plan: [CURSOR_ROADMAP.md § Phase 9](CURSOR_ROADMAP.md#phase-9---computed-recipe-traits--catalog-keys). Specs: [features/computed-traits.md](features/computed-traits.md), [features/taxonomy-resolver.md](features/taxonomy-resolver.md).
 
 **Authoritative taxonomy files** (not the superseded single-YAML proposal):
 
@@ -488,9 +498,9 @@ Shipped in `v0.6.0` via PR #9. Full plan: [CURSOR_ROADMAP.md § Phase 9](CURSOR_
 
 ### Phase 10 — Cooking mode ✅
 
-Branch: `phase-10/cooking-mode`. Spec: [COOKING_MODE.md](COOKING_MODE.md). Merged PR [#10](https://github.com/didac-crst/mealroulette/pull/10), tag [`v0.7.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.7.0), merge `9f8fe92`.
+Branch: `phase-10/cooking-mode`. Spec: [features/cooking-mode.md](features/cooking-mode.md). Merged PR [#10](https://github.com/didac-crst/mealroulette/pull/10), tag [`v0.7.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.7.0), merge `9f8fe92`.
 
-- [x] Phase 10 spec (`docs/COOKING_MODE.md`)
+- [x] Phase 10 spec (`docs/features/cooking-mode.md`)
 - [x] **`/today` home** — default route; lunch/dinner cards with Cook + Review
 - [x] Route `/recipes/:recipeId/cook` + `RecipeCookingPage`
 - [x] **Cook** button on recipe detail
@@ -575,5 +585,5 @@ Cross-reference for [docs/MVP.md](MVP.md). Checked items are done; the rest trac
 
 1. When starting work, set **Current focus** to the active phase.
 2. When a phase completes, mark it done, check off related version items, and add the merge commit hash.
-3. When a **product version** (v0.1, v0.2, …) is fully shipped, update its row in the product roadmap table and create a `vX.Y.Z` tag — see [docs/RELEASES.md](RELEASES.md).
+3. When a **product version** (v0.1, v0.2, …) is fully shipped, update its row in the product roadmap table and create a `vX.Y.Z` tag — see [docs/operations/releases.md](operations/releases.md).
 4. Do not duplicate spec detail here — link to `SPECS.md` and `CURSOR_ROADMAP.md` instead.

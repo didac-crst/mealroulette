@@ -1,5 +1,12 @@
 # MealRoulette - Software Specification
 
+## Document metadata
+
+- **Purpose:** Long-term product requirements and data model overview.
+- **Authority:** Canonical for product scope; feature behaviour detail in [docs/features/](docs/features/).
+- **Status:** Living — update when product semantics change.
+- **Update when:** New user-facing behaviour ships or data model contracts change.
+
 ## 1. Overview
 
 MealRoulette is a self-hosted household meal planning application designed to reduce daily decision fatigue around what to eat.
@@ -582,6 +589,8 @@ Fields (v0.1):
 - suitable_for_lunch, suitable_for_dinner, weekday_friendly, leftovers_possible, freezer_friendly, kids_friendly (nullable booleans)
 - notes
 - tag_ids (via dish_tags)
+- meal_composition (`complete_meal`, `half`, `dessert`, `side`, …) — planner slot role; see [docs/features/meal-composition.md](docs/features/meal-composition.md)
+- simple_dish_part (optional label when `meal_composition` is `half`)
 - seasonality (optional; see §7.12)
 - created_at, updated_at
 
@@ -669,9 +678,13 @@ Fields:
 - pantry_item
 - season_start_month
 - season_end_month
+- family_id (FK to `ingredient_families`; preferred taxonomy link)
+- family (legacy string rollup key; dual-read during migration — see ADR 002)
 - notes
 - created_at
 - updated_at
+
+Food group membership is via `ingredient_families.food_group_id`, not a direct column on `ingredients`. Taxonomy tables and resolver semantics: [docs/features/taxonomy-resolver.md](docs/features/taxonomy-resolver.md).
 
 Examples:
 
@@ -680,6 +693,13 @@ canonical_name: tomato
 display_name: Tomatoes
 aliases: tomato, tomatoes, tomate, tomates, tomàquet, Tomaten
 ```
+
+### 7.5.1 Taxonomy tables (v0.8+)
+
+First-class reference tables seeded from YAML:
+
+- `food_groups` — top-level browsing groups (e.g. vegetables, fish, dairy)
+- `ingredient_families` — rollup keys for scheduler vectors and traits; FK to `food_groups`
 
 ### 7.6 Ingredient Aliases
 

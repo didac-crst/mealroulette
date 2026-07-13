@@ -1,5 +1,8 @@
 # Phase 9 Taxonomy And Ingredient Resolver Spec
 
+> **Superseded.** Canonical feature spec: [features/taxonomy-resolver.md](../features/taxonomy-resolver.md).  
+> This file is retained as Phase 9 proposal material and working notes — do not treat it as the authority for current behaviour.
+
 ## Purpose
 
 Split ingredient taxonomy into declarative files that can support:

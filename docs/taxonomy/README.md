@@ -10,7 +10,7 @@ Phase 9 ingredient taxonomy specs, proposals, and validation reports.
 | [backend/mealroulette/data/taxonomy/ingredient_families.yaml](../backend/mealroulette/data/taxonomy/ingredient_families.yaml) | 69 families |
 | [backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml](../backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml) | 412 canonical ingredients (import target) |
 
-See also [TAXONOMY_AND_RESOLVER.md](../TAXONOMY_AND_RESOLVER.md) and [COMPUTED_TRAITS.md](../COMPUTED_TRAITS.md).
+See also [features/taxonomy-resolver.md](../features/taxonomy-resolver.md) and [features/computed-traits.md](../features/computed-traits.md).
 
 ## Proposals (not active)
 
@@ -18,7 +18,7 @@ Expanded MVP catalogue proposal (~627 candidates, 90 families, 22 food groups):
 
 - [backend/mealroulette/data/taxonomy/proposals/](../backend/mealroulette/data/taxonomy/proposals/)
 - [catalogue_assessment_and_mvp_plan.md](catalogue_assessment_and_mvp_plan.md) — target **500–700** ingredients for MVP, not 2,000 immediately
-- [proposal_taxonomy_and_resolver_spec.md](proposal_taxonomy_and_resolver_spec.md) — updated resolver/taxonomy spec from handoff
+- [proposal_taxonomy_and_resolver_spec.md](proposal_taxonomy_and_resolver_spec.md) — **superseded** Phase 9 proposal; canonical spec is [features/taxonomy-resolver.md](../features/taxonomy-resolver.md)
 
 **Do not import proposals until validated and promoted.**
 

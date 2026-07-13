@@ -1,10 +1,19 @@
 # Scheduler — family vectors and similarity
 
-Authoritative rules for **Phase 8 / v0.5** automatic meal roulette. Implementation lives in `backend/mealroulette/services/scheduler/`. Product behaviour (reroll, generate week, scheduled job, Telegram) is in [CURSOR_ROADMAP.md](CURSOR_ROADMAP.md#phase-8---explainable-scheduler).
+## Document metadata
 
-**Purpose:** similarity between dishes for history-aware roulette. **Not** used for weekly targets — those use dish **tags** only.
+- **Purpose:** Family-vector similarity and how it relates to weekly target matching.
+- **Authority:** Canonical for scheduler vector math; weekly target semantics also in [computed-traits.md](computed-traits.md) and [meal-composition.md](meal-composition.md).
+- **Status:** Living — update when scheduler scoring changes.
+- **Update when:** `targets.py` or neighbour/scoring rules change.
 
-**Not in scope:** ML embeddings (see [SPECS.md §10](../SPECS.md#10-meal-similarity-logic)).
+---
+
+Authoritative rules for **Phase 8 / v0.5** automatic meal roulette (extended in Phase 11 for trait-based targets). Implementation lives in `backend/mealroulette/services/scheduler/`. Product behaviour (reroll, generate week, scheduled job, Telegram) is in [CURSOR_ROADMAP.md](../CURSOR_ROADMAP.md#phase-8---explainable-scheduler).
+
+**Purpose:** similarity between dishes for history-aware roulette. **Weekly targets** use main-recipe **computed traits** first (`fish`, `meat`, `pasta`, `rice`, `vegetarian`, …), with **curated style tags** as fallback for non-derivable classifications (e.g. `soup`). See `mealroulette.services.scheduler.targets`.
+
+**Not in scope:** ML embeddings (see [SPECS.md §10](../../SPECS.md#10-meal-similarity-logic)).
 
 ---
 
@@ -89,8 +98,8 @@ similarity = 1 - similarity_distance     # 1 = identical, 0 = orthogonal
 ```
 
 - Range: `similarity_distance ∈ [0, 1]` for non-negative vectors.
-- **Not used for:** weekly target checks (tags only).
-- **Tags are not merged into the family vector** in v0.5. Pasta vs rice similarity comes from overlapping ingredient families; carb/protein tags remain for weekly targets only. A optional tag-blend layer may be added later without changing vector construction.
+- **Not used for:** weekly target checks (traits + style-tag fallback handle those).
+- **Tags are not merged into the family vector.** Pasta vs rice similarity comes from overlapping ingredient families; weekly targets use computed traits from the main recipe, not the vector.
 
 ---
 
@@ -147,11 +156,12 @@ The generator fills slots **in calendar order** (Mon lunch → Mon dinner → �
 
 ---
 
-## 5. Tags vs vectors (reminder)
+## 5. Traits, tags, and vectors (reminder)
 
 | Mechanism | Role |
 | --- | --- |
-| **Tags** (`protein`, `carb`, `style`, `temperature`) | Weekly targets, min/max + tolerance, selection reasons |
+| **Computed traits** (main recipe) | Weekly targets (`fish`, `meat`, `pasta`, `rice`, `vegetarian`, …) |
+| **Curated style tags** | Fallback for non-derivable targets (e.g. `soup`); temperature and legacy carb/protein tags where still used |
 | **Family vector** | Similarity to temporal neighbours only |
 | **Seasonality** | Soft score per slot month |
 | **Ratings** | Soft boost from household ratings |
@@ -239,6 +249,6 @@ Configured in **`scheduler_settings`** (admin UI `/settings/scheduler`, API `GET
 
 ## 11. Related docs
 
-- [SPECS.md §10–12](../SPECS.md#10-meal-similarity-logic) — product-level scheduler design
-- [CURSOR_ROADMAP.md § Phase 8](CURSOR_ROADMAP.md#phase-8---explainable-scheduler) — deliverables and UI slices
-- [BACKLOG.md](BACKLOG.md) — v0.5 checklist
+- [SPECS.md §10–12](../../SPECS.md#10-meal-similarity-logic) — product-level scheduler design
+- [CURSOR_ROADMAP.md § Phase 8](../CURSOR_ROADMAP.md#phase-8---explainable-scheduler) — deliverables and UI slices
+- [BACKLOG.md](../BACKLOG.md) — shipment status

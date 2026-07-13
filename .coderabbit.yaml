@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 # CodeRabbit: manual reviews only (comment @coderabbitai review on the PR).
-# Avoids burning a review when CI is still failing. See docs/CODERABBIT.md
+# Avoids burning a review when CI is still failing. See docs/operations/coderabbit.md
 language: "en-US"
 reviews:
   auto_review:

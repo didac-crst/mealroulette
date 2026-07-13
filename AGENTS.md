@@ -16,6 +16,8 @@ Before proposing or making changes, read:
 
 - `README.md`;
 
+- [docs/README.md](docs/README.md) — documentation authority map;
+
 - the documents referenced by the current task;
 
 - the architecture, specification and ADR documents relevant to the affected

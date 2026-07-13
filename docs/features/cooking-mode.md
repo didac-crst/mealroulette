@@ -1,6 +1,14 @@
 # Cooking mode (Phase 10)
 
-**Status:** Released in [`v0.7.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.7.0)  
+## Document metadata
+
+- **Purpose:** Today home, step-by-step cooking viewer, timers, and notifications.
+- **Authority:** Canonical for cooking-mode UX and API behaviour.
+- **Status:** Living — shipped in v0.7.0; update when cooking flows change.
+- **Update when:** Cooking routes, timers, or Telegram alerts change.
+
+---
+
 **Target product version:** v0.7 (first slice toward v1.0)  
 **Depends on:** v0.6.0 catalog keys, recipe steps, and recipe ingredients APIs
 
@@ -126,6 +134,6 @@ Manual: open a recipe with steps on a phone-sized viewport; walk through all ste
 ## References
 
 - [CURSOR_ROADMAP.md § Phase 10](CURSOR_ROADMAP.md#phase-10---cooking-mode)
-- [BACKLOG.md](BACKLOG.md)
+- [BACKLOG.md](../BACKLOG.md)
 - Frontend: `RecipeDetailPage.tsx`, `RecipeCookingPage.tsx`, `AppRouter.tsx`
 - API: `fetchRecipe`, `fetchRecipeSteps`, `fetchRecipeIngredients` in `frontend/src/api/catalog.ts`

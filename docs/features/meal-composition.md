@@ -1,5 +1,14 @@
 # Meal composition (dish-level planner metadata)
 
+## Document metadata
+
+- **Purpose:** `meal_composition` and `simple_dish_part` dish fields for planner slots.
+- **Authority:** Canonical for composition semantics; weekly generation rules in [scheduler.md](scheduler.md).
+- **Status:** Living — update when composition or planner integration changes.
+- **Update when:** Dish model or planner slot logic changes.
+
+---
+
 Phase 11 catalog field for how a dish participates in lunch/dinner planning. This is separate from **`course`** (`starter` | `main` | `dessert`), which describes menu position within a meal.
 
 ## Fields
@@ -66,6 +75,6 @@ Legacy protein/carb dish tags are no longer edited in the UI. The scheduler uses
 
 ## Related docs
 
-- [BACKLOG.md](BACKLOG.md) — composable meals follow-up
-- [SCHEDULER.md](SCHEDULER.md) — weekly generation (not yet composition-aware)
-- [BACKUP_EXPORT_IMPORT.md](BACKUP_EXPORT_IMPORT.md) — export must include these dish fields
+- [BACKLOG.md](../BACKLOG.md) — composable meals follow-up
+- [scheduler.md](scheduler.md) — weekly generation (not yet composition-aware)
+- [backup-export-import.md](backup-export-import.md) — export must include these dish fields

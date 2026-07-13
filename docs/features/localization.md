@@ -1,5 +1,14 @@
 # MealRoulette — Localization & Translation
 
+## Document metadata
+
+- **Purpose:** Multilingual content and UI chrome design (Phase 12).
+- **Authority:** Canonical for localization design; not yet implemented in product.
+- **Status:** Living design — implementation deferred to Phase 12.
+- **Update when:** Localization architecture or approval workflow changes.
+
+---
+
 This document is the design spec for multilingual **content** (dishes, recipes, ingredients) and how it relates to multilingual **UI chrome** (buttons, labels).
 
 Product principles (same as LLM-assisted entry elsewhere):
@@ -8,7 +17,7 @@ Product principles (same as LLM-assisted entry elsewhere):
 - **No live translation** on page load or shopping-list generation.
 - **Bulk jobs** are idempotent, auditable, and field-aware.
 
-See also: [SPECS.md](../SPECS.md), [CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) Phase 11.
+See also: [SPECS.md](../../SPECS.md), [CURSOR_ROADMAP.md](../CURSOR_ROADMAP.md) Phase 11.
 
 ---
 
