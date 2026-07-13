@@ -22,6 +22,8 @@ export type Dish = {
   default_cook_time_minutes: number | null;
   default_difficulty: "easy" | "medium" | "hard" | null;
   course: "starter" | "main" | "dessert" | null;
+  meal_composition: "main_dish" | "simple_dish" | "dessert";
+  simple_dish_part: "centerpiece" | "sidedish" | null;
   status: "draft" | "active" | "archived";
   image_url: string | null;
   suitable_for_lunch: boolean | null;
@@ -188,6 +190,8 @@ export type DishInput = {
   description?: string | null;
   image_url?: string | null;
   course?: Dish["course"];
+  meal_composition?: Dish["meal_composition"];
+  simple_dish_part?: Dish["simple_dish_part"];
   status?: Dish["status"];
   suitable_for_lunch?: boolean | null;
   suitable_for_dinner?: boolean | null;

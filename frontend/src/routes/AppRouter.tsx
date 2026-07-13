@@ -17,6 +17,7 @@ import { PlanWeekPage } from "../features/planning/PlanWeekPage";
 import { ReviewWeekPage } from "../features/planning/ReviewWeekPage";
 import { TodayPage } from "../features/planning/TodayPage";
 import { ShoppingPage } from "../features/shopping/ShoppingPage";
+import { BackupSettingsPage } from "../features/settings/BackupSettingsPage";
 import { TelegramSettingsPage } from "../features/settings/TelegramSettingsPage";
 import { SchedulerSettingsPage } from "../features/settings/SchedulerSettingsPage";
 import { AdminSettingsPage } from "../features/settings/AdminSettingsPage";
@@ -52,6 +53,7 @@ export function AppRouter() {
               <Route path="settings" element={<AdminSettingsPage />} />
               <Route path="settings/targets" element={<PlanningTargetsPage />} />
               <Route path="settings/telegram" element={<TelegramSettingsPage />} />
+              <Route path="settings/backups" element={<BackupSettingsPage />} />
               <Route path="settings/scheduler" element={<SchedulerSettingsPage />} />
             </Route>
           </Route>

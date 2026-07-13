@@ -145,7 +145,7 @@ Phases 0–10 shipped through **`v0.7.0`**. Phases 11–13 cover backup, LLM/loc
 | --- | --- | --- |
 | 9 | Computed recipe traits & catalog keys | v0.6 |
 | 10 | Cooking mode | v0.7 |
-| 11 | Backup, export, and import | v1.0 |
+| 11 | Taxonomy hardening + backup, export, import | v1.0 |
 | 12 | LLM-assisted entry & localization | v0.8 |
 | 13 | v1 hardening | v1.0 |
 
@@ -822,9 +822,16 @@ Acceptance criteria:
 - Recipe detail/edit flows and backend behaviour unchanged.
 - Frontend tests and build pass.
 
-### Phase 11 - Backup, Export, and Import
+### Phase 11 - Taxonomy Hardening + Backup, Export, and Import
 
-Deliverables:
+**Status:** Ready for PR on `phase-11/taxonomy-backup` (204 backend tests passed). Handoff: [PHASE11_HANDOFF.md](PHASE11_HANDOFF.md). ADR: [002-canonical-taxonomy-before-backup.md](adr/002-canonical-taxonomy-before-backup.md). Backup spec: [BACKUP_EXPORT_IMPORT.md](BACKUP_EXPORT_IMPORT.md).
+
+**Order of work:**
+
+1. **Taxonomy hardening** — `food_groups` and `ingredient_families` tables; `ingredients.family_id` FK; canonical ingredient enforcement; migrate weekly targets from tags to computed traits (with temporary fallback); curated classifications for non-derivable concepts (`soup`, …).
+2. **Backup contract** — JSON export/import, run tracking, retention, optional `pg_dump`, restore docs — format reflects hardened taxonomy.
+
+Deliverables (backup slice):
 
 - Full JSON export
 - Full JSON import
@@ -836,8 +843,10 @@ Deliverables:
 
 Acceptance criteria:
 
-- JSON export includes all required domain data.
-- Import validates shape before writing.
+- Taxonomy tables and FK integrity enforced before backup ships.
+- Weekly target matching uses computed traits for derivable targets (legacy tag fallback documented and removable).
+- JSON export includes food groups, families, canonical ingredients, and related reference data.
+- Import validates shape and referential integrity before writing.
 - Backup files are written under `/backups`.
 - Old backups are removed according to retention settings.
 

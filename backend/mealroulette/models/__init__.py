@@ -1,3 +1,4 @@
+from mealroulette.models.backup import BACKUP_SETTINGS_ID, BackupRun, BackupSettings
 from mealroulette.models.catalog import (
     Dish,
     DishSeasonality,
@@ -13,6 +14,8 @@ from mealroulette.models.catalog import (
 )
 from mealroulette.models.cooking import CookingTimerAlert, CookingTimerAlertStatus
 from mealroulette.models.enums import (
+    BackupRunStatus,
+    BackupType,
     ConversionConfidence,
     MealPlanItemStatus,
     MealPlanStatus,
@@ -25,17 +28,25 @@ from mealroulette.models.enums import (
 from mealroulette.models.planning import MealPlan, MealPlanItem, MealRating
 from mealroulette.models.scheduler import PlanningRule, SchedulerSettings
 from mealroulette.models.shopping import ShoppingList, ShoppingListItem
+from mealroulette.models.taxonomy import FoodGroup, IngredientFamily
 from mealroulette.models.telegram import TelegramSettings, TelegramSubscriber
 from mealroulette.models.user import RefreshToken, User, UserRole
 
 __all__ = [
+    "BACKUP_SETTINGS_ID",
+    "BackupRun",
+    "BackupRunStatus",
+    "BackupSettings",
+    "BackupType",
     "ConversionConfidence",
     "CookingTimerAlert",
     "CookingTimerAlertStatus",
     "Dish",
     "DishSeasonality",
     "DishTag",
+    "FoodGroup",
     "Ingredient",
+    "IngredientFamily",
     "IngredientAlias",
     "IngredientUnitConversion",
     "MealPlan",

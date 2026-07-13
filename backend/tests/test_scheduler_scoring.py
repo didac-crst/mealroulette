@@ -29,6 +29,7 @@ def _candidate(
     vector: dict[str, float] | None = None,
     protein_tags: frozenset[str] | None = None,
     tag_names: frozenset[str] | None = None,
+    computed_traits_json: dict | None = None,
     suitable_for_lunch: bool | None = True,
     suitable_for_dinner: bool | None = True,
 ) -> DishCandidate:
@@ -41,7 +42,7 @@ def _candidate(
         carb_tags=frozenset(),
         style_tags=frozenset(),
         vector=vector or {"vegetables": 0.5, "grains": 0.5},
-        computed_traits_json=None,
+        computed_traits_json=computed_traits_json,
         average_rating=None,
         seasonality_mode=SeasonalityMode.all_year,
         preferred_months=frozenset(),
@@ -200,9 +201,14 @@ def test_build_similarity_neighbours_includes_fixed_and_generated():
 def test_weekly_target_matching_and_warnings():
     fish_dish = _candidate(1, tag_names=frozenset({"fish"}))
     meat_dish = _candidate(2, protein_tags=frozenset({"chicken"}))
+    trait_fish = _candidate(
+        3,
+        computed_traits_json={"contains_food_groups": ["fish"], "contains_meat": False},
+    )
 
     assert dish_matches_weekly_target(fish_dish, "fish")
     assert dish_matches_weekly_target(meat_dish, "meat")
+    assert dish_matches_weekly_target(trait_fish, "fish")
 
     rules = _rules(weekly_targets={"fish": WeeklyTargetSpec(min=2, max=2)}, weekly_target_tolerance=0)
     warnings = weekly_target_warnings([1], candidates_by_id={1: fish_dish, 2: meat_dish}, rules=rules)

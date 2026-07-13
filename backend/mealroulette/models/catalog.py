@@ -24,10 +24,12 @@ from mealroulette.models.enums import (
     ConversionSource,
     DishCourse,
     DishStatus,
+    MealComposition,
     RecipeType,
     SeasonalityMode,
     SeasonalityStrength,
     ServingTemperature,
+    SimpleDishPart,
     UnitDimension,
     VegetableLevel,
 )
@@ -83,6 +85,9 @@ class Ingredient(Base):
     )
     pantry_item: Mapped[bool] = mapped_column(Boolean, default=False)
     family: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    family_id: Mapped[str | None] = mapped_column(
+        ForeignKey("ingredient_families.id"), nullable=True, index=True
+    )
     preferred_shopping_unit_id: Mapped[int | None] = mapped_column(ForeignKey("units.id"), nullable=True)
     aggregation_unit_id: Mapped[int | None] = mapped_column(ForeignKey("units.id"), nullable=True)
     aggregation_strategy: Mapped[AggregationStrategy | None] = mapped_column(
@@ -102,6 +107,9 @@ class Ingredient(Base):
     aliases: Mapped[list["IngredientAlias"]] = relationship(back_populates="ingredient", cascade="all, delete-orphan")
     unit_conversions: Mapped[list["IngredientUnitConversion"]] = relationship(
         back_populates="ingredient", cascade="all, delete-orphan"
+    )
+    ingredient_family: Mapped["IngredientFamily | None"] = relationship(
+        "IngredientFamily", foreign_keys=[family_id]
     )
 
 
@@ -167,6 +175,16 @@ class Dish(Base):
     default_cook_time_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
     default_difficulty: Mapped[str | None] = mapped_column(String(32), nullable=True)
     course: Mapped[DishCourse | None] = mapped_column(Enum(DishCourse, name="dish_course"), nullable=True)
+    meal_composition: Mapped[MealComposition] = mapped_column(
+        Enum(MealComposition, name="meal_composition"),
+        nullable=False,
+        default=MealComposition.main_dish,
+        server_default=MealComposition.main_dish.value,
+    )
+    simple_dish_part: Mapped[SimpleDishPart | None] = mapped_column(
+        Enum(SimpleDishPart, name="simple_dish_part"),
+        nullable=True,
+    )
     status: Mapped[DishStatus] = mapped_column(Enum(DishStatus, name="dish_status"), default=DishStatus.active)
     image_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
     vegetable_level: Mapped[VegetableLevel | None] = mapped_column(

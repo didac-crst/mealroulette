@@ -189,6 +189,8 @@ def test_full_dish_recipe_flow(client, catalog_seed, admin_headers):
     assert detail_body["default_cook_time_minutes"] == 20
     assert detail_body["default_difficulty"] == "easy"
     assert detail_body["thermomix_possible"] is False
+    assert detail_body["meal_composition"] == "main_dish"
+    assert detail_body["simple_dish_part"] is None
 
     steps = client.get(f"/api/recipes/{recipe_id}/steps", headers=admin_headers)
     assert steps.status_code == 200
@@ -224,3 +226,75 @@ def test_delete_ingredient_referenced_by_recipe_returns_409(client, catalog_seed
     response = client.delete(f"/api/ingredients/{salmon['id']}", headers=admin_headers)
 
     assert response.status_code == 409
+
+
+def test_dish_meal_composition_defaults_to_main_dish(client, catalog_seed, admin_headers):
+    response = client.post(
+        "/api/dishes",
+        headers=admin_headers,
+        json={"name": "Plain Pasta"},
+    )
+    assert response.status_code == 201
+    body = response.json()
+    assert body["meal_composition"] == "main_dish"
+    assert body["simple_dish_part"] is None
+
+
+def test_dish_simple_dish_requires_part(client, catalog_seed, admin_headers):
+    response = client.post(
+        "/api/dishes",
+        headers=admin_headers,
+        json={"name": "Roast Potatoes", "meal_composition": "simple_dish"},
+    )
+    assert response.status_code == 422
+
+
+def test_dish_simple_dish_with_part(client, catalog_seed, admin_headers):
+    response = client.post(
+        "/api/dishes",
+        headers=admin_headers,
+        json={
+            "name": "Roast Potatoes",
+            "meal_composition": "simple_dish",
+            "simple_dish_part": "sidedish",
+        },
+    )
+    assert response.status_code == 201
+    body = response.json()
+    assert body["meal_composition"] == "simple_dish"
+    assert body["simple_dish_part"] == "sidedish"
+
+
+def test_dish_update_clears_simple_dish_part_when_not_simple(client, catalog_seed, admin_headers):
+    created = client.post(
+        "/api/dishes",
+        headers=admin_headers,
+        json={
+            "name": "Ham Croquettes",
+            "meal_composition": "simple_dish",
+            "simple_dish_part": "centerpiece",
+        },
+    ).json()
+
+    updated = client.put(
+        f"/api/dishes/{created['id']}",
+        headers=admin_headers,
+        json={"meal_composition": "main_dish"},
+    )
+    assert updated.status_code == 200
+    body = updated.json()
+    assert body["meal_composition"] == "main_dish"
+    assert body["simple_dish_part"] is None
+
+
+def test_dish_main_dish_rejects_simple_dish_part(client, catalog_seed, admin_headers):
+    response = client.post(
+        "/api/dishes",
+        headers=admin_headers,
+        json={
+            "name": "Risotto",
+            "meal_composition": "main_dish",
+            "simple_dish_part": "centerpiece",
+        },
+    )
+    assert response.status_code == 422

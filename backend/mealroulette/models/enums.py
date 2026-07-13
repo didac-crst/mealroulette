@@ -52,6 +52,17 @@ class DishCourse(str, enum.Enum):
     dessert = "dessert"
 
 
+class MealComposition(str, enum.Enum):
+    main_dish = "main_dish"
+    simple_dish = "simple_dish"
+    dessert = "dessert"
+
+
+class SimpleDishPart(str, enum.Enum):
+    centerpiece = "centerpiece"
+    sidedish = "sidedish"
+
+
 class DishStatus(str, enum.Enum):
     draft = "draft"
     active = "active"
@@ -107,3 +118,14 @@ class ShoppingListStatus(str, enum.Enum):
     active = "active"
     completed = "completed"
     archived = "archived"
+
+
+class BackupType(str, enum.Enum):
+    json_export = "json_export"
+    pg_dump = "pg_dump"
+
+
+class BackupRunStatus(str, enum.Enum):
+    running = "running"
+    succeeded = "succeeded"
+    failed = "failed"

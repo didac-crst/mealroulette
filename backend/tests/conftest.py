@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from mealroulette.auth.security import hash_password
 from mealroulette.core.config import Settings, get_settings
 from mealroulette.data.seed_catalog import seed_catalog_data
+from mealroulette.data.seed_taxonomy import seed_taxonomy_data
 from mealroulette.db.base import Base
 from mealroulette.db.session import get_db
 from mealroulette.main import create_app
@@ -121,6 +122,7 @@ def user_token(client: TestClient, regular_user: User) -> str:
 @pytest.fixture
 def catalog_seed(db_session: Session):
     seed_catalog_data(db_session)
+    seed_taxonomy_data(db_session)
     return db_session
 
 

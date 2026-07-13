@@ -1,3 +1,4 @@
+import json
 from typing import Any
 
 from fastapi import Request
@@ -11,6 +12,11 @@ def error_payload(code: str, message: str, details: Any | None = None) -> dict[s
     if details is not None:
         payload["error"]["details"] = details
     return payload
+
+
+def _json_safe_validation_errors(errors: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Pydantic may attach exception objects (e.g. under ctx.error) that are not JSON-serializable."""
+    return json.loads(json.dumps(errors, default=str))
 
 
 async def http_exception_handler(
@@ -30,6 +36,6 @@ async def validation_exception_handler(
         content=error_payload(
             "validation_error",
             "Request validation failed",
-            exc.errors(),
+            _json_safe_validation_errors(exc.errors()),
         ),
     )

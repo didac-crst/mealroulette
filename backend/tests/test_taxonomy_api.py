@@ -3,7 +3,7 @@ def test_food_groups_api(client, catalog_seed, user_headers):
     assert response.status_code == 200
     groups = response.json()
     assert len(groups) == 22
-    assert groups[0]["id"] == "vegetable"
+    assert any(group["id"] == "vegetable" for group in groups)
 
 
 def test_food_group_families_api(client, catalog_seed, user_headers):

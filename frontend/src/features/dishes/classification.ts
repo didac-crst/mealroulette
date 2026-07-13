@@ -2,6 +2,9 @@ import type { Tag } from "../../api/catalog";
 
 export const STRUCTURED_TAG_FAMILIES = ["protein", "carb", "style", "temperature"] as const;
 
+/** Dish-level tags that are not inferred from recipe ingredients (e.g. soup). */
+export const CURATED_DISH_TAG_FAMILIES = ["style"] as const;
+
 export const RECIPE_TYPE_OPTIONS = [
   { value: "standard", label: "Standard" },
   { value: "thermomix", label: "Thermomix" },
@@ -15,6 +18,17 @@ export const COURSE_OPTIONS = [
   { value: "starter", label: "Starter" },
   { value: "main", label: "Main" },
   { value: "dessert", label: "Dessert" },
+] as const;
+
+export const MEAL_COMPOSITION_OPTIONS = [
+  { value: "main_dish", label: "Main dish" },
+  { value: "simple_dish", label: "Simple dish" },
+  { value: "dessert", label: "Dessert" },
+] as const;
+
+export const SIMPLE_DISH_PART_OPTIONS = [
+  { value: "centerpiece", label: "Centerpiece" },
+  { value: "sidedish", label: "Side dish" },
 ] as const;
 
 export const STATUS_OPTIONS = [
@@ -116,6 +130,12 @@ export function findTagId(tags: Tag[], family: string, name: string): number | u
 export function selectedTagNames(tags: Tag[], tagIds: number[], family: string): string[] {
   const idSet = new Set(tagIds);
   return tags.filter((tag) => tag.family === family && idSet.has(tag.id)).map((tag) => tag.name);
+}
+
+export function curatedDishTagIds(tagIds: number[], tags: Tag[]): number[] {
+  const allowedFamilies = new Set<string>(CURATED_DISH_TAG_FAMILIES);
+  const allowedIds = new Set(tags.filter((tag) => allowedFamilies.has(tag.family)).map((tag) => tag.id));
+  return tagIds.filter((id) => allowedIds.has(id));
 }
 
 export function formatTagName(name: string): string {

@@ -1,16 +1,15 @@
 import type { Dish, Tag } from "../../api/catalog";
 import {
-  CARB_OPTIONS,
-  COURSE_OPTIONS,
+  MEAL_COMPOSITION_OPTIONS,
   MONTH_OPTIONS,
-  PROTEIN_OPTIONS,
   SEASONALITY_MODE_OPTIONS,
+  SIMPLE_DISH_PART_OPTIONS,
   STYLE_OPTIONS,
-  TEMPERATURE_OPTIONS,
   formatOptionLabel,
   selectedTagNames,
 } from "./classification";
 import { formatDifficulty } from "./constants";
+import { InferredTraitsSummary } from "./InferredTraitsSummary";
 
 type Props = {
   dish: Dish;
@@ -25,8 +24,7 @@ function joinLabels(values: string[], options: ReadonlyArray<{ value: string; la
 }
 
 export function DishInheritedContext({ dish, tags }: Props) {
-  const proteins = selectedTagNames(tags, dish.tag_ids, "protein");
-  const carbs = selectedTagNames(tags, dish.tag_ids, "carb");
+  const styles = selectedTagNames(tags, dish.tag_ids, "style");
   const mealSlots: string[] = [];
   if (dish.suitable_for_lunch) {
     mealSlots.push("lunch");
@@ -39,13 +37,19 @@ export function DishInheritedContext({ dish, tags }: Props) {
     <aside className="inherited-context stack">
       <h3 className="section-title">Inherited from dish</h3>
       <p>
-        <span className="muted">Course: </span>
-        {formatOptionLabel(COURSE_OPTIONS, dish.course ?? "")}
+        <span className="muted">Meal composition: </span>
+        {formatOptionLabel(MEAL_COMPOSITION_OPTIONS, dish.meal_composition)}
+        {dish.meal_composition === "simple_dish" && dish.simple_dish_part
+          ? ` (${formatOptionLabel(SIMPLE_DISH_PART_OPTIONS, dish.simple_dish_part)})`
+          : ""}
       </p>
-      <p>
-        <span className="muted">Food profile: </span>
-        {[joinLabels(proteins, PROTEIN_OPTIONS), joinLabels(carbs, CARB_OPTIONS)].filter((v) => v !== "Not set").join(" · ") || "Not set"}
-      </p>
+      <InferredTraitsSummary traits={dish.computed_traits_json} />
+      {styles.length > 0 ? (
+        <p>
+          <span className="muted">Curated style: </span>
+          {joinLabels(styles, STYLE_OPTIONS)}
+        </p>
+      ) : null}
       <p>
         <span className="muted">Suitable for: </span>
         {mealSlots.length > 0 ? mealSlots.join(", ") : "Not set"}
@@ -64,10 +68,7 @@ export function DishInheritedContext({ dish, tags }: Props) {
 }
 
 export function DishClassificationSummary({ dish, tags }: Props) {
-  const proteins = selectedTagNames(tags, dish.tag_ids, "protein");
-  const carbs = selectedTagNames(tags, dish.tag_ids, "carb");
   const styles = selectedTagNames(tags, dish.tag_ids, "style");
-  const temperatures = selectedTagNames(tags, dish.tag_ids, "temperature");
 
   const mealSlots: string[] = [];
   if (dish.suitable_for_lunch) {
@@ -80,29 +81,19 @@ export function DishClassificationSummary({ dish, tags }: Props) {
   return (
     <div className="classification-summary stack">
       <div>
-        <h3 className="section-title">Food profile</h3>
+        <h3 className="section-title">Classification</h3>
         <p>
-          <span className="muted">Course: </span>
-          {formatOptionLabel(COURSE_OPTIONS, dish.course ?? "")}
+          <span className="muted">Meal composition: </span>
+          {formatOptionLabel(MEAL_COMPOSITION_OPTIONS, dish.meal_composition)}
+          {dish.meal_composition === "simple_dish" && dish.simple_dish_part
+            ? ` (${formatOptionLabel(SIMPLE_DISH_PART_OPTIONS, dish.simple_dish_part)})`
+            : ""}
         </p>
-        <p>
-          <span className="muted">Protein / source: </span>
-          {joinLabels(proteins, PROTEIN_OPTIONS)}
-        </p>
-        <p>
-          <span className="muted">Carb / base: </span>
-          {joinLabels(carbs, CARB_OPTIONS)}
-        </p>
+        <InferredTraitsSummary traits={dish.computed_traits_json} />
         {styles.length > 0 ? (
           <p>
-            <span className="muted">Style: </span>
+            <span className="muted">Curated style: </span>
             {joinLabels(styles, STYLE_OPTIONS)}
-          </p>
-        ) : null}
-        {temperatures.length > 0 ? (
-          <p>
-            <span className="muted">Temperature: </span>
-            {joinLabels(temperatures, TEMPERATURE_OPTIONS)}
           </p>
         ) : null}
       </div>
@@ -158,7 +149,6 @@ export function DishClassificationSummary({ dish, tags }: Props) {
           ) : null}
         </div>
       ) : null}
-      <p className="muted">Dietary information is inferred from recipe ingredients.</p>
     </div>
   );
 }

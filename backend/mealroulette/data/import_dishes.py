@@ -16,8 +16,10 @@ from mealroulette.models.enums import (
     DifficultyLevel,
     DishCourse,
     DishStatus,
+    MealComposition,
     RecipeType,
     SeasonalityMode,
+    SimpleDishPart,
 )
 from mealroulette.schemas.catalog import (
     DishCreateRequest,
@@ -85,6 +87,19 @@ def _resolve_tag_ids(tag_specs: list[tuple[str, str]], tag_lookup: dict[tuple[st
     return tag_ids
 
 
+def _parse_meal_composition_fields(dish_data: dict) -> tuple[MealComposition, SimpleDishPart | None]:
+    raw_composition = dish_data.get("meal_composition")
+    raw_part = dish_data.get("simple_dish_part")
+    if raw_composition:
+        meal_composition = MealComposition(raw_composition)
+        simple_dish_part = SimpleDishPart(raw_part) if raw_part else None
+        return meal_composition, simple_dish_part
+    course = dish_data.get("course")
+    if course == DishCourse.dessert.value or course == "dessert":
+        return MealComposition.dessert, None
+    return MealComposition.main_dish, None
+
+
 def _get_or_create_ingredient(
     service: CatalogService,
     *,
@@ -134,6 +149,7 @@ def import_dish_fixtures(db: Session, path: Path | str = DEFAULT_FIXTURE_PATH) -
             continue
 
         tag_ids = _resolve_tag_ids(_parse_tag_specs(dish_data.get("tags")), tag_lookup)
+        meal_composition, simple_dish_part = _parse_meal_composition_fields(dish_data)
         seasonality_raw = dish_data.get("seasonality")
         seasonality = None
         if seasonality_raw:
@@ -147,6 +163,8 @@ def import_dish_fixtures(db: Session, path: Path | str = DEFAULT_FIXTURE_PATH) -
                 name=dish_name,
                 description=dish_data.get("description"),
                 course=DishCourse(dish_data["course"]) if dish_data.get("course") else None,
+                meal_composition=meal_composition,
+                simple_dish_part=simple_dish_part,
                 status=DishStatus(dish_data.get("status", "active")),
                 suitable_for_lunch=dish_data.get("suitable_for_lunch"),
                 suitable_for_dinner=dish_data.get("suitable_for_dinner"),
