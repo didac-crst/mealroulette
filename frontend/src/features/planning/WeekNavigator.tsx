@@ -1,5 +1,5 @@
 import { Button } from "../../components/ui";
-import { addWeeks, formatPlanDate, weekDates } from "./planFormat";
+import { addWeeks, formatPlanDate, todayIso, weekDates, weekStartForDate } from "./planFormat";
 
 type Props = {
   weekStart: string | null;
@@ -9,6 +9,22 @@ type Props = {
   onNextWeek: () => void;
 };
 
+function formatWeekRange(weekStart: string): string {
+  const dates = weekDates(weekStart);
+  if (dates.length === 0) {
+    return formatPlanDate(weekStart);
+  }
+  const start = new Date(`${dates[0]}T12:00:00`);
+  const end = new Date(`${dates[dates.length - 1]}T12:00:00`);
+  const sameMonth = start.getMonth() === end.getMonth();
+  const startLabel = start.toLocaleDateString(undefined, { day: "numeric", month: "short" });
+  const endLabel = end.toLocaleDateString(
+    undefined,
+    sameMonth ? { day: "numeric" } : { day: "numeric", month: "short" },
+  );
+  return `${startLabel} – ${endLabel}`;
+}
+
 export function WeekNavigator({
   weekStart,
   loading = false,
@@ -16,53 +32,49 @@ export function WeekNavigator({
   onThisWeek,
   onNextWeek,
 }: Props) {
-  const dates = weekStart ? weekDates(weekStart) : [];
-  const rangeLabel =
-    dates.length > 0
-      ? `${formatPlanDate(dates[0])} – ${formatPlanDate(dates[dates.length - 1])}`
-      : "Select a week";
+  const currentWeekStart = weekStartForDate(todayIso());
+  const isCurrentWeek = weekStart === currentWeekStart;
+  const rangeLabel = weekStart ? formatWeekRange(weekStart) : "Select a week";
 
   return (
     <div className="week-navigator">
-      <p className="week-navigator-range" aria-live="polite">
-        {rangeLabel}
-      </p>
-      <div className="week-nav" role="group" aria-label="Week navigation">
+      <div className="week-navigator-controls" role="group" aria-label="Week navigation">
         <Button
           type="button"
-          variant="secondary"
+          variant="ghost"
           size="sm"
-          className="week-nav-button"
+          className="week-nav-chevron"
           disabled={!weekStart || loading}
           onClick={onPreviousWeek}
           aria-label="Previous week"
         >
-          <span aria-hidden="true">‹</span>
-          <span className="week-nav-label-long">Previous</span>
+          ‹
         </Button>
+        <p className="week-navigator-range" aria-live="polite">
+          {rangeLabel}
+        </p>
         <Button
           type="button"
-          variant="secondary"
+          variant="ghost"
           size="sm"
-          className="week-nav-button week-nav-today"
-          disabled={loading}
-          onClick={onThisWeek}
-        >
-          This week
-        </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          className="week-nav-button"
+          className="week-nav-chevron"
           disabled={!weekStart || loading}
           onClick={onNextWeek}
           aria-label="Next week"
         >
-          <span className="week-nav-label-long">Next</span>
-          <span aria-hidden="true">›</span>
+          ›
         </Button>
       </div>
+      {!isCurrentWeek ? (
+        <button
+          type="button"
+          className="week-navigator-reset"
+          disabled={loading}
+          onClick={onThisWeek}
+        >
+          This week
+        </button>
+      ) : null}
     </div>
   );
 }

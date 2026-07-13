@@ -422,7 +422,10 @@ export function IngredientEditPage() {
         </FormSection>
 
         <div className="catalog-form-disclosure-stack">
-          <DisclosureSection title="Taxonomy & seasonality">
+          <DisclosureSection
+            title="Taxonomy & seasonality"
+            description="Food group, family, and seasonal availability"
+          >
             <div className="stack">
               <div className="grid-2">
                 <label>
@@ -489,7 +492,10 @@ export function IngredientEditPage() {
             </div>
           </DisclosureSection>
 
-          <DisclosureSection title="Units & aggregation">
+          <DisclosureSection
+            title="Units & aggregation"
+            description="Default units and how quantities combine in shopping lists"
+          >
             <div className="stack">
               <div className="grid-2">
                 <label>
@@ -594,7 +600,11 @@ export function IngredientEditPage() {
             </p>
           ) : null}
 
-          <DisclosureSection title={`Aliases (${detail.aliases.length})`}>
+          <DisclosureSection
+            title="Aliases"
+            meta={`${detail.aliases.length}`}
+            description="Alternative names for matching and search"
+          >
             <ul className="bulleted-list">
               {detail.aliases.map((alias) => (
                 <li key={alias.id} className="row-between ingredient-alias-row">
@@ -644,7 +654,11 @@ export function IngredientEditPage() {
             </div>
           </DisclosureSection>
 
-          <DisclosureSection title={`Unit conversions (${detail.unit_conversions.length})`}>
+          <DisclosureSection
+            title="Unit conversions"
+            meta={`${detail.unit_conversions.length}`}
+            description="Factors between units for this ingredient"
+          >
             <p className="muted admin-field-hint">
               Only approved conversions are used when aggregating shopping lists across incompatible units.
             </p>

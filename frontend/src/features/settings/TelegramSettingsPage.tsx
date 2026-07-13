@@ -12,8 +12,9 @@ import {
   type TelegramSubscriber,
 } from "../../api/telegram";
 import { ApiError } from "../../api/client";
-import { Button, EmptyState, FormSection, FormStickyActions, NumberStepper, Switch } from "../../components/ui";
+import { Button, EmptyState, FormSection, FormStickyActions, SegmentedControl, Switch, TimezoneSelect } from "../../components/ui";
 import { formatInstantInTimeZone } from "../../lib/datetime";
+import { REMINDER_WINDOW_PRESETS } from "../../lib/timezones";
 import { useAuth } from "../auth/AuthContext";
 import { SettingsPageShell } from "./SettingsPageShell";
 
@@ -219,21 +220,23 @@ export function TelegramSettingsPage() {
             </label>
             <label>
               Timezone
-              <input
+              <TimezoneSelect
                 value={form.timezone ?? "Europe/Paris"}
-                onChange={(event) => setForm({ ...form, timezone: event.target.value })}
+                onChange={(timezone) => setForm({ ...form, timezone })}
               />
             </label>
           </div>
 
-          <NumberStepper
-            ariaLabel="Reminder window in days"
-            label="Reminder window (days)"
-            min={1}
-            max={14}
-            value={form.shopping_window_days ?? 3}
-            onChange={(shopping_window_days) => setForm({ ...form, shopping_window_days })}
-          />
+          <div className="stack">
+            <span className="muted">Reminder window</span>
+            <SegmentedControl
+              className="segmented-control-full"
+              ariaLabel="Reminder window in days"
+              value={form.shopping_window_days ?? 3}
+              options={[...REMINDER_WINDOW_PRESETS]}
+              onChange={(shopping_window_days) => setForm({ ...form, shopping_window_days })}
+            />
+          </div>
           <p className="muted admin-field-hint">
             Same as <code>/reminder {form.shopping_window_days ?? 3}</code>
           </p>

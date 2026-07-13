@@ -112,7 +112,7 @@ describe("long label layout smoke (German)", () => {
       </DisclosureSection>,
     );
 
-    expect(screen.getByText(de.disclosureTitle)).toHaveClass("disclosure-section-summary");
+    expect(screen.getByText(de.disclosureTitle)).toHaveClass("disclosure-section-title");
   });
 
   it("renders FormSaveStatus for unsaved German workflow copy", () => {

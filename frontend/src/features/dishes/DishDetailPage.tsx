@@ -151,6 +151,11 @@ export function DishDetailPage() {
             Plan for…
           </Button>
           {isAdmin ? (
+            <ButtonLink to={`/dishes/${dish.id}/recipes/new`} variant="secondary">
+              Add recipe
+            </ButtonLink>
+          ) : null}
+          {isAdmin ? (
             <ButtonLink to={`/dishes/${dish.id}/edit`} variant="ghost">
               Edit dish
             </ButtonLink>
@@ -159,11 +164,6 @@ export function DishDetailPage() {
             <OverflowMenu
               ariaLabel="Dish admin actions"
               items={[
-                {
-                  id: "add-recipe",
-                  label: "Add recipe",
-                  onClick: () => navigate(`/dishes/${dish.id}/recipes/new`),
-                },
                 {
                   id: "delete",
                   label: "Delete dish",

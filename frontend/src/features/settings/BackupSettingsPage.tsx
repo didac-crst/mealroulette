@@ -10,7 +10,7 @@ import {
   type BackupSettingsInput,
 } from "../../api/backup";
 import { ApiError } from "../../api/client";
-import { Button, EmptyState, FormSection, FormStickyActions, NumberStepper, Switch } from "../../components/ui";
+import { Button, EmptyState, FormSection, FormStickyActions, NumberStepper, Switch, TimezoneSelect } from "../../components/ui";
 import { formatInstantInTimeZone } from "../../lib/datetime";
 import { useAuth } from "../auth/AuthContext";
 import { SettingsPageShell } from "./SettingsPageShell";
@@ -128,6 +128,19 @@ export function BackupSettingsPage() {
       title="Backups"
       subtitle="Full JSON export to /backups, optional pg_dump, and nightly schedule."
     >
+      {settings?.last_backup_at ? (
+        <p className="muted admin-notice">
+          Last backup: {formatInstantInTimeZone(settings.last_backup_at, settings.timezone)}
+        </p>
+      ) : null}
+      {settings?.last_error ? <p className="error">{settings.last_error}</p> : null}
+      {error ? (
+        <p className="error" role="alert">
+          {error}
+        </p>
+      ) : null}
+      {notice ? <p className="muted admin-notice">{notice}</p> : null}
+
       <form onSubmit={handleSubmit} className="admin-form">
         <FormSection title="Schedule">
           <Switch
@@ -146,9 +159,9 @@ export function BackupSettingsPage() {
             </label>
             <label>
               Timezone
-              <input
+              <TimezoneSelect
                 value={form.timezone ?? "Europe/Paris"}
-                onChange={(event) => setForm({ ...form, timezone: event.target.value })}
+                onChange={(timezone) => setForm({ ...form, timezone })}
               />
             </label>
           </div>
@@ -185,24 +198,14 @@ export function BackupSettingsPage() {
           <Button type="submit" loading={saving} disabled={running}>
             Save settings
           </Button>
-          <Button type="button" loading={running} disabled={saving} onClick={() => void handleRunNow()}>
-            Run backup now
-          </Button>
         </FormStickyActions>
       </form>
 
-      {settings?.last_backup_at ? (
-        <p className="muted admin-notice">
-          Last backup: {formatInstantInTimeZone(settings.last_backup_at, settings.timezone)}
-        </p>
-      ) : null}
-      {settings?.last_error ? <p className="error">{settings.last_error}</p> : null}
-      {notice ? <p className="muted admin-notice">{notice}</p> : null}
-      {error ? (
-        <p className="error" role="alert">
-          {error}
-        </p>
-      ) : null}
+      <FormSection title="Run backup now" description="Create a backup immediately using the current settings.">
+        <Button type="button" loading={running} disabled={saving} onClick={() => void handleRunNow()}>
+          Run backup now
+        </Button>
+      </FormSection>
 
       <FormSection title="Recent runs">
         {runs.length === 0 ? (

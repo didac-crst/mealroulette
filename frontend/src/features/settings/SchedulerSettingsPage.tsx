@@ -9,8 +9,18 @@ import {
   type SchedulerSettingsInput,
 } from "../../api/scheduler";
 import { ApiError } from "../../api/client";
-import { Button, FormSection, FormStickyActions, NumberStepper, SchedulerWeekdayPicker, Switch } from "../../components/ui";
+import {
+  Button,
+  FormSection,
+  FormStickyActions,
+  NumberStepper,
+  SchedulerWeekdayPicker,
+  SegmentedControl,
+  Switch,
+  TimezoneSelect,
+} from "../../components/ui";
 import { formatInstantInTimeZone } from "../../lib/datetime";
+import { WEEK_OFFSET_OPTIONS } from "../../lib/timezones";
 import { useAuth } from "../auth/AuthContext";
 import { SettingsPageShell } from "./SettingsPageShell";
 
@@ -186,22 +196,23 @@ export function SchedulerSettingsPage() {
             </label>
             <label>
               Timezone
-              <input
+              <TimezoneSelect
                 value={form.timezone ?? "Europe/Paris"}
-                onChange={(event) => setForm({ ...form, timezone: event.target.value })}
+                onChange={(timezone) => setForm({ ...form, timezone })}
               />
             </label>
           </div>
 
-          <NumberStepper
-            ariaLabel="Target week offset"
-            label="Target week offset"
-            min={0}
-            max={4}
-            value={form.target_week_offset ?? 1}
-            onChange={(target_week_offset) => setForm({ ...form, target_week_offset })}
-          />
-          <p className="muted admin-field-hint">0 = this week, 1 = next week</p>
+          <div className="stack">
+            <span className="muted">Plan for</span>
+            <SegmentedControl
+              className="segmented-control-full"
+              ariaLabel="Target week offset"
+              value={form.target_week_offset ?? 1}
+              options={[...WEEK_OFFSET_OPTIONS]}
+              onChange={(target_week_offset) => setForm({ ...form, target_week_offset })}
+            />
+          </div>
         </FormSection>
 
         <FormSection title="Telegram notification">

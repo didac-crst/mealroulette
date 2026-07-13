@@ -19,6 +19,7 @@ import {
 import { ApiError } from "../../api/client";
 import { ButtonLink } from "../../components/ButtonLink";
 import { Card, EmptyState, PageShell } from "../../components/ui";
+import { CookingIngredientList } from "./CookingIngredientList";
 import { useAuth } from "../auth/AuthContext";
 import { RECIPE_TYPE_OPTIONS, formatOptionLabel } from "./classification";
 import { DishInheritedContext } from "./DishClassificationSummary";
@@ -169,18 +170,11 @@ export function RecipeDetailPage() {
         {ingredients.length === 0 ? (
           <EmptyState title="No ingredients yet" description="Add ingredients when editing this recipe." />
         ) : (
-          <ul className="editable-list">
-            {ingredients.map((item) => {
-              const unitSymbol = units.find((unit) => unit.id === item.unit_id)?.symbol;
-              return (
-                <li key={item.id}>
-                  {ingredientNames[item.ingredient_id] ?? `ingredient #${item.ingredient_id}`}
-                  {item.quantity ? ` — ${item.quantity}${unitSymbol ? ` ${unitSymbol}` : ""}` : ""}
-                  {item.optional ? " (optional)" : ""}
-                </li>
-              );
-            })}
-          </ul>
+          <CookingIngredientList
+            items={ingredients}
+            ingredientNames={ingredientNames}
+            units={units}
+          />
         )}
       </Card>
 

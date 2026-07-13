@@ -31,7 +31,8 @@ import {
 } from "../../api/catalog";
 import { ApiError } from "../../api/client";
 import { ButtonLink } from "../../components/ButtonLink";
-import { Button, Card, DisclosureSection, FormSection, FormStickyActions, PageShell } from "../../components/ui";
+import { Button, Card, DisclosureSection, FormSection, FormStickyActions, NumberStepper, PageShell, SegmentedControl, Switch } from "../../components/ui";
+import { formatQuantityWithUnit } from "../../lib/formatQuantity";
 import { useFormSaveState } from "../../lib/useFormSaveState";
 import { useAuth } from "../auth/AuthContext";
 import { formatStepTimerLabel, stepTimerDurationSeconds, timerMinutesFromSeconds, timerSecondsFromMinutesInput } from "./recipeCooking";
@@ -297,46 +298,40 @@ export function RecipeEditPage() {
                 required
               />
             </label>
-            <label>
-              Servings
-              <input
-                type="number"
-                min={1}
-                value={form.servings}
-                onChange={(event) => setForm({ ...form, servings: event.target.value })}
-              />
-            </label>
-            <label>
-              Recipe type
-              <select
+            <NumberStepper
+              ariaLabel="Servings"
+              label="Servings"
+              min={1}
+              max={24}
+              value={form.servings ? Number(form.servings) : 4}
+              onChange={(servings) => setForm({ ...form, servings: String(servings) })}
+            />
+            <div className="stack">
+              <span className="muted">Recipe type</span>
+              <SegmentedControl
+                className="segmented-control-full"
+                ariaLabel="Recipe type"
                 value={form.recipe_type}
-                onChange={(event) =>
-                  setForm({ ...form, recipe_type: event.target.value as Recipe["recipe_type"] })
-                }
-              >
-                {RECIPE_TYPE_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+                options={RECIPE_TYPE_OPTIONS.map((option) => ({
+                  value: option.value,
+                  label: option.label,
+                }))}
+                onChange={(recipe_type) => setForm({ ...form, recipe_type })}
+              />
+            </div>
             {isNew && existingRecipeCount === 0 ? (
               <p className="muted">This will be the main recipe and define dish defaults.</p>
             ) : (
-              <label className="checkbox-pill">
-                <input
-                  type="checkbox"
-                  checked={form.is_main}
-                  onChange={(event) => setForm({ ...form, is_main: event.target.checked })}
-                />
-                Main recipe (defines dish difficulty and times)
-              </label>
+              <Switch
+                checked={form.is_main}
+                onChange={(event) => setForm({ ...form, is_main: event.target.checked })}
+                label="Main recipe (defines dish difficulty and times)"
+              />
             )}
           </div>
         </FormSection>
 
-        <DisclosureSection title="Advanced recipe settings">
+        <DisclosureSection title="Advanced recipe settings" description="Description, timing, source, and notes">
           <div className="stack">
             <label>
               Variant description
@@ -409,7 +404,12 @@ export function RecipeEditPage() {
         <p className="muted">Save the recipe first to add ingredients and steps.</p>
       ) : accessToken && recipeIdNum ? (
         <div className="catalog-form">
-          <FormSection title="Ingredients">
+          <DisclosureSection
+            title="Ingredients"
+            meta={`${ingredients.length}`}
+            description="Quantities for this recipe variant"
+            defaultOpen
+          >
             <div className="ingredient-table stack">
               {ingredients.length === 0 ? <p className="muted">No ingredients yet.</p> : null}
               {ingredients.map((item) => (
@@ -440,9 +440,9 @@ export function RecipeEditPage() {
                 + Add ingredient
               </Button>
             )}
-          </FormSection>
+          </DisclosureSection>
 
-          <FormSection title="Steps">
+          <DisclosureSection title="Steps" meta={`${steps.length}`} description="Cooking instructions in order">
             <ol className="editable-list">
               {steps.map((step) => (
                 <StepEditorRow
@@ -469,7 +469,7 @@ export function RecipeEditPage() {
                 + Add step
               </Button>
             )}
-          </FormSection>
+          </DisclosureSection>
         </div>
       ) : null}
 
@@ -736,7 +736,7 @@ function IngredientEditorRow({
     <div className="ingredient-row list-item-row">
       <span>
         <strong>{ingredientName}</strong>
-        {item.quantity ? ` — ${item.quantity}${unitSymbol ? ` ${unitSymbol}` : ""}` : ""}
+        {item.quantity ? ` — ${formatQuantityWithUnit(item.quantity, unitSymbol)}` : ""}
         {item.optional ? " (optional)" : ""}
       </span>
       <div className="row-actions">

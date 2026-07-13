@@ -1,10 +1,9 @@
 body {
   margin: 0;
-  overflow-x: clip;
 }
 
 html {
-  overflow-x: clip;
+  scroll-behavior: smooth;
 }
 
 a {
@@ -23,7 +22,6 @@ a {
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  overflow-x: clip;
 }
 
 /* Legacy standalone pages (loading gates) */

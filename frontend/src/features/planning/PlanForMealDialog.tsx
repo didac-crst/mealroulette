@@ -14,7 +14,6 @@ import {
 import {
   addDays,
   formatPlanDate,
-  formatShortPlanDate,
   formatSlotLabel,
   todayIso,
   weekDates,
@@ -130,7 +129,12 @@ export function PlanForMealDialog({
               setMealDate(date);
               setWeekStart(weekStartForDate(date));
             }}
-            formatLabel={formatShortPlanDate}
+            formatLabel={(date) =>
+              new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(new Date(`${date}T12:00:00`))
+            }
+            formatSubLabel={(date) =>
+              new Intl.DateTimeFormat(undefined, { day: "numeric" }).format(new Date(`${date}T12:00:00`))
+            }
             disabled={busy}
             ariaLabel="Day"
           />

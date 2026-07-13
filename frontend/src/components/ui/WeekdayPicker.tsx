@@ -3,6 +3,7 @@ export type WeekdayPickerProps = {
   value: string;
   onChange: (date: string) => void;
   formatLabel: (isoDate: string) => string;
+  formatSubLabel?: (isoDate: string) => string;
   disabled?: boolean;
   ariaLabel: string;
   className?: string;
@@ -13,6 +14,7 @@ export function WeekdayPicker({
   value,
   onChange,
   formatLabel,
+  formatSubLabel,
   disabled = false,
   ariaLabel,
   className,
@@ -23,7 +25,7 @@ export function WeekdayPicker({
 
   return (
     <div
-      className={["weekday-picker", className].filter(Boolean).join(" ")}
+      className={["weekday-picker-grid", className].filter(Boolean).join(" ")}
       role="group"
       aria-label={ariaLabel}
     >
@@ -33,12 +35,15 @@ export function WeekdayPicker({
           <button
             key={date}
             type="button"
-            className={`weekday-picker-option${active ? " weekday-picker-option-active" : ""}`}
+            className={`weekday-picker-cell${active ? " weekday-picker-cell-active" : ""}`}
             disabled={disabled}
             aria-pressed={active}
             onClick={() => onChange(date)}
           >
-            {formatLabel(date)}
+            <span className="weekday-picker-weekday">{formatLabel(date)}</span>
+            {formatSubLabel ? (
+              <span className="weekday-picker-date">{formatSubLabel(date)}</span>
+            ) : null}
           </button>
         );
       })}

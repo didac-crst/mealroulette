@@ -225,11 +225,16 @@
   .responsive-action-group-stack-sm {
     flex-direction: column;
     align-items: stretch;
+    width: 100%;
+    max-width: 100%;
   }
 
   .responsive-action-group-stack-sm > .button,
   .responsive-action-group-stack-sm > a.button {
-    width: 100%;
+    width: auto;
+    max-width: 100%;
+    align-self: stretch;
+    box-sizing: border-box;
   }
 }
 
@@ -239,15 +244,37 @@
 
 .disclosure-section-summary {
   display: flex;
-  align-items: center;
-  gap: var(--space-2);
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
   min-height: var(--control-md);
-  padding: var(--space-1) 0;
+  padding: var(--space-2) 0;
   font-size: var(--font-size-sm);
-  font-weight: 600;
   color: var(--color-text-primary);
   cursor: pointer;
   list-style: none;
+}
+
+.disclosure-section-heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.disclosure-section-title {
+  font-weight: 600;
+}
+
+.disclosure-section-description {
+  font-size: var(--font-size-xs);
+}
+
+.disclosure-section-meta {
+  flex: 0 0 auto;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
 }
 
 .disclosure-section-summary::-webkit-details-marker {
@@ -416,30 +443,193 @@
   color: var(--color-danger);
 }
 
-.weekday-picker {
-  display: flex;
-  flex-wrap: wrap;
+.weekday-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: var(--space-2);
   min-width: 0;
 }
 
-.weekday-picker-option {
-  flex: 1 1 4.5rem;
+.weekday-picker-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
   min-height: var(--control-md);
-  padding: 0 var(--space-3);
+  padding: var(--space-2) var(--space-1);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-md);
   background: var(--surface-card);
   color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   font-weight: 600;
   cursor: pointer;
 }
 
-.weekday-picker-option-active {
+.weekday-picker-weekday {
+  font-size: var(--font-size-xs);
+}
+
+.weekday-picker-date {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.weekday-picker-cell-active {
   border-color: var(--color-interactive);
   background: var(--color-interactive-subtle);
   color: var(--color-interactive-hover);
+}
+
+.weekday-picker-cell-active .weekday-picker-date {
+  color: inherit;
+}
+
+.metadata-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  min-width: 0;
+}
+
+.metadata-list-row {
+  display: grid;
+  grid-template-columns: minmax(0, 9rem) minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: baseline;
+}
+
+.metadata-list-label {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.metadata-list-value {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.navigation-action {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--control-md);
+  padding: var(--space-3);
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.navigation-action:hover {
+  background: var(--surface-muted);
+  color: var(--color-text-primary);
+}
+
+.navigation-action:focus-visible {
+  outline: 2px solid var(--color-interactive);
+  outline-offset: 2px;
+}
+
+.navigation-action-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.shopping-list-item-row {
+  min-width: 0;
+  padding-block: var(--space-2);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.shopping-list-item-row:last-child {
+  border-bottom: none;
+}
+
+.shopping-list-item-main {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.shopping-list-item-checkbox,
+.shopping-list-item-checkbox-spacer {
+  flex: 0 0 auto;
+  width: 1.125rem;
+  margin-top: 0.15rem;
+}
+
+.shopping-list-item-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.shopping-list-item-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.shopping-list-item-name {
+  min-width: 0;
+}
+
+.shopping-list-item-quantity {
+  flex: 0 0 auto;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.shopping-list-item-usage {
+  margin: var(--space-1) 0 0;
+  font-size: var(--font-size-xs);
+  line-height: 1.4;
+}
+
+.cooking-ingredient-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cooking-ingredient-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.cooking-ingredient-name {
+  min-width: 0;
+}
+
+.cooking-ingredient-quantity {
+  flex: 0 0 auto;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.timezone-select {
+  width: 100%;
+  min-width: 0;
 }
 
 .swap-target-grid {

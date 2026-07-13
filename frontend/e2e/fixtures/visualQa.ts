@@ -261,12 +261,37 @@ export async function setupVisualQaApiMocks(context: BrowserContext) {
 }
 
 export async function assertNoHorizontalOverflow(page: Page) {
-  const hasOverflow = await page.evaluate(() => {
+  const result = await page.evaluate(() => {
     const root = document.documentElement;
-    return root.scrollWidth > root.clientWidth + 1;
+    const offenders: Array<{ tag: string; className: string; right: number }> = [];
+    for (const element of document.querySelectorAll("*")) {
+      const rect = element.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) {
+        continue;
+      }
+      if (rect.right > root.clientWidth + 1) {
+        offenders.push({
+          tag: element.tagName.toLowerCase(),
+          className: typeof element.className === "string" ? element.className : "",
+          left: Math.round(rect.left),
+          right: Math.round(rect.right),
+          width: Math.round(rect.width),
+        });
+      }
+    }
+    return {
+      scrollWidth: root.scrollWidth,
+      clientWidth: root.clientWidth,
+      offenders: offenders.slice(0, 5),
+    };
   });
-  if (hasOverflow) {
-    throw new Error("Page has horizontal overflow");
+  if (result.scrollWidth > result.clientWidth + 1) {
+    const details = result.offenders
+      .map((entry) => `${entry.tag}.${entry.className} (l=${entry.left}, w=${entry.width}, r=${entry.right})`)
+      .join("; ");
+    throw new Error(
+      `Page has horizontal overflow (${result.scrollWidth}px > ${result.clientWidth}px)${details ? `: ${details}` : ""}`,
+    );
   }
 }
 

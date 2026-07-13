@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 
-import { Button } from "../components/ui";
+import { NavigationAction } from "../components/ui";
 import { BrandLogo } from "../components/BrandLogo";
 import { NavIcon } from "./NavIcon";
 import { ADMIN_NAV, PRIMARY_NAV } from "./navigation";
@@ -10,6 +10,26 @@ type DesktopSidebarProps = {
   isAdmin: boolean;
   onSignOut: () => void;
 };
+
+function SignOutIcon() {
+  return (
+    <svg
+      width={22}
+      height={22}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" y1="12" x2="9" y2="12" />
+    </svg>
+  );
+}
 
 export function DesktopSidebar({ username, isAdmin, onSignOut }: DesktopSidebarProps) {
   return (
@@ -63,9 +83,7 @@ export function DesktopSidebar({ username, isAdmin, onSignOut }: DesktopSidebarP
       ) : null}
 
       <div className="desktop-sidebar-footer">
-        <Button type="button" variant="secondary" size="sm" onClick={onSignOut}>
-          Sign out
-        </Button>
+        <NavigationAction icon={<SignOutIcon />} label="Sign out" onClick={onSignOut} />
       </div>
     </aside>
   );

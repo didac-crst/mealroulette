@@ -8,7 +8,7 @@ import {
   type WeeklyTargetSpec,
 } from "../../api/planningRules";
 import { ApiError } from "../../api/client";
-import { Button, ChoiceChip, EmptyState, FormSection, FormStickyActions, NumberStepper } from "../../components/ui";
+import { Button, ChoiceChip, EmptyState, FormSection, FormStickyActions, NumberStepper, OverflowMenu } from "../../components/ui";
 import { useAuth } from "../auth/AuthContext";
 import { SettingsPageShell } from "./SettingsPageShell";
 import { TARGET_PRESETS, targetHint, targetLabel } from "./planningTargetLabels";
@@ -198,19 +198,26 @@ export function PlanningTargetsPage() {
           <div className="stack">
             {rows.map((row, index) => (
               <div key={`${row.key}-${index}`} className="target-row">
-                <div className="target-row-header">
-                  <strong>{targetLabel(row.key) || "New target"}</strong>
-                  {targetHint(row.key) ? <span className="muted target-row-hint">{targetHint(row.key)}</span> : null}
+                <div className="target-row-header row-between">
+                  <div>
+                    <strong>{targetLabel(row.key) || "New target"}</strong>
+                    {targetHint(row.key) ? (
+                      <span className="muted target-row-hint">{targetHint(row.key)}</span>
+                    ) : null}
+                  </div>
+                  <OverflowMenu
+                    ariaLabel={`Actions for ${targetLabel(row.key)} target`}
+                    items={[
+                      {
+                        id: "remove",
+                        label: "Remove",
+                        variant: "danger",
+                        onClick: () => removeRow(index),
+                      },
+                    ]}
+                  />
                 </div>
                 <div className="target-row-fields">
-                  <label>
-                    Tag key
-                    <input
-                      value={row.key}
-                      onChange={(event) => updateRow(index, { key: event.target.value })}
-                      placeholder="fish"
-                    />
-                  </label>
                   <NumberStepper
                     ariaLabel={`Minimum ${row.key}`}
                     label="Min"
@@ -227,15 +234,6 @@ export function PlanningTargetsPage() {
                     value={row.max}
                     onChange={(max) => updateRow(index, { max })}
                   />
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className="target-row-remove"
-                    onClick={() => removeRow(index)}
-                    aria-label={`Remove ${row.key} target`}
-                  >
-                    Remove
-                  </Button>
                 </div>
               </div>
             ))}

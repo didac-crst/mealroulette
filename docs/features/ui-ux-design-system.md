@@ -539,6 +539,28 @@ Distinct from the structural migration (Phases 1–6). Goal: interaction-first, 
 
 ---
 
+## Phase 8 — Visual reconciliation
+
+Screen-by-screen visual and interaction polish after Phase 7. Presentation-only; no API or stored-value changes.
+
+### Slice status
+
+| Slice | Scope | Status |
+|-------|--------|--------|
+| 1 | Page shell (Plan/Review/Shopping titles off cards), Cook overflow fix, sidebar Sign out, `WeekNavigator` v2, central `formatQuantity` | Done |
+| 2 | Plan Reroll/Swap/Lock action group, `DisclosureSection` upgrade, `ReviewOutcomeSelector`, `ShoppingListItemRow`, homogeneous `WeekdayPicker` | Done |
+| 3 | `MetadataList`, dish detail actions, recipe basics/inheritance, `CookingIngredientList` | Done |
+| 4 | Weekly targets, scheduler timezone/week labels, Telegram reminder presets, backups task layout, ingredients editor disclosures | Done |
+
+**Phase 8 deliverables**
+
+- Shared formatters: `formatQuantity`, `formatQuantityWithUnit`, `timezones.ts` presets
+- New UI primitives: `NavigationAction`, `MetadataList`, `ReviewOutcomeSelector`, `TimezoneSelect`
+- Removed global `overflow-x: clip` masking once Cook/Today action layout was fixed
+- `npm test -- --run`, `npm run build`, and `npm run test:visual:ci` pass
+
+---
+
 ## Out of scope
 
 - New product features (LLM, localization implementation, composable meals logic)

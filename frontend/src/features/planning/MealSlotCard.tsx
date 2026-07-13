@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import type { Dish, Recipe } from "../../api/catalog";
 import { fetchRecipes } from "../../api/catalog";
 import { ApiError } from "../../api/client";
-import { Button, ChoiceCard, DisclosureSection, OverflowMenu, ResponsiveActionGroup, SearchSelect, StatusBadge } from "../../components/ui";
+import { Button, DisclosureSection, ResponsiveActionGroup, ReviewOutcomeSelector, SearchSelect, StatusBadge } from "../../components/ui";
 import { dishPlaceholderEmoji } from "../dishes/dishVisual";
 import {
   fetchMealRating,
@@ -119,34 +119,7 @@ export function MealSlotCard({
     [recipes],
   );
   const selectionReasons = selectionReasonsList(item);
-  const overflowItems = useMemo(() => {
-    const items: Array<{
-      id: string;
-      label: string;
-      onClick: () => void;
-      disabled?: boolean;
-    }> = [];
-    if (showSwap) {
-      items.push({
-        id: "swap",
-        label: "Swap",
-        disabled: actionBusy,
-        onClick: () => setSwapOpen(true),
-      });
-    }
-    items.push({
-      id: "lock",
-      label: item.is_locked ? "Unlock" : "Lock",
-      disabled: actionBusy || (!item.is_locked && !item.dish_id),
-      onClick: () =>
-        void run(() =>
-          item.is_locked
-            ? unlockMealPlanItem(accessToken, item.id)
-            : lockMealPlanItem(accessToken, item.id),
-        ),
-    });
-    return items;
-  }, [actionBusy, item, showSwap, accessToken]);
+  const showLock = mode === "plan";
 
   useEffect(() => {
     if (mode !== "plan" || !item.dish_id) {
@@ -383,7 +356,7 @@ export function MealSlotCard({
             </DisclosureSection>
           ) : null}
 
-          <div className="meal-slot-actions meal-slot-actions-primary">
+          <div className="meal-slot-plan-actions">
             {showReroll ? (
               <Button
                 type="button"
@@ -395,7 +368,36 @@ export function MealSlotCard({
                 Reroll
               </Button>
             ) : null}
-            <OverflowMenu items={overflowItems} ariaLabel={`More actions for ${formatSlotLabel(item.meal_slot)}`} />
+            {showSwap ? (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="meal-slot-secondary-action"
+                disabled={actionBusy}
+                onClick={() => setSwapOpen(true)}
+              >
+                Swap
+              </Button>
+            ) : null}
+            {showLock ? (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="meal-slot-secondary-action"
+                disabled={actionBusy || (!item.is_locked && !item.dish_id)}
+                onClick={() =>
+                  void run(() =>
+                    item.is_locked
+                      ? unlockMealPlanItem(accessToken, item.id)
+                      : lockMealPlanItem(accessToken, item.id),
+                  )
+                }
+              >
+                {item.is_locked ? "Unlock" : "Lock"}
+              </Button>
+            ) : null}
           </div>
           {swapOpen && onSwap ? (
             <SwapSlotDialog
@@ -446,26 +448,35 @@ export function MealSlotCard({
       {showReviewPanel ? (
         <>
           {showReviewExecutionActions(item) && !skipFormOpen ? (
-            <div className="review-outcome-grid" role="group" aria-label="How did this meal go?">
-              <ChoiceCard
-                title="Ate as planned"
-                description="Mark this meal as eaten."
-                disabled={busy || !item.dish_id}
-                onClick={() => void run(() => markMealPlanItemEaten(accessToken, item.id))}
-              />
-              <ChoiceCard
-                title="Skipped"
-                description="Did not eat this meal."
-                disabled={busy}
-                onClick={() => setSkipFormOpen(true)}
-              />
-              <ChoiceCard
-                title="Ate leftovers"
-                description="Finished leftovers instead."
-                disabled={busy}
-                onClick={() => void run(() => markMealPlanItemAteLeftovers(accessToken, item.id))}
-              />
-            </div>
+            <ReviewOutcomeSelector
+              ariaLabel="How did this meal go?"
+              options={[
+                {
+                  id: "ate",
+                  title: "Ate as planned",
+                  description: "Mark this meal as eaten.",
+                  icon: "✓",
+                  disabled: busy || !item.dish_id,
+                  onSelect: () => void run(() => markMealPlanItemEaten(accessToken, item.id)),
+                },
+                {
+                  id: "skipped",
+                  title: "Skipped",
+                  description: "Did not eat this meal.",
+                  icon: "—",
+                  disabled: busy,
+                  onSelect: () => setSkipFormOpen(true),
+                },
+                {
+                  id: "leftovers",
+                  title: "Ate leftovers",
+                  description: "Finished leftovers instead.",
+                  icon: "↺",
+                  disabled: busy,
+                  onSelect: () => void run(() => markMealPlanItemAteLeftovers(accessToken, item.id)),
+                },
+              ]}
+            />
           ) : null}
 
           {showReviewExecutionActions(item) && skipFormOpen ? (

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { Card, PageShell } from "../../components/ui";
+import { PageShell } from "../../components/ui";
 import { WeekNavigator } from "./WeekNavigator";
 
 type Props = {
@@ -14,6 +14,7 @@ type Props = {
   error: string | null;
   children: ReactNode;
   className?: string;
+  actions?: ReactNode;
 };
 
 export function WeekPlanShell({
@@ -27,24 +28,23 @@ export function WeekPlanShell({
   error,
   children,
   className,
+  actions,
 }: Props) {
   return (
     <div className={["stack", "plan-page", className].filter(Boolean).join(" ")}>
-      <Card density="comfortable" className="week-shell-card">
-        <PageShell title={title} subtitle={subtitle} />
-        <WeekNavigator
-          weekStart={weekStart}
-          loading={loading}
-          onPreviousWeek={onPreviousWeek}
-          onThisWeek={onThisWeek}
-          onNextWeek={onNextWeek}
-        />
-        {error ? (
-          <p className="error week-shell-error" role="alert">
-            {error}
-          </p>
-        ) : null}
-      </Card>
+      <PageShell title={title} subtitle={subtitle} actions={actions} />
+      <WeekNavigator
+        weekStart={weekStart}
+        loading={loading}
+        onPreviousWeek={onPreviousWeek}
+        onThisWeek={onThisWeek}
+        onNextWeek={onNextWeek}
+      />
+      {error ? (
+        <p className="error week-shell-error" role="alert">
+          {error}
+        </p>
+      ) : null}
       {children}
     </div>
   );

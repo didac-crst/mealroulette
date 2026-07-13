@@ -21,7 +21,8 @@ import {
 } from "../../api/catalog";
 import { ApiError } from "../../api/client";
 import { ButtonLink } from "../../components/ButtonLink";
-import { Button, PageLoadingState, PageShell } from "../../components/ui";
+import { Button, DisclosureSection, PageLoadingState, PageShell } from "../../components/ui";
+import { CookingIngredientList } from "./CookingIngredientList";
 import { useAuth } from "../auth/AuthContext";
 import { CookingActiveTimersBar } from "./CookingActiveTimersBar";
 import { CookingStepTimer } from "./CookingStepTimer";
@@ -41,19 +42,6 @@ import {
   sortRecipeSteps,
   stepTimerDurationSeconds,
 } from "./recipeCooking";
-
-function formatIngredientLine(
-  item: RecipeIngredient,
-  ingredientNames: Record<number, string>,
-  units: Unit[],
-): string {
-  const name = ingredientNames[item.ingredient_id] ?? `ingredient #${item.ingredient_id}`;
-  const unitSymbol = units.find((unit) => unit.id === item.unit_id)?.symbol;
-  const quantity =
-    item.quantity && unitSymbol ? `${item.quantity} ${unitSymbol}` : item.quantity ?? "";
-  const optional = item.optional ? " (optional)" : "";
-  return quantity ? `${name} — ${quantity}${optional}` : `${name}${optional}`;
-}
 
 export function RecipeCookingPage() {
   const { recipeId } = useParams();
@@ -315,18 +303,13 @@ export function RecipeCookingPage() {
         onDismiss={handleDismissTimer}
       />
 
-      <details className="cooking-mode-ingredients">
-        <summary>Ingredients ({ingredients.length})</summary>
-        {ingredients.length === 0 ? (
-          <p className="muted">No ingredients listed.</p>
-        ) : (
-          <ul className="cooking-mode-ingredient-list">
-            {ingredients.map((item) => (
-              <li key={item.id}>{formatIngredientLine(item, ingredientNames, units)}</li>
-            ))}
-          </ul>
-        )}
-      </details>
+      <DisclosureSection title="Ingredients" meta={`${ingredients.length}`} defaultOpen>
+        <CookingIngredientList
+          items={ingredients}
+          ingredientNames={ingredientNames}
+          units={units}
+        />
+      </DisclosureSection>
 
       <div className="cooking-mode-step-panel" aria-live="polite">
         {stepCount === 0 ? (
