@@ -15,11 +15,11 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Phase 11 — Taxonomy hardening + backup** on branch `phase-11/taxonomy-backup` (from `v0.7.0`).
+**Phase 12 — LLM-assisted entry & localization** on `main` (from `v0.8.0`).
 
-Taxonomy and scheduler target semantics must settle **before** the JSON backup contract is finalized. See [PHASE11_HANDOFF.md](PHASE11_HANDOFF.md), [ADR 002](adr/002-canonical-taxonomy-before-backup.md), and [BACKUP_EXPORT_IMPORT.md](BACKUP_EXPORT_IMPORT.md).
+Phase 11 shipped taxonomy hardening and backup/export/import as [`v0.8.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.8.0). See [BACKUP_EXPORT_IMPORT.md](BACKUP_EXPORT_IMPORT.md), [RESTORE.md](RESTORE.md), and [ADR 002](adr/002-canonical-taxonomy-before-backup.md).
 
-**v0.7 shipped** as [`v0.7.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.7.0) — Today home, cooking mode, step timers, Telegram cooking alerts, dish search. Release notes: [docs/releases/v0.7.0.md](releases/v0.7.0.md).
+**v0.8 shipped** as [`v0.8.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.8.0) — taxonomy tables, computed-trait weekly targets, meal composition metadata, JSON backup/import, scheduled backups, restore docs. Release notes: [docs/releases/v0.8.0.md](releases/v0.8.0.md).
 
 ---
 
@@ -53,6 +53,7 @@ Use one branch per milestone, then merge via pull request:
 - `phase-8/scheduler` — explainable scheduler, family-vector similarity, scheduled roulette (merged, `v0.5.0`, PR #8)
 - `phase-9/computed-recipe-traits` — public keys, food groups, computed recipe traits, taxonomy & resolver (merged in PR #9, `v0.6.0`)
 - `phase-10/cooking-mode` — interactive cooking mode with step timers & Telegram alerts (PR #10)
+- `phase-11/taxonomy-backup` — taxonomy hardening and backup/export/import (merged in PR #11, `v0.8.0`)
 
 ---
 
@@ -69,7 +70,8 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.5** | Automatic scheduler — explainable weekly generation, reroll | **Done** ([`v0.5.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.5.0)) |
 | **v0.6** | Catalog keys & computed traits — public keys, food groups, recipe trait metadata | **Done** ([`v0.6.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.6.0), merge `322c30c`, PR #9) |
 | **v0.7** | Cooking mode — Today home, step-by-step cooking, timers, dish search | **Done** ([`v0.7.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.7.0), merge `9f8fe92`, PR #10) |
-| **v0.8** | LLM-assisted entry — draft enrichment, review before save | Not started |
+| **v0.8** | Taxonomy hardening + backup — canonical taxonomy tables, backup/export/import | **Done** ([`v0.8.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.8.0), merge `f5ec043`, PR #11) |
+| **v0.9** | LLM-assisted entry — draft enrichment, review before save | Not started |
 | **Future** | Composable meals — complete / half / dessert roles, paired halves, manual desserts | Backlog only (see below) |
 | **v1.0** | Stable home version — backups, auth hardening, scheduler reliability | Not started |
 
@@ -222,7 +224,20 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [x] Dish library real-time search
 - [x] Release notes [`v0.7.0.md`](releases/v0.7.0.md)
 
-### v0.8 — LLM-Assisted Entry
+### v0.8 — Taxonomy Hardening + Backup
+
+**Status:** Done — merged in PR [#11](https://github.com/didac-crst/mealroulette/pull/11), tag [`v0.8.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.8.0), merge `f5ec043`.
+
+- [x] First-class `food_groups` and `ingredient_families` tables
+- [x] Ingredient `family_id` FK with seed and legacy backfill
+- [x] Computed-trait weekly target matching with documented legacy fallback
+- [x] Meal composition metadata on dishes
+- [x] Full JSON export/import with schema revision validation
+- [x] Backup settings, run tracking, retention cleanup, scheduled worker job
+- [x] Optional `pg_dump` backup with timeout and failure propagation
+- [x] Restore documentation and admin backup UI
+
+### v0.9 — LLM-Assisted Entry
 
 - [ ] LLM dish enrichment
 - [ ] Suggest ingredients
@@ -274,7 +289,7 @@ When `meal_composition = simple_dish`, **`simple_dish_part`** is required: `cent
 
 - [ ] Usable mobile UI
 - [ ] Stable API
-- [ ] Backup / restore
+- [x] Backup / restore
 - [ ] Auth and roles
 - [ ] Scheduler reliable enough for real use
 - [x] Telegram reminders
@@ -300,8 +315,8 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 8 | Explainable scheduler | v0.5 | Done (`v0.5.0`) |
 | 9 | Computed recipe traits & catalog keys | v0.6 | Done (PR #9, `v0.6.0`) |
 | 10 | Cooking mode | v0.7 | Done (PR #10, `v0.7.0`) |
-| 11 | Taxonomy hardening + backup, export, import | v1.0 | Ready for PR (`phase-11/taxonomy-backup`) |
-| 12 | LLM-assisted entry & localization | v0.8 | Not started |
+| 11 | Taxonomy hardening + backup, export, import | v0.8 | Done (PR #11, `v0.8.0`) |
+| 12 | LLM-assisted entry & localization | v0.9 | Not started |
 | 13 | v1 hardening | v1.0 | Not started |
 
 ### Phase 0 — Project bootstrap ✅

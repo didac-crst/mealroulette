@@ -139,14 +139,14 @@ The default commit hook should fail if tests fail. Lint/format hooks may run in 
 
 ## Implementation Phases
 
-Phases 0–10 shipped through **`v0.7.0`**. Phases 11–13 cover backup, LLM/localization, and v1 hardening.
+Phases 0–11 shipped through **`v0.8.0`**. Phases 12–13 cover LLM/localization and v1 hardening.
 
 | Phase | Name | Target version |
 | --- | --- | --- |
 | 9 | Computed recipe traits & catalog keys | v0.6 |
 | 10 | Cooking mode | v0.7 |
-| 11 | Taxonomy hardening + backup, export, import | v1.0 |
-| 12 | LLM-assisted entry & localization | v0.8 |
+| 11 | Taxonomy hardening + backup, export, import | v0.8 |
+| 12 | LLM-assisted entry & localization | v0.9 |
 | 13 | v1 hardening | v1.0 |
 
 ### Phase 0 - Project Bootstrap
@@ -824,7 +824,7 @@ Acceptance criteria:
 
 ### Phase 11 - Taxonomy Hardening + Backup, Export, and Import
 
-**Status:** Ready for PR on `phase-11/taxonomy-backup` (204 backend tests passed). Handoff: [PHASE11_HANDOFF.md](PHASE11_HANDOFF.md). ADR: [002-canonical-taxonomy-before-backup.md](adr/002-canonical-taxonomy-before-backup.md). Backup spec: [BACKUP_EXPORT_IMPORT.md](BACKUP_EXPORT_IMPORT.md).
+**Status:** Done — shipped as [`v0.8.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.8.0), PR [#11](https://github.com/didac-crst/mealroulette/pull/11), merge `f5ec043`. Handoff: [PHASE11_HANDOFF.md](PHASE11_HANDOFF.md). ADR: [002-canonical-taxonomy-before-backup.md](adr/002-canonical-taxonomy-before-backup.md). Backup spec: [BACKUP_EXPORT_IMPORT.md](BACKUP_EXPORT_IMPORT.md).
 
 **Order of work:**
 

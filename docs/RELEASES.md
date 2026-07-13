@@ -13,6 +13,7 @@ Git tags mark **product versions** users can run. We do not tag individual imple
 | `v0.5.0` | Phase 8 merged — explainable scheduler, family-vector similarity, scheduled roulette — **released** — [release notes](releases/v0.5.0.md) |
 | `v0.6.0` | Phase 9 merged — computed recipe traits, ingredient taxonomy, resolver — **released** — [release notes](releases/v0.6.0.md) |
 | `v0.7.0` | Phase 10 merged — Today home, cooking mode, step timers, Telegram cooking alerts, dish search — **released** — [release notes](releases/v0.7.0.md) |
+| `v0.8.0` | Phase 11 merged — taxonomy hardening, meal composition, backup/export/import — **released** — [release notes](releases/v0.8.0.md) |
 
 Use [semantic versioning](https://semver.org/) at the product-version level: `vMAJOR.MINOR.PATCH`. Patch bumps are for fixes on an already-released version line.
 
@@ -42,11 +43,12 @@ git push origin v0.1.0
 | [`v0.5.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.5.0) | — | 2026-07-12 | Explainable scheduler, family-vector similarity, scheduled roulette — [release notes](releases/v0.5.0.md) |
 | [`v0.6.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.6.0) | [`322c30c`](https://github.com/didac-crst/mealroulette/commit/322c30c) | 2026-07-12 | Catalog keys, computed traits, taxonomy, resolver — [release notes](releases/v0.6.0.md) |
 | [`v0.7.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.7.0) | [`9f8fe92`](https://github.com/didac-crst/mealroulette/commit/9f8fe92) | 2026-07-12 | Cooking mode, Today home, timers, dish search — [release notes](releases/v0.7.0.md) |
+| [`v0.8.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.8.0) | [`f5ec043`](https://github.com/didac-crst/mealroulette/commit/f5ec043) | 2026-07-13 | Taxonomy hardening, meal composition, backup/export/import — [release notes](releases/v0.8.0.md) |
 
 ## Check out a release
 
 ```bash
-git checkout v0.7.0   # latest tagged release
+git checkout v0.8.0   # latest tagged release
 docker compose up --build
 ```
 

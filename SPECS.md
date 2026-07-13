@@ -1765,7 +1765,30 @@ Backup settings:
 - roulette again
 - selection reasons
 
-### v0.6 - LLM-Assisted Entry
+### v0.6 - Catalog Keys & Computed Traits
+
+- stable public keys for dishes and recipes
+- ingredient food groups
+- computed recipe traits
+- taxonomy resolver
+
+### v0.7 - Cooking Mode
+
+- Today home
+- step-by-step cooking mode
+- step timers
+- Telegram cooking alerts
+
+### v0.8 - Taxonomy Hardening and Backup
+
+- first-class food group and ingredient family tables
+- computed-trait weekly target matching
+- meal composition metadata
+- full JSON export/import
+- scheduled backups
+- restore procedure documentation
+
+### v0.9 - LLM-Assisted Entry
 
 - LLM dish enrichment
 - suggest ingredients
