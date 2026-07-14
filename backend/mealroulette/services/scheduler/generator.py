@@ -20,6 +20,7 @@ from mealroulette.services.scheduler.constraints import (
 )
 from mealroulette.services.scheduler.neighbours import build_similarity_neighbours
 from mealroulette.services.scheduler.pair_rejections import pair_is_hard_rejected
+from mealroulette.services.scheduler.pair_scoring import score_pair_compatibility
 from mealroulette.services.scheduler.scoring import score_candidate_for_slot
 from mealroulette.services.scheduler.targets import weekly_target_warnings
 from mealroulette.services.scheduler.types import (
@@ -238,18 +239,24 @@ def _build_slot_options(
                 continue
             if pair_is_hard_rejected(centerpiece.candidate, side.candidate):
                 continue
-            # Pair total uses pre-scored side estimates; sides are not rescored with the
-            # centerpiece already assigned, and combined pair traits/targets are not scored
-            # yet. Future work: score the package as one unit (aggregate vector/traits).
-            total_score = centerpiece.score + (SIDE_PAIR_SCORE_WEIGHT * side.score)
+            pair_compatibility = score_pair_compatibility(centerpiece.candidate, side.candidate)
+            total_score = (
+                centerpiece.score
+                + (SIDE_PAIR_SCORE_WEIGHT * side.score)
+                + pair_compatibility.adjustment
+            )
+            pair_reasons = list(pair_compatibility.reasons)
+            if not pair_reasons:
+                pair_reasons.append(f"Paired with {side.candidate.dish_name}")
             payload = {
                 **centerpiece.payload,
                 "reasons": [
                     *centerpiece.payload.get("reasons", []),
-                    f"Paired with {side.candidate.dish_name}",
+                    *pair_reasons,
                 ],
                 "score": round(total_score, 3),
                 "package_type": "centerpiece_side",
+                "pair_reason_codes": list(pair_compatibility.reason_codes),
             }
             options.append(
                 _SlotPickOption(
