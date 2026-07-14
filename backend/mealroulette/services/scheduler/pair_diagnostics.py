@@ -64,6 +64,13 @@ class RecipePairDiagnostics:
     semantic_role: SimpleDishSemanticRole | None
 
 
+@dataclass(frozen=True)
+class CandidatePairSummary:
+    primary_ingredient_ids: frozenset[int]
+    primary_family_keys: frozenset[str]
+    semantic_role: SimpleDishSemanticRole | None
+
+
 def _is_trivial_ingredient(*, pantry_item: bool, food_group: str, category: str | None, share_pct: float) -> bool:
     if not pantry_item and food_group not in TRIVIAL_FOOD_GROUPS and (category or "").lower() not in TRIVIAL_CATEGORIES:
         return False

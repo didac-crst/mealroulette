@@ -19,6 +19,7 @@ from mealroulette.services.scheduler.constraints import (
     passes_slot_suitability,
 )
 from mealroulette.services.scheduler.neighbours import build_similarity_neighbours
+from mealroulette.services.scheduler.pair_rejections import pair_is_hard_rejected
 from mealroulette.services.scheduler.scoring import score_candidate_for_slot
 from mealroulette.services.scheduler.targets import weekly_target_warnings
 from mealroulette.services.scheduler.types import (
@@ -234,6 +235,8 @@ def _build_slot_options(
     for centerpiece in shortlisted_centerpieces:
         for side in shortlisted_sides:
             if side.candidate.dish_id == centerpiece.candidate.dish_id:
+                continue
+            if pair_is_hard_rejected(centerpiece.candidate, side.candidate):
                 continue
             # Pair total uses pre-scored side estimates; sides are not rescored with the
             # centerpiece already assigned, and combined pair traits/targets are not scored
