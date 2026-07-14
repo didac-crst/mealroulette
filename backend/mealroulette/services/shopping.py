@@ -583,7 +583,12 @@ class ShoppingListService:
             self.db.scalars(
                 select(MealPlanItem)
                 .where(MealPlanItem.id.in_(meal_item_ids))
-                .options(selectinload(MealPlanItem.dish), selectinload(MealPlanItem.recipe))
+                .options(
+                    selectinload(MealPlanItem.dish),
+                    selectinload(MealPlanItem.recipe),
+                    selectinload(MealPlanItem.lines).selectinload(MealPlanItemDish.dish),
+                    selectinload(MealPlanItem.lines).selectinload(MealPlanItemDish.recipe),
+                )
                 .order_by(MealPlanItem.date, MealPlanItem.meal_slot)
             )
         ) if meal_item_ids else []

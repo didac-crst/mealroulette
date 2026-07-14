@@ -22,18 +22,6 @@ def role_for_dish(dish: Dish) -> MealPlanDishLineRole:
     return MealPlanDishLineRole.main
 
 
-def _line_sort_key(line: MealPlanItemDish) -> tuple[int, int, int]:
-    source_rank = 0 if line.source == MealPlanDishLineSource.roulette else 1
-    role_rank = {
-        MealPlanDishLineRole.main: 0,
-        MealPlanDishLineRole.centerpiece: 1,
-        MealPlanDishLineRole.side: 2,
-        MealPlanDishLineRole.dessert: 3,
-        MealPlanDishLineRole.extra: 4,
-    }.get(line.role, 5)
-    return (source_rank, role_rank, line.position)
-
-
 def primary_line(lines: list[MealPlanItemDish]) -> MealPlanItemDish | None:
     if not lines:
         return None

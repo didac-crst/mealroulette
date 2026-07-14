@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { canOpenCookMode, resolveCookRecipeId } from "./todayMeals";
-import type { MealPlanItem } from "../../api/planning";
+import type { MealPlanItem, MealPlanDishLine } from "../../api/planning";
 
 function item(overrides: Partial<MealPlanItem> = {}): MealPlanItem {
   return {
@@ -50,7 +50,7 @@ describe("todayMeals helpers", () => {
   it("blocks cook mode for leftovers meals", () => {
     expect(canOpenCookMode(item({ status: "ate_leftovers" }))).toBe(false);
     expect(canOpenCookMode(item({ dish_id: null, lines: [] }))).toBe(false);
-    expect(canOpenCookMode(item({ dish_id: null, lines: [{ id: 1, dish_id: 10 } as never] }))).toBe(true);
+    expect(canOpenCookMode(item({ dish_id: null, lines: [{ id: 1, dish_id: 10 } as unknown as MealPlanDishLine] }))).toBe(true);
     expect(canOpenCookMode(item())).toBe(true);
   });
 });

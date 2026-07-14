@@ -84,7 +84,7 @@ def restore_undo_snapshot(db: Session, plan: MealPlan) -> bool:
         if item is None or item.meal_plan_id != plan.id:
             continue
         line_entries = entry.get("lines")
-        if not line_entries:
+        if line_entries is None:
             _restore_legacy_only(item, entry)
             sync_legacy_mirror(item)
             continue

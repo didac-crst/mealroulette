@@ -1,4 +1,3 @@
----
 version: 1
 dishes:
 - course: main
@@ -30,9 +29,7 @@ dishes:
     - step_number: 2
       instruction: Steam until tender but still bright green.
     - step_number: 3
-      instruction: Season with salt
-      olive oil: null
-      and lemon if desired.: null
+      instruction: "Season with salt, olive oil, and lemon if desired."
     ingredients:
     - name: broccoli
       quantity: 700
@@ -563,7 +560,7 @@ dishes:
     - 9
     - 10
   name: Ratatouille
-  description: Stewed zucchini, eggplant, peppers, tomato, and onion.
+  description: "Stewed zucchini, eggplant, peppers, tomato, and onion."
   recipes:
   - variant_name: Simple
     is_main: true
@@ -578,11 +575,7 @@ dishes:
     - step_number: 1
       instruction: Dice the vegetables.
     - step_number: 2
-      instruction: Cook onion
-      eggplant: null
-      zucchini: null
-      pepper: null
-      and tomato until soft.: null
+      instruction: "Cook onion, eggplant, zucchini, pepper, and tomato until soft."
     - step_number: 3
       instruction: Simmer until saucy and season.
     ingredients:
@@ -628,8 +621,7 @@ dishes:
     - step_number: 1
       instruction: Wash the spinach and slice the garlic.
     - step_number: 2
-      instruction: Saute garlic briefly
-      then add spinach.: null
+      instruction: "Saute garlic briefly, then add spinach."
     - step_number: 3
       instruction: Cook until wilted and season.
     ingredients:
@@ -666,8 +658,7 @@ dishes:
     - step_number: 1
       instruction: Wash and chop the Swiss chard.
     - step_number: 2
-      instruction: Saute garlic
-      then add the chard stems and leaves.: null
+      instruction: "Saute garlic, then add the chard stems and leaves."
     - step_number: 3
       instruction: Cook until tender and season.
     ingredients:
@@ -867,9 +858,7 @@ dishes:
     - step_number: 1
       instruction: Slice the cucumbers thinly.
     - step_number: 2
-      instruction: Dress with salt
-      vinegar or lemon: null
-      and olive oil.: null
+      instruction: "Dress with salt, vinegar or lemon, and olive oil."
     - step_number: 3
       instruction: Chill briefly if desired.
     ingredients:
@@ -930,7 +919,7 @@ dishes:
   kids_friendly: true
   seasonality: *id001
   name: Caesar Salad
-  description: Romaine salad with croutons, parmesan, and Caesar dressing.
+  description: "Romaine salad with croutons, parmesan, and Caesar dressing."
   recipes:
   - variant_name: Simple
     is_main: true
@@ -1235,9 +1224,7 @@ dishes:
     - step_number: 2
       instruction: Add eggs and boil until the yolks are soft.
     - step_number: 3
-      instruction: Cool briefly
-      peel if desired: null
-      and serve.: null
+      instruction: "Cool briefly, peel if desired, and serve."
     ingredients:
     - name: egg
       quantity: 8
@@ -1271,9 +1258,7 @@ dishes:
     - step_number: 2
       instruction: Boil until fully set.
     - step_number: 3
-      instruction: Cool
-      peel: null
-      and serve.: null
+      instruction: "Cool, peel, and serve."
     ingredients:
     - name: egg
       quantity: 8
@@ -1307,9 +1292,7 @@ dishes:
     - step_number: 2
       instruction: Crack in eggs and poach until whites are set.
     - step_number: 3
-      instruction: Lift out
-      drain: null
-      and season.: null
+      instruction: "Lift out, drain, and season."
     ingredients:
     - name: egg
       quantity: 8
@@ -1529,9 +1512,7 @@ dishes:
     - step_number: 2
       instruction: Boil until tender.
     - step_number: 3
-      instruction: Drain
-      season: null
-      and serve.: null
+      instruction: "Drain, season, and serve."
     ingredients:
     - name: potato
       quantity: 900
@@ -1599,9 +1580,7 @@ dishes:
     - step_number: 2
       instruction: Fry potatoes until browned and tender.
     - step_number: 3
-      instruction: Add onion
-      season: null
-      and finish cooking.: null
+      instruction: "Add onion, season, and finish cooking."
     ingredients:
     - name: potato
       quantity: 900
@@ -1673,8 +1652,7 @@ dishes:
     - step_number: 1
       instruction: Make or use mashed potatoes.
     - step_number: 2
-      instruction: Shape
-      coat with egg and breadcrumbs.: null
+      instruction: "Shape, coat with egg and breadcrumbs."
     - step_number: 3
       instruction: Fry or bake until crisp.
     ingredients:
@@ -1716,9 +1694,7 @@ dishes:
     - step_number: 2
       instruction: Fry in a thin layer until crisp.
     - step_number: 3
-      instruction: Flip
-      finish cooking: null
-      and season.: null
+      instruction: "Flip, finish cooking, and season."
     ingredients:
     - name: potato
       quantity: 900
@@ -1824,12 +1800,9 @@ dishes:
     - step_number: 1
       instruction: Saute sliced mushrooms.
     - step_number: 2
-      instruction: Add rice and liquid
-      then cook until tender.: null
+      instruction: "Add rice and liquid, then cook until tender."
     - step_number: 3
-      instruction: Rest
-      fluff: null
-      and season.: null
+      instruction: "Rest, fluff, and season."
     ingredients:
     - name: rice
       quantity: 320
@@ -1864,8 +1837,7 @@ dishes:
     - step_number: 1
       instruction: Toast the rice briefly in oil.
     - step_number: 2
-      instruction: Add tomato sauce and liquid
-      then cook until tender.: null
+      instruction: "Add tomato sauce and liquid, then cook until tender."
     - step_number: 3
       instruction: Rest and fluff.
     ingredients:
@@ -1976,8 +1948,7 @@ dishes:
     - step_number: 1
       instruction: Soften onion in olive oil.
     - step_number: 2
-      instruction: Add barley and stock
-      then simmer until tender.: null
+      instruction: "Add barley and stock, then simmer until tender."
     - step_number: 3
       instruction: Stir in parmesan if desired.
     ingredients:
@@ -2060,8 +2031,7 @@ dishes:
     - step_number: 1
       instruction: Boil pasta until al dente.
     - step_number: 2
-      instruction: Drain
-      reserving a little pasta water.: null
+      instruction: "Drain, reserving a little pasta water."
     - step_number: 3
       instruction: Toss with butter and season.
     ingredients:
@@ -2140,9 +2110,7 @@ dishes:
     description: Simple pasta salad.
     steps:
     - step_number: 1
-      instruction: Boil pasta
-      drain: null
-      and cool.: null
+      instruction: "Boil pasta, drain, and cool."
     - step_number: 2
       instruction: Chop vegetables.
     - step_number: 3
@@ -2556,9 +2524,7 @@ dishes:
     description: Simple lentils with vegetables.
     steps:
     - step_number: 1
-      instruction: Dice onion
-      carrot: null
-      and celery.: null
+      instruction: "Dice onion, carrot, and celery."
     - step_number: 2
       instruction: Simmer lentils and vegetables until tender.
     - step_number: 3
@@ -3164,9 +3130,7 @@ dishes:
     description: Simple breaded veal.
     steps:
     - step_number: 1
-      instruction: Coat veal in flour
-      egg: null
-      and breadcrumbs.: null
+      instruction: "Coat veal in flour, egg, and breadcrumbs."
     - step_number: 2
       instruction: Fry until golden and cooked through.
     - step_number: 3
@@ -3380,9 +3344,7 @@ dishes:
     description: Simple breaded fish.
     steps:
     - step_number: 1
-      instruction: Coat fish in flour
-      egg: null
-      and breadcrumbs.: null
+      instruction: "Coat fish in flour, egg, and breadcrumbs."
     - step_number: 2
       instruction: Fry or bake until crisp and cooked through.
     - step_number: 3
@@ -3678,9 +3640,7 @@ dishes:
     - step_number: 2
       instruction: Fry quickly until crisp.
     - step_number: 3
-      instruction: Drain
-      season: null
-      and serve with lemon.: null
+      instruction: "Drain, season, and serve with lemon."
     ingredients:
     - name: calamari
       quantity: 700
@@ -3753,8 +3713,7 @@ dishes:
     - step_number: 1
       instruction: Mash cooked lentils.
     - step_number: 2
-      instruction: Mix with egg and breadcrumbs
-      then shape patties.: null
+      instruction: "Mix with egg and breadcrumbs, then shape patties."
     - step_number: 3
       instruction: Pan-fry until browned.
     ingredients:
@@ -3794,8 +3753,7 @@ dishes:
     - step_number: 1
       instruction: Mash chickpeas.
     - step_number: 2
-      instruction: Mix with egg and breadcrumbs
-      then shape patties.: null
+      instruction: "Mix with egg and breadcrumbs, then shape patties."
     - step_number: 3
       instruction: Pan-fry until browned.
     ingredients:
@@ -3979,8 +3937,7 @@ dishes:
     - step_number: 1
       instruction: Remove mushroom stems and chop them.
     - step_number: 2
-      instruction: Mix stems with breadcrumbs and cheese
-      then fill caps.: null
+      instruction: "Mix stems with breadcrumbs and cheese, then fill caps."
     - step_number: 3
       instruction: Bake until tender and browned.
     ingredients:
@@ -4063,9 +4020,7 @@ dishes:
     - step_number: 2
       instruction: Cook potatoes and Swiss chard until tender.
     - step_number: 3
-      instruction: Drain
-      season: null
-      and dress with olive oil.: null
+      instruction: "Drain, season, and dress with olive oil."
     ingredients:
     - name: chard
       quantity: 700
@@ -4102,9 +4057,7 @@ dishes:
     description: Simple braised leeks.
     steps:
     - step_number: 1
-      instruction: Trim
-      wash: null
-      and slice the leeks.: null
+      instruction: "Trim, wash, and slice the leeks."
     - step_number: 2
       instruction: Braise gently with a little water or stock until tender.
     - step_number: 3
@@ -4142,12 +4095,9 @@ dishes:
     description: Simple creamed leeks.
     steps:
     - step_number: 1
-      instruction: Trim
-      wash: null
-      and slice the leeks.: null
+      instruction: "Trim, wash, and slice the leeks."
     - step_number: 2
-      instruction: Cook until soft
-      then add cream.: null
+      instruction: "Cook until soft, then add cream."
     - step_number: 3
       instruction: Simmer briefly and season.
     ingredients:
@@ -4504,7 +4454,7 @@ dishes:
     - 8
     - 9
   name: Greek Salad
-  description: Tomato, cucumber, onion, olives, and feta salad.
+  description: "Tomato, cucumber, onion, olives, and feta salad."
   recipes:
   - variant_name: Simple
     is_main: true
@@ -4517,9 +4467,7 @@ dishes:
     description: Simple Greek salad.
     steps:
     - step_number: 1
-      instruction: Chop the tomatoes
-      cucumber: null
-      and onion.: null
+      instruction: "Chop the tomatoes, cucumber, and onion."
     - step_number: 2
       instruction: Add olives and feta.
     - step_number: 3
@@ -4675,7 +4623,7 @@ dishes:
   kids_friendly: true
   seasonality: *id001
   name: Russian Salad
-  description: Potato, carrot, peas, egg, and mayonnaise salad.
+  description: "Potato, carrot, peas, egg, and mayonnaise salad."
   recipes:
   - variant_name: Simple
     is_main: true
@@ -4688,10 +4636,7 @@ dishes:
     description: Simple Russian salad.
     steps:
     - step_number: 1
-      instruction: Boil potatoes
-      carrots: null
-      peas: null
-      and eggs.: null
+      instruction: "Boil potatoes, carrots, peas, and eggs."
     - step_number: 2
       instruction: Dice and cool the cooked ingredients.
     - step_number: 3
@@ -5274,9 +5219,7 @@ dishes:
     - step_number: 2
       instruction: Cook with water until tender.
     - step_number: 3
-      instruction: Rest
-      fluff: null
-      and serve.: null
+      instruction: "Rest, fluff, and serve."
     ingredients:
     - name: rice
       quantity: 320
@@ -5310,9 +5253,7 @@ dishes:
     - step_number: 2
       instruction: Cook with water until tender.
     - step_number: 3
-      instruction: Rest
-      fluff: null
-      and serve.: null
+      instruction: "Rest, fluff, and serve."
     ingredients:
     - name: brown rice
       quantity: 320
@@ -5346,9 +5287,7 @@ dishes:
     - step_number: 2
       instruction: Stir-fry egg and vegetables.
     - step_number: 3
-      instruction: Add rice
-      season: null
-      and fry together.: null
+      instruction: "Add rice, season, and fry together."
     ingredients:
     - name: rice
       quantity: 320
@@ -5425,9 +5364,7 @@ dishes:
     - step_number: 2
       instruction: Simmer with water until tender.
     - step_number: 3
-      instruction: Rest
-      fluff: null
-      and season.: null
+      instruction: "Rest, fluff, and season."
     ingredients:
     - name: quinoa
       quantity: 320
@@ -5530,8 +5467,7 @@ dishes:
     - step_number: 1
       instruction: Boil pasta until al dente.
     - step_number: 2
-      instruction: Drain
-      reserving a little pasta water.: null
+      instruction: "Drain, reserving a little pasta water."
     - step_number: 3
       instruction: Toss pasta with pesto and serve.
     ingredients:
@@ -5568,10 +5504,7 @@ dishes:
     - step_number: 1
       instruction: Boil macaroni until just tender.
     - step_number: 2
-      instruction: Make a cheese sauce with milk
-      butter: null
-      flour: null
-      and cheese.: null
+      instruction: "Make a cheese sauce with milk, butter, flour, and cheese."
     - step_number: 3
       instruction: Mix pasta with sauce and serve or bake briefly.
     ingredients:
@@ -5615,9 +5548,7 @@ dishes:
     description: Simple lentil stew.
     steps:
     - step_number: 1
-      instruction: Dice onion
-      carrot: null
-      and celery.: null
+      instruction: "Dice onion, carrot, and celery."
     - step_number: 2
       instruction: Simmer vegetables and lentils until tender.
     - step_number: 3
@@ -5662,8 +5593,7 @@ dishes:
     - step_number: 1
       instruction: Cook onion and vegetables until soft.
     - step_number: 2
-      instruction: Add chickpeas and tomato
-      then simmer.: null
+      instruction: "Add chickpeas and tomato, then simmer."
     - step_number: 3
       instruction: Season and serve hot.
     ingredients:
@@ -5706,9 +5636,7 @@ dishes:
     - step_number: 1
       instruction: Drain and rinse chickpeas.
     - step_number: 2
-      instruction: Blend with tahini
-      lemon: null
-      and garlic.: null
+      instruction: "Blend with tahini, lemon, and garlic."
     - step_number: 3
       instruction: Adjust seasoning and texture.
     ingredients:
@@ -5783,9 +5711,7 @@ dishes:
     description: Simple breaded chicken.
     steps:
     - step_number: 1
-      instruction: Coat chicken in flour
-      egg: null
-      and breadcrumbs.: null
+      instruction: "Coat chicken in flour, egg, and breadcrumbs."
     - step_number: 2
       instruction: Fry or bake until crisp and cooked through.
     - step_number: 3
@@ -6102,8 +6028,7 @@ dishes:
     - step_number: 2
       instruction: Stir-fry tofu until browned.
     - step_number: 3
-      instruction: Add vegetables and sauce
-      then cook until tender.: null
+      instruction: "Add vegetables and sauce, then cook until tender."
     ingredients:
     - name: firm tofu
       quantity: 600
@@ -6302,9 +6227,7 @@ dishes:
     description: Simple gazpacho.
     steps:
     - step_number: 1
-      instruction: Chop tomatoes
-      cucumber: null
-      and pepper.: null
+      instruction: "Chop tomatoes, cucumber, and pepper."
     - step_number: 2
       instruction: Blend with olive oil and a little water.
     - step_number: 3
@@ -6386,7 +6309,7 @@ dishes:
     - 9
     - 10
   name: Escalivada
-  description: Roasted eggplant, peppers, and onion.
+  description: "Roasted eggplant, peppers, and onion."
   recipes:
   - variant_name: Simple
     is_main: true
@@ -6399,9 +6322,7 @@ dishes:
     description: Simple escalivada.
     steps:
     - step_number: 1
-      instruction: Roast eggplant
-      peppers: null
-      and onion until soft.: null
+      instruction: "Roast eggplant, peppers, and onion until soft."
     - step_number: 2
       instruction: Peel and tear into strips.
     - step_number: 3
@@ -6509,7 +6430,7 @@ dishes:
     - 9
     - 10
   name: Pisto
-  description: Spanish vegetable stew with tomato, zucchini, pepper, and onion.
+  description: "Spanish vegetable stew with tomato, zucchini, pepper, and onion."
   recipes:
   - variant_name: Simple
     is_main: true
@@ -6524,10 +6445,7 @@ dishes:
     - step_number: 1
       instruction: Dice the vegetables.
     - step_number: 2
-      instruction: Cook onion
-      pepper: null
-      zucchini: null
-      and tomato until soft.: null
+      instruction: "Cook onion, pepper, zucchini, and tomato until soft."
     - step_number: 3
       instruction: Simmer until thick and season.
     ingredients:
@@ -6570,8 +6488,7 @@ dishes:
     - step_number: 1
       instruction: Trim and wash leeks.
     - step_number: 2
-      instruction: Cook until tender
-      then cool.: null
+      instruction: "Cook until tender, then cool."
     - step_number: 3
       instruction: Dress with vinaigrette and serve cold.
     ingredients:
@@ -6590,7 +6507,7 @@ dishes:
   kids_friendly: true
   seasonality: *id001
   name: Quiche Lorraine
-  description: Bacon, egg, and cream quiche.
+  description: "Bacon, egg, and cream quiche."
   recipes:
   - variant_name: Simple
     is_main: true
@@ -6648,9 +6565,7 @@ dishes:
     - step_number: 1
       instruction: Dice vegetables.
     - step_number: 2
-      instruction: Simmer vegetables
-      beans: null
-      and tomato with stock.: null
+      instruction: "Simmer vegetables, beans, and tomato with stock."
     - step_number: 3
       instruction: Season and serve hot.
     ingredients:
@@ -6733,9 +6648,7 @@ dishes:
     - step_number: 1
       instruction: Slice bread and prepare toppings.
     - step_number: 2
-      instruction: Arrange cheese
-      cold cuts: null
-      and vegetables.: null
+      instruction: "Arrange cheese, cold cuts, and vegetables."
     - step_number: 3
       instruction: Serve cold or room temperature.
     ingredients:
@@ -6835,7 +6748,7 @@ dishes:
   kids_friendly: true
   seasonality: *id001
   name: Tzatziki
-  description: Yogurt, cucumber, and garlic dip.
+  description: "Yogurt, cucumber, and garlic dip."
   recipes:
   - variant_name: Simple
     is_main: true
@@ -6882,7 +6795,7 @@ dishes:
     - 8
     - 9
   name: Tabbouleh
-  description: Bulgur salad with parsley, tomato, and lemon.
+  description: "Bulgur salad with parsley, tomato, and lemon."
   recipes:
   - variant_name: Simple
     is_main: true
@@ -6897,9 +6810,7 @@ dishes:
     - step_number: 1
       instruction: Hydrate bulgur and let it cool.
     - step_number: 2
-      instruction: Chop parsley
-      tomato: null
-      and cucumber.: null
+      instruction: "Chop parsley, tomato, and cucumber."
     - step_number: 3
       instruction: Toss with lemon and olive oil.
     ingredients:
@@ -6982,8 +6893,7 @@ dishes:
     - step_number: 1
       instruction: Heat a pan and add gyoza.
     - step_number: 2
-      instruction: Brown the bottoms
-      then steam until cooked through.: null
+      instruction: "Brown the bottoms, then steam until cooked through."
     - step_number: 3
       instruction: Serve hot.
     ingredients:
@@ -7057,10 +6967,7 @@ dishes:
     description: Simple borscht.
     steps:
     - step_number: 1
-      instruction: Prepare beetroot
-      cabbage: null
-      carrot: null
-      and onion.: null
+      instruction: "Prepare beetroot, cabbage, carrot, and onion."
     - step_number: 2
       instruction: Simmer vegetables in stock until tender.
     - step_number: 3

@@ -202,7 +202,7 @@ export function MealSlotPlanEditor({
             type="button"
             variant="secondary"
             size="sm"
-            disabled={busy || item.is_locked}
+            disabled={actionDisabled || item.is_locked}
             onClick={() => void run(() => reopenMealSlot(accessToken, item.id))}
           >
             Reopen slot
@@ -320,7 +320,7 @@ export function MealSlotPlanEditor({
       ) : null}
 
       {isFuture && canModifyPlanning ? (
-        <Button type="button" variant="ghost" size="sm" disabled={busy} onClick={() => void handleDoNotPlan()}>
+        <Button type="button" variant="ghost" size="sm" disabled={actionDisabled} onClick={() => void handleDoNotPlan()}>
           Do not plan
         </Button>
       ) : null}

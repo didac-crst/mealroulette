@@ -84,6 +84,16 @@ def upgrade() -> None:
         "meal_plan_item_dishes",
         ["meal_plan_item_id"],
     )
+    op.create_index(
+        "ix_meal_plan_item_dishes_dish_id",
+        "meal_plan_item_dishes",
+        ["dish_id"],
+    )
+    op.create_index(
+        "ix_meal_plan_item_dishes_recipe_id",
+        "meal_plan_item_dishes",
+        ["recipe_id"],
+    )
 
     op.execute(
         sa.text(
@@ -126,6 +136,8 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    op.drop_index("ix_meal_plan_item_dishes_recipe_id", table_name="meal_plan_item_dishes")
+    op.drop_index("ix_meal_plan_item_dishes_dish_id", table_name="meal_plan_item_dishes")
     op.drop_index("ix_meal_plan_item_dishes_meal_plan_item_id", table_name="meal_plan_item_dishes")
     op.drop_table("meal_plan_item_dishes")
     op.drop_column("meal_plan_items", "planning_state")

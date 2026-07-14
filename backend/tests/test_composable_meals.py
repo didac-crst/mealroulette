@@ -151,6 +151,56 @@ def test_assign_add_mode_appends_line(client, catalog_seed, admin_headers, user_
     assert len(added.json()["lines"]) == 2
 
 
+def test_do_not_plan_rejects_locked_slot(client, catalog_seed, admin_headers, user_headers):
+    dish = _create_dish(client, admin_headers, "Locked Do Not Plan Dish")
+    plan = client.get("/api/meal-plans/current", headers=user_headers).json()
+    item = _today_or_future_item(plan, client=client, user_headers=user_headers)
+
+    client.post(
+        "/api/meal-plan-items/assign",
+        headers=user_headers,
+        json={
+            "date": item["date"],
+            "meal_slot": item["meal_slot"],
+            "dish_id": dish["id"],
+            "mode": "replace_all",
+        },
+    )
+    locked = client.post(f"/api/meal-plan-items/{item['id']}/lock", headers=user_headers)
+    assert locked.status_code == 200
+
+    blocked = client.post(
+        f"/api/meal-plan-items/{item['id']}/do-not-plan",
+        headers=user_headers,
+        json={"remove_existing_lines": True},
+    )
+    assert blocked.status_code == 400
+
+
+def test_add_line_rejects_duplicate_position(client, catalog_seed, admin_headers, user_headers):
+    first = _create_dish(client, admin_headers, "Position Main")
+    second = _create_dish(client, admin_headers, "Position Extra")
+    plan = client.get("/api/meal-plans/current", headers=user_headers).json()
+    item = _today_or_future_item(plan, client=client, user_headers=user_headers)
+
+    client.post(
+        "/api/meal-plan-items/assign",
+        headers=user_headers,
+        json={
+            "date": item["date"],
+            "meal_slot": item["meal_slot"],
+            "dish_id": first["id"],
+            "mode": "replace_all",
+        },
+    )
+    conflict = client.post(
+        f"/api/meal-plan-items/{item['id']}/lines",
+        headers=user_headers,
+        json={"dish_id": second["id"], "position": 0},
+    )
+    assert conflict.status_code == 409
+
+
 @pytest.mark.integration
 def test_meal_traits_aggregate_across_fixture_dishes(client, catalog_seed, admin_headers, user_headers, db_session):
     import_dish_fixtures(db_session, DEFAULT_FIXTURE_PATH)

@@ -6,6 +6,7 @@ from __future__ import annotations
 import os
 
 import psycopg
+from psycopg import sql
 
 
 def _database_names(parallel_dbs: int) -> list[str]:
@@ -29,7 +30,7 @@ def setup_test_databases(*, parallel_dbs: int | None = None) -> list[str]:
                 cursor.execute("SELECT 1 FROM pg_database WHERE datname = %s", (name,))
                 if cursor.fetchone() is not None:
                     continue
-                cursor.execute(f'CREATE DATABASE "{name}"')
+                cursor.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(name)))
                 print(f"Created database {name}")
 
     return names

@@ -330,6 +330,30 @@ ingredients:
     approved: false
   food_group: carbohydrate
   review_status: candidate
+- canonical_name: baked_beans
+  display_name: Baked beans
+  description: Canned baked beans in tomato sauce.
+  category: legume
+  food_group: legume
+  family: legume_family
+  pantry_item: true
+  default_recipe_unit: can
+  preferred_shopping_unit: can
+  aggregation_unit: g
+  aggregation_strategy: allow_approximate_conversion
+  aliases:
+  - baked beans
+  - haricots blancs à la tomate
+  - alubias con tomate
+  unit_conversions:
+  - from_unit: can
+    to_unit: g
+    factor: 240
+    basis: drained/usable contents of one small can
+    confidence: medium
+    source: seed_suggestion
+  review_status: candidate
+  storage_class: ambient
 - canonical_name: banana
   display_name: Banana
   description: 'Banana..
@@ -818,6 +842,22 @@ ingredients:
   - morcilla francesa
   review_status: candidate
   storage_class: refrigerated
+- canonical_name: bratwurst
+  display_name: Bratwurst
+  description: German-style pork sausage.
+  category: meat
+  food_group: meat
+  family: pork_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - bratwurst
+  - bratwurst sausage
+  review_status: candidate
+  storage_class: refrigerated
 - canonical_name: bread_flour
   display_name: Bread Flour
   description: 'Bread flour.
@@ -961,6 +1001,21 @@ ingredients:
   - cremini mushrooms
   - brown button mushrooms
   - brown mushrooms
+- canonical_name: brown_rice
+  display_name: Brown rice
+  description: Wholegrain brown rice.
+  category: carbohydrate
+  food_group: carbohydrate
+  family: rice_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - brown rice
+  review_status: candidate
+  storage_class: ambient
 - canonical_name: brussels_sprouts
   display_name: Brussels Sprouts
   description: 'Brussels sprouts..
@@ -1489,6 +1544,22 @@ ingredients:
   - acelga
   review_status: candidate
   storage_class: fresh_produce
+- canonical_name: cheddar
+  display_name: Cheddar
+  description: Firm cheddar cheese.
+  category: cheese
+  food_group: cheese
+  family: hard_cheese_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - cheddar
+  - cheddar cheese
+  review_status: candidate
+  storage_class: refrigerated
 - canonical_name: cherry_tomato
   display_name: Cherry Tomato
   description: 'Small fresh tomatoes..
@@ -1677,6 +1748,21 @@ ingredients:
   - pollo picado
   review_status: candidate
   storage_class: refrigerated
+- canonical_name: chicken_nuggets
+  display_name: Chicken nuggets
+  description: Prepared breaded chicken nuggets.
+  category: meat
+  food_group: meat
+  family: chicken_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - chicken nuggets
+  review_status: candidate
+  storage_class: frozen
 - canonical_name: chicken_thigh
   display_name: Chicken Thigh
   description: 'Chicken thigh..
@@ -1894,6 +1980,24 @@ ingredients:
   food_group: condiment
   review_status: candidate
   storage_class: ambient
+- canonical_name: cod_fillets
+  display_name: Cod fillets
+  description: Fresh or frozen cod fillets.
+  category: fish
+  food_group: fish
+  family: white_fish_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - cod fillet
+  - cod fillets
+  - filets de cabillaud
+  - filetes de bacalao
+  review_status: candidate
+  storage_class: refrigerated
 - canonical_name: coeur_de_boeuf_tomato
   display_name: Coeur De Boeuf Tomato
   description: 'Large ribbed tomato..
@@ -1928,6 +2032,23 @@ ingredients:
   food_group: vegetable
   review_status: candidate
   storage_class: fresh_produce
+- canonical_name: cold_cuts
+  display_name: Cold cuts
+  description: Mixed sliced deli meats.
+  category: meat
+  food_group: meat
+  family: pork_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - cold cuts
+  - charcuterie slices
+  - embutidos
+  review_status: candidate
+  storage_class: refrigerated
 - canonical_name: collard_greens
   display_name: Collard Greens
   description: 'Collard greens.
@@ -2188,6 +2309,29 @@ ingredients:
   food_group: dairy
   review_status: candidate
   storage_class: refrigerated
+- canonical_name: croquettes
+  display_name: Croquettes
+  description: Prepared croquettes, breaded and ready to cook.
+  category: carbohydrate
+  food_group: carbohydrate
+  family: bread_pastry_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: g
+  aggregation_strategy: allow_approximate_conversion
+  aliases:
+  - croquettes
+  - croquetas
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 35
+    basis: one medium croquette
+    confidence: medium
+    source: seed_suggestion
+  review_status: candidate
+  storage_class: frozen
 - canonical_name: croutons
   display_name: Croutons
   description: 'Croutons.
@@ -2781,6 +2925,22 @@ ingredients:
     approved: false
   food_group: plant_protein
   review_status: candidate
+- canonical_name: fish_fingers
+  display_name: Fish fingers
+  description: Prepared breaded white fish fingers.
+  category: fish
+  food_group: fish
+  family: white_fish_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - fish fingers
+  - fish sticks
+  review_status: candidate
+  storage_class: frozen
 - canonical_name: fish_stock
   display_name: Fish Stock
   description: 'Fish stock..
@@ -3141,6 +3301,21 @@ ingredients:
   - cellophane noodles
   - vermicelles de soja
   review_status: candidate
+- canonical_name: gnocchi
+  display_name: Gnocchi
+  description: Potato gnocchi.
+  category: carbohydrate
+  food_group: carbohydrate
+  family: potato_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - gnocchi
+  review_status: candidate
+  storage_class: refrigerated
 - canonical_name: goat_cheese_log
   display_name: Goat Cheese Log
   description: 'Goat cheese log.
@@ -3650,6 +3825,21 @@ ingredients:
   - haricots rouges
   - alubias rojas
   review_status: candidate
+- canonical_name: kimchi
+  display_name: Kimchi
+  description: Fermented Korean cabbage condiment.
+  category: vegetable
+  food_group: vegetable
+  family: brassica_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - kimchi
+  review_status: candidate
+  storage_class: refrigerated
 - canonical_name: king_oyster_mushroom
   display_name: King Oyster Mushroom
   description: 'King oyster mushroom.
@@ -4366,6 +4556,29 @@ ingredients:
   - menthe
   - menta
   review_status: candidate
+- canonical_name: miso_paste
+  display_name: Miso paste
+  description: Fermented soybean miso paste.
+  category: condiment
+  food_group: condiment
+  family: sauce_condiment_family
+  pantry_item: true
+  default_recipe_unit: tbsp
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: allow_approximate_conversion
+  aliases:
+  - miso paste
+  - miso
+  unit_conversions:
+  - from_unit: tbsp
+    to_unit: g
+    factor: 18
+    basis: one tablespoon miso paste
+    confidence: medium
+    source: seed_suggestion
+  review_status: candidate
+  storage_class: refrigerated
 - canonical_name: mixed_mushrooms
   display_name: Mixed mushrooms
   description: Mixed mushrooms, useful when exact variety is flexible.
@@ -4380,6 +4593,23 @@ ingredients:
   - mélange de champignons
   - assorted mushrooms
   - mixed mushrooms
+- canonical_name: mixed_salad_leaves
+  display_name: Mixed salad leaves
+  description: Mixed tender salad greens.
+  category: vegetable
+  food_group: vegetable
+  family: leafy_green_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - mixed salad leaves
+  - mixed greens
+  - salad mix
+  review_status: candidate
+  storage_class: fresh_produce
 - canonical_name: monkfish
   display_name: Monkfish
   description: 'Monkfish..
@@ -4945,6 +5175,38 @@ ingredients:
   aliases:
   - plumas
   review_status: candidate
+- canonical_name: pesto
+  display_name: Pesto
+  description: Basil pesto sauce.
+  category: condiment
+  food_group: condiment
+  family: prepared_sauce_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - pesto
+  - basil pesto
+  review_status: candidate
+  storage_class: refrigerated
+- canonical_name: pierogi
+  display_name: Pierogi
+  description: Filled Polish dumplings.
+  category: carbohydrate
+  food_group: carbohydrate
+  family: pasta_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - pierogi
+  - pierogies
+  review_status: candidate
+  storage_class: refrigerated
 - canonical_name: pine_nuts
   display_name: Pine Nuts
   description: 'Pine nuts..
@@ -5385,6 +5647,29 @@ ingredients:
   food_group: seafood
   review_status: candidate
   storage_class: refrigerated
+- canonical_name: prepared_gyoza
+  display_name: Gyoza
+  description: Prepared filled gyoza dumplings.
+  category: carbohydrate
+  food_group: carbohydrate
+  family: asian_wrappers_family
+  pantry_item: false
+  default_recipe_unit: unit
+  preferred_shopping_unit: unit
+  aggregation_unit: g
+  aggregation_strategy: allow_approximate_conversion
+  aliases:
+  - gyoza
+  - prepared gyoza
+  unit_conversions:
+  - from_unit: unit
+    to_unit: g
+    factor: 25
+    basis: one medium gyoza
+    confidence: medium
+    source: seed_suggestion
+  review_status: candidate
+  storage_class: frozen
 - canonical_name: pretzel_bread
   display_name: Pretzel bread
   description: Laugen/pretzel bread used for dumpling bakes.
@@ -6035,6 +6320,22 @@ ingredients:
   aliases:
   - rigatoni
   review_status: candidate
+- canonical_name: roast_beef_slices
+  display_name: Roast beef slices
+  description: Cooked sliced roast beef.
+  category: meat
+  food_group: meat
+  family: beef_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - roast beef slices
+  - sliced roast beef
+  review_status: candidate
+  storage_class: refrigerated
 - canonical_name: rocket
   display_name: Rocket
   description: 'Rocket salad..
@@ -6269,6 +6570,23 @@ ingredients:
   aliases:
   - sardines
   - sardinas
+  review_status: candidate
+  storage_class: refrigerated
+- canonical_name: sauerkraut
+  display_name: Sauerkraut
+  description: Fermented cabbage.
+  category: vegetable
+  food_group: vegetable
+  family: brassica_family
+  pantry_item: true
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - sauerkraut
+  - choucroute
+  - chucrut
   review_status: candidate
   storage_class: refrigerated
 - canonical_name: savoy_cabbage
@@ -6728,6 +7046,31 @@ ingredients:
   - pain au levain
   - pan de masa madre
   review_status: candidate
+- canonical_name: soy_sauce
+  display_name: Soy sauce
+  description: Salty fermented soy seasoning sauce.
+  category: condiment
+  food_group: condiment
+  family: sauce_condiment_family
+  pantry_item: true
+  default_recipe_unit: tbsp
+  preferred_shopping_unit: ml
+  aggregation_unit: ml
+  aggregation_strategy: prefer_volume
+  aliases:
+  - soy sauce
+  - soja sauce
+  - salsa de soja
+  unit_conversions:
+  - from_unit: tbsp
+    to_unit: ml
+    factor: 15
+    basis: exact tablespoon volume
+    confidence: exact
+    source: seed_suggestion
+    approved: true
+  review_status: candidate
+  storage_class: ambient
 - canonical_name: spaetzle
   display_name: Spaetzle
   description: Fresh or packaged German egg noodles/dumplings.
@@ -7128,6 +7471,29 @@ ingredients:
   aliases:
   - tallarines
   review_status: candidate
+- canonical_name: tahini
+  display_name: Tahini
+  description: Ground sesame paste.
+  category: nut_seed
+  food_group: nut_seed
+  family: seed_family
+  pantry_item: true
+  default_recipe_unit: tbsp
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: allow_approximate_conversion
+  aliases:
+  - tahini
+  - sesame paste
+  unit_conversions:
+  - from_unit: tbsp
+    to_unit: g
+    factor: 15
+    basis: one tablespoon tahini
+    confidence: medium
+    source: seed_suggestion
+  review_status: candidate
+  storage_class: ambient
 - canonical_name: tapioca_starch
   display_name: Tapioca Starch
   description: 'Tapioca starch.
@@ -7711,6 +8077,30 @@ ingredients:
   - espárrago blanco
   review_status: candidate
   storage_class: fresh_produce
+- canonical_name: white_beans
+  display_name: White beans
+  description: Cooked or canned white beans.
+  category: legume
+  food_group: legume
+  family: legume_family
+  pantry_item: true
+  default_recipe_unit: can
+  preferred_shopping_unit: can
+  aggregation_unit: g
+  aggregation_strategy: allow_approximate_conversion
+  aliases:
+  - white beans
+  - haricots blancs
+  - alubias blancas
+  unit_conversions:
+  - from_unit: can
+    to_unit: g
+    factor: 240
+    basis: drained/usable contents of one small can
+    confidence: medium
+    source: seed_suggestion
+  review_status: candidate
+  storage_class: ambient
 - canonical_name: white_cabbage
   display_name: White Cabbage
   description: 'White cabbage..
@@ -7729,6 +8119,24 @@ ingredients:
   - repollo
   review_status: candidate
   storage_class: fresh_produce
+- canonical_name: white_fish_fillets
+  display_name: White fish fillets
+  description: Generic white fish fillets.
+  category: fish
+  food_group: fish
+  family: white_fish_family
+  pantry_item: false
+  default_recipe_unit: g
+  preferred_shopping_unit: g
+  aggregation_unit: g
+  aggregation_strategy: prefer_mass
+  aliases:
+  - fish fillet
+  - fish fillets
+  - white fish fillet
+  - white fish fillets
+  review_status: candidate
+  storage_class: refrigerated
 - canonical_name: white_mushrooms
   display_name: White mushrooms
   description: White button mushrooms.
@@ -7953,414 +8361,6 @@ ingredients:
   aliases:
   - yaourt
   - yogur
-  review_status: candidate
-  storage_class: refrigerated
-- canonical_name: baked_beans
-  display_name: Baked beans
-  description: Canned baked beans in tomato sauce.
-  category: legume
-  food_group: legume
-  family: legume_family
-  pantry_item: true
-  default_recipe_unit: can
-  preferred_shopping_unit: can
-  aggregation_unit: g
-  aggregation_strategy: allow_approximate_conversion
-  aliases:
-  - baked beans
-  - haricots blancs à la tomate
-  - alubias con tomate
-  unit_conversions:
-  - from_unit: can
-    to_unit: g
-    factor: 240
-    basis: drained/usable contents of one small can
-    confidence: medium
-    source: seed_suggestion
-  review_status: candidate
-  storage_class: ambient
-- canonical_name: bratwurst
-  display_name: Bratwurst
-  description: German-style pork sausage.
-  category: meat
-  food_group: meat
-  family: pork_family
-  pantry_item: false
-  default_recipe_unit: g
-  preferred_shopping_unit: g
-  aggregation_unit: g
-  aggregation_strategy: prefer_mass
-  aliases:
-  - bratwurst
-  - bratwurst sausage
-  review_status: candidate
-  storage_class: refrigerated
-- canonical_name: brown_rice
-  display_name: Brown rice
-  description: Wholegrain brown rice.
-  category: carbohydrate
-  food_group: carbohydrate
-  family: rice_family
-  pantry_item: false
-  default_recipe_unit: g
-  preferred_shopping_unit: g
-  aggregation_unit: g
-  aggregation_strategy: prefer_mass
-  aliases:
-  - brown rice
-  review_status: candidate
-  storage_class: ambient
-- canonical_name: cheddar
-  display_name: Cheddar
-  description: Firm cheddar cheese.
-  category: cheese
-  food_group: cheese
-  family: hard_cheese_family
-  pantry_item: false
-  default_recipe_unit: g
-  preferred_shopping_unit: g
-  aggregation_unit: g
-  aggregation_strategy: prefer_mass
-  aliases:
-  - cheddar
-  - cheddar cheese
-  review_status: candidate
-  storage_class: refrigerated
-- canonical_name: chicken_nuggets
-  display_name: Chicken nuggets
-  description: Prepared breaded chicken nuggets.
-  category: meat
-  food_group: meat
-  family: chicken_family
-  pantry_item: false
-  default_recipe_unit: g
-  preferred_shopping_unit: g
-  aggregation_unit: g
-  aggregation_strategy: prefer_mass
-  aliases:
-  - chicken nuggets
-  review_status: candidate
-  storage_class: frozen
-- canonical_name: cod_fillets
-  display_name: Cod fillets
-  description: Fresh or frozen cod fillets.
-  category: fish
-  food_group: fish
-  family: white_fish_family
-  pantry_item: false
-  default_recipe_unit: g
-  preferred_shopping_unit: g
-  aggregation_unit: g
-  aggregation_strategy: prefer_mass
-  aliases:
-  - cod fillet
-  - cod fillets
-  - filets de cabillaud
-  - filetes de bacalao
-  review_status: candidate
-  storage_class: refrigerated
-- canonical_name: cold_cuts
-  display_name: Cold cuts
-  description: Mixed sliced deli meats.
-  category: meat
-  food_group: meat
-  family: pork_family
-  pantry_item: false
-  default_recipe_unit: g
-  preferred_shopping_unit: g
-  aggregation_unit: g
-  aggregation_strategy: prefer_mass
-  aliases:
-  - cold cuts
-  - charcuterie slices
-  - embutidos
-  review_status: candidate
-  storage_class: refrigerated
-- canonical_name: croquettes
-  display_name: Croquettes
-  description: Prepared croquettes, breaded and ready to cook.
-  category: carbohydrate
-  food_group: carbohydrate
-  family: bread_pastry_family
-  pantry_item: false
-  default_recipe_unit: unit
-  preferred_shopping_unit: unit
-  aggregation_unit: g
-  aggregation_strategy: allow_approximate_conversion
-  aliases:
-  - croquettes
-  - croquetas
-  unit_conversions:
-  - from_unit: unit
-    to_unit: g
-    factor: 35
-    basis: one medium croquette
-    confidence: medium
-    source: seed_suggestion
-  review_status: candidate
-  storage_class: frozen
-- canonical_name: fish_fingers
-  display_name: Fish fingers
-  description: Prepared breaded white fish fingers.
-  category: fish
-  food_group: fish
-  family: white_fish_family
-  pantry_item: false
-  default_recipe_unit: g
-  preferred_shopping_unit: g
-  aggregation_unit: g
-  aggregation_strategy: prefer_mass
-  aliases:
-  - fish fingers
-  - fish sticks
-  review_status: candidate
-  storage_class: frozen
-- canonical_name: gnocchi
-  display_name: Gnocchi
-  description: Potato gnocchi.
-  category: carbohydrate
-  food_group: carbohydrate
-  family: potato_family
-  pantry_item: false
-  default_recipe_unit: g
-  preferred_shopping_unit: g
-  aggregation_unit: g
-  aggregation_strategy: prefer_mass
-  aliases:
-  - gnocchi
-  review_status: candidate
-  storage_class: refrigerated
-- canonical_name: kimchi
-  display_name: Kimchi
-  description: Fermented Korean cabbage condiment.
-  category: vegetable
-  food_group: vegetable
-  family: brassica_family
-  pantry_item: false
-  default_recipe_unit: g
-  preferred_shopping_unit: g
-  aggregation_unit: g
-  aggregation_strategy: prefer_mass
-  aliases:
-  - kimchi
-  review_status: candidate
-  storage_class: refrigerated
-- canonical_name: miso_paste
-  display_name: Miso paste
-  description: Fermented soybean miso paste.
-  category: condiment
-  food_group: condiment
-  family: sauce_condiment_family
-  pantry_item: true
-  default_recipe_unit: tbsp
-  preferred_shopping_unit: g
-  aggregation_unit: g
-  aggregation_strategy: allow_approximate_conversion
-  aliases:
-  - miso paste
-  - miso
-  unit_conversions:
-  - from_unit: tbsp
-    to_unit: g
-    factor: 18
-    basis: one tablespoon miso paste
-    confidence: medium
-    source: seed_suggestion
-  review_status: candidate
-  storage_class: refrigerated
-- canonical_name: mixed_salad_leaves
-  display_name: Mixed salad leaves
-  description: Mixed tender salad greens.
-  category: vegetable
-  food_group: vegetable
-  family: leafy_green_family
-  pantry_item: false
-  default_recipe_unit: g
-  preferred_shopping_unit: g
-  aggregation_unit: g
-  aggregation_strategy: prefer_mass
-  aliases:
-  - mixed salad leaves
-  - mixed greens
-  - salad mix
-  review_status: candidate
-  storage_class: fresh_produce
-- canonical_name: pierogi
-  display_name: Pierogi
-  description: Filled Polish dumplings.
-  category: carbohydrate
-  food_group: carbohydrate
-  family: pasta_family
-  pantry_item: false
-  default_recipe_unit: g
-  preferred_shopping_unit: g
-  aggregation_unit: g
-  aggregation_strategy: prefer_mass
-  aliases:
-  - pierogi
-  - pierogies
-  review_status: candidate
-  storage_class: refrigerated
-- canonical_name: pesto
-  display_name: Pesto
-  description: Basil pesto sauce.
-  category: condiment
-  food_group: condiment
-  family: prepared_sauce_family
-  pantry_item: true
-  default_recipe_unit: g
-  preferred_shopping_unit: g
-  aggregation_unit: g
-  aggregation_strategy: prefer_mass
-  aliases:
-  - pesto
-  - basil pesto
-  review_status: candidate
-  storage_class: refrigerated
-- canonical_name: prepared_gyoza
-  display_name: Gyoza
-  description: Prepared filled gyoza dumplings.
-  category: carbohydrate
-  food_group: carbohydrate
-  family: asian_wrappers_family
-  pantry_item: false
-  default_recipe_unit: unit
-  preferred_shopping_unit: unit
-  aggregation_unit: g
-  aggregation_strategy: allow_approximate_conversion
-  aliases:
-  - gyoza
-  - prepared gyoza
-  unit_conversions:
-  - from_unit: unit
-    to_unit: g
-    factor: 25
-    basis: one medium gyoza
-    confidence: medium
-    source: seed_suggestion
-  review_status: candidate
-  storage_class: frozen
-- canonical_name: roast_beef_slices
-  display_name: Roast beef slices
-  description: Cooked sliced roast beef.
-  category: meat
-  food_group: meat
-  family: beef_family
-  pantry_item: false
-  default_recipe_unit: g
-  preferred_shopping_unit: g
-  aggregation_unit: g
-  aggregation_strategy: prefer_mass
-  aliases:
-  - roast beef slices
-  - sliced roast beef
-  review_status: candidate
-  storage_class: refrigerated
-- canonical_name: sauerkraut
-  display_name: Sauerkraut
-  description: Fermented cabbage.
-  category: vegetable
-  food_group: vegetable
-  family: brassica_family
-  pantry_item: true
-  default_recipe_unit: g
-  preferred_shopping_unit: g
-  aggregation_unit: g
-  aggregation_strategy: prefer_mass
-  aliases:
-  - sauerkraut
-  - choucroute
-  - chucrut
-  review_status: candidate
-  storage_class: refrigerated
-- canonical_name: soy_sauce
-  display_name: Soy sauce
-  description: Salty fermented soy seasoning sauce.
-  category: condiment
-  food_group: condiment
-  family: sauce_condiment_family
-  pantry_item: true
-  default_recipe_unit: tbsp
-  preferred_shopping_unit: ml
-  aggregation_unit: ml
-  aggregation_strategy: prefer_volume
-  aliases:
-  - soy sauce
-  - soja sauce
-  - salsa de soja
-  unit_conversions:
-  - from_unit: tbsp
-    to_unit: ml
-    factor: 15
-    basis: exact tablespoon volume
-    confidence: exact
-    source: seed_suggestion
-    approved: true
-  review_status: candidate
-  storage_class: ambient
-- canonical_name: tahini
-  display_name: Tahini
-  description: Ground sesame paste.
-  category: nut_seed
-  food_group: nut_seed
-  family: seed_family
-  pantry_item: true
-  default_recipe_unit: tbsp
-  preferred_shopping_unit: g
-  aggregation_unit: g
-  aggregation_strategy: allow_approximate_conversion
-  aliases:
-  - tahini
-  - sesame paste
-  unit_conversions:
-  - from_unit: tbsp
-    to_unit: g
-    factor: 15
-    basis: one tablespoon tahini
-    confidence: medium
-    source: seed_suggestion
-  review_status: candidate
-  storage_class: ambient
-- canonical_name: white_beans
-  display_name: White beans
-  description: Cooked or canned white beans.
-  category: legume
-  food_group: legume
-  family: legume_family
-  pantry_item: true
-  default_recipe_unit: can
-  preferred_shopping_unit: can
-  aggregation_unit: g
-  aggregation_strategy: allow_approximate_conversion
-  aliases:
-  - white beans
-  - haricots blancs
-  - alubias blancas
-  unit_conversions:
-  - from_unit: can
-    to_unit: g
-    factor: 240
-    basis: drained/usable contents of one small can
-    confidence: medium
-    source: seed_suggestion
-  review_status: candidate
-  storage_class: ambient
-- canonical_name: white_fish_fillets
-  display_name: White fish fillets
-  description: Generic white fish fillets.
-  category: fish
-  food_group: fish
-  family: white_fish_family
-  pantry_item: false
-  default_recipe_unit: g
-  preferred_shopping_unit: g
-  aggregation_unit: g
-  aggregation_strategy: prefer_mass
-  aliases:
-  - fish fillet
-  - fish fillets
-  - white fish fillet
-  - white fish fillets
   review_status: candidate
   storage_class: refrigerated
 - canonical_name: zucchini

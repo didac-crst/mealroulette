@@ -13,6 +13,7 @@ from mealroulette.services.scheduler.generator import (
     _build_slot_options,
     _diverse_shortlist,
     _effective_plan_attempts,
+    _partition_candidates,
     generate_week_assignments,
 )
 from mealroulette.services.scheduler.types import DishCandidate, GenerationSlot
@@ -356,10 +357,13 @@ def test_build_slot_options_caps_pair_exploration_for_large_catalog():
     candidates = _large_catalog_candidates()
     slot = _week_slots()[0]
     candidates_by_id = {candidate.dish_id: candidate for candidate in candidates}
+    partitions = _partition_candidates(candidates)
 
     options = _build_slot_options(
         slot,
-        candidates=candidates,
+        mains=partitions.mains,
+        centerpieces=partitions.centerpieces,
+        sides=partitions.sides,
         assigned_dish_ids=[],
         forbidden_dish_ids=None,
         dish_date_index={},
@@ -386,10 +390,13 @@ def test_build_slot_options_scores_each_eligible_candidate_once_per_slot(monkeyp
     candidates = _large_catalog_candidates()
     slot = _week_slots()[0]
     candidates_by_id = {candidate.dish_id: candidate for candidate in candidates}
+    partitions = _partition_candidates(candidates)
 
     _build_slot_options(
         slot,
-        candidates=candidates,
+        mains=partitions.mains,
+        centerpieces=partitions.centerpieces,
+        sides=partitions.sides,
         assigned_dish_ids=[],
         forbidden_dish_ids=None,
         dish_date_index={},

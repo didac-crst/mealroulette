@@ -40,6 +40,13 @@ LARGE_PAIR_SPACE_THRESHOLD = 2_000
 
 
 @dataclass(frozen=True)
+class _CandidatePartitions:
+    mains: list[DishCandidate]
+    centerpieces: list[DishCandidate]
+    sides: list[DishCandidate]
+
+
+@dataclass(frozen=True)
 class _ScoredCandidate:
     candidate: DishCandidate
     score: float
@@ -76,10 +83,17 @@ def _candidate_is_eligible(
     )
 
 
+def _partition_candidates(candidates: list[DishCandidate]) -> _CandidatePartitions:
+    return _CandidatePartitions(
+        mains=[candidate for candidate in candidates if is_main_candidate(candidate)],
+        centerpieces=[candidate for candidate in candidates if is_centerpiece_candidate(candidate)],
+        sides=[candidate for candidate in candidates if is_side_candidate(candidate)],
+    )
+
+
 def _score_eligible_candidates(
     candidates: list[DishCandidate],
     *,
-    predicate,
     slot: GenerationSlot,
     assigned_dish_ids: list[int],
     forbidden_dish_ids: frozenset[int] | None,
@@ -90,8 +104,6 @@ def _score_eligible_candidates(
 ) -> list[_ScoredCandidate]:
     scored: list[_ScoredCandidate] = []
     for candidate in candidates:
-        if not predicate(candidate):
-            continue
         if not _candidate_is_eligible(
             candidate,
             slot=slot,
@@ -147,7 +159,9 @@ def _effective_plan_attempts(rules: PlanningRulesConfig, candidates: list[DishCa
 def _build_slot_options(
     slot: GenerationSlot,
     *,
-    candidates: list[DishCandidate],
+    mains: list[DishCandidate],
+    centerpieces: list[DishCandidate],
+    sides: list[DishCandidate],
     assigned_dish_ids: list[int],
     forbidden_dish_ids: frozenset[int] | None,
     dish_date_index: dict[int, list[date]],
@@ -159,8 +173,7 @@ def _build_slot_options(
     options: list[_SlotPickOption] = []
 
     for scored in _score_eligible_candidates(
-        candidates,
-        predicate=is_main_candidate,
+        mains,
         slot=slot,
         assigned_dish_ids=assigned_dish_ids,
         forbidden_dish_ids=forbidden_dish_ids,
@@ -183,8 +196,7 @@ def _build_slot_options(
         )
 
     scored_centerpieces = _score_eligible_candidates(
-        candidates,
-        predicate=is_centerpiece_candidate,
+        centerpieces,
         slot=slot,
         assigned_dish_ids=assigned_dish_ids,
         forbidden_dish_ids=forbidden_dish_ids,
@@ -194,8 +206,7 @@ def _build_slot_options(
         rules=rules,
     )
     scored_sides = _score_eligible_candidates(
-        candidates,
-        predicate=is_side_candidate,
+        sides,
         slot=slot,
         assigned_dish_ids=assigned_dish_ids,
         forbidden_dish_ids=forbidden_dish_ids,
@@ -271,6 +282,7 @@ def generate_week_assignments(
         return WeekGenerationResult(assignments=[], total_score=0.0, warnings=[])
 
     candidates_by_id = {candidate.dish_id: candidate for candidate in candidates}
+    candidate_partitions = _partition_candidates(candidates)
     best_assignments: list[SlotAssignment] = []
     best_score = float("-inf")
     best_warnings: list[str] = []
@@ -306,7 +318,9 @@ def generate_week_assignments(
 
             options = _build_slot_options(
                 slot,
-                candidates=candidates,
+                mains=candidate_partitions.mains,
+                centerpieces=candidate_partitions.centerpieces,
+                sides=candidate_partitions.sides,
                 assigned_dish_ids=assigned_dish_ids,
                 forbidden_dish_ids=forbidden_dish_ids,
                 dish_date_index=dish_date_index,

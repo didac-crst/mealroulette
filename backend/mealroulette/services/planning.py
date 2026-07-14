@@ -303,6 +303,21 @@ class PlanningService:
             return 0
         return max(line.position for line in item.lines) + 1
 
+    def _resolve_line_position(self, item: MealPlanItem, position: int | None, *, exclude_line_id: int | None = None) -> int:
+        if position is None:
+            return self._next_line_position(item)
+        occupied = {
+            line.position
+            for line in item.lines
+            if exclude_line_id is None or line.id != exclude_line_id
+        }
+        if position in occupied:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Line position {position} is already occupied",
+            )
+        return position
+
     def _append_manual_line(
         self,
         item: MealPlanItem,
@@ -316,11 +331,12 @@ class PlanningService:
         if dish is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dish not found")
         resolved_recipe_id = self._resolve_recipe_for_dish(dish_id, recipe_id)
+        resolved_position = self._resolve_line_position(item, position)
         line = MealPlanItemDish(
             meal_plan_item_id=item.id,
             dish_id=dish_id,
             recipe_id=resolved_recipe_id,
-            position=position if position is not None else self._next_line_position(item),
+            position=resolved_position,
             role=role or role_for_dish(dish),
             source=MealPlanDishLineSource.manual,
             selection_reasons_json=None,
@@ -784,7 +800,7 @@ class PlanningService:
         if "role" in updates and updates["role"] is not None:
             line.role = updates["role"]
         if "position" in updates and updates["position"] is not None:
-            line.position = updates["position"]
+            line.position = self._resolve_line_position(item, updates["position"], exclude_line_id=line.id)
         sync_legacy_mirror(item)
         self.db.commit()
         return self.to_item_public(self._load_item(item.id))
@@ -812,6 +828,7 @@ class PlanningService:
 
     def mark_do_not_plan(self, item_id: int, payload: MealPlanDoNotPlanRequest) -> MealPlanItemPublic:
         item = self._load_item(item_id)
+        self._assert_assignment_allowed(item)
         if item.status != MealPlanItemStatus.planned:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
