@@ -9,13 +9,35 @@ from mealroulette.models.enums import (
     MealComposition,
     MealPlanDishLineRole,
     MealPlanDishLineSource,
+    SeasonalityMode,
     SimpleDishPart,
 )
 from mealroulette.models.planning import MealPlanItem, MealPlanItemDish
 from mealroulette.services.planning import PlanningService
 from mealroulette.services.scheduler.composition import assignment_from_main, assignment_from_pair
+from mealroulette.services.scheduler.types import DishCandidate
 
 pytestmark = pytest.mark.unit
+
+
+def _candidate(dish, recipe, *, part=None):
+    return DishCandidate(
+        dish_id=dish.id,
+        dish_name=dish.name,
+        recipe_id=recipe.id,
+        meal_composition=dish.meal_composition,
+        simple_dish_part=part,
+        tag_names=frozenset(),
+        protein_tags=frozenset(),
+        carb_tags=frozenset(),
+        style_tags=frozenset(),
+        vector={},
+        average_rating=None,
+        seasonality_mode=SeasonalityMode.all_year,
+        preferred_months=frozenset(),
+        suitable_for_lunch=True,
+        suitable_for_dinner=True,
+    )
 
 
 def _future_week_start(planning: PlanningService) -> date:
@@ -76,67 +98,16 @@ def test_swap_exchanges_composed_and_main_packages(db_session, catalog_seed):
     cp_recipe = _add_recipe(db_session, cp_dish)
     side_recipe = _add_recipe(db_session, side_dish)
 
-    from mealroulette.models.enums import SeasonalityMode
-    from mealroulette.services.scheduler.types import DishCandidate
-
     main_assignment = assignment_from_main(
         item_id=source.id,
-        candidate=DishCandidate(
-            dish_id=main_dish.id,
-            dish_name=main_dish.name,
-            recipe_id=main_recipe.id,
-            meal_composition=MealComposition.main_dish,
-            simple_dish_part=None,
-            tag_names=frozenset(),
-            protein_tags=frozenset(),
-            carb_tags=frozenset(),
-            style_tags=frozenset(),
-            vector={},
-            average_rating=None,
-            seasonality_mode=SeasonalityMode.all_year,
-            preferred_months=frozenset(),
-            suitable_for_lunch=True,
-            suitable_for_dinner=True,
-        ),
+        candidate=_candidate(main_dish, main_recipe),
         score=1.0,
         payload={"reasons": ["Main reason"], "score": 1.0},
     )
     pair_assignment = assignment_from_pair(
         item_id=target.id,
-        centerpiece=DishCandidate(
-            dish_id=cp_dish.id,
-            dish_name=cp_dish.name,
-            recipe_id=cp_recipe.id,
-            meal_composition=MealComposition.simple_dish,
-            simple_dish_part=SimpleDishPart.centerpiece,
-            tag_names=frozenset(),
-            protein_tags=frozenset(),
-            carb_tags=frozenset(),
-            style_tags=frozenset(),
-            vector={},
-            average_rating=None,
-            seasonality_mode=SeasonalityMode.all_year,
-            preferred_months=frozenset(),
-            suitable_for_lunch=True,
-            suitable_for_dinner=True,
-        ),
-        side=DishCandidate(
-            dish_id=side_dish.id,
-            dish_name=side_dish.name,
-            recipe_id=side_recipe.id,
-            meal_composition=MealComposition.simple_dish,
-            simple_dish_part=SimpleDishPart.sidedish,
-            tag_names=frozenset(),
-            protein_tags=frozenset(),
-            carb_tags=frozenset(),
-            style_tags=frozenset(),
-            vector={},
-            average_rating=None,
-            seasonality_mode=SeasonalityMode.all_year,
-            preferred_months=frozenset(),
-            suitable_for_lunch=True,
-            suitable_for_dinner=True,
-        ),
+        centerpiece=_candidate(cp_dish, cp_recipe, part=SimpleDishPart.centerpiece),
+        side=_candidate(side_dish, side_recipe, part=SimpleDishPart.sidedish),
         score=2.0,
         payload={"reasons": ["Pair reason"], "score": 2.0},
     )
@@ -175,28 +146,6 @@ def test_swap_moves_manual_extras_with_package(db_session, catalog_seed):
     side_recipe = _add_recipe(db_session, side_dish)
     dessert_recipe = _add_recipe(db_session, dessert)
     main_recipe = _add_recipe(db_session, main_dish)
-
-    from mealroulette.models.enums import SeasonalityMode
-    from mealroulette.services.scheduler.types import DishCandidate
-
-    def _candidate(dish, recipe, *, part=None):
-        return DishCandidate(
-            dish_id=dish.id,
-            dish_name=dish.name,
-            recipe_id=recipe.id,
-            meal_composition=dish.meal_composition,
-            simple_dish_part=part,
-            tag_names=frozenset(),
-            protein_tags=frozenset(),
-            carb_tags=frozenset(),
-            style_tags=frozenset(),
-            vector={},
-            average_rating=None,
-            seasonality_mode=SeasonalityMode.all_year,
-            preferred_months=frozenset(),
-            suitable_for_lunch=True,
-            suitable_for_dinner=True,
-        )
 
     pair_assignment = assignment_from_pair(
         item_id=source.id,
@@ -258,39 +207,17 @@ def test_swap_composed_to_composed_preserves_roles(db_session, catalog_seed):
     db_session.flush()
     recipes = {key: _add_recipe(db_session, dish) for key, dish in dishes.items()}
 
-    from mealroulette.models.enums import SeasonalityMode
-    from mealroulette.services.scheduler.types import DishCandidate
-
-    def _candidate(dish, recipe, part):
-        return DishCandidate(
-            dish_id=dish.id,
-            dish_name=dish.name,
-            recipe_id=recipe.id,
-            meal_composition=MealComposition.simple_dish,
-            simple_dish_part=part,
-            tag_names=frozenset(),
-            protein_tags=frozenset(),
-            carb_tags=frozenset(),
-            style_tags=frozenset(),
-            vector={},
-            average_rating=None,
-            seasonality_mode=SeasonalityMode.all_year,
-            preferred_months=frozenset(),
-            suitable_for_lunch=True,
-            suitable_for_dinner=True,
-        )
-
     left_assignment = assignment_from_pair(
         item_id=left.id,
-        centerpiece=_candidate(dishes["cp1"], recipes["cp1"], SimpleDishPart.centerpiece),
-        side=_candidate(dishes["side1"], recipes["side1"], SimpleDishPart.sidedish),
+        centerpiece=_candidate(dishes["cp1"], recipes["cp1"], part=SimpleDishPart.centerpiece),
+        side=_candidate(dishes["side1"], recipes["side1"], part=SimpleDishPart.sidedish),
         score=1.0,
         payload={"reasons": ["Left"], "score": 1.0},
     )
     right_assignment = assignment_from_pair(
         item_id=right.id,
-        centerpiece=_candidate(dishes["cp2"], recipes["cp2"], SimpleDishPart.centerpiece),
-        side=_candidate(dishes["side2"], recipes["side2"], SimpleDishPart.sidedish),
+        centerpiece=_candidate(dishes["cp2"], recipes["cp2"], part=SimpleDishPart.centerpiece),
+        side=_candidate(dishes["side2"], recipes["side2"], part=SimpleDishPart.sidedish),
         score=1.0,
         payload={"reasons": ["Right"], "score": 1.0},
     )

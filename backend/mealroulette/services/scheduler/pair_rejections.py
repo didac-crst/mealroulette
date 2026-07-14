@@ -5,12 +5,16 @@ from enum import StrEnum
 
 from mealroulette.data.taxonomy_loader import family_to_food_group
 from mealroulette.models.enums import SimpleDishPart
-from mealroulette.services.food_groups import PROTEIN_FOOD_GROUPS
+from mealroulette.services.scheduler.pair_candidate_helpers import (
+    candidate_semantic_role,
+    candidate_traits,
+    food_group_weight,
+    protein_share,
+)
 from mealroulette.services.scheduler.pair_diagnostics import (
     CENTERPIECE_PROTEIN_MIN_SHARE_PCT,
     SIDE_PROTEIN_MIN_SHARE_PCT,
     SimpleDishSemanticRole,
-    derive_simple_dish_semantic_role,
 )
 from mealroulette.services.scheduler.types import DishCandidate
 
@@ -40,32 +44,6 @@ class PairHardRejectionResult:
     reasons: tuple[PairRejection, ...]
 
 
-def _traits(candidate: DishCandidate) -> dict:
-    return candidate.computed_traits_json or {}
-
-
-def _semantic_role(candidate: DishCandidate) -> SimpleDishSemanticRole | None:
-    if candidate.pair_summary is not None and candidate.pair_summary.semantic_role is not None:
-        return candidate.pair_summary.semantic_role
-    return derive_simple_dish_semantic_role(
-        candidate.computed_traits_json,
-        simple_dish_part=candidate.simple_dish_part,
-        tag_names=candidate.tag_names,
-    )
-
-
-def _weight(traits: dict, group: str) -> float:
-    weights = traits.get("food_group_weights")
-    if not isinstance(weights, dict):
-        return 0.0
-    value = weights.get(group, 0.0)
-    return float(value) if isinstance(value, (int, float)) else 0.0
-
-
-def _protein_share(traits: dict) -> float:
-    return sum(_weight(traits, group) for group in PROTEIN_FOOD_GROUPS)
-
-
 def _normalize_animal_protein_group(group: str | None) -> str | None:
     if group is None:
         return None
@@ -84,25 +62,26 @@ def _animal_protein_group_from_family(family_key: str | None) -> str | None:
 
 
 def _dominant_animal_protein_group(candidate: DishCandidate) -> str | None:
-    traits = _traits(candidate)
+    traits = candidate_traits(candidate)
     dominant = traits.get("dominant_protein")
     if isinstance(dominant, str):
         group = _animal_protein_group_from_family(dominant)
         if group is not None:
             return group
 
-    best_group: str | None = None
-    best_share = 0.0
-    for group in ("fish", "seafood", "meat", "egg"):
-        share = _weight(traits, group)
-        if share > best_share:
-            best_group = _normalize_animal_protein_group(group)
-            best_share = share
-    return best_group
+    group_shares = {
+        "fish": food_group_weight(traits, "fish") + food_group_weight(traits, "seafood"),
+        "meat": food_group_weight(traits, "meat"),
+        "egg": food_group_weight(traits, "egg"),
+    }
+    best_group = max(group_shares, key=group_shares.get)
+    if group_shares[best_group] <= 0:
+        return None
+    return _normalize_animal_protein_group(best_group)
 
 
 def _is_principal_animal_protein_identity(candidate: DishCandidate) -> bool:
-    role = _semantic_role(candidate)
+    role = candidate_semantic_role(candidate)
     if role in {
         SimpleDishSemanticRole.protein_centerpiece,
         SimpleDishSemanticRole.protein_side,
@@ -121,13 +100,13 @@ def _is_principal_animal_protein_identity(candidate: DishCandidate) -> bool:
     }:
         return False
 
-    traits = _traits(candidate)
+    traits = candidate_traits(candidate)
     threshold = (
         SIDE_PROTEIN_MIN_SHARE_PCT
         if candidate.simple_dish_part == SimpleDishPart.sidedish
         else CENTERPIECE_PROTEIN_MIN_SHARE_PCT
     )
-    return _protein_share(traits) >= threshold and _dominant_animal_protein_group(candidate) is not None
+    return protein_share(traits) >= threshold and _dominant_animal_protein_group(candidate) is not None
 
 
 def _primary_ingredient_ids(candidate: DishCandidate) -> frozenset[int]:
@@ -166,8 +145,8 @@ def _duplicate_dominant_protein_rejections(
     centerpiece: DishCandidate,
     side: DishCandidate,
 ) -> list[PairRejection]:
-    centerpiece_traits = _traits(centerpiece)
-    side_traits = _traits(side)
+    centerpiece_traits = candidate_traits(centerpiece)
+    side_traits = candidate_traits(side)
     centerpiece_dominant = centerpiece_traits.get("dominant_protein")
     side_dominant = side_traits.get("dominant_protein")
 
@@ -256,11 +235,11 @@ def _invalid_side_identity_rejections(
     centerpiece: DishCandidate,
     side: DishCandidate,
 ) -> list[PairRejection]:
-    side_role = _semantic_role(side)
+    side_role = candidate_semantic_role(side)
     if side_role == SimpleDishSemanticRole.sauce_or_condiment:
         return [PairRejection(code=PairRejectionCode.invalid_side_identity, detail="sauce_or_condiment")]
 
-    centerpiece_role = _semantic_role(centerpiece)
+    centerpiece_role = candidate_semantic_role(centerpiece)
     if side_role == SimpleDishSemanticRole.soup_side and centerpiece_role == SimpleDishSemanticRole.soup_side:
         return [PairRejection(code=PairRejectionCode.invalid_side_identity, detail="dual_soup_structure")]
 

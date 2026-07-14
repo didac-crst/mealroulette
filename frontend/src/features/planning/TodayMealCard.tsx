@@ -42,20 +42,21 @@ export function TodayMealCard({
     }
     let cancelled = false;
     setRecipesLoading(true);
-    Promise.all(
+    Promise.allSettled(
       dishIds.map(async (dishId) => {
         const recipes = await fetchRecipes(accessToken, dishId);
         return [dishId, recipes] as const;
       }),
     )
-      .then((entries) => {
+      .then((results) => {
         if (!cancelled) {
+          const entries = results
+            .filter(
+              (result): result is PromiseFulfilledResult<readonly [number, Recipe[]]> =>
+                result.status === "fulfilled",
+            )
+            .map((result) => result.value);
           setRecipesByDishId(new Map(entries));
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setRecipesByDishId(new Map());
         }
       })
       .finally(() => {

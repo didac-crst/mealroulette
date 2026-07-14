@@ -177,15 +177,17 @@ class PlanningService:
         plan: MealPlan,
         *,
         reference_date: date | None = None,
-    ) -> None:
+    ) -> bool:
         effective_date = reference_date or household_local_today(self.db)
         current_week_start = self.week_start_for(effective_date)
-        if clear_stale_reroll_history(
-            plan,
-            reference_date=effective_date,
-            current_week_start=current_week_start,
-        ):
-            self.db.commit()
+        return (
+            clear_stale_reroll_history(
+                plan,
+                reference_date=effective_date,
+                current_week_start=current_week_start,
+            )
+            > 0
+        )
 
     def to_plan_public(self, plan: MealPlan) -> MealPlanPublic:
         gram_unit, ml_unit = load_reference_units(self.db)
@@ -210,7 +212,8 @@ class PlanningService:
         )
         if plan is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Meal plan not found")
-        self._maybe_clear_stale_reroll_history(plan)
+        if self._maybe_clear_stale_reroll_history(plan):
+            self.db.commit()
         return plan
 
     def _load_item(self, item_id: int) -> MealPlanItem:
@@ -266,7 +269,8 @@ class PlanningService:
         normalized = self.week_start_for(week_start)
         plan = self._load_plan_by_week_start(normalized)
         if plan is not None:
-            self._maybe_clear_stale_reroll_history(plan)
+            if self._maybe_clear_stale_reroll_history(plan):
+                self.db.commit()
             return plan
 
         plan = MealPlan(week_start_date=normalized, status=status)

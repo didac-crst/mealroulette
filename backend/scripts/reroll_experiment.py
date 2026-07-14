@@ -28,6 +28,7 @@ from mealroulette.services.scheduler.generator import _build_main_options, _buil
 from mealroulette.services.scheduler.meal_structure import (
     MealStructure,
     assignment_structure,
+    candidate_primary_structure,
     count_week_structures,
     select_preferred_structure,
 )
@@ -53,8 +54,6 @@ def _week_structure_snapshot(plan, candidates_by_id) -> tuple[int, int, int]:
         candidate = candidates_by_id.get(item.dish_id)
         if candidate is None:
             continue
-        from mealroulette.services.scheduler.meal_structure import candidate_primary_structure
-
         if candidate_primary_structure(candidate) == MealStructure.composed_pair:
             composed += 1
         else:
@@ -105,23 +104,6 @@ def _option_kind(option) -> str:
     if len(lines) == 2:
         return "pair"
     return "other"
-
-
-def _analyze_option_pool(options) -> dict:
-    sorted_options = sorted(options, key=lambda entry: entry.score, reverse=True)
-    top5 = sorted_options[:5]
-    pool_counts = Counter(_option_kind(option) for option in options)
-    top5_counts = Counter(_option_kind(option) for option in top5)
-    main_scores = [option.score for option in options if _option_kind(option) == "main"]
-    pair_scores = [option.score for option in options if _option_kind(option) == "pair"]
-    return {
-        "total": len(options),
-        "pool": dict(pool_counts),
-        "top5": dict(top5_counts),
-        "best_main_score": max(main_scores) if main_scores else None,
-        "best_pair_score": max(pair_scores) if pair_scores else None,
-        "top5_scores": [(round(option.score, 3), _option_kind(option)) for option in top5],
-    }
 
 
 def _analyze_class_pools(main_options, pair_options) -> dict:

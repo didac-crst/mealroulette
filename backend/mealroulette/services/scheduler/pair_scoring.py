@@ -4,7 +4,13 @@ from dataclasses import dataclass
 
 from mealroulette.services.food_groups import CARB_FOOD_GROUP, PROTEIN_FOOD_GROUPS
 from mealroulette.schemas.scheduler import PlanningRulesConfig
-from mealroulette.services.scheduler.pair_diagnostics import SimpleDishSemanticRole, derive_simple_dish_semantic_role
+from mealroulette.services.scheduler.pair_candidate_helpers import (
+    candidate_semantic_role,
+    candidate_traits,
+    food_group_weight,
+    protein_share,
+)
+from mealroulette.services.scheduler.pair_diagnostics import SimpleDishSemanticRole
 from mealroulette.services.scheduler.scoring import rating_score, score_candidate_for_slot, seasonality_score
 from mealroulette.services.scheduler.types import DishCandidate, GenerationSlot, MealNeighbourSnapshot
 
@@ -75,36 +81,10 @@ class PairCompatibilityScore:
     reason_codes: tuple[str, ...]
 
 
-def _traits(candidate: DishCandidate) -> dict:
-    return candidate.computed_traits_json or {}
-
-
-def _semantic_role(candidate: DishCandidate) -> SimpleDishSemanticRole | None:
-    if candidate.pair_summary is not None and candidate.pair_summary.semantic_role is not None:
-        return candidate.pair_summary.semantic_role
-    return derive_simple_dish_semantic_role(
-        candidate.computed_traits_json,
-        simple_dish_part=candidate.simple_dish_part,
-        tag_names=candidate.tag_names,
-    )
-
-
-def _weight(traits: dict, group: str) -> float:
-    weights = traits.get("food_group_weights")
-    if not isinstance(weights, dict):
-        return 0.0
-    value = weights.get(group, 0.0)
-    return float(value) if isinstance(value, (int, float)) else 0.0
-
-
-def _protein_share(traits: dict) -> float:
-    return sum(_weight(traits, group) for group in PROTEIN_FOOD_GROUPS)
-
-
 def _combined_food_group_weights(centerpiece: DishCandidate, side: DishCandidate) -> dict[str, float]:
     combined_grams: dict[str, float] = {}
     for candidate in (centerpiece, side):
-        traits = _traits(candidate)
+        traits = candidate_traits(candidate)
         grams = traits.get("food_group_grams")
         if not isinstance(grams, dict):
             continue
@@ -124,8 +104,8 @@ def _complementarity_reason(
     centerpiece_role: SimpleDishSemanticRole,
     side_role: SimpleDishSemanticRole,
 ) -> str | None:
-    traits = _traits(centerpiece)
-    is_fish_centerpiece = _weight(traits, "fish") >= 25.0 or _weight(traits, "seafood") >= 25.0
+    traits = candidate_traits(centerpiece)
+    is_fish_centerpiece = food_group_weight(traits, "fish") >= 25.0 or food_group_weight(traits, "seafood") >= 25.0
 
     if centerpiece_role == SimpleDishSemanticRole.protein_centerpiece:
         if side_role in {SimpleDishSemanticRole.salad_side, SimpleDishSemanticRole.vegetable_side}:
@@ -154,8 +134,8 @@ def _score_complementarity(
     centerpiece: DishCandidate,
     side: DishCandidate,
 ) -> tuple[float, list[str], list[str]]:
-    centerpiece_role = _semantic_role(centerpiece)
-    side_role = _semantic_role(side)
+    centerpiece_role = candidate_semantic_role(centerpiece)
+    side_role = candidate_semantic_role(side)
     if centerpiece_role is None or side_role is None:
         return 0.0, [], []
 
@@ -175,10 +155,16 @@ def _score_complementarity(
 
     if side_role in avoided:
         if centerpiece_role == SimpleDishSemanticRole.carb_centerpiece and side_role == SimpleDishSemanticRole.carb_side:
-            if _traits(side).get("carb_heavy") or _weight(_traits(side), CARB_FOOD_GROUP) >= 30.0:
+            side_traits = candidate_traits(side)
+            if side_traits.get("carb_heavy") or food_group_weight(side_traits, CARB_FOOD_GROUP) >= 30.0:
                 adjustment -= POOR_COMPLEMENT_PENALTY
                 reasons.append("Side repeats the carb focus of the centerpiece")
-        elif centerpiece_role == SimpleDishSemanticRole.legume_centerpiece and _weight(_traits(side), "legume") >= 20.0:
+            else:
+                adjustment -= POOR_COMPLEMENT_PENALTY
+                reasons.append("Side does not contrast enough with the centerpiece role")
+        elif centerpiece_role == SimpleDishSemanticRole.legume_centerpiece and food_group_weight(
+            candidate_traits(side), "legume"
+        ) >= 20.0:
             adjustment -= POOR_COMPLEMENT_PENALTY
             reasons.append("Side repeats the legume focus of the centerpiece")
         else:
@@ -189,10 +175,10 @@ def _score_complementarity(
         centerpiece_groups = {
             group
             for group in MEANINGFUL_FOOD_GROUPS
-            if _weight(_traits(centerpiece), group) >= MEANINGFUL_GROUP_MIN_SHARE
+            if food_group_weight(candidate_traits(centerpiece), group) >= MEANINGFUL_GROUP_MIN_SHARE
         }
         side_groups = {
-            group for group in MEANINGFUL_FOOD_GROUPS if _weight(_traits(side), group) >= MEANINGFUL_GROUP_MIN_SHARE
+            group for group in MEANINGFUL_FOOD_GROUPS if food_group_weight(candidate_traits(side), group) >= MEANINGFUL_GROUP_MIN_SHARE
         }
         missing = side_groups - centerpiece_groups
         if missing:
@@ -232,9 +218,9 @@ def _score_whole_meal_balance(
         adjustment -= POOR_BALANCE_PENALTY
         reasons.append(f"One food group dominates the combined meal ({dominant_group})")
 
-    protein_share = _protein_share({"food_group_weights": combined})
+    combined_protein_share = protein_share({"food_group_weights": combined})
     carb_share = combined.get(CARB_FOOD_GROUP, 0.0)
-    if protein_share >= COMBINED_PROTEIN_HEAVY_THRESHOLD:
+    if combined_protein_share >= COMBINED_PROTEIN_HEAVY_THRESHOLD:
         adjustment -= POOR_BALANCE_PENALTY * 0.5
         reasons.append("Combined meal is very protein-heavy")
     if carb_share >= COMBINED_CARB_HEAVY_THRESHOLD:
@@ -381,22 +367,11 @@ def score_pair_for_slot(
         neighbours=neighbours,
         rules=rules,
     )
-    side_light = _score_side_light_for_pair(side, slot, rules=rules)
-    pair_compatibility = score_pair_compatibility(centerpiece, side)
-    total_score = centerpiece_score + (SIDE_LIGHT_SCORE_WEIGHT * side_light) + pair_compatibility.adjustment
-
-    pair_reasons = list(pair_compatibility.reasons)
-    if not pair_reasons:
-        pair_reasons.append(f"Paired with {side.dish_name}")
-
-    payload = {
-        **centerpiece_payload,
-        "reasons": [
-            *centerpiece_payload.get("reasons", []),
-            *pair_reasons,
-        ],
-        "score": round(total_score, 3),
-        "package_type": "centerpiece_side",
-        "pair_reason_codes": list(pair_compatibility.reason_codes),
-    }
-    return total_score, payload
+    return composed_pair_score_from_prescored(
+        centerpiece,
+        side,
+        centerpiece_score=centerpiece_score,
+        centerpiece_payload=centerpiece_payload,
+        slot=slot,
+        rules=rules,
+    )

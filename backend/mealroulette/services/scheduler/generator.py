@@ -423,18 +423,18 @@ def _pick_slot_option(
         candidates_by_id=candidates_by_id,
         rules=rules,
     )
-    main_options = _build_main_options(mains=mains, **common_kwargs)
-    pair_options = _build_pair_options(
-        centerpieces=centerpieces,
-        sides=sides,
-        rng=rng,
-        **common_kwargs,
-    )
 
     if preferred == MealStructure.main_dish:
+        main_options = _build_main_options(mains=mains, **common_kwargs)
         if main_options:
             picked = _weighted_pick(main_options, rng)
             return _attach_structure_reasons(picked, structure_reasons, structure_codes)
+        pair_options = _build_pair_options(
+            centerpieces=centerpieces,
+            sides=sides,
+            rng=rng,
+            **common_kwargs,
+        )
         if pair_options:
             fallback_reasons = [STRUCTURE_FALLBACK_COMPOSED_REASON, *structure_reasons]
             fallback_codes = ["structure_fallback_no_candidates", *structure_codes]
@@ -442,9 +442,16 @@ def _pick_slot_option(
             return _attach_structure_reasons(picked, fallback_reasons, fallback_codes)
         return None
 
+    pair_options = _build_pair_options(
+        centerpieces=centerpieces,
+        sides=sides,
+        rng=rng,
+        **common_kwargs,
+    )
     if pair_options:
         picked = _weighted_pick(pair_options, rng)
         return _attach_structure_reasons(picked, structure_reasons, structure_codes)
+    main_options = _build_main_options(mains=mains, **common_kwargs)
     if main_options:
         fallback_reasons = [STRUCTURE_FALLBACK_MAIN_REASON, *structure_reasons]
         fallback_codes = ["structure_fallback_no_candidates", *structure_codes]

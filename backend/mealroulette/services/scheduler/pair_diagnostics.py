@@ -85,7 +85,8 @@ def derive_primary_ingredients(
     vector_min_grams: int = 5,
     default_grams_per_count: int = 100,
 ) -> tuple[PrimaryIngredient, ...]:
-    scored_lines: list[PrimaryIngredient] = []
+    aggregated_grams: dict[int, float] = {}
+    ingredient_info: dict[int, tuple[str, str | None]] = {}
     ingredient_meta: dict[int, tuple[bool, str, str | None]] = {}
     total_grams = Decimal("0")
 
@@ -122,18 +123,22 @@ def derive_primary_ingredients(
             family=ingredient.family,
         )
         ingredient_meta[ingredient.id] = (ingredient.pantry_item, food_group, ingredient.category)
-        scored_lines.append(
-            PrimaryIngredient(
-                ingredient_id=ingredient.id,
-                canonical_name=ingredient.canonical_name,
-                family_key=family_key,
-                grams=float(grams),
-                share_pct=0.0,
-            )
-        )
+        ingredient_info[ingredient.id] = (ingredient.canonical_name, family_key)
+        aggregated_grams[ingredient.id] = aggregated_grams.get(ingredient.id, 0.0) + float(grams)
 
-    if total_grams <= 0 or not scored_lines:
+    if total_grams <= 0 or not aggregated_grams:
         return ()
+
+    scored_lines = [
+        PrimaryIngredient(
+            ingredient_id=ingredient_id,
+            canonical_name=ingredient_info[ingredient_id][0],
+            family_key=ingredient_info[ingredient_id][1],
+            grams=grams,
+            share_pct=0.0,
+        )
+        for ingredient_id, grams in aggregated_grams.items()
+    ]
 
     with_shares = [
         PrimaryIngredient(
@@ -193,6 +198,14 @@ def _weight(traits: dict, group: str) -> float:
 
 def _protein_share(traits: dict) -> float:
     return sum(_weight(traits, group) for group in PROTEIN_FOOD_GROUPS)
+
+
+def food_group_weight(traits: dict, group: str) -> float:
+    return _weight(traits, group)
+
+
+def protein_share(traits: dict) -> float:
+    return _protein_share(traits)
 
 
 def derive_simple_dish_semantic_role(

@@ -162,3 +162,31 @@ def test_carb_centerpiece_with_carb_side_is_penalized():
 
     assert carb_pair.adjustment < salad_pair.adjustment
     assert any("carb" in reason.lower() for reason in carb_pair.reasons)
+
+
+def test_carb_centerpiece_with_low_carb_carb_side_is_penalized():
+    pasta = _candidate(
+        12,
+        simple_dish_part=SimpleDishPart.centerpiece,
+        traits=_traits_with_grams({"carbohydrate": 70.0, "vegetable": 30.0}, total=450.0)
+        | {"carb_heavy": True, "dominant_carb": "pasta_family"},
+        pair_summary=_summary(role=SimpleDishSemanticRole.carb_centerpiece),
+    )
+    light_carb_side = _candidate(
+        13,
+        simple_dish_part=SimpleDishPart.sidedish,
+        traits=_traits_with_grams({"carbohydrate": 15.0, "vegetable": 85.0}, total=220.0),
+        pair_summary=_summary(role=SimpleDishSemanticRole.carb_side),
+    )
+    salad = _candidate(
+        14,
+        simple_dish_part=SimpleDishPart.sidedish,
+        traits=_traits_with_grams({"vegetable": 90.0, "pantry": 10.0}, total=220.0),
+        pair_summary=_summary(role=SimpleDishSemanticRole.salad_side),
+    )
+
+    light_carb_pair = score_pair_compatibility(pasta, light_carb_side)
+    salad_pair = score_pair_compatibility(pasta, salad)
+
+    assert light_carb_pair.adjustment < salad_pair.adjustment
+    assert any("contrast" in reason.lower() for reason in light_carb_pair.reasons)

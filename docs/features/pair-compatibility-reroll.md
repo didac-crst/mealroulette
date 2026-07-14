@@ -314,9 +314,7 @@ A -> reroll -> B -> reroll -> A
 
 This is compliant with "exclude current dish" but poor product behavior.
 
-## Required Behavior
-
-For each meal slot, reroll must maintain a seen set for the current planning interaction:
+## Required Reroll Behavior
 
 ```text
 initial: A
@@ -394,9 +392,7 @@ Do not implement "replace only the bad component" in this phase. It is a future 
 
 Swap is currently a meal-level action. After composable meals, it must continue to swap the whole meal package, not one dish line.
 
-## Required Behavior
-
-When a user clicks `Swap` on a meal slot:
+## Required Swap Behavior
 
 - the chooser must show target meal slots, not individual dish lines;
 - each target option must display the whole menu for that slot;

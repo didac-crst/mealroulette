@@ -4,6 +4,7 @@ from mealroulette.models.enums import MealComposition, SeasonalityMode, SimpleDi
 from mealroulette.services.scheduler.pair_diagnostics import CandidatePairSummary, SimpleDishSemanticRole
 from mealroulette.services.scheduler.pair_rejections import (
     PairRejectionCode,
+    _dominant_animal_protein_group,
     evaluate_pair_hard_rejections,
     pair_is_hard_rejected,
 )
@@ -47,6 +48,19 @@ def _fish_traits(*, dominant_protein: str, fish_pct: float = 70.0) -> dict:
         "dominant_protein": dominant_protein,
         "total_trait_grams": 400.0,
     }
+
+
+def test_dominant_animal_protein_group_merges_fish_and_seafood():
+    candidate = _candidate(
+        99,
+        simple_dish_part=SimpleDishPart.centerpiece,
+        traits={
+            "food_group_weights": {"fish": 18.0, "seafood": 22.0, "meat": 25.0, "vegetable": 35.0},
+            "total_trait_grams": 400.0,
+        },
+    )
+
+    assert _dominant_animal_protein_group(candidate) == "fish"
 
 
 def _summary(

@@ -115,7 +115,7 @@ class SchedulerService:
             )
 
         plan = self._load_plan_for_update(item.meal_plan_id)
-        self.planning_service._maybe_clear_stale_reroll_history(plan)
+        self.planning_service._maybe_clear_stale_reroll_history(plan, reference_date=reference_date)
         item = next(plan_item for plan_item in plan.items if plan_item.id == item_id)
         candidates = self._load_candidates(rules)
         slot = GenerationSlot(item_id=item.id, meal_date=item.date, meal_slot=item.meal_slot)

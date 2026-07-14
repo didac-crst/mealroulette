@@ -24,7 +24,7 @@ def _item(*, dish_id: int | None = None, lines: list[MealPlanItemDish] | None = 
     item = MealPlanItem(
         id=1,
         meal_plan_id=10,
-        date=__import__("datetime").date(2026, 7, 7),
+        date=date(2026, 7, 7),
         meal_slot=MealSlot.lunch,
         dish_id=dish_id,
         status=MealPlanItemStatus.planned,

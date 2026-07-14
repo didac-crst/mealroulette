@@ -17,15 +17,18 @@ def snapshot_from_meal_package(
     source: str,
     item_id: int | None = None,
     primary_dish_id: int | None = None,
+    meal_label: str | None = None,
 ) -> MealNeighbourSnapshot | None:
     if not candidates:
         return None
     primary_id = primary_dish_id if primary_dish_id is not None else candidates[0].dish_id
-    label = candidates[0].dish_name if len(candidates) == 1 else " + ".join(
-        candidate.dish_name for candidate in candidates
-    )
-    if len(candidates) == 2:
-        label = f"{candidates[0].dish_name} with {candidates[1].dish_name}"
+    label = meal_label
+    if label is None:
+        label = candidates[0].dish_name if len(candidates) == 1 else " + ".join(
+            candidate.dish_name for candidate in candidates
+        )
+        if len(candidates) == 2:
+            label = f"{candidates[0].dish_name} with {candidates[1].dish_name}"
     return MealNeighbourSnapshot(
         dish_id=primary_id,
         dish_name=label,
@@ -90,18 +93,9 @@ def build_similarity_neighbours(
             source="generated",
             item_id=assignment.item_id,
             primary_dish_id=assignment.dish_id,
+            meal_label=assignment_meal_label(assignment, candidates_by_id),
         )
         if snapshot is not None:
-            label = assignment_meal_label(assignment, candidates_by_id)
-            neighbours.append(
-                MealNeighbourSnapshot(
-                    dish_id=snapshot.dish_id,
-                    dish_name=label,
-                    meal_date=snapshot.meal_date,
-                    vector=snapshot.vector,
-                    source=snapshot.source,
-                    item_id=snapshot.item_id,
-                )
-            )
+            neighbours.append(snapshot)
 
     return neighbours

@@ -159,6 +159,48 @@ def test_derive_primary_ingredients_from_recipe_lines(db_session, catalog_seed):
 
 
 @pytest.mark.integration
+def test_derive_primary_ingredients_aggregates_duplicate_lines(db_session, catalog_seed):
+    gram_unit, ml_unit = load_reference_units(db_session)
+    recipe = _recipe(db_session, "Split Oil Dressing")
+    oil = _add_line(
+        db_session,
+        recipe,
+        canonical_name="diag_oil_split",
+        category="pantry",
+        family="olive_oil",
+        food_group="pantry",
+        quantity=120,
+    )
+    unit = db_session.scalar(select(Unit).where(Unit.symbol == "g"))
+    db_session.add(
+        RecipeIngredient(
+            recipe_id=recipe.id,
+            ingredient_id=oil.id,
+            quantity=Decimal("80"),
+            unit_id=unit.id,
+        )
+    )
+    db_session.flush()
+    _add_line(
+        db_session,
+        recipe,
+        canonical_name="diag_lettuce",
+        category="vegetable",
+        family="lettuce_family",
+        food_group="vegetable",
+        quantity=300,
+    )
+    db_session.refresh(recipe)
+
+    primary = derive_primary_ingredients(recipe, gram_unit=gram_unit, ml_unit=ml_unit)
+    oil_entry = next(entry for entry in primary if entry.ingredient_id == oil.id)
+
+    assert len(primary) == 2
+    assert oil_entry.grams == pytest.approx(200.0)
+    assert oil_entry.share_pct == pytest.approx(40.0, rel=0.01)
+
+
+@pytest.mark.integration
 def test_derive_primary_ingredients_keeps_top_two_when_shares_are_balanced(db_session, catalog_seed):
     gram_unit, ml_unit = load_reference_units(db_session)
     recipe = _recipe(db_session, "Balanced Trio")
