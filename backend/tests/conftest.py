@@ -14,7 +14,9 @@ from mealroulette.data.seed_taxonomy import seed_taxonomy_data
 from mealroulette.db.base import Base
 from mealroulette.db.session import get_db
 from mealroulette.main import create_app
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID, DEFAULT_HOUSEHOLD_NAME, Household, HouseholdRole
 from mealroulette.models.user import User, UserRole
+from mealroulette.services.household import HouseholdService
 import mealroulette.models  # noqa: F401
 
 
@@ -83,7 +85,25 @@ def client(db_session: Session) -> Generator[TestClient, None, None]:
 
 
 @pytest.fixture
-def admin_user(db_session: Session) -> User:
+def default_household(db_session: Session) -> Household:
+    household = db_session.get(Household, DEFAULT_HOUSEHOLD_ID)
+    if household is None:
+        household = Household(id=DEFAULT_HOUSEHOLD_ID, name=DEFAULT_HOUSEHOLD_NAME)
+        db_session.add(household)
+        db_session.commit()
+        db_session.refresh(household)
+    return household
+
+
+def _provision_user(db_session: Session, user: User) -> User:
+    HouseholdService(db_session).provision_user_tenancy(user, legacy_role=user.role)
+    db_session.commit()
+    db_session.refresh(user)
+    return user
+
+
+@pytest.fixture
+def admin_user(db_session: Session, default_household: Household) -> User:
     user = User(
         username="admin",
         email="admin@example.com",
@@ -92,13 +112,12 @@ def admin_user(db_session: Session) -> User:
         active=True,
     )
     db_session.add(user)
-    db_session.commit()
-    db_session.refresh(user)
-    return user
+    db_session.flush()
+    return _provision_user(db_session, user)
 
 
 @pytest.fixture
-def regular_user(db_session: Session) -> User:
+def regular_user(db_session: Session, default_household: Household) -> User:
     user = User(
         username="household",
         email="household@example.com",
@@ -107,9 +126,8 @@ def regular_user(db_session: Session) -> User:
         active=True,
     )
     db_session.add(user)
-    db_session.commit()
-    db_session.refresh(user)
-    return user
+    db_session.flush()
+    return _provision_user(db_session, user)
 
 
 @pytest.fixture

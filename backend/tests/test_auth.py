@@ -63,6 +63,8 @@ def test_me_returns_public_user_fields_only(client, admin_token, admin_user):
     assert payload["username"] == admin_user.username
     assert payload["email"] == admin_user.email
     assert payload["role"] == "admin"
+    assert "platform_admin" in payload["platform_roles"]
+    assert payload["active_household_id"] is not None
     assert "password_hash" not in payload
 
 

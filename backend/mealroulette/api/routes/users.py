@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from uuid import UUID
 
 from mealroulette.auth.dependencies import get_current_admin
 from mealroulette.db.session import get_db
@@ -31,7 +32,7 @@ def create_user(
 
 @router.get("/{user_id}", response_model=UserPublic)
 def get_user(
-    user_id: int,
+    user_id: UUID,
     _admin: User = Depends(get_current_admin),
     db: Session = Depends(get_db),
 ) -> UserPublic:
@@ -41,7 +42,7 @@ def get_user(
 
 @router.put("/{user_id}", response_model=UserPublic)
 def update_user(
-    user_id: int,
+    user_id: UUID,
     payload: UserUpdateRequest,
     _admin: User = Depends(get_current_admin),
     db: Session = Depends(get_db),
@@ -52,7 +53,7 @@ def update_user(
 
 @router.delete("/{user_id}", status_code=204)
 def delete_user(
-    user_id: int,
+    user_id: UUID,
     _admin: User = Depends(get_current_admin),
     db: Session = Depends(get_db),
 ) -> None:

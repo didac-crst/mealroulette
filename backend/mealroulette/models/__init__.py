@@ -13,6 +13,15 @@ from mealroulette.models.catalog import (
     Unit,
 )
 from mealroulette.models.cooking import CookingTimerAlert, CookingTimerAlertStatus
+from mealroulette.models.household import (
+    DEFAULT_HOUSEHOLD_ID,
+    DEFAULT_HOUSEHOLD_NAME,
+    Household,
+    HouseholdMembership,
+    HouseholdRole,
+    PlatformRole,
+    UserPlatformRole,
+)
 from mealroulette.models.enums import (
     BackupRunStatus,
     BackupType,
@@ -44,6 +53,13 @@ __all__ = [
     "ConversionConfidence",
     "CookingTimerAlert",
     "CookingTimerAlertStatus",
+    "DEFAULT_HOUSEHOLD_ID",
+    "DEFAULT_HOUSEHOLD_NAME",
+    "Household",
+    "HouseholdMembership",
+    "HouseholdRole",
+    "PlatformRole",
+    "UserPlatformRole",
     "Dish",
     "DishSeasonality",
     "DishTag",

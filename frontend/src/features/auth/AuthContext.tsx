@@ -134,7 +134,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loading,
       login,
       logout,
-      isAdmin: user?.role === "admin",
+      isAdmin:
+        user?.role === "admin" ||
+        user?.role === "platform_admin" ||
+        user?.platform_roles.includes("platform_admin") === true,
     }),
     [user, accessToken, loading, login, logout],
   );

@@ -52,6 +52,9 @@ def logout(payload: LogoutRequest, db: Session = Depends(get_db)) -> None:
 
 
 @router.get("/me", response_model=UserPublic)
-def me(current_user: User = Depends(get_current_user)) -> UserPublic:
+def me(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> UserPublic:
     """Return the current user. Requires Authorization: Bearer <access_token> from /login."""
-    return UserService.to_public(current_user)
+    return UserService(db).to_public(current_user)

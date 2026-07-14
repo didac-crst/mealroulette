@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
@@ -29,10 +30,13 @@ class LogoutRequest(BaseModel):
 class UserPublic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
+    id: UUID
     username: str
     email: EmailStr
     role: UserRole
+    platform_roles: list[str] = Field(default_factory=list)
+    active_household_id: UUID | None = None
+    household_role: str | None = None
     active: bool
     created_at: datetime
     updated_at: datetime
