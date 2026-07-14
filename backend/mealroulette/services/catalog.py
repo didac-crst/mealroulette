@@ -33,6 +33,7 @@ from mealroulette.services.ingredient_resolver import IngredientResolverService
 from mealroulette.services.names import normalize_name
 from mealroulette.services.public_keys import generate_dish_public_key, generate_recipe_public_key
 from mealroulette.services.recipe_traits import compute_recipe_traits_now, refresh_recipe_traits, refresh_recipes_for_ingredient
+from mealroulette.services.quantities import UnitInfo
 from mealroulette.services.scheduler.catalog import load_reference_units
 from mealroulette.schemas.catalog import (
     DishCreateRequest,
@@ -141,19 +142,34 @@ class CatalogService:
             ml_unit=ml_unit,
         )
 
-    def to_recipe_public(self, recipe: Recipe, *, computed_traits: dict | None = None) -> RecipePublic:
+    def to_recipe_public(
+        self,
+        recipe: Recipe,
+        *,
+        computed_traits: dict | None = None,
+        gram_unit: UnitInfo | None = None,
+        ml_unit: UnitInfo | None = None,
+    ) -> RecipePublic:
         if computed_traits is None:
-            gram_unit, ml_unit = self._reference_units()
+            if gram_unit is None or ml_unit is None:
+                gram_unit, ml_unit = self._reference_units()
             traits = compute_recipe_traits_now(self.db, recipe, gram_unit=gram_unit, ml_unit=ml_unit)
         else:
             traits = computed_traits
         return RecipePublic.model_validate(recipe).model_copy(update={"computed_traits_json": traits})
 
-    def to_dish_public(self, dish: Dish) -> DishPublic:
+    def to_dish_public(
+        self,
+        dish: Dish,
+        *,
+        gram_unit: UnitInfo | None = None,
+        ml_unit: UnitInfo | None = None,
+    ) -> DishPublic:
         main_recipe = self._main_recipe(dish)
         traits = None
         if main_recipe is not None:
-            gram_unit, ml_unit = self._reference_units()
+            if gram_unit is None or ml_unit is None:
+                gram_unit, ml_unit = self._reference_units()
             traits = compute_recipe_traits_now(self.db, main_recipe, gram_unit=gram_unit, ml_unit=ml_unit)
         return DishPublic(
             id=dish.id,
@@ -184,6 +200,20 @@ class CatalogService:
             computed_traits_json=traits,
             seasonality=SeasonalityPublic.model_validate(dish.seasonality) if dish.seasonality else None,
         )
+
+    def list_dishes_public(self, active_only: bool = False) -> list[DishPublic]:
+        gram_unit, ml_unit = self._reference_units()
+        return [
+            self.to_dish_public(dish, gram_unit=gram_unit, ml_unit=ml_unit)
+            for dish in self.list_dishes(active_only)
+        ]
+
+    def list_recipes_public(self, dish_id: int) -> list[RecipePublic]:
+        gram_unit, ml_unit = self._reference_units()
+        return [
+            self.to_recipe_public(recipe, gram_unit=gram_unit, ml_unit=ml_unit)
+            for recipe in self.list_recipes(dish_id)
+        ]
 
     @staticmethod
     def to_ingredient_public(ingredient: Ingredient) -> IngredientPublic:

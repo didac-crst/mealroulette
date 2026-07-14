@@ -268,7 +268,7 @@ def list_dishes(
     db: Session = Depends(get_db),
 ) -> list[DishPublic]:
     service = CatalogService(db)
-    return [service.to_dish_public(dish) for dish in service.list_dishes(active_only)]
+    return service.list_dishes_public(active_only)
 
 
 @router.post("/dishes", response_model=DishPublic, status_code=201)
@@ -315,7 +315,7 @@ def list_recipes(
     db: Session = Depends(get_db),
 ) -> list[RecipePublic]:
     service = CatalogService(db)
-    return [service.to_recipe_public(recipe) for recipe in service.list_recipes(dish_id)]
+    return service.list_recipes_public(dish_id)
 
 
 @router.post("/dishes/{dish_id}/recipes", response_model=RecipePublic, status_code=201)

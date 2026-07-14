@@ -162,6 +162,7 @@ Column: `recipes.computed_traits_json` (JSONB).
 
 - Include all recipe ingredients in percentage-based vectors and trait flags.
 - Omit lines below **`vector_min_grams`** (default **5 g**) after unit conversion — this keeps pinches of salt, spices, and similar amounts from affecting percentages.
+- **`pantry_item`** affects shopping lists and Telegram reminders only; it does **not** exclude an ingredient from trait or vector computation (see [taxonomy-resolver.md](taxonomy-resolver.md)).
 - Use the same gram/ml conversion rules as scheduler family vectors (`family_vector.py`).
 - `family_vector`: L1-normalized weights (percentages) by ingredient `family`, with category/canonical fallback (same as scheduler).
 - `food_group_weights`: L1-normalized weights by resolved food group.
