@@ -64,6 +64,60 @@ def test_preview_shopping_list_from_planned_meals(client, catalog_seed, admin_he
 
 
 @pytest.mark.integration
+def test_preview_shopping_list_includes_all_meal_lines(client, catalog_seed, admin_headers, user_headers, db_session):
+    import_dish_fixtures(db_session, DEFAULT_FIXTURE_PATH)
+
+    plan = client.get("/api/meal-plans/current", headers=user_headers).json()
+    slot = _future_items(plan, 1)[0]
+    _assign_dish(client, user_headers, admin_headers, slot["id"], "Mushroom Risotto")
+
+    dishes = client.get("/api/dishes", headers=admin_headers).json()
+    extra = next(d for d in dishes if d["name"] == "Spaghetti Puttanesca")
+    added = client.post(
+        f"/api/meal-plan-items/{slot['id']}/lines",
+        headers=user_headers,
+        json={"dish_id": extra["id"]},
+    )
+    assert added.status_code == 200
+
+    from_date = date.fromisoformat(slot["date"])
+    preview = client.get(
+        "/api/shopping-list",
+        headers=user_headers,
+        params={"from": from_date.isoformat(), "days": 1, "exclude_pantry": True},
+    )
+    assert preview.status_code == 200
+    body = preview.json()
+    planned_names = {meal["dish_name"] for meal in body["planned_meals"]}
+    assert "Mushroom Risotto" in planned_names
+    assert "Spaghetti Puttanesca" in planned_names
+
+
+@pytest.mark.integration
+def test_do_not_plan_slots_excluded_from_shopping(client, catalog_seed, admin_headers, user_headers, db_session):
+    import_dish_fixtures(db_session, DEFAULT_FIXTURE_PATH)
+
+    plan = client.get("/api/meal-plans/current", headers=user_headers).json()
+    slot = _future_items(plan, 1)[0]
+    _assign_dish(client, user_headers, admin_headers, slot["id"], "Mushroom Risotto")
+    marked = client.post(
+        f"/api/meal-plan-items/{slot['id']}/do-not-plan",
+        headers=user_headers,
+        json={"remove_existing_lines": True},
+    )
+    assert marked.status_code == 200
+
+    from_date = date.fromisoformat(slot["date"])
+    preview = client.get(
+        "/api/shopping-list",
+        headers=user_headers,
+        params={"from": from_date.isoformat(), "days": 1, "exclude_pantry": True},
+    )
+    assert preview.status_code == 200
+    assert preview.json()["planned_meals"] == []
+
+
+@pytest.mark.integration
 def test_create_and_check_off_shopping_list(client, catalog_seed, admin_headers, user_headers, db_session):
     import_dish_fixtures(db_session, DEFAULT_FIXTURE_PATH)
 

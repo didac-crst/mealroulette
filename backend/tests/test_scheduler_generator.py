@@ -1,17 +1,25 @@
 import random
 from datetime import date
 
-from mealroulette.models.enums import MealSlot, SeasonalityMode
+from mealroulette.models.enums import MealComposition, MealSlot, SeasonalityMode, SimpleDishPart
 from mealroulette.schemas.scheduler import PlanningRulesConfig
 from mealroulette.services.scheduler.generator import generate_week_assignments
 from mealroulette.services.scheduler.types import DishCandidate, GenerationSlot
 
 
-def _candidate(dish_id: int, vector: dict[str, float]) -> DishCandidate:
+def _candidate(
+    dish_id: int,
+    vector: dict[str, float],
+    *,
+    meal_composition: MealComposition = MealComposition.main_dish,
+    simple_dish_part: SimpleDishPart | None = None,
+) -> DishCandidate:
     return DishCandidate(
         dish_id=dish_id,
         dish_name=f"Dish {dish_id}",
         recipe_id=dish_id * 10,
+        meal_composition=meal_composition,
+        simple_dish_part=simple_dish_part,
         tag_names=frozenset(),
         protein_tags=frozenset(),
         carb_tags=frozenset(),
@@ -113,3 +121,29 @@ def test_generate_week_returns_warning_when_impossible():
 
     assert result.assignments == []
     assert result.warnings
+
+
+def test_generate_week_can_assign_centerpiece_side_pair():
+    candidates = [
+        _candidate(1, {"a": 1.0}, meal_composition=MealComposition.simple_dish, simple_dish_part=SimpleDishPart.centerpiece),
+        _candidate(2, {"b": 1.0}, meal_composition=MealComposition.simple_dish, simple_dish_part=SimpleDishPart.sidedish),
+    ]
+    slots = [
+        GenerationSlot(item_id=101, meal_date=date(2026, 7, 7), meal_slot=MealSlot.lunch),
+    ]
+    result = generate_week_assignments(
+        slots,
+        candidates,
+        fixed_assignments={},
+        fixed_dates_by_item={},
+        eaten_meals=[],
+        rules=_rules(plan_attempts=5),
+        today=date(2026, 7, 1),
+        rng=random.Random(3),
+    )
+
+    assert len(result.assignments) == 1
+    assignment = result.assignments[0]
+    assert len(assignment.lines) == 2
+    roles = {line.role.value for line in assignment.lines}
+    assert roles == {"centerpiece", "side"}

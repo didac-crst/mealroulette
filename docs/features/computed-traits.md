@@ -148,6 +148,8 @@ Column: `recipes.computed_traits_json` (JSONB).
 ```json
 {
   "family_vector": { "rice_family": 62.5, "chicken_family": 37.5 },
+  "food_group_grams": { "carbohydrate": 300.0, "meat": 200.0 },
+  "total_trait_grams": 500.0,
   "food_group_weights": { "carbohydrate": 62.5, "meat": 37.5 },
   "contains_food_groups": ["carbohydrate", "meat"],
   "contains_meat": true,
@@ -166,6 +168,8 @@ Column: `recipes.computed_traits_json` (JSONB).
 - Use the same gram/ml conversion rules as scheduler family vectors (`family_vector.py`).
 - `family_vector`: L1-normalized weights (percentages) by ingredient `family`, with category/canonical fallback (same as scheduler).
 - `food_group_weights`: L1-normalized weights by resolved food group.
+- `food_group_grams`: absolute reference grams per food group (same inclusion rules as weights).
+- `total_trait_grams`: sum of `food_group_grams` for the recipe.
 - `contains_food_groups`: food groups with non-zero weight after normalization.
 - `vegan = false` if any ingredient has food group in `{meat, fish, seafood, egg, dairy, cheese}`; else `true`.
 - `contains_meat = true` only for food group `meat` (fish/seafood are not meat).
@@ -176,6 +180,10 @@ Column: `recipes.computed_traits_json` (JSONB).
 Do **not** infer style tags (e.g. `soup`) from ingredients in Phase 9.
 
 Module: `mealroulette.services.recipe_traits`.
+
+### Meal slot aggregation (composable meals)
+
+`MealPlanItem.computed_traits_json` sums `food_group_grams` across all dish lines in the slot, then recomputes `food_group_weights` and `total_trait_grams`. Do not average per-recipe percentages when multiple dishes are present.
 
 ### Trait refresh
 

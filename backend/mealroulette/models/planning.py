@@ -17,7 +17,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from mealroulette.db.base import Base
 from mealroulette.models.catalog import Dish, Recipe
-from mealroulette.models.enums import MealPlanItemStatus, MealPlanStatus, MealSlot
+from mealroulette.models.enums import (
+    MealPlanDishLineRole,
+    MealPlanDishLineSource,
+    MealPlanItemStatus,
+    MealPlanningState,
+    MealPlanStatus,
+    MealSlot,
+)
 
 
 class MealPlan(Base):
@@ -55,6 +62,9 @@ class MealPlanItem(Base):
     status: Mapped[MealPlanItemStatus] = mapped_column(
         Enum(MealPlanItemStatus, name="meal_plan_item_status"), default=MealPlanItemStatus.planned
     )
+    planning_state: Mapped[MealPlanningState] = mapped_column(
+        Enum(MealPlanningState, name="meal_planning_state"), default=MealPlanningState.open
+    )
     is_locked: Mapped[bool] = mapped_column(Boolean, default=False)
     manually_selected: Mapped[bool] = mapped_column(Boolean, default=False)
     skip_reason: Mapped[str | None] = mapped_column(String(64), nullable=True)
@@ -72,7 +82,40 @@ class MealPlanItem(Base):
     meal_plan: Mapped[MealPlan] = relationship(back_populates="items")
     dish: Mapped[Dish | None] = relationship(foreign_keys=[dish_id])
     recipe: Mapped[Recipe | None] = relationship()
+    lines: Mapped[list["MealPlanItemDish"]] = relationship(
+        back_populates="meal_plan_item",
+        cascade="all, delete-orphan",
+        order_by="MealPlanItemDish.position",
+    )
     meal_rating: Mapped["MealRating | None"] = relationship(back_populates="meal_plan_item", uselist=False)
+
+
+class MealPlanItemDish(Base):
+    __tablename__ = "meal_plan_item_dishes"
+    __table_args__ = (
+        UniqueConstraint("meal_plan_item_id", "position", name="uq_meal_plan_item_dishes_position"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    meal_plan_item_id: Mapped[int] = mapped_column(
+        ForeignKey("meal_plan_items.id", ondelete="CASCADE"), index=True
+    )
+    dish_id: Mapped[int | None] = mapped_column(ForeignKey("dishes.id", ondelete="SET NULL"), nullable=True)
+    recipe_id: Mapped[int | None] = mapped_column(ForeignKey("recipes.id", ondelete="SET NULL"), nullable=True)
+    position: Mapped[int] = mapped_column(Integer)
+    role: Mapped[MealPlanDishLineRole] = mapped_column(Enum(MealPlanDishLineRole, name="meal_plan_dish_line_role"))
+    source: Mapped[MealPlanDishLineSource] = mapped_column(
+        Enum(MealPlanDishLineSource, name="meal_plan_dish_line_source")
+    )
+    selection_reasons_json: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+    meal_plan_item: Mapped[MealPlanItem] = relationship(back_populates="lines")
+    dish: Mapped[Dish | None] = relationship(foreign_keys=[dish_id])
+    recipe: Mapped[Recipe | None] = relationship()
 
 
 class MealRating(Base):

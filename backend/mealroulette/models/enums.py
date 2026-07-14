@@ -113,6 +113,25 @@ class MealPlanItemStatus(str, enum.Enum):
     ate_leftovers = "ate_leftovers"
 
 
+class MealPlanningState(str, enum.Enum):
+    open = "open"
+    do_not_plan = "do_not_plan"
+
+
+class MealPlanDishLineRole(str, enum.Enum):
+    main = "main"
+    centerpiece = "centerpiece"
+    side = "side"
+    dessert = "dessert"
+    extra = "extra"
+
+
+class MealPlanDishLineSource(str, enum.Enum):
+    roulette = "roulette"
+    manual = "manual"
+    leftover = "leftover"
+
+
 class ShoppingListStatus(str, enum.Enum):
     draft = "draft"
     active = "active"

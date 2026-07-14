@@ -93,6 +93,9 @@ def test_build_recipe_traits_meat_and_carb_heavy(db_session, catalog_seed):
     assert traits["dominant_protein"] == "chicken_family"
     assert "carbohydrate" in traits["contains_food_groups"]
     assert "meat" in traits["contains_food_groups"]
+    assert traits["food_group_grams"]["carbohydrate"] == 300.0
+    assert traits["food_group_grams"]["meat"] == 200.0
+    assert traits["total_trait_grams"] >= 500.0
 
 
 @pytest.mark.integration

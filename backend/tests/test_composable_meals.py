@@ -1,0 +1,190 @@
+from datetime import date, timedelta
+
+import pytest
+
+from mealroulette.data.import_dishes import DEFAULT_FIXTURE_PATH, import_dish_fixtures
+from mealroulette.services.planning import PlanningService
+
+
+def _today_or_future_item(plan: dict, *, client=None, user_headers=None) -> dict:
+    today = date.today()
+    for item in plan["items"]:
+        if date.fromisoformat(item["date"]) >= today:
+            return item
+    if client is not None and user_headers is not None:
+        week_start = date.fromisoformat(plan["week_start_date"])
+        response = client.get(
+            f"/api/meal-plans/{(week_start + timedelta(days=7)).isoformat()}",
+            headers=user_headers,
+        )
+        if response.status_code == 200:
+            next_plan = response.json()
+            for item in next_plan["items"]:
+                if date.fromisoformat(item["date"]) >= today:
+                    return item
+    raise AssertionError("expected at least one today-or-future meal slot")
+
+
+def _create_dish(client, admin_headers, name: str) -> dict:
+    dish = client.post(
+        "/api/dishes",
+        headers=admin_headers,
+        json={"name": name, "status": "active"},
+    ).json()
+    client.post(
+        f"/api/dishes/{dish['id']}/recipes",
+        headers=admin_headers,
+        json={"variant_name": "Main", "is_main": True},
+    )
+    return dish
+
+
+def test_meal_slot_supports_multiple_manual_lines(client, catalog_seed, admin_headers, user_headers):
+    first = _create_dish(client, admin_headers, "Composable Main")
+    second = _create_dish(client, admin_headers, "Composable Side")
+
+    plan = client.get("/api/meal-plans/current", headers=user_headers).json()
+    item = _today_or_future_item(plan, client=client, user_headers=user_headers)
+
+    assigned = client.post(
+        "/api/meal-plan-items/assign",
+        headers=user_headers,
+        json={
+            "date": item["date"],
+            "meal_slot": item["meal_slot"],
+            "dish_id": first["id"],
+            "mode": "replace_all",
+        },
+    )
+    assert assigned.status_code == 200, assigned.text
+    body = assigned.json()
+    assert len(body["lines"]) == 1
+    assert body["lines"][0]["source"] == "manual"
+    assert body["title"] == "Composable Main"
+
+    added = client.post(
+        f"/api/meal-plan-items/{item['id']}/lines",
+        headers=user_headers,
+        json={"dish_id": second["id"]},
+    )
+    assert added.status_code == 200
+    added_body = added.json()
+    assert len(added_body["lines"]) == 2
+    assert added_body["computed_traits_json"] is not None
+    assert "food_group_weights" in added_body["computed_traits_json"]
+    assert "food_group_grams" in added_body["computed_traits_json"]
+    assert "total_trait_grams" in added_body["computed_traits_json"]
+    assert added_body["title"] == "Composable Main + 1 more"
+
+    line_id = added_body["lines"][1]["id"]
+    removed = client.delete(f"/api/meal-plan-item-lines/{line_id}", headers=user_headers)
+    assert removed.status_code == 200
+    assert len(removed.json()["lines"]) == 1
+
+
+def test_do_not_plan_clears_lines_and_blocks_add(client, catalog_seed, admin_headers, user_headers):
+    dish = _create_dish(client, admin_headers, "Do Not Plan Dish")
+    plan = client.get("/api/meal-plans/current", headers=user_headers).json()
+    item = _today_or_future_item(plan, client=client, user_headers=user_headers)
+
+    client.post(
+        "/api/meal-plan-items/assign",
+        headers=user_headers,
+        json={
+            "date": item["date"],
+            "meal_slot": item["meal_slot"],
+            "dish_id": dish["id"],
+            "mode": "replace_all",
+        },
+    )
+
+    marked = client.post(
+        f"/api/meal-plan-items/{item['id']}/do-not-plan",
+        headers=user_headers,
+        json={"remove_existing_lines": True},
+    )
+    assert marked.status_code == 200
+    body = marked.json()
+    assert body["planning_state"] == "do_not_plan"
+    assert body["title"] == "Not planning"
+    assert body["lines"] == []
+
+    blocked = client.post(
+        f"/api/meal-plan-items/{item['id']}/lines",
+        headers=user_headers,
+        json={"dish_id": dish["id"]},
+    )
+    assert blocked.status_code == 400
+
+    reopened = client.post(f"/api/meal-plan-items/{item['id']}/reopen", headers=user_headers)
+    assert reopened.status_code == 200
+    assert reopened.json()["planning_state"] == "open"
+
+
+def test_assign_add_mode_appends_line(client, catalog_seed, admin_headers, user_headers):
+    first = _create_dish(client, admin_headers, "Add Mode Main")
+    second = _create_dish(client, admin_headers, "Add Mode Extra")
+    plan = client.get("/api/meal-plans/current", headers=user_headers).json()
+    item = _today_or_future_item(plan, client=client, user_headers=user_headers)
+
+    client.post(
+        "/api/meal-plan-items/assign",
+        headers=user_headers,
+        json={
+            "date": item["date"],
+            "meal_slot": item["meal_slot"],
+            "dish_id": first["id"],
+            "mode": "replace_all",
+        },
+    )
+    added = client.post(
+        "/api/meal-plan-items/assign",
+        headers=user_headers,
+        json={
+            "date": item["date"],
+            "meal_slot": item["meal_slot"],
+            "dish_id": second["id"],
+            "mode": "add",
+        },
+    )
+    assert added.status_code == 200
+    assert len(added.json()["lines"]) == 2
+
+
+@pytest.mark.integration
+def test_meal_traits_aggregate_across_fixture_dishes(client, catalog_seed, admin_headers, user_headers, db_session):
+    import_dish_fixtures(db_session, DEFAULT_FIXTURE_PATH)
+    dishes = client.get("/api/dishes", headers=admin_headers).json()
+    risotto = next(d for d in dishes if d["name"] == "Mushroom Risotto")
+    puttanesca = next(d for d in dishes if d["name"] == "Spaghetti Puttanesca")
+
+    plan = client.get("/api/meal-plans/current", headers=user_headers).json()
+    item = _today_or_future_item(plan, client=client, user_headers=user_headers)
+
+    assigned = client.post(
+        "/api/meal-plan-items/assign",
+        headers=user_headers,
+        json={
+            "date": item["date"],
+            "meal_slot": item["meal_slot"],
+            "dish_id": risotto["id"],
+            "mode": "replace_all",
+        },
+    )
+    assert assigned.status_code == 200
+    single_total = assigned.json()["computed_traits_json"]["total_trait_grams"]
+
+    added = client.post(
+        f"/api/meal-plan-items/{item['id']}/lines",
+        headers=user_headers,
+        json={"dish_id": puttanesca["id"]},
+    )
+    assert added.status_code == 200
+    traits = added.json()["computed_traits_json"]
+    assert traits is not None
+    assert traits["total_trait_grams"] > single_total
+    assert traits["food_group_grams"]
+
+    public = PlanningService(db_session).to_item_public(PlanningService(db_session)._load_item(item["id"]))
+    assert public.computed_traits_json is not None
+    assert public.computed_traits_json["total_trait_grams"] == traits["total_trait_grams"]

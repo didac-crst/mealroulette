@@ -2,21 +2,39 @@ from datetime import date, datetime, timedelta, timezone
 
 from fastapi import HTTPException, status
 from sqlalchemy import select
+from sqlalchemy import delete
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
 from mealroulette.models.catalog import Dish, Recipe
-from mealroulette.models.enums import MealPlanItemStatus, MealPlanStatus, MealSlot
-from mealroulette.models.planning import MealPlan, MealPlanItem, MealRating
+from mealroulette.models.enums import (
+    MealPlanDishLineRole,
+    MealPlanDishLineSource,
+    MealPlanItemStatus,
+    MealPlanningState,
+    MealPlanStatus,
+    MealSlot,
+)
+from mealroulette.models.planning import MealPlan, MealPlanItem, MealPlanItemDish, MealRating
 from mealroulette.services.household_time import household_local_today
+from mealroulette.services.meal_plan_lines import (
+    compute_meal_title,
+    role_for_dish,
+    sync_legacy_mirror,
+)
 from mealroulette.services.scheduler.undo import clear_undo_snapshot
 from mealroulette.services.recipe_traits import (
     RECIPE_TRAIT_INGREDIENT_LOAD,
-    effective_traits_for_meal_plan_item,
+    compute_recipe_traits_now,
+    effective_traits_for_meal_slot,
 )
 from mealroulette.services.scheduler.catalog import load_reference_units
 from mealroulette.schemas.planning import (
     MealPlanCreateRequest,
+    MealPlanDishLineCreateRequest,
+    MealPlanDishLinePublic,
+    MealPlanDishLineUpdateRequest,
+    MealPlanDoNotPlanRequest,
     MealPlanItemPublic,
     MealPlanItemUpdateRequest,
     MealPlanPublic,
@@ -40,11 +58,18 @@ class PlanningService:
 
     @staticmethod
     def _meal_plan_item_trait_options() -> tuple:
+        line_recipe_load = (
+            selectinload(MealPlanItem.lines)
+            .selectinload(MealPlanItemDish.recipe)
+            .options(*RECIPE_TRAIT_INGREDIENT_LOAD),
+            selectinload(MealPlanItem.lines).selectinload(MealPlanItemDish.dish),
+        )
         return (
             selectinload(MealPlanItem.recipe).options(*RECIPE_TRAIT_INGREDIENT_LOAD),
             selectinload(MealPlanItem.dish)
             .selectinload(Dish.recipes)
             .options(*RECIPE_TRAIT_INGREDIENT_LOAD),
+            *line_recipe_load,
         )
 
     @staticmethod
@@ -60,6 +85,30 @@ class PlanningService:
             cook = cook if cook is not None else item.dish.default_cook_time_minutes
         return prep, cook
 
+    def _to_line_public(
+        self,
+        line: MealPlanItemDish,
+        *,
+        gram_unit=None,
+        ml_unit=None,
+    ) -> MealPlanDishLinePublic:
+        traits = None
+        if line.recipe is not None:
+            traits = compute_recipe_traits_now(self.db, line.recipe, gram_unit=gram_unit, ml_unit=ml_unit)
+        return MealPlanDishLinePublic(
+            id=line.id,
+            meal_plan_item_id=line.meal_plan_item_id,
+            dish_id=line.dish_id,
+            recipe_id=line.recipe_id,
+            dish_name=line.dish.name if line.dish else None,
+            recipe_variant_name=line.recipe.variant_name if line.recipe else None,
+            role=line.role,
+            source=line.source,
+            position=line.position,
+            selection_reasons_json=line.selection_reasons_json,
+            computed_traits_json=traits,
+        )
+
     def to_item_public(
         self,
         item: MealPlanItem,
@@ -68,6 +117,10 @@ class PlanningService:
         ml_unit=None,
     ) -> MealPlanItemPublic:
         prep_time_minutes, cook_time_minutes = self._meal_times(item)
+        lines = sorted(item.lines, key=lambda line: line.position)
+        line_publics = [
+            self._to_line_public(line, gram_unit=gram_unit, ml_unit=ml_unit) for line in lines
+        ]
         return MealPlanItemPublic(
             id=item.id,
             meal_plan_id=item.meal_plan_id,
@@ -80,14 +133,18 @@ class PlanningService:
             prep_time_minutes=prep_time_minutes,
             cook_time_minutes=cook_time_minutes,
             status=item.status,
+            planning_state=item.planning_state,
+            title=compute_meal_title(item, lines),
+            lines=line_publics,
             is_locked=item.is_locked,
             manually_selected=item.manually_selected,
             skip_reason=item.skip_reason,
             skip_comment=item.skip_comment,
             leftover_source_item_id=item.leftover_source_item_id,
             selection_reasons_json=item.selection_reasons_json,
-            computed_traits_json=effective_traits_for_meal_plan_item(
+            computed_traits_json=effective_traits_for_meal_slot(
                 db=self.db,
+                lines=lines,
                 recipe=item.recipe,
                 dish_recipes=item.dish.recipes if item.dish is not None else None,
                 gram_unit=gram_unit,
@@ -234,25 +291,130 @@ class PlanningService:
             )
         return main_recipe.id if main_recipe else None
 
-    def _apply_assignment(self, item: MealPlanItem, dish_id: int | None, recipe_id: int | None) -> None:
+    def _assert_slot_mutable(self, item: MealPlanItem) -> None:
+        if item.planning_state == MealPlanningState.do_not_plan:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Cannot modify a do-not-plan meal slot",
+            )
+
+    def _next_line_position(self, item: MealPlanItem) -> int:
+        if not item.lines:
+            return 0
+        return max(line.position for line in item.lines) + 1
+
+    def _append_manual_line(
+        self,
+        item: MealPlanItem,
+        dish_id: int,
+        recipe_id: int | None,
+        *,
+        role: MealPlanDishLineRole | None = None,
+        position: int | None = None,
+    ) -> MealPlanItemDish:
+        dish = self.db.get(Dish, dish_id)
+        if dish is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dish not found")
+        resolved_recipe_id = self._resolve_recipe_for_dish(dish_id, recipe_id)
+        line = MealPlanItemDish(
+            meal_plan_item_id=item.id,
+            dish_id=dish_id,
+            recipe_id=resolved_recipe_id,
+            position=position if position is not None else self._next_line_position(item),
+            role=role or role_for_dish(dish),
+            source=MealPlanDishLineSource.manual,
+            selection_reasons_json=None,
+        )
+        item.lines.append(line)
+        sync_legacy_mirror(item)
+        return line
+
+    def _clear_all_lines(self, item: MealPlanItem) -> None:
+        item.lines.clear()
+        sync_legacy_mirror(item)
+
+    def _remove_roulette_lines(self, item: MealPlanItem) -> None:
+        self.db.execute(
+            delete(MealPlanItemDish).where(
+                MealPlanItemDish.meal_plan_item_id == item.id,
+                MealPlanItemDish.source == MealPlanDishLineSource.roulette,
+            )
+        )
+        self.db.flush()
+        self.db.expire(item, ["lines"])
+        for index, line in enumerate(sorted(item.lines, key=lambda row: row.position)):
+            line.position = index
+        sync_legacy_mirror(item)
+
+    def apply_roulette_package(self, item_id: int, assignment) -> None:
+        item = self._load_item(item_id)
+        manual_snapshot = [
+            (
+                line.dish_id,
+                line.recipe_id,
+                line.role,
+                line.selection_reasons_json,
+            )
+            for line in sorted(item.lines, key=lambda row: row.position)
+            if line.source == MealPlanDishLineSource.manual
+        ]
+        self.db.execute(delete(MealPlanItemDish).where(MealPlanItemDish.meal_plan_item_id == item.id))
+        self.db.flush()
+        item.lines.clear()
+        for index, (dish_id, recipe_id, role, reasons) in enumerate(manual_snapshot):
+            item.lines.append(
+                MealPlanItemDish(
+                    meal_plan_item_id=item.id,
+                    dish_id=dish_id,
+                    recipe_id=recipe_id,
+                    position=index,
+                    role=role,
+                    source=MealPlanDishLineSource.manual,
+                    selection_reasons_json=reasons,
+                )
+            )
+        next_position = len(manual_snapshot)
+        for offset, line_def in enumerate(assignment.lines):
+            item.lines.append(
+                MealPlanItemDish(
+                    meal_plan_item_id=item.id,
+                    dish_id=line_def.dish_id,
+                    recipe_id=line_def.recipe_id,
+                    position=next_position + offset,
+                    role=line_def.role,
+                    source=MealPlanDishLineSource.roulette,
+                    selection_reasons_json=line_def.selection_reasons_json,
+                )
+            )
+        sync_legacy_mirror(item)
+
+    def _apply_assignment(
+        self,
+        item: MealPlanItem,
+        dish_id: int | None,
+        recipe_id: int | None,
+        *,
+        mode: str = "replace_all",
+    ) -> None:
+        self._assert_slot_mutable(item)
         if dish_id is None:
             if item.status != MealPlanItemStatus.planned:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Cannot clear dish on a meal that has already been reviewed",
                 )
-            item.dish_id = None
-            item.recipe_id = None
-            item.manually_selected = False
-            item.selection_reasons_json = None
+            self._clear_all_lines(item)
             return
-        dish = self.db.get(Dish, dish_id)
-        if dish is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dish not found")
-        item.dish_id = dish_id
-        item.recipe_id = self._resolve_recipe_for_dish(dish_id, recipe_id)
-        item.manually_selected = True
-        item.selection_reasons_json = None
+
+        if mode == "add":
+            self._append_manual_line(item, dish_id, recipe_id)
+        elif mode == "replace_roulette":
+            self._remove_roulette_lines(item)
+            self._append_manual_line(item, dish_id, recipe_id)
+        else:
+            self._clear_all_lines(item)
+            self._append_manual_line(item, dish_id, recipe_id, position=0)
+
         if item.status == MealPlanItemStatus.skipped:
             item.status = MealPlanItemStatus.planned
         item.skip_reason = None
@@ -343,7 +505,7 @@ class PlanningService:
     def mark_eaten(self, item_id: int) -> MealPlanItemPublic:
         item = self._load_item(item_id)
         self._assert_can_execute(item)
-        if item.dish_id is None:
+        if item.dish_id is None and not item.lines:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Assign a dish before marking the meal as eaten",
@@ -391,7 +553,7 @@ class PlanningService:
 
     def lock_item(self, item_id: int) -> MealPlanItemPublic:
         item = self._load_item(item_id)
-        if item.dish_id is None:
+        if not item.lines and item.dish_id is None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Assign a dish before locking the meal",
@@ -546,6 +708,7 @@ class PlanningService:
         meal_slot: MealSlot,
         dish_id: int,
         recipe_id: int | None = None,
+        mode: str = "replace_all",
     ) -> MealPlanItemPublic:
         reference_date = household_local_today(self.db)
         if meal_date < reference_date:
@@ -576,6 +739,109 @@ class PlanningService:
             )
 
         clear_undo_snapshot(plan)
-        self._apply_assignment(item, dish_id, recipe_id)
+        self._apply_assignment(item, dish_id, recipe_id, mode=mode)
         self.db.commit()
         return self.to_item_public(self._load_item(item.id))
+
+    def add_line(self, item_id: int, payload: MealPlanDishLineCreateRequest) -> MealPlanItemPublic:
+        item = self._load_item(item_id)
+        self._assert_assignment_allowed(item)
+        self._assert_slot_mutable(item)
+        if item.status != MealPlanItemStatus.planned:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Can only add dishes to planned meals",
+            )
+        self._append_manual_line(
+            item,
+            payload.dish_id,
+            payload.recipe_id,
+            role=payload.role,
+            position=payload.position,
+        )
+        plan = self.db.get(MealPlan, item.meal_plan_id)
+        if plan is not None:
+            clear_undo_snapshot(plan)
+        self.db.commit()
+        return self.to_item_public(self._load_item(item.id))
+
+    def update_line(self, line_id: int, payload: MealPlanDishLineUpdateRequest) -> MealPlanItemPublic:
+        line = self._load_line(line_id)
+        item = line.meal_plan_item
+        self._assert_assignment_allowed(item)
+        self._assert_slot_mutable(item)
+        updates = payload.model_dump(exclude_unset=True)
+        if "dish_id" in updates or "recipe_id" in updates:
+            dish_id = updates.get("dish_id", line.dish_id)
+            if dish_id is None:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="dish_id is required")
+            recipe_id = updates.get("recipe_id", line.recipe_id)
+            line.dish_id = dish_id
+            line.recipe_id = self._resolve_recipe_for_dish(dish_id, recipe_id)
+            dish = self.db.get(Dish, dish_id)
+            if dish is not None and "role" not in updates:
+                line.role = role_for_dish(dish)
+        if "role" in updates and updates["role"] is not None:
+            line.role = updates["role"]
+        if "position" in updates and updates["position"] is not None:
+            line.position = updates["position"]
+        sync_legacy_mirror(item)
+        self.db.commit()
+        return self.to_item_public(self._load_item(item.id))
+
+    def delete_line(self, line_id: int) -> MealPlanItemPublic:
+        line = self._load_line(line_id)
+        item = line.meal_plan_item
+        self._assert_assignment_allowed(item)
+        self._assert_slot_mutable(item)
+        if item.status != MealPlanItemStatus.planned:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Can only remove dishes from planned meals",
+            )
+        self.db.delete(line)
+        self.db.flush()
+        for index, remaining in enumerate(sorted(item.lines, key=lambda row: row.position)):
+            remaining.position = index
+        sync_legacy_mirror(item)
+        plan = self.db.get(MealPlan, item.meal_plan_id)
+        if plan is not None:
+            clear_undo_snapshot(plan)
+        self.db.commit()
+        return self.to_item_public(self._load_item(item.id))
+
+    def mark_do_not_plan(self, item_id: int, payload: MealPlanDoNotPlanRequest) -> MealPlanItemPublic:
+        item = self._load_item(item_id)
+        if item.status != MealPlanItemStatus.planned:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Can only mark planned meals as do-not-plan",
+            )
+        item.planning_state = MealPlanningState.do_not_plan
+        if payload.remove_existing_lines:
+            self._clear_all_lines(item)
+        plan = self.db.get(MealPlan, item.meal_plan_id)
+        if plan is not None:
+            clear_undo_snapshot(plan)
+        self.db.commit()
+        return self.to_item_public(self._load_item(item.id))
+
+    def reopen_slot(self, item_id: int) -> MealPlanItemPublic:
+        item = self._load_item(item_id)
+        item.planning_state = MealPlanningState.open
+        self.db.commit()
+        return self.to_item_public(self._load_item(item.id))
+
+    def _load_line(self, line_id: int) -> MealPlanItemDish:
+        line = self.db.scalar(
+            select(MealPlanItemDish)
+            .where(MealPlanItemDish.id == line_id)
+            .options(
+                selectinload(MealPlanItemDish.meal_plan_item).options(*self._meal_plan_item_trait_options()),
+                selectinload(MealPlanItemDish.dish),
+                selectinload(MealPlanItemDish.recipe).options(*RECIPE_TRAIT_INGREDIENT_LOAD),
+            )
+        )
+        if line is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Meal dish line not found")
+        return line

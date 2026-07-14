@@ -14,6 +14,9 @@ function item(overrides: Partial<MealPlanItem> = {}): MealPlanItem {
     dish_name: "Pasta",
     recipe_variant_name: null,
     status: "planned",
+    planning_state: "open",
+    title: "Pasta",
+    lines: [],
     is_locked: false,
     manually_selected: false,
     skip_reason: null,
@@ -46,7 +49,8 @@ describe("todayMeals helpers", () => {
 
   it("blocks cook mode for leftovers meals", () => {
     expect(canOpenCookMode(item({ status: "ate_leftovers" }))).toBe(false);
-    expect(canOpenCookMode(item({ dish_id: null }))).toBe(false);
+    expect(canOpenCookMode(item({ dish_id: null, lines: [] }))).toBe(false);
+    expect(canOpenCookMode(item({ dish_id: null, lines: [{ id: 1, dish_id: 10 } as never] }))).toBe(true);
     expect(canOpenCookMode(item())).toBe(true);
   });
 });

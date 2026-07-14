@@ -106,6 +106,7 @@ def build_recipe_traits(
 
     food_group_weights = _normalize_weights(food_group_grams)
     carb_pct = food_group_weights.get(CARB_FOOD_GROUP, 0.0)
+    total_trait_grams = sum(food_group_grams.values(), start=Decimal("0"))
 
     dominant_carb = _dominant_family(family_grams_by_food_group.get(CARB_FOOD_GROUP, {}))
     dominant_protein = _dominant_family(
@@ -119,6 +120,8 @@ def build_recipe_traits(
 
     return {
         "family_vector": family_vector_result.weights,
+        "food_group_grams": {key: float(amount) for key, amount in food_group_grams.items()},
+        "total_trait_grams": float(total_trait_grams),
         "food_group_weights": food_group_weights,
         "contains_food_groups": sorted(food_group_weights.keys()),
         "contains_meat": contains_meat,
@@ -214,3 +217,97 @@ def effective_traits_for_meal_plan_item(
     if target is None:
         return None
     return compute_recipe_traits_now(db, target, gram_unit=gram_unit, ml_unit=ml_unit)
+
+
+def aggregate_meal_traits(trait_payloads: list[dict]) -> dict | None:
+    food_group_grams: dict[str, Decimal] = {}
+    contains_meat = False
+    vegan = True
+
+    for payload in trait_payloads:
+        if not payload:
+            continue
+        if payload.get("contains_meat"):
+            contains_meat = True
+        if not payload.get("vegan", True):
+            vegan = False
+
+        line_grams = payload.get("food_group_grams")
+        if isinstance(line_grams, dict) and line_grams:
+            for group, amount in line_grams.items():
+                food_group_grams[group] = food_group_grams.get(group, Decimal("0")) + Decimal(str(amount))
+            continue
+
+        # Legacy payloads without absolute grams cannot be summed accurately.
+        weights = payload.get("food_group_weights")
+        if not isinstance(weights, dict):
+            continue
+        line_total = payload.get("total_trait_grams")
+        if line_total is None:
+            continue
+        line_total_decimal = Decimal(str(line_total))
+        for group, weight in weights.items():
+            if not isinstance(weight, (int, float)):
+                continue
+            grams = line_total_decimal * (Decimal(str(weight)) / Decimal("100"))
+            food_group_grams[group] = food_group_grams.get(group, Decimal("0")) + grams
+
+    if not food_group_grams:
+        return None
+
+    total_trait_grams = sum(food_group_grams.values(), start=Decimal("0"))
+    food_group_weights = _normalize_weights(food_group_grams)
+    carb_pct = food_group_weights.get(CARB_FOOD_GROUP, 0.0)
+
+    return {
+        "food_group_grams": {key: float(amount) for key, amount in food_group_grams.items()},
+        "total_trait_grams": float(total_trait_grams),
+        "food_group_weights": food_group_weights,
+        "contains_food_groups": sorted(food_group_weights.keys()),
+        "contains_meat": contains_meat,
+        "vegan": vegan,
+        "carb_heavy": carb_pct >= CARB_HEAVY_THRESHOLD_PCT,
+        "dominant_carb": next((payload.get("dominant_carb") for payload in trait_payloads if payload.get("dominant_carb")), None),
+        "dominant_protein": next(
+            (payload.get("dominant_protein") for payload in trait_payloads if payload.get("dominant_protein")),
+            None,
+        ),
+    }
+
+
+def effective_traits_for_meal_slot(
+    *,
+    db: Session,
+    lines: list,
+    recipe: Recipe | None = None,
+    dish_recipes: list[Recipe] | None = None,
+    gram_unit: UnitInfo | None = None,
+    ml_unit: UnitInfo | None = None,
+) -> dict | None:
+    if gram_unit is None or ml_unit is None:
+        from mealroulette.services.scheduler.catalog import load_reference_units
+
+        loaded_gram, loaded_ml = load_reference_units(db)
+        gram_unit = gram_unit or loaded_gram
+        ml_unit = ml_unit or loaded_ml
+
+    trait_payloads: list[dict] = []
+    for line in lines:
+        if getattr(line, "recipe", None) is None:
+            continue
+        trait_payloads.append(
+            compute_recipe_traits_now(db, line.recipe, gram_unit=gram_unit, ml_unit=ml_unit)
+        )
+
+    if trait_payloads:
+        aggregated = aggregate_meal_traits(trait_payloads)
+        if aggregated is not None:
+            return aggregated
+
+    return effective_traits_for_meal_plan_item(
+        db=db,
+        recipe=recipe,
+        dish_recipes=dish_recipes,
+        gram_unit=gram_unit,
+        ml_unit=ml_unit,
+    )

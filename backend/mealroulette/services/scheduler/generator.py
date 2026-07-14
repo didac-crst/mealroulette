@@ -1,10 +1,18 @@
 from __future__ import annotations
 
 import random
+from dataclasses import dataclass
 from datetime import date
 
 from mealroulette.schemas.scheduler import PlanningRulesConfig
 from mealroulette.services.planning_rules import meal_slot_sort_key
+from mealroulette.services.scheduler.composition import (
+    assignment_from_main,
+    assignment_from_pair,
+    is_centerpiece_candidate,
+    is_main_candidate,
+    is_side_candidate,
+)
 from mealroulette.services.scheduler.constraints import (
     build_dish_date_index,
     passes_same_dish_window,
@@ -20,6 +28,151 @@ from mealroulette.services.scheduler.types import (
     SlotAssignment,
     WeekGenerationResult,
 )
+
+SIDE_PAIR_SCORE_WEIGHT = 0.25
+
+
+@dataclass(frozen=True)
+class _SlotPickOption:
+    score: float
+    assignment: SlotAssignment
+    assigned_dish_ids: tuple[int, ...]
+
+
+def _candidate_is_eligible(
+    candidate: DishCandidate,
+    *,
+    slot: GenerationSlot,
+    assigned_dish_ids: list[int],
+    forbidden_dish_ids: frozenset[int] | None,
+    dish_date_index: dict[int, list[date]],
+    rules: PlanningRulesConfig,
+) -> bool:
+    if candidate.dish_id in assigned_dish_ids:
+        return False
+    if forbidden_dish_ids and candidate.dish_id in forbidden_dish_ids:
+        return False
+    if not passes_slot_suitability(candidate, slot.meal_slot):
+        return False
+    return passes_same_dish_window(
+        candidate,
+        slot,
+        dish_dates=dish_date_index,
+        rules=rules,
+    )
+
+
+def _build_slot_options(
+    slot: GenerationSlot,
+    *,
+    candidates: list[DishCandidate],
+    assigned_dish_ids: list[int],
+    forbidden_dish_ids: frozenset[int] | None,
+    dish_date_index: dict[int, list[date]],
+    neighbours: list[MealNeighbourSnapshot],
+    candidates_by_id: dict[int, DishCandidate],
+    rules: PlanningRulesConfig,
+) -> list[_SlotPickOption]:
+    options: list[_SlotPickOption] = []
+
+    for candidate in candidates:
+        if not is_main_candidate(candidate):
+            continue
+        if not _candidate_is_eligible(
+            candidate,
+            slot=slot,
+            assigned_dish_ids=assigned_dish_ids,
+            forbidden_dish_ids=forbidden_dish_ids,
+            dish_date_index=dish_date_index,
+            rules=rules,
+        ):
+            continue
+        score, payload = score_candidate_for_slot(
+            candidate,
+            slot,
+            assigned_dish_ids=assigned_dish_ids,
+            candidates_by_id=candidates_by_id,
+            neighbours=neighbours,
+            rules=rules,
+        )
+        options.append(
+            _SlotPickOption(
+                score=score,
+                assignment=assignment_from_main(
+                    item_id=slot.item_id,
+                    candidate=candidate,
+                    score=score,
+                    payload=payload,
+                ),
+                assigned_dish_ids=(candidate.dish_id,),
+            )
+        )
+
+    centerpieces = [candidate for candidate in candidates if is_centerpiece_candidate(candidate)]
+    sides = [candidate for candidate in candidates if is_side_candidate(candidate)]
+    for centerpiece in centerpieces:
+        if not _candidate_is_eligible(
+            centerpiece,
+            slot=slot,
+            assigned_dish_ids=assigned_dish_ids,
+            forbidden_dish_ids=forbidden_dish_ids,
+            dish_date_index=dish_date_index,
+            rules=rules,
+        ):
+            continue
+        centerpiece_score, centerpiece_payload = score_candidate_for_slot(
+            centerpiece,
+            slot,
+            assigned_dish_ids=assigned_dish_ids,
+            candidates_by_id=candidates_by_id,
+            neighbours=neighbours,
+            rules=rules,
+        )
+        for side in sides:
+            if side.dish_id == centerpiece.dish_id:
+                continue
+            if not _candidate_is_eligible(
+                side,
+                slot=slot,
+                assigned_dish_ids=[*assigned_dish_ids, centerpiece.dish_id],
+                forbidden_dish_ids=forbidden_dish_ids,
+                dish_date_index=dish_date_index,
+                rules=rules,
+            ):
+                continue
+            side_score, _ = score_candidate_for_slot(
+                side,
+                slot,
+                assigned_dish_ids=[*assigned_dish_ids, centerpiece.dish_id],
+                candidates_by_id=candidates_by_id,
+                neighbours=neighbours,
+                rules=rules,
+            )
+            total_score = centerpiece_score + (SIDE_PAIR_SCORE_WEIGHT * side_score)
+            payload = {
+                **centerpiece_payload,
+                "reasons": [
+                    *centerpiece_payload.get("reasons", []),
+                    f"Paired with {side.dish_name}",
+                ],
+                "score": round(total_score, 3),
+                "package_type": "centerpiece_side",
+            }
+            options.append(
+                _SlotPickOption(
+                    score=total_score,
+                    assignment=assignment_from_pair(
+                        item_id=slot.item_id,
+                        centerpiece=centerpiece,
+                        side=side,
+                        score=total_score,
+                        payload=payload,
+                    ),
+                    assigned_dish_ids=(centerpiece.dish_id, side.dish_id),
+                )
+            )
+
+    return options
 
 
 def generate_week_assignments(
@@ -56,8 +209,9 @@ def generate_week_assignments(
             planned_dish_dates = [
                 (dish_id, fixed_dates_by_item[item_id]) for item_id, dish_id in fixed_assignments.items()
             ] + [
-                (assignment.dish_id, slot_dates_by_item[assignment.item_id])
+                (line.dish_id, slot_dates_by_item[assignment.item_id])
                 for assignment in attempt_assignments
+                for line in assignment.lines
             ]
             dish_date_index = build_dish_date_index(eaten_meals, planned_dish_dates)
             neighbours = build_similarity_neighbours(
@@ -70,52 +224,28 @@ def generate_week_assignments(
                 exclude_item_id=slot.item_id,
             )
 
-            eligible: list[tuple[DishCandidate, float, dict]] = []
-            for candidate in candidates:
-                if candidate.dish_id in assigned_dish_ids:
-                    continue
-                if forbidden_dish_ids and candidate.dish_id in forbidden_dish_ids:
-                    continue
-                if not passes_slot_suitability(candidate, slot.meal_slot):
-                    continue
-                if not passes_same_dish_window(
-                    candidate,
-                    slot,
-                    dish_dates=dish_date_index,
-                    rules=rules,
-                ):
-                    continue
-
-                score, payload = score_candidate_for_slot(
-                    candidate,
-                    slot,
-                    assigned_dish_ids=assigned_dish_ids,
-                    candidates_by_id=candidates_by_id,
-                    neighbours=neighbours,
-                    rules=rules,
-                )
-                eligible.append((candidate, score, payload))
-
-            if not eligible:
+            options = _build_slot_options(
+                slot,
+                candidates=candidates,
+                assigned_dish_ids=assigned_dish_ids,
+                forbidden_dish_ids=forbidden_dish_ids,
+                dish_date_index=dish_date_index,
+                neighbours=neighbours,
+                candidates_by_id=candidates_by_id,
+                rules=rules,
+            )
+            if not options:
                 failed = True
                 break
 
-            eligible.sort(key=lambda entry: entry[1], reverse=True)
-            top = eligible[:5]
-            weights = [max(entry[1], 0.1) for entry in top]
-            picked, picked_score, payload = random_source.choices(top, weights=weights, k=1)[0]
+            options.sort(key=lambda entry: entry.score, reverse=True)
+            top = options[:5]
+            weights = [max(entry.score, 0.1) for entry in top]
+            picked = random_source.choices(top, weights=weights, k=1)[0]
 
-            attempt_assignments.append(
-                SlotAssignment(
-                    item_id=slot.item_id,
-                    dish_id=picked.dish_id,
-                    recipe_id=picked.recipe_id,
-                    score=picked_score,
-                    selection_reasons_json=payload,
-                )
-            )
-            assigned_dish_ids.append(picked.dish_id)
-            attempt_score += picked_score
+            attempt_assignments.append(picked.assignment)
+            assigned_dish_ids.extend(picked.assigned_dish_ids)
+            attempt_score += picked.score
 
         if failed:
             continue

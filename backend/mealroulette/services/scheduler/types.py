@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import date
 
-from mealroulette.models.enums import MealSlot, SeasonalityMode
+from mealroulette.models.enums import MealComposition, MealPlanDishLineRole, MealSlot, SeasonalityMode, SimpleDishPart
 
 
 @dataclass(frozen=True)
@@ -11,6 +11,8 @@ class DishCandidate:
     dish_id: int
     dish_name: str
     recipe_id: int
+    meal_composition: MealComposition
+    simple_dish_part: SimpleDishPart | None
     tag_names: frozenset[str]
     protein_tags: frozenset[str]
     carb_tags: frozenset[str]
@@ -46,12 +48,28 @@ class GenerationSlot:
 
 
 @dataclass(frozen=True)
-class SlotAssignment:
-    item_id: int
+class SlotAssignmentLine:
     dish_id: int
     recipe_id: int
+    role: MealPlanDishLineRole
+    position: int
+    selection_reasons_json: dict | None = None
+
+
+@dataclass(frozen=True)
+class SlotAssignment:
+    item_id: int
+    lines: tuple[SlotAssignmentLine, ...]
     score: float
     selection_reasons_json: dict
+
+    @property
+    def dish_id(self) -> int:
+        return self.lines[0].dish_id
+
+    @property
+    def recipe_id(self) -> int:
+        return self.lines[0].recipe_id
 
 
 @dataclass

@@ -8,9 +8,11 @@ from sqlalchemy.orm import Session, selectinload
 
 from mealroulette.models.planning import MealPlan, MealPlanItem
 from mealroulette.services.household_time import household_local_today
+from mealroulette.services.meal_plan_lines import sync_legacy_mirror
 from mealroulette.services.planning import PlanningService
 from mealroulette.services.planning_rule_service import PlanningRuleService
 from mealroulette.services.scheduler.catalog import load_dish_candidates, load_eaten_meal_snapshots
+from mealroulette.services.scheduler.composition import item_has_roulette_lines, roulette_dish_ids
 from mealroulette.services.scheduler.constraints import slot_is_regenerable
 from mealroulette.services.scheduler.generator import generate_week_assignments
 from mealroulette.services.scheduler.neighbours import build_similarity_neighbours
@@ -81,19 +83,13 @@ class SchedulerService:
         reference_date = today or household_local_today(self.db)
         rules = self.rules_service.get_active_rules()
         item = self._load_item(item_id)
-        if not slot_is_regenerable(
-            meal_date=item.date,
-            today=reference_date,
-            is_locked=item.is_locked,
-            manually_selected=item.manually_selected,
-            status=item.status,
-        ):
+        if not self._slot_can_reroll(item, reference_date=reference_date):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="This meal slot cannot be rerolled",
             )
 
-        previous_dish_id = item.dish_id
+        previous_roulette_dish_ids = roulette_dish_ids(item)
         plan = self._load_plan_for_update(item.meal_plan_id)
         item = next(plan_item for plan_item in plan.items if plan_item.id == item_id)
         candidates = self._load_candidates(rules)
@@ -107,7 +103,7 @@ class SchedulerService:
             fixed_assignments[plan_item.id] = plan_item.dish_id
             fixed_dates_by_item[plan_item.id] = plan_item.date
 
-        forbidden_dish_ids = frozenset({previous_dish_id}) if previous_dish_id is not None else None
+        forbidden_dish_ids = frozenset(previous_roulette_dish_ids) if previous_roulette_dish_ids else None
         eaten_meals = self._load_eaten_meals([slot], rules)
         result = generate_week_assignments(
             [slot],
@@ -149,6 +145,18 @@ class SchedulerService:
         plan = self._load_plan(meal_plan_id)
         return plan.last_roulette_undo_json is not None
 
+    def _slot_can_reroll(self, item: MealPlanItem, *, reference_date: date) -> bool:
+        if not slot_is_regenerable(
+            meal_date=item.date,
+            today=reference_date,
+            is_locked=item.is_locked,
+            manually_selected=item.manually_selected,
+            status=item.status,
+            planning_state=item.planning_state,
+        ):
+            return False
+        return item_has_roulette_lines(item) or not item.lines
+
     def _load_candidates(self, rules):
         candidates = load_dish_candidates(self.db, rules=rules)
         if not candidates:
@@ -175,6 +183,7 @@ class SchedulerService:
                 is_locked=item.is_locked,
                 manually_selected=item.manually_selected,
                 status=item.status,
+                planning_state=item.planning_state,
             ):
                 regenerable_slots.append(
                     GenerationSlot(item_id=item.id, meal_date=item.date, meal_slot=item.meal_slot)
@@ -225,7 +234,7 @@ class SchedulerService:
         plan = self.db.scalar(
             select(MealPlan)
             .where(MealPlan.id == meal_plan_id)
-            .options(selectinload(MealPlan.items))
+            .options(selectinload(MealPlan.items).selectinload(MealPlanItem.lines))
             .with_for_update()
         )
         if plan is None:
@@ -236,25 +245,23 @@ class SchedulerService:
         plan = self.db.get(
             MealPlan,
             meal_plan_id,
-            options=(selectinload(MealPlan.items),),
+            options=(selectinload(MealPlan.items).selectinload(MealPlanItem.lines),),
         )
         if plan is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Meal plan not found")
         return plan
 
     def _load_item(self, item_id: int) -> MealPlanItem:
-        item = self.db.get(MealPlanItem, item_id)
+        item = self.db.scalar(
+            select(MealPlanItem)
+            .where(MealPlanItem.id == item_id)
+            .options(selectinload(MealPlanItem.lines))
+        )
         if item is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Meal plan item not found")
         return item
 
     def _apply_assignments(self, result: WeekGenerationResult) -> None:
         for assignment in result.assignments:
-            item = self.db.get(MealPlanItem, assignment.item_id)
-            if item is None:
-                continue
-            item.dish_id = assignment.dish_id
-            item.recipe_id = assignment.recipe_id
-            item.manually_selected = False
-            item.selection_reasons_json = assignment.selection_reasons_json
+            self.planning_service.apply_roulette_package(assignment.item_id, assignment)
         self.db.commit()

@@ -1,8 +1,32 @@
 from datetime import date, datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from mealroulette.models.enums import MealPlanItemStatus, MealPlanStatus, MealSlot
+from mealroulette.models.enums import (
+    MealPlanDishLineRole,
+    MealPlanDishLineSource,
+    MealPlanItemStatus,
+    MealPlanningState,
+    MealPlanStatus,
+    MealSlot,
+)
+
+
+class MealPlanDishLinePublic(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    meal_plan_item_id: int
+    dish_id: int | None
+    recipe_id: int | None
+    dish_name: str | None = None
+    recipe_variant_name: str | None = None
+    role: MealPlanDishLineRole
+    source: MealPlanDishLineSource
+    position: int
+    selection_reasons_json: dict | None
+    computed_traits_json: dict | None = None
 
 
 class MealPlanItemPublic(BaseModel):
@@ -19,6 +43,9 @@ class MealPlanItemPublic(BaseModel):
     prep_time_minutes: int | None = None
     cook_time_minutes: int | None = None
     status: MealPlanItemStatus
+    planning_state: MealPlanningState = MealPlanningState.open
+    title: str = "Unassigned"
+    lines: list[MealPlanDishLinePublic] = Field(default_factory=list)
     is_locked: bool
     manually_selected: bool
     skip_reason: str | None
@@ -81,6 +108,25 @@ class MealPlanSlotAssignRequest(BaseModel):
     meal_slot: MealSlot
     dish_id: int
     recipe_id: int | None = None
+    mode: Literal["add", "replace_roulette", "replace_all"] = "replace_all"
+
+
+class MealPlanDishLineCreateRequest(BaseModel):
+    dish_id: int
+    recipe_id: int | None = None
+    role: MealPlanDishLineRole | None = None
+    position: int | None = Field(default=None, ge=0)
+
+
+class MealPlanDishLineUpdateRequest(BaseModel):
+    dish_id: int | None = None
+    recipe_id: int | None = None
+    role: MealPlanDishLineRole | None = None
+    position: int | None = Field(default=None, ge=0)
+
+
+class MealPlanDoNotPlanRequest(BaseModel):
+    remove_existing_lines: bool = True
 
 
 class MealRatingPublic(BaseModel):
