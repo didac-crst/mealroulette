@@ -1,19 +1,24 @@
 .PHONY: test test-unit test-integration test-backend test-frontend up down test-db-setup free-ports validate-taxonomy apply-conversion-policy reconcile-taxonomy
 
+# Optional test selection. Backend paths are relative to backend/ (e.g. tests/test_catalog.py).
+# Frontend paths are relative to frontend/ (e.g. src/features/planning/planFormat.test.ts).
+TESTS ?=
+FRONTEND_TESTS ?=
+
 test: test-db-setup test-backend test-frontend
 
 test-unit:
-	cd backend && python3.12 -m pytest -m "not integration"
+	cd backend && python3.12 -m pytest -m "not integration" $(TESTS)
 
 test-integration: test-db-setup
-	cd backend && python3.12 -m pytest -m integration
-	cd frontend && npm test -- --run
+	cd backend && python3.12 -m pytest -m integration $(TESTS)
+	cd frontend && npm test -- --run $(FRONTEND_TESTS)
 
 test-backend: test-db-setup
-	cd backend && python3.12 -m pytest
+	cd backend && python3.12 -m pytest $(TESTS)
 
 test-frontend:
-	cd frontend && npm test -- --run
+	cd frontend && npm test -- --run $(FRONTEND_TESTS)
 
 free-ports:
 	./scripts/free-ports.sh
