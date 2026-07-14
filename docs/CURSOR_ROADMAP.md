@@ -151,15 +151,17 @@ The default commit hook should fail if tests fail. Lint/format hooks may run in 
 
 ## Implementation Phases
 
-Phases 0–11 shipped through **`v0.8.0`**. Phases 12–13 cover LLM/localization and v1 hardening.
+Phases 0–11 shipped through **`v0.8.0`**. Later phases continue from the documentation/UI reconciliation work in `v0.9.0` and the composable-meals work targeting `v0.10.0`.
 
 | Phase | Name | Target version |
 | --- | --- | --- |
 | 9 | Computed recipe traits & catalog keys | v0.6 |
 | 10 | Cooking mode | v0.7 |
 | 11 | Taxonomy hardening + backup, export, import | v0.8 |
-| 12 | LLM-assisted entry & localization | v0.9 |
-| 13 | v1 hardening | v1.0 |
+| 12 | UI/UX design system and live traits | v0.9 |
+| 13 | Composable meals and simple dishes | v0.10 |
+| 14 | LLM-assisted entry & localization | Future |
+| 15 | v1 hardening | v1.0 |
 
 ### Phase 0 - Project Bootstrap
 
@@ -375,7 +377,7 @@ Acceptance criteria:
 - Shopping items show which planned meals require them.
 - Admins can review and approve conversion suggestions from the ingredient dashboard.
 
-**Deferred to Phase 12:** multilingual content translations — design in [features/localization.md](features/localization.md).
+**Deferred to Phase 14:** multilingual content translations — design in [features/localization.md](features/localization.md).
 
 Implementation notes (v0.3):
 
@@ -384,7 +386,7 @@ Implementation notes (v0.3):
 - `services/quantities`: strategy-aware aggregation; approved conversions only for cross-dimension merge.
 - Ingredient seed: `import_ingredient_seed` + `mealroulette_ingredients_seed.yaml`.
 - Frontend: `/shopping` (List tab), `/ingredients` admin catalog and edit.
-- Localization design documented; implementation deferred to Phase 12.
+- Localization design documented; implementation deferred to Phase 14.
 
 ### Later — Leftover inventory (after shopping lists)
 
@@ -855,7 +857,54 @@ Acceptance criteria:
 - Backup files are written under `/backups`.
 - Old backups are removed according to retention settings.
 
-### Phase 12 - LLM-Assisted Entry & Localization
+### Phase 12 - UI/UX Design System and Live Traits
+
+Specs: [features/ui-ux-design-system.md](features/ui-ux-design-system.md), [features/computed-traits.md](features/computed-traits.md). Shipment status: [BACKLOG.md](BACKLOG.md).
+
+Deliverables:
+
+- Documentation harmonization and release map.
+- Shared app shell, navigation, typography, layout, and control tokens.
+- Shared UI primitives for cards, metadata, settings headers, controls, disclosures, technical values, dialogs, and status.
+- Dish, recipe, planning, shopping, review, and settings reconciliation.
+- Fresh computed recipe traits on read paths instead of stale stored trait JSON.
+- Recipe public-key lookup endpoint and readable public-key name slug behavior.
+- Recipe composition chart and grouped food-group display.
+- Visual QA fixtures for core routes.
+
+Acceptance criteria:
+
+- UI routes use the shared shell and token-backed primitives where applicable.
+- Recipe and dish trait responses reflect current ingredients and taxonomy.
+- Design-system specs and release docs match the implemented behavior.
+- Frontend tests/build and backend tests pass.
+
+### Phase 13 - Composable Meals and Simple Dishes
+
+Spec: [features/composable-meals.md](features/composable-meals.md). Shipment status: [BACKLOG.md](BACKLOG.md).
+
+Deliverables:
+
+- Multi-dish meal slots via `meal_plan_item_dishes`.
+- `Do not plan` slot state.
+- Roulette assignment of either one `main_dish` or one `centerpiece` + one `sidedish` pair.
+- Manual extra dish lines and line-level source/role ordering.
+- Shopping, undo, history, review, and title compatibility for multi-line slots.
+- Strict fixture import for canonical ingredients and aliases.
+- Large simple-dish fixture seed.
+- Bounded diverse pair selection and adaptive attempts for scheduler performance.
+- Parallel backend test execution and split CI jobs.
+
+Acceptance criteria:
+
+- Existing single-dish plans migrate without visible behavior loss.
+- Roulette does not fill `Do not plan` slots.
+- Shopping includes all dish lines in a slot.
+- Simple-dish catalog imports fail on duplicate canonical ingredients, alias clashes, and non-canonical recipe ingredients.
+- Week generation remains interactive with a large centerpiece/side catalog.
+- Backend, frontend, and taxonomy validation pass.
+
+### Phase 14 - LLM-Assisted Entry & Localization
 
 Design spec: [features/localization.md](features/localization.md). Shipment status: [BACKLOG.md](BACKLOG.md).
 
@@ -886,7 +935,7 @@ Acceptance criteria:
 - Recipe step translation preserves quantities, times, temperatures, units, and appliance terms.
 - Ingredient display translations remain separate from search aliases.
 
-### Phase 13 - v1 Hardening
+### Phase 15 - v1 Hardening
 
 Deliverables:
 

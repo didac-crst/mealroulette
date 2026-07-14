@@ -1,8 +1,8 @@
 # MealRoulette
 
-Self-hosted household meal planning: dishes and recipes, weekly lunch/dinner plans, shopping lists, Telegram reminders, explainable scheduling, cooking mode, and JSON backup/restore.
+Self-hosted household meal planning: dishes and recipes, composable weekly lunch/dinner plans, shopping lists, Telegram reminders, explainable scheduling, cooking mode, and JSON backup/restore.
 
-Current release: **v0.8.0** — see [docs/releases/v0.8.0.md](docs/releases/v0.8.0.md).
+Current release: **v0.10.0** — see [docs/releases/v0.10.0.md](docs/releases/v0.10.0.md).
 
 ## Documentation
 

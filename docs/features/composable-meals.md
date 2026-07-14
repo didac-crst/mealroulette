@@ -1,4 +1,4 @@
-# MealRoulette Phase 12 Spec — Composable Meals and Simple Dishes
+# Composable Meals and Simple Dishes
 
 ## Purpose
 
@@ -309,7 +309,7 @@ Future extension:
 
 - line-level ratings for side dishes or dessert.
 
-Do not implement line-level ratings in Phase 12 unless explicitly approved.
+Do not implement line-level ratings in the initial composable-meals release unless explicitly approved.
 
 ## Leftovers Semantics
 
@@ -323,7 +323,7 @@ Future extension:
 
 - line-level leftovers, e.g. "eat leftover rice but cook fresh fish".
 
-Do not implement line-level leftovers in Phase 12.
+Do not implement line-level leftovers in the initial composable-meals release.
 
 ---
 
@@ -546,7 +546,7 @@ Simple first implementation:
 - score side compatibility with a smaller modifier;
 - aggregate pair vector for similarity and weekly target counting.
 
-**Current generator behaviour (Phase 12 performance guard):**
+**Current generator behaviour (performance guard):**
 
 - eligible centerpieces and sides are **pre-scored once per slot**;
 - pair total = `centerpiece_score + 0.25 × side_score` using those pre-scored estimates;
@@ -662,7 +662,7 @@ Required for accurate aggregation:
 }
 ```
 
-Recommended Phase 12 approach:
+Recommended initial approach:
 
 - extend trait computation to include `food_group_grams` and `total_trait_grams`;
 - use those values to aggregate meal/day/week composition;
@@ -865,7 +865,7 @@ Widths:
 
 - Add aggregate grams to trait computation or direct aggregation service.
 - Add meal-level composition chart.
-- Add day/week charts if still small enough; otherwise create Phase 13.
+- Add day/week charts if still small enough; otherwise schedule a later phase.
 
 ---
 
@@ -889,8 +889,8 @@ Widths:
 2. Should roulette be allowed to add a side to an existing manual centerpiece?
    - Recommendation for MVP: no; roulette only controls empty slots or its own roulette package.
 
-3. Should day/week analytics be required in Phase 12 or allowed to move to Phase 13?
-   - Recommendation: meal-level in Phase 12; day/week in Phase 13 if implementation grows.
+3. Should day/week analytics be required in the initial release or allowed to move to a later phase?
+   - Recommendation: meal-level in the initial release; day/week later if implementation grows.
 
 4. Should a simple pair title use "with" in all cases?
    - Recommendation: yes for compact English UI now; localization later.
