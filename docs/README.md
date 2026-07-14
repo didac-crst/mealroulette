@@ -39,6 +39,7 @@ Where to look for product truth, feature behaviour, operations, and history.
 | [features/taxonomy-resolver.md](features/taxonomy-resolver.md) | Ingredient taxonomy, resolver, food groups and families |
 | [features/computed-traits.md](features/computed-traits.md) | Recipe computed traits and catalog keys |
 | [features/scheduler.md](features/scheduler.md) | Family vectors, similarity, weekly targets |
+| [features/pair-compatibility-reroll.md](features/pair-compatibility-reroll.md) | Composable-meal pair scoring and reroll memory |
 | [features/cooking-mode.md](features/cooking-mode.md) | Today home, step-by-step cooking, timers |
 | [features/meal-composition.md](features/meal-composition.md) | Dish `meal_composition` / planner slots |
 | [features/composable-meals.md](features/composable-meals.md) | Multi-dish meal slots, do-not-plan, composable roulette |

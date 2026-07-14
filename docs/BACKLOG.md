@@ -25,11 +25,13 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**v0.10.0 release candidate — composable meals and simple dishes** on PR [#14](https://github.com/didac-crst/mealroulette/pull/14).
+**Next focus — pair compatibility and reroll memory.**
 
 `v0.9.0` shipped documentation harmonization, UI/UX design-system reconciliation, and live computed traits. See [releases/v0.9.0.md](releases/v0.9.0.md).
 
-`v0.10.0` is ready to tag after PR #14 merges: multi-dish meal slots, `Do not plan`, simple-dish fixture import, stricter canonical ingredient validation, faster roulette pair generation, and parallel backend CI. Release notes: [releases/v0.10.0.md](releases/v0.10.0.md).
+`v0.10.0` shipped multi-dish meal slots, `Do not plan`, simple-dish fixture import, stricter canonical ingredient validation, faster roulette pair generation, and parallel backend CI. Release notes: [releases/v0.10.0.md](releases/v0.10.0.md).
+
+The next scheduler phase is specified in [features/pair-compatibility-reroll.md](features/pair-compatibility-reroll.md): it should prevent compositionally bad centerpiece/side pairs and stop reroll from cycling through already-seen alternatives.
 
 ---
 
@@ -84,7 +86,9 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.7** | Cooking mode — Today home, step-by-step cooking, timers, dish search | **Done** ([`v0.7.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.7.0), merge `9f8fe92`, PR #10) |
 | **v0.8** | Taxonomy hardening + backup — canonical taxonomy tables, backup/export/import | **Done** ([`v0.8.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.8.0), merge `f5ec043`, PR #11) |
 | **v0.9** | UI/UX design system + live recipe traits — shared shell, visual QA, fresh trait reads | **Done** ([`v0.9.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.9.0), merge `9647509`, PR #12/#13) |
-| **v0.10** | Composable meals — multi-dish slots, simple dishes, do-not-plan, faster roulette | In review (PR [#14](https://github.com/didac-crst/mealroulette/pull/14), release notes [v0.10.0](releases/v0.10.0.md)) |
+| **v0.10** | Composable meals — multi-dish slots, simple dishes, do-not-plan, faster roulette | **Done** ([`v0.10.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.10.0), merge `a2e29de`, PR #14) |
+| **Next** | Pair compatibility and reroll memory — prevent bad simple-dish pairs and reroll cycles | Spec ready |
+| **Future** | Household users and memberships — user creation, household scoping, Telegram linking | Architecture needed |
 | **Future** | LLM-assisted entry — draft enrichment, review before save | Not started |
 | **v1.0** | Stable home version — backups, auth hardening, scheduler reliability | Not started |
 
@@ -263,7 +267,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 
 ### v0.10 — Composable Meals and Simple Dishes
 
-**Status:** In review on PR [#14](https://github.com/didac-crst/mealroulette/pull/14). Release target: [`v0.10.0`](releases/v0.10.0.md).
+**Status:** Done — merged in PR [#14](https://github.com/didac-crst/mealroulette/pull/14), tag [`v0.10.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.10.0), merge `a2e29de`.
 
 See [features/composable-meals.md](features/composable-meals.md) and [features/meal-composition.md](features/meal-composition.md).
 
@@ -300,6 +304,54 @@ When `meal_composition = simple_dish`, **`simple_dish_part`** is required: `cent
 - Day/week analytics beyond slot-level meal composition.
 - Whether Telegram/cooking mode need richer per-line presentation beyond current compatibility behavior.
 
+### Next — Pair Compatibility and Reroll Memory
+
+**Status:** Spec ready. See [features/pair-compatibility-reroll.md](features/pair-compatibility-reroll.md).
+
+**Problem:** `v0.10.0` makes composed meals possible, but the scheduler can still pair individually valid dishes into bad meals, such as fish plus tuna salad or beans plus green beans. Reroll can also cycle back to previously shown choices.
+
+**Checklist:**
+
+- [ ] Derive primary canonical ingredients and primary ingredient families from recipe lines.
+- [ ] Derive scheduler-facing simple-dish roles such as `protein_centerpiece`, `vegetable_side`, and `carb_side`.
+- [ ] Reject duplicate dominant canonical ingredients.
+- [ ] Reject duplicate dominant protein families.
+- [ ] Penalize or reject excessive primary-family overlap.
+- [ ] Add positive complementarity scoring for useful centerpiece/side pairs.
+- [ ] Score composed meals as one candidate before selection.
+- [ ] Add pair-level "Why this meal?" reasons and internal rejection reason codes.
+- [ ] Track reroll history per meal slot/combo and avoid silent A/B cycling.
+- [ ] Add explicit reroll exhaustion behavior.
+- [ ] Add table-driven tests for the bad screenshot examples and good expected pairs.
+
+### Future — Household Users and Memberships
+
+**Status:** Architecture needed before implementation.
+
+Use **household** or **workspace** as the product concept, not "entity".
+
+Recommended staged model:
+
+- [ ] Single default household migration for current installations.
+- [ ] `households` table.
+- [ ] `household_memberships` table with household-level roles.
+- [ ] User creation/invite UI for household admins.
+- [ ] Join requests that require household-admin approval.
+- [ ] Telegram subscriptions linked to `{user, household}`.
+- [ ] Household-scoped plans, dishes, recipes, settings, ratings, and notifications.
+- [ ] System-level canonical ingredients, food groups, units, and taxonomy restricted to `system_admin`.
+- [ ] Household admins can manage household recipes/dishes but cannot mutate global canonical taxonomy.
+
+Initial role direction:
+
+| Scope | Role | Capability |
+| --- | --- | --- |
+| System | `system_admin` | Canonical ingredients, taxonomy, units, global maintenance |
+| Household | `admin` | Manage household members, recipes, dishes, planning settings |
+| Household | `user` | Plan, shop, cook, review, reroll |
+
+Do not add public signup before household scoping and membership approval are specified.
+
 ### v1.0 — Stable Home Version
 
 - [ ] Usable mobile UI
@@ -332,9 +384,11 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 10 | Cooking mode | v0.7 | Done (PR #10, `v0.7.0`) |
 | 11 | Taxonomy hardening + backup, export, import | v0.8 | Done (PR #11, `v0.8.0`) |
 | 12 | UI/UX design system and live traits | v0.9 | Done (PR #12/#13, `v0.9.0`) |
-| 13 | Composable meals and simple dishes | v0.10 | In review (PR #14) |
-| 14 | LLM-assisted entry & localization | Future | Not started |
-| 15 | v1 hardening | v1.0 | Not started |
+| 13 | Composable meals and simple dishes | v0.10 | Done (PR #14, `v0.10.0`) |
+| 14 | Pair compatibility and reroll memory | Next | Spec ready |
+| 15 | Household users and memberships | Future | Architecture needed |
+| 16 | LLM-assisted entry & localization | Future | Not started |
+| 17 | v1 hardening | v1.0 | Not started |
 
 ### Phase 0 — Project bootstrap ✅
 
@@ -442,7 +496,7 @@ Branch: `phase-6/shopping`.
 - [x] Ingredient seed import and conversion approval bootstrap
 - [x] Ingredient conversions CRUD API (unique triplet constraint, migration `018`)
 - [x] Ingredient admin UI — catalog list, edit aliases/conversions/unit behavior
-- [x] Localization design documented ([features/localization.md](features/localization.md)); implementation deferred to Phase 14
+- [x] Localization design documented ([features/localization.md](features/localization.md)); implementation deferred to Phase 16
 
 ### Phase 7 — Telegram reminders ✅
 

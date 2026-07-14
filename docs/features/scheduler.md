@@ -3,13 +3,15 @@
 ## Document metadata
 
 - **Purpose:** Family-vector similarity and how it relates to weekly target matching.
-- **Authority:** Canonical for scheduler vector math; weekly target semantics also in [computed-traits.md](computed-traits.md) and [meal-composition.md](meal-composition.md).
+- **Authority:** Canonical for scheduler vector math; weekly target semantics also in [computed-traits.md](computed-traits.md) and [meal-composition.md](meal-composition.md); composed-pair compatibility is in [pair-compatibility-reroll.md](pair-compatibility-reroll.md).
 - **Status:** Living — update when scheduler scoring changes.
 - **Update when:** `targets.py` or neighbour/scoring rules change.
 
 ---
 
 Rules for automatic meal roulette: family-vector similarity, weekly targets, and scoring. Implementation lives in `backend/mealroulette/services/scheduler/`. Product behaviour (reroll, generate week, scheduled job, Telegram) is in [CURSOR_ROADMAP.md](../CURSOR_ROADMAP.md#phase-8---explainable-scheduler).
+
+Composable meal pair compatibility and reroll memory are specified separately in [pair-compatibility-reroll.md](pair-compatibility-reroll.md).
 
 **Purpose:** similarity between dishes for history-aware roulette. **Weekly targets** use main-recipe **computed traits** first (`fish`, `meat`, `pasta`, `rice`, `vegetarian`, …), with **curated style tags** as fallback for non-derivable classifications (e.g. `soup`). See `mealroulette.services.scheduler.targets`.
 

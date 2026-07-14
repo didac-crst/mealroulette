@@ -160,8 +160,10 @@ Phases 0–11 shipped through **`v0.8.0`**. Later phases continue from the docum
 | 11 | Taxonomy hardening + backup, export, import | v0.8 |
 | 12 | UI/UX design system and live traits | v0.9 |
 | 13 | Composable meals and simple dishes | v0.10 |
-| 14 | LLM-assisted entry & localization | Future |
-| 15 | v1 hardening | v1.0 |
+| 14 | Pair compatibility and reroll memory | Next |
+| 15 | Household users and memberships | Future |
+| 16 | LLM-assisted entry & localization | Future |
+| 17 | v1 hardening | v1.0 |
 
 ### Phase 0 - Project Bootstrap
 
@@ -377,7 +379,7 @@ Acceptance criteria:
 - Shopping items show which planned meals require them.
 - Admins can review and approve conversion suggestions from the ingredient dashboard.
 
-**Deferred to Phase 14:** multilingual content translations — design in [features/localization.md](features/localization.md).
+**Deferred to Phase 16:** multilingual content translations — design in [features/localization.md](features/localization.md).
 
 Implementation notes (v0.3):
 
@@ -386,7 +388,7 @@ Implementation notes (v0.3):
 - `services/quantities`: strategy-aware aggregation; approved conversions only for cross-dimension merge.
 - Ingredient seed: `import_ingredient_seed` + `mealroulette_ingredients_seed.yaml`.
 - Frontend: `/shopping` (List tab), `/ingredients` admin catalog and edit.
-- Localization design documented; implementation deferred to Phase 14.
+- Localization design documented; implementation deferred to Phase 16.
 
 ### Later — Leftover inventory (after shopping lists)
 
@@ -904,7 +906,52 @@ Acceptance criteria:
 - Week generation remains interactive with a large centerpiece/side catalog.
 - Backend, frontend, and taxonomy validation pass.
 
-### Phase 14 - LLM-Assisted Entry & Localization
+### Phase 14 - Pair Compatibility and Reroll Memory
+
+Spec: [features/pair-compatibility-reroll.md](features/pair-compatibility-reroll.md). Shipment status: [BACKLOG.md](BACKLOG.md).
+
+Deliverables:
+
+- Primary ingredient and primary family derivation for recipes.
+- Scheduler-facing simple-dish semantic role derivation.
+- Pair hard rejections for duplicate dominant ingredients, duplicate dominant protein, competing animal proteins, and excessive primary-family overlap.
+- Pair soft scoring for complementarity and whole-meal completeness.
+- Pair-level selection reasons and internal rejection reason codes.
+- Reroll seen-combination history per meal slot.
+- Explicit reroll exhaustion response and UI state.
+- Regression tests for observed bad combinations and known good combinations.
+
+Acceptance criteria:
+
+- Sardines/fish/tuna centerpieces are not paired with tuna-bearing sides.
+- Baked beans are not paired with green-bean sides as a high-quality combination.
+- Good combinations such as sardines with potatoes or tomato salad remain eligible.
+- Week generation stays interactive with the simple-dish catalog.
+- Reroll does not silently cycle back to a previously shown meal/combo.
+- "Why this meal?" includes pair-level reasons for composed meals.
+
+### Phase 15 - Household Users and Memberships
+
+Architecture spec: not yet written. Shipment status: [BACKLOG.md](BACKLOG.md).
+
+Deliverables:
+
+- Decide final product name: recommended `household` or `workspace`, not `entity`.
+- Single default household migration for existing installations.
+- Household membership model and per-household roles.
+- User creation/invite/join-request flow.
+- Household-scoped plan, dish, recipe, settings, rating, and Telegram subscription behavior.
+- System-level role for canonical ingredient/taxonomy maintenance.
+
+Acceptance criteria:
+
+- Existing installations migrate into one default household without losing access.
+- A household admin can invite or approve users for their household.
+- Normal household users cannot mutate canonical ingredients, food groups, units, or global taxonomy.
+- Telegram subscriptions are linked to a user and household.
+- Public signup does not grant household access without approval.
+
+### Phase 16 - LLM-Assisted Entry & Localization
 
 Design spec: [features/localization.md](features/localization.md). Shipment status: [BACKLOG.md](BACKLOG.md).
 
@@ -935,7 +982,7 @@ Acceptance criteria:
 - Recipe step translation preserves quantities, times, temperatures, units, and appliance terms.
 - Ingredient display translations remain separate from search aliases.
 
-### Phase 15 - v1 Hardening
+### Phase 17 - v1 Hardening
 
 Deliverables:
 
