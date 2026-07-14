@@ -8,6 +8,9 @@ from mealroulette.db.session import get_db
 from mealroulette.models.user import User
 from mealroulette.schemas.planning import (
     MealPlanCreateRequest,
+    MealPlanDishLineCreateRequest,
+    MealPlanDishLineUpdateRequest,
+    MealPlanDoNotPlanRequest,
     MealPlanItemAteLeftoversRequest,
     MealPlanItemPublic,
     MealPlanItemSkipRequest,
@@ -226,7 +229,57 @@ def assign_meal_plan_slot(
         meal_slot=payload.meal_slot,
         dish_id=payload.dish_id,
         recipe_id=payload.recipe_id,
+        mode=payload.mode,
     )
+
+
+@router.post("/meal-plan-items/{item_id}/lines", response_model=MealPlanItemPublic)
+def add_meal_plan_line(
+    item_id: int,
+    payload: MealPlanDishLineCreateRequest,
+    _user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MealPlanItemPublic:
+    return PlanningService(db).add_line(item_id, payload)
+
+
+@router.put("/meal-plan-item-lines/{line_id}", response_model=MealPlanItemPublic)
+def update_meal_plan_line(
+    line_id: int,
+    payload: MealPlanDishLineUpdateRequest,
+    _user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MealPlanItemPublic:
+    return PlanningService(db).update_line(line_id, payload)
+
+
+@router.delete("/meal-plan-item-lines/{line_id}", response_model=MealPlanItemPublic)
+def delete_meal_plan_line(
+    line_id: int,
+    _user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MealPlanItemPublic:
+    return PlanningService(db).delete_line(line_id)
+
+
+@router.post("/meal-plan-items/{item_id}/do-not-plan", response_model=MealPlanItemPublic)
+def mark_meal_plan_do_not_plan(
+    item_id: int,
+    payload: MealPlanDoNotPlanRequest | None = None,
+    _user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MealPlanItemPublic:
+    body = payload or MealPlanDoNotPlanRequest()
+    return PlanningService(db).mark_do_not_plan(item_id, body)
+
+
+@router.post("/meal-plan-items/{item_id}/reopen", response_model=MealPlanItemPublic)
+def reopen_meal_plan_slot(
+    item_id: int,
+    _user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MealPlanItemPublic:
+    return PlanningService(db).reopen_slot(item_id)
 
 
 @router.post("/meal-plan-items/{item_id}/swap", response_model=MealPlanItemSwapResponse)

@@ -6,29 +6,42 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from mealroulette.core.config import settings
-from mealroulette.data.import_dishes import DEFAULT_FIXTURE_PATH, import_dish_fixtures
+from mealroulette.data.import_dishes import DEFAULT_FIXTURE_PATHS, import_dish_fixtures
 
 
-def import_sample_dishes(fixture_path: Path) -> None:
+def import_sample_dishes(fixture_paths: list[Path]) -> None:
     engine = create_engine(settings.database_url, pool_pre_ping=True)
 
+    total_dishes_added = 0
+    total_dishes_skipped = 0
+    total_recipes_added = 0
+    total_steps_added = 0
+    total_ingredients_added = 0
+    total_ingredients_created = 0
     with Session(engine) as db:
-        result = import_dish_fixtures(db, fixture_path)
+        for fixture_path in fixture_paths:
+            result = import_dish_fixtures(db, fixture_path)
+            total_dishes_added += result.dishes_added
+            total_dishes_skipped += result.dishes_skipped
+            total_recipes_added += result.recipes_added
+            total_steps_added += result.steps_added
+            total_ingredients_added += result.ingredients_added
+            total_ingredients_created += result.ingredients_created
 
-    if result.total_added == 0 and result.dishes_skipped:
-        print(f"All {result.dishes_skipped} dish(es) already present; nothing to import.")
+    if total_dishes_added == 0 and total_dishes_skipped:
+        print(f"All {total_dishes_skipped} dish(es) already present; nothing to import.")
         return
 
     print(
         "Imported "
-        f"{result.dishes_added} dish(es), "
-        f"{result.recipes_added} recipe(s), "
-        f"{result.steps_added} step(s), "
-        f"{result.ingredients_added} recipe ingredient line(s) "
-        f"({result.ingredients_created} new ingredient(s))."
+        f"{total_dishes_added} dish(es), "
+        f"{total_recipes_added} recipe(s), "
+        f"{total_steps_added} step(s), "
+        f"{total_ingredients_added} recipe ingredient line(s) "
+        f"({total_ingredients_created} new ingredient(s))."
     )
-    if result.dishes_skipped:
-        print(f"Skipped {result.dishes_skipped} existing dish(es) by name.")
+    if total_dishes_skipped:
+        print(f"Skipped {total_dishes_skipped} existing dish(es) by name.")
 
 
 def main() -> None:
@@ -38,17 +51,19 @@ def main() -> None:
     parser.add_argument(
         "--file",
         type=Path,
-        default=DEFAULT_FIXTURE_PATH,
-        help=f"Path to fixture YAML (default: {DEFAULT_FIXTURE_PATH.name})",
+        action="append",
+        help="Path to fixture YAML. May be repeated. Defaults to the bundled sample and simple dish fixtures.",
     )
     args = parser.parse_args()
+    fixture_paths = args.file or list(DEFAULT_FIXTURE_PATHS)
 
-    if not args.file.is_file():
-        print(f"Fixture file not found: {args.file}", file=sys.stderr)
-        sys.exit(1)
+    for fixture_path in fixture_paths:
+        if not fixture_path.is_file():
+            print(f"Fixture file not found: {fixture_path}", file=sys.stderr)
+            sys.exit(1)
 
     try:
-        import_sample_dishes(args.file)
+        import_sample_dishes(fixture_paths)
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         sys.exit(1)

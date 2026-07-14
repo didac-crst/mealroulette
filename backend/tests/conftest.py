@@ -1,8 +1,10 @@
 from collections.abc import Generator
+import os
 
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, text
+from sqlalchemy.engine.url import make_url
 from sqlalchemy.orm import Session, sessionmaker
 
 from mealroulette.auth.security import hash_password
@@ -16,11 +18,22 @@ from mealroulette.models.user import User, UserRole
 import mealroulette.models  # noqa: F401
 
 
+def _test_database_url() -> str:
+    worker = os.environ.get("PYTEST_XDIST_WORKER")
+    database_name = "mealroulette_test" if worker in (None, "master") else f"mealroulette_test_{worker}"
+    base_url = os.environ.get(
+        "TEST_DATABASE_URL",
+        "postgresql+psycopg://mealroulette:mealroulette@localhost:5432/mealroulette_test",
+    )
+    return make_url(base_url).set(database=database_name).render_as_string(hide_password=False)
+
+
 @pytest.fixture
 def settings() -> Settings:
+    test_url = _test_database_url()
     return Settings(
-        database_url="postgresql+psycopg://mealroulette:mealroulette@localhost:5432/mealroulette_test",
-        test_database_url="postgresql+psycopg://mealroulette:mealroulette@localhost:5432/mealroulette_test",
+        database_url=test_url,
+        test_database_url=test_url,
         secret_key="test-secret-key-that-is-long-enough-for-hs256",
     )
 

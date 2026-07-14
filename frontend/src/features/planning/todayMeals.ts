@@ -1,5 +1,6 @@
 import type { Recipe } from "../../api/catalog";
 import type { MealPlanItem } from "../../api/planning";
+import { hasMealAssignment } from "./planFormat";
 
 export function resolveCookRecipeId(item: MealPlanItem, recipes: Recipe[]): number | null {
   if (item.recipe_id != null) {
@@ -13,5 +14,5 @@ export function resolveCookRecipeId(item: MealPlanItem, recipes: Recipe[]): numb
 }
 
 export function canOpenCookMode(item: MealPlanItem): boolean {
-  return item.dish_id != null && item.status !== "ate_leftovers";
+  return hasMealAssignment(item) && item.status !== "ate_leftovers";
 }

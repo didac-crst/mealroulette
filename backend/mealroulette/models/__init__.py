@@ -17,7 +17,10 @@ from mealroulette.models.enums import (
     BackupRunStatus,
     BackupType,
     ConversionConfidence,
+    MealPlanDishLineRole,
+    MealPlanDishLineSource,
     MealPlanItemStatus,
+    MealPlanningState,
     MealPlanStatus,
     MealSlot,
     SeasonalityMode,
@@ -25,7 +28,7 @@ from mealroulette.models.enums import (
     ShoppingListStatus,
     UnitDimension,
 )
-from mealroulette.models.planning import MealPlan, MealPlanItem, MealRating
+from mealroulette.models.planning import MealPlan, MealPlanItem, MealPlanItemDish, MealRating
 from mealroulette.models.scheduler import PlanningRule, SchedulerSettings
 from mealroulette.models.shopping import ShoppingList, ShoppingListItem
 from mealroulette.models.taxonomy import FoodGroup, IngredientFamily
@@ -51,7 +54,11 @@ __all__ = [
     "IngredientUnitConversion",
     "MealPlan",
     "MealPlanItem",
+    "MealPlanItemDish",
     "MealPlanItemStatus",
+    "MealPlanDishLineRole",
+    "MealPlanDishLineSource",
+    "MealPlanningState",
     "MealPlanStatus",
     "MealSlot",
     "MealRating",

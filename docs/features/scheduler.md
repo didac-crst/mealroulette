@@ -153,6 +153,19 @@ The generator fills slots **in calendar order** (Mon lunch → Mon dinner → �
 
 **Algorithm:** up to `plan_attempts` (default 50) full passes. Each pass fills all open slots in order; keep the pass with highest total score. Per slot: filter hard constraints → score → take top 5 → weighted random pick.
 
+**Composable simple-dish catalogs (Phase 12):** centerpiece×side pairing can explode when many simple dishes exist. The generator bounds exploration per slot:
+
+| Control | Default |
+| --- | --- |
+| Centerpiece shortlist | top 8 by score + 7 random from the remainder (max 15) |
+| Side shortlist | top 12 by score + 13 random from the remainder (max 25) |
+| Scoring | each eligible main/centerpiece/side scored once per slot; pair total reuses those scores |
+| Adaptive attempts | when `centerpieces × sides > 2000`, effective attempts drop to `min(plan_attempts, max(15, plan_attempts // 2))`; above 10 000 pairs, `min(plan_attempts, max(10, plan_attempts // 3))` |
+
+Example: 94 centerpieces and 88 sides (8 272 pair space) runs 25 attempts instead of 50. Random shortlist slots use the same generator RNG as week generation (deterministic when seeded).
+
+Manual benchmark against a live DB: `python backend/scripts/benchmark_generate_week.py`.
+
 ---
 
 ## 5. Traits, tags, and vectors (reminder)

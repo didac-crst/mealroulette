@@ -6,7 +6,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from mealroulette.models.catalog import Dish, Ingredient, Recipe, RecipeIngredient, Unit
-from mealroulette.models.enums import DishStatus, MealPlanItemStatus, SeasonalityMode
+from mealroulette.models.enums import DishStatus, MealComposition, MealPlanItemStatus, SeasonalityMode
 from mealroulette.models.planning import MealPlanItem, MealRating
 from mealroulette.schemas.scheduler import PlanningRulesConfig
 from mealroulette.services.recipe_traits import compute_recipe_traits_now
@@ -48,6 +48,8 @@ def load_dish_candidates(db: Session, *, rules: PlanningRulesConfig) -> list[Dis
 
     candidates: list[DishCandidate] = []
     for dish in dishes:
+        if dish.meal_composition == MealComposition.dessert:
+            continue
         main_recipe = next((recipe for recipe in dish.recipes if recipe.is_main), None)
         if main_recipe is None:
             main_recipe = dish.recipes[0] if dish.recipes else None
@@ -67,6 +69,8 @@ def load_dish_candidates(db: Session, *, rules: PlanningRulesConfig) -> list[Dis
                 dish_id=dish.id,
                 dish_name=dish.name,
                 recipe_id=main_recipe.id,
+                meal_composition=dish.meal_composition,
+                simple_dish_part=dish.simple_dish_part,
                 tag_names=frozenset(tag.name for tag in dish.tags),
                 protein_tags=frozenset(tag.name for tag in dish.tags if tag.family == "protein"),
                 carb_tags=frozenset(tag.name for tag in dish.tags if tag.family == "carb"),

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import date
 
-from mealroulette.models.enums import MealPlanItemStatus, MealSlot
+from mealroulette.models.enums import MealPlanItemStatus, MealPlanningState, MealSlot
 from mealroulette.schemas.scheduler import PlanningRulesConfig
 from mealroulette.services.scheduler.types import DishCandidate, EatenMealSnapshot, GenerationSlot
 
@@ -14,7 +14,10 @@ def slot_is_regenerable(
     is_locked: bool,
     manually_selected: bool,
     status: MealPlanItemStatus,
+    planning_state: MealPlanningState = MealPlanningState.open,
 ) -> bool:
+    if planning_state == MealPlanningState.do_not_plan:
+        return False
     if is_locked or manually_selected:
         return False
     if meal_date < today:

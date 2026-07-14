@@ -2,6 +2,24 @@ import { apiRequest } from "./client";
 
 export type MealSlot = "lunch" | "dinner";
 export type MealPlanItemStatus = "planned" | "eaten" | "skipped" | "ate_leftovers";
+export type MealPlanningState = "open" | "do_not_plan";
+export type MealPlanDishLineRole = "main" | "centerpiece" | "side" | "dessert" | "extra";
+export type MealPlanDishLineSource = "roulette" | "manual" | "leftover";
+export type MealPlanAssignMode = "add" | "replace_roulette" | "replace_all";
+
+export type MealPlanDishLine = {
+  id: number;
+  meal_plan_item_id: number;
+  dish_id: number | null;
+  recipe_id: number | null;
+  dish_name: string | null;
+  recipe_variant_name: string | null;
+  role: MealPlanDishLineRole;
+  source: MealPlanDishLineSource;
+  position: number;
+  selection_reasons_json: Record<string, unknown> | null;
+  computed_traits_json: Record<string, unknown> | null;
+};
 
 export type MealPlanItem = {
   id: number;
@@ -13,6 +31,9 @@ export type MealPlanItem = {
   dish_name: string | null;
   recipe_variant_name: string | null;
   status: MealPlanItemStatus;
+  planning_state: MealPlanningState;
+  title: string;
+  lines: MealPlanDishLine[];
   is_locked: boolean;
   manually_selected: boolean;
   skip_reason: string | null;
@@ -198,6 +219,7 @@ export async function generateMealPlanWeekDetails(
   return apiRequest<MealPlanRouletteResponse>(`/api/meal-plans/${mealPlanId}/generate/details`, {
     method: "POST",
     token,
+    timeoutMs: 60_000,
   });
 }
 
@@ -234,11 +256,72 @@ export async function assignMealPlanSlot(
     meal_slot: MealSlot;
     dish_id: number;
     recipe_id?: number | null;
+    mode?: MealPlanAssignMode;
   },
 ): Promise<MealPlanItem> {
   return apiRequest<MealPlanItem>("/api/meal-plan-items/assign", {
     method: "POST",
     token,
     body: JSON.stringify(body),
+  });
+}
+
+export async function addMealPlanLine(
+  token: string,
+  itemId: number,
+  body: {
+    dish_id: number;
+    recipe_id?: number | null;
+    role?: MealPlanDishLineRole;
+    position?: number;
+  },
+): Promise<MealPlanItem> {
+  return apiRequest<MealPlanItem>(`/api/meal-plan-items/${itemId}/lines`, {
+    method: "POST",
+    token,
+    body: JSON.stringify(body),
+  });
+}
+
+export async function updateMealPlanLine(
+  token: string,
+  lineId: number,
+  body: {
+    dish_id?: number;
+    recipe_id?: number | null;
+    role?: MealPlanDishLineRole;
+    position?: number;
+  },
+): Promise<MealPlanItem> {
+  return apiRequest<MealPlanItem>(`/api/meal-plan-item-lines/${lineId}`, {
+    method: "PUT",
+    token,
+    body: JSON.stringify(body),
+  });
+}
+
+export async function deleteMealPlanLine(token: string, lineId: number): Promise<MealPlanItem> {
+  return apiRequest<MealPlanItem>(`/api/meal-plan-item-lines/${lineId}`, {
+    method: "DELETE",
+    token,
+  });
+}
+
+export async function markMealDoNotPlan(
+  token: string,
+  itemId: number,
+  removeExistingLines = true,
+): Promise<MealPlanItem> {
+  return apiRequest<MealPlanItem>(`/api/meal-plan-items/${itemId}/do-not-plan`, {
+    method: "POST",
+    token,
+    body: JSON.stringify({ remove_existing_lines: removeExistingLines }),
+  });
+}
+
+export async function reopenMealSlot(token: string, itemId: number): Promise<MealPlanItem> {
+  return apiRequest<MealPlanItem>(`/api/meal-plan-items/${itemId}/reopen`, {
+    method: "POST",
+    token,
   });
 }

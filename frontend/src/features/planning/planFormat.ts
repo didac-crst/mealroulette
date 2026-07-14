@@ -1,4 +1,4 @@
-import type { MealPlanItem, MealPlanItemStatus, MealSlot } from "../../api/planning";
+import type { MealPlanDishLine, MealPlanItem, MealPlanItemStatus, MealSlot } from "../../api/planning";
 import { isoDateFromLocalDate } from "../../lib/datetime";
 
 const DAY_FORMAT = new Intl.DateTimeFormat(undefined, { weekday: "long", month: "short", day: "numeric" });
@@ -258,7 +258,46 @@ export function weekStartForDate(isoDate: string): string {
   return date.toISOString().slice(0, 10);
 }
 
+export function sortedMealLines(item: MealPlanItem): MealPlanDishLine[] {
+  return [...(item.lines ?? [])].sort((left, right) => left.position - right.position);
+}
+
+export function primaryDishId(item: MealPlanItem): number | null {
+  const lines = sortedMealLines(item);
+  return lines[0]?.dish_id ?? item.dish_id;
+}
+
+export function hasMealAssignment(item: MealPlanItem): boolean {
+  return sortedMealLines(item).length > 0 || item.dish_id != null;
+}
+
+export function isDoNotPlanSlot(item: MealPlanItem): boolean {
+  return item.planning_state === "do_not_plan";
+}
+
+export function mealSlotTitle(item: MealPlanItem): string {
+  return item.title || "Unassigned";
+}
+
+export function lineSelectionReasonsList(line: MealPlanDishLine): string[] {
+  const payload = line.selection_reasons_json;
+  if (!payload || typeof payload !== "object") {
+    return [];
+  }
+  const reasons = (payload as { reasons?: unknown }).reasons;
+  if (!Array.isArray(reasons)) {
+    return [];
+  }
+  return reasons.filter((reason): reason is string => typeof reason === "string");
+}
+
 export function selectionReasonsList(item: MealPlanItem): string[] {
+  const lineReasons = sortedMealLines(item).flatMap((line) =>
+    line.source === "roulette" ? lineSelectionReasonsList(line) : [],
+  );
+  if (lineReasons.length > 0) {
+    return lineReasons;
+  }
   const payload = item.selection_reasons_json;
   if (!payload || typeof payload !== "object") {
     return [];
@@ -270,12 +309,32 @@ export function selectionReasonsList(item: MealPlanItem): string[] {
   return reasons.filter((reason): reason is string => typeof reason === "string");
 }
 
+export function hasRouletteLines(item: MealPlanItem): boolean {
+  const lines = sortedMealLines(item);
+  if (lines.length > 0) {
+    return lines.some((line) => line.source === "roulette");
+  }
+  return hasMealAssignment(item) && !item.manually_selected;
+}
+
 export function canRerollMeal(item: MealPlanItem): boolean {
-  return item.status === "planned" && !item.is_locked && item.date >= todayIso();
+  return (
+    item.status === "planned" &&
+    !item.is_locked &&
+    !isDoNotPlanSlot(item) &&
+    item.date >= todayIso() &&
+    (hasRouletteLines(item) || !hasMealAssignment(item))
+  );
 }
 
 export function canSwapMeal(item: MealPlanItem): boolean {
-  return item.status === "planned" && !item.is_locked && item.date >= todayIso();
+  return (
+    item.status === "planned" &&
+    !item.is_locked &&
+    !isDoNotPlanSlot(item) &&
+    item.date >= todayIso() &&
+    hasMealAssignment(item)
+  );
 }
 
 export function swappableMeals(item: MealPlanItem, planItems: MealPlanItem[]): MealPlanItem[] {

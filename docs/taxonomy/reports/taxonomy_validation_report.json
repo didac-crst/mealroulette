@@ -3,7 +3,7 @@
   "candidates_path": "backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml",
   "active_seed_path": "backend/mealroulette/data/fixtures/mealroulette_ingredients_seed.yaml",
   "summary": {
-    "candidates": 412,
+    "candidates": 434,
     "food_groups": 22,
     "families": 69,
     "blockers": 0,
@@ -11,10 +11,10 @@
     "suggestions": 0,
     "alias_collisions": 0,
     "suspicious_conversions": 0,
-    "auto_accepted": 412
+    "auto_accepted": 434
   },
   "tier_counts": {
-    "auto_accepted": 412,
+    "auto_accepted": 434,
     "needs_human_review": 0,
     "blocked": 0
   },

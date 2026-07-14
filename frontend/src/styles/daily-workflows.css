@@ -347,6 +347,14 @@
   gap: var(--space-3);
 }
 
+.meal-composition {
+  margin-top: var(--space-2);
+}
+
+.meal-composition .recipe-composition-chart {
+  --recipe-composition-size: clamp(96px, 22vw, 128px);
+}
+
 .today-empty-slot {
   padding: var(--space-5);
 }

@@ -37,6 +37,9 @@ function item(overrides: Partial<MealPlanItem>): MealPlanItem {
     dish_name: null,
     recipe_variant_name: null,
     status: "planned",
+    planning_state: "open",
+    title: "Unassigned",
+    lines: [],
     is_locked: false,
     manually_selected: false,
     skip_reason: null,
@@ -169,7 +172,9 @@ describe("planFormat", () => {
 
   it("computes Monday week start and reroll eligibility", () => {
     expect(weekStartForDate("2026-07-09")).toBe("2026-07-06");
+    expect(canRerollMeal(item({ date: todayIso(), status: "planned", is_locked: false, dish_id: 1 }))).toBe(true);
     expect(canRerollMeal(item({ date: todayIso(), status: "planned", is_locked: false }))).toBe(true);
+    expect(canRerollMeal(item({ date: todayIso(), status: "planned", is_locked: false, manually_selected: true, dish_id: 1 }))).toBe(false);
     expect(canRerollMeal(item({ date: "2020-01-01", status: "planned", is_locked: false }))).toBe(false);
     expect(canRerollMeal(item({ date: todayIso(), status: "planned", is_locked: true }))).toBe(false);
     expect(canSwapMeal(item({ date: todayIso(), status: "planned", is_locked: true }))).toBe(false);

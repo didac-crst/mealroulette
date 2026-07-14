@@ -9,8 +9,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from mealroulette.models.catalog import Ingredient, IngredientUnitConversion, Recipe, RecipeIngredient, Unit
-from mealroulette.models.enums import AggregationStrategy, MealPlanItemStatus, ShoppingListStatus
-from mealroulette.models.planning import MealPlanItem
+from mealroulette.models.enums import AggregationStrategy, MealPlanningState, MealPlanItemStatus, ShoppingListStatus
+from mealroulette.models.planning import MealPlanItem, MealPlanItemDish
 from mealroulette.models.shopping import ShoppingList, ShoppingListItem
 from mealroulette.schemas.shopping import (
     ShoppingListCreateRequest,
@@ -45,6 +45,8 @@ class _SourcedLine:
     line: QuantityLine
     meal_plan_item_id: int
     optional: bool
+    dish_name: str
+    recipe_variant_name: str | None
 
 
 @dataclass(frozen=True)
@@ -109,28 +111,51 @@ class ShoppingListService:
         return grouped
 
     def _eligible_meal_items(self, from_date: date, to_date: date) -> list[MealPlanItem]:
-        return list(
+        recipe_ingredient_load = (
+            selectinload(Recipe.ingredients).selectinload(RecipeIngredient.ingredient),
+            selectinload(Recipe.ingredients).selectinload(RecipeIngredient.unit),
+        )
+        items = list(
             self.db.scalars(
                 select(MealPlanItem)
                 .where(
                     MealPlanItem.date >= from_date,
                     MealPlanItem.date <= to_date,
-                    MealPlanItem.dish_id.is_not(None),
-                    MealPlanItem.recipe_id.is_not(None),
                     MealPlanItem.status == MealPlanItemStatus.planned,
+                    MealPlanItem.planning_state != MealPlanningState.do_not_plan,
                 )
                 .options(
                     selectinload(MealPlanItem.dish),
-                    selectinload(MealPlanItem.recipe).selectinload(Recipe.ingredients).selectinload(
-                        RecipeIngredient.ingredient
-                    ),
-                    selectinload(MealPlanItem.recipe).selectinload(Recipe.ingredients).selectinload(
-                        RecipeIngredient.unit
-                    ),
+                    selectinload(MealPlanItem.recipe).options(*recipe_ingredient_load),
+                    selectinload(MealPlanItem.lines)
+                    .selectinload(MealPlanItemDish.dish),
+                    selectinload(MealPlanItem.lines)
+                    .selectinload(MealPlanItemDish.recipe)
+                    .options(*recipe_ingredient_load),
                 )
                 .order_by(MealPlanItem.date, MealPlanItem.meal_slot)
             )
         )
+        return [
+            item
+            for item in items
+            if any(line.recipe_id is not None for line in item.lines) or item.recipe_id is not None
+        ]
+
+    @staticmethod
+    def _recipe_sources_for_item(meal_item: MealPlanItem) -> list[tuple[Recipe, str | None, str | None]]:
+        sources: list[tuple[Recipe, str | None, str | None]] = []
+        for line in sorted(meal_item.lines, key=lambda row: row.position):
+            if line.recipe is None:
+                continue
+            dish_name = line.dish.name if line.dish else "Unknown"
+            recipe_variant_name = line.recipe.variant_name if line.recipe else None
+            sources.append((line.recipe, dish_name, recipe_variant_name))
+        if not sources and meal_item.recipe is not None:
+            dish_name = meal_item.dish.name if meal_item.dish else "Unknown"
+            recipe_variant_name = meal_item.recipe.variant_name if meal_item.recipe else None
+            sources.append((meal_item.recipe, dish_name, recipe_variant_name))
+        return sources
 
     def _collect_sourced_lines(
         self,
@@ -140,28 +165,29 @@ class ShoppingListService:
     ) -> list[_SourcedLine]:
         sourced: list[_SourcedLine] = []
         for meal_item in meal_items:
-            if meal_item.recipe is None:
-                continue
-            for recipe_ingredient in meal_item.recipe.ingredients:
-                ingredient = recipe_ingredient.ingredient
-                if exclude_pantry and ingredient.pantry_item:
-                    continue
-                if recipe_ingredient.quantity is None or recipe_ingredient.unit_id is None:
-                    continue
-                unit = units.get(recipe_ingredient.unit_id)
-                if unit is None:
-                    continue
-                sourced.append(
-                    _SourcedLine(
-                        line=QuantityLine(
-                            ingredient_id=ingredient.id,
-                            quantity=recipe_ingredient.quantity,
-                            unit=unit,
-                        ),
-                        meal_plan_item_id=meal_item.id,
-                        optional=recipe_ingredient.optional,
+            for recipe, dish_name, recipe_variant_name in self._recipe_sources_for_item(meal_item):
+                for recipe_ingredient in recipe.ingredients:
+                    ingredient = recipe_ingredient.ingredient
+                    if exclude_pantry and ingredient.pantry_item:
+                        continue
+                    if recipe_ingredient.quantity is None or recipe_ingredient.unit_id is None:
+                        continue
+                    unit = units.get(recipe_ingredient.unit_id)
+                    if unit is None:
+                        continue
+                    sourced.append(
+                        _SourcedLine(
+                            line=QuantityLine(
+                                ingredient_id=ingredient.id,
+                                quantity=recipe_ingredient.quantity,
+                                unit=unit,
+                            ),
+                            meal_plan_item_id=meal_item.id,
+                            optional=recipe_ingredient.optional,
+                            dish_name=dish_name,
+                            recipe_variant_name=recipe_variant_name,
+                        )
                     )
-                )
         return sourced
 
     def _ingredient_contexts(
@@ -253,8 +279,8 @@ class ShoppingListService:
                     meal_plan_item_id=entry.meal_plan_item_id,
                     date=meal_item.date,
                     meal_slot=meal_item.meal_slot,
-                    dish_name=meal_item.dish.name if meal_item.dish else "Unknown",
-                    recipe_variant_name=meal_item.recipe.variant_name if meal_item.recipe else None,
+                    dish_name=entry.dish_name,
+                    recipe_variant_name=entry.recipe_variant_name,
                     quantity=entry.line.quantity,
                     unit_symbol=entry.line.unit.symbol,
                     optional=entry.optional,
@@ -304,16 +330,19 @@ class ShoppingListService:
 
     @staticmethod
     def _build_planned_meals(meal_items: list[MealPlanItem]) -> list[ShoppingPlannedMeal]:
-        return [
-            ShoppingPlannedMeal(
-                meal_plan_item_id=item.id,
-                date=item.date,
-                meal_slot=item.meal_slot,
-                dish_name=item.dish.name if item.dish else "Unknown",
-                recipe_variant_name=item.recipe.variant_name if item.recipe else None,
-            )
-            for item in meal_items
-        ]
+        planned: list[ShoppingPlannedMeal] = []
+        for item in meal_items:
+            for recipe, dish_name, recipe_variant_name in ShoppingListService._recipe_sources_for_item(item):
+                planned.append(
+                    ShoppingPlannedMeal(
+                        meal_plan_item_id=item.id,
+                        date=item.date,
+                        meal_slot=item.meal_slot,
+                        dish_name=dish_name,
+                        recipe_variant_name=recipe_variant_name,
+                    )
+                )
+        return planned
 
     @staticmethod
     def _contributions_to_json(contributions: list[ShoppingSourceContribution]) -> list[dict]:
@@ -339,10 +368,9 @@ class ShoppingListService:
         meal_by_id = {item.id: item for item in meal_items}
         ingredient_cache: dict[int, Ingredient] = {}
         for meal_item in meal_items:
-            if meal_item.recipe is None:
-                continue
-            for recipe_ingredient in meal_item.recipe.ingredients:
-                ingredient_cache[recipe_ingredient.ingredient.id] = recipe_ingredient.ingredient
+            for recipe, _, _ in self._recipe_sources_for_item(meal_item):
+                for recipe_ingredient in recipe.ingredients:
+                    ingredient_cache[recipe_ingredient.ingredient.id] = recipe_ingredient.ingredient
 
         generated: list[_GeneratedItem] = []
         for aggregated, group in self._aggregate_sourced_lines(
@@ -555,7 +583,12 @@ class ShoppingListService:
             self.db.scalars(
                 select(MealPlanItem)
                 .where(MealPlanItem.id.in_(meal_item_ids))
-                .options(selectinload(MealPlanItem.dish), selectinload(MealPlanItem.recipe))
+                .options(
+                    selectinload(MealPlanItem.dish),
+                    selectinload(MealPlanItem.recipe),
+                    selectinload(MealPlanItem.lines).selectinload(MealPlanItemDish.dish),
+                    selectinload(MealPlanItem.lines).selectinload(MealPlanItemDish.recipe),
+                )
                 .order_by(MealPlanItem.date, MealPlanItem.meal_slot)
             )
         ) if meal_item_ids else []

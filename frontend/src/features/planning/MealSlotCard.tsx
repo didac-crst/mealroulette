@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import type { Dish, Recipe } from "../../api/catalog";
-import { fetchRecipes } from "../../api/catalog";
+import type { Dish } from "../../api/catalog";
 import { ApiError } from "../../api/client";
-import { Button, DisclosureSection, ResponsiveActionGroup, ReviewOutcomeSelector, SearchSelect, StatusBadge } from "../../components/ui";
+import { Button, DisclosureSection, ResponsiveActionGroup, ReviewOutcomeSelector, StatusBadge } from "../../components/ui";
 import { dishPlaceholderEmoji } from "../dishes/dishVisual";
 import {
   fetchMealRating,
@@ -25,8 +24,11 @@ import {
   formatStatus,
   canRerollMeal,
   canSwapMeal,
+  hasMealAssignment,
   isFutureMealDate,
   leftoverSourceLabel,
+  mealSlotTitle,
+  primaryDishId,
   selectionReasonsList,
   showLeftoverSourcePicker,
   showLeftoverSourceSummary,
@@ -36,6 +38,8 @@ import {
   showUndoStatus,
   swappableMeals,
 } from "./planFormat";
+import { MealSlotLinesSummary, MealSlotPlanEditor } from "./MealSlotPlanEditor";
+import { MealCompositionChart } from "./MealCompositionChart";
 import { mealStatusBadgeVariant } from "./mealStatusBadge";
 import { canOpenCookMode } from "./todayMeals";
 import { StarRatingDisplay, StarRatingInput } from "./StarRating";
@@ -88,8 +92,6 @@ export function MealSlotCard({
   const [skipReason, setSkipReason] = useState(item.skip_reason ?? "");
   const [skipComment, setSkipComment] = useState(item.skip_comment ?? "");
   const [skipFormOpen, setSkipFormOpen] = useState(false);
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [recipesLoading, setRecipesLoading] = useState(false);
   const [leftoverSourceId, setLeftoverSourceId] = useState(
     item.leftover_source_item_id ? String(item.leftover_source_item_id) : "",
   );
@@ -108,50 +110,12 @@ export function MealSlotCard({
   const swapTargets = swappableMeals(item, planItems);
   const showReroll = mode === "plan" && onReroll && canRerollMeal(item);
   const showSwap = mode === "plan" && onSwap && canSwapMeal(item);
-  const dish = item.dish_id ? dishes.find((entry) => entry.id === item.dish_id) : undefined;
-  const dishOptions = useMemo(
-    () => dishes.map((entry) => ({ value: String(entry.id), label: entry.name })),
-    [dishes],
-  );
-  const recipeOptions = useMemo(
-    () =>
-      recipes.map((recipe) => ({
-        value: String(recipe.id),
-        label: `${recipe.variant_name}${recipe.is_main ? " (main)" : ""}`,
-      })),
-    [recipes],
-  );
+  const primaryDish = primaryDishId(item);
+  const dish = primaryDish ? dishes.find((entry) => entry.id === primaryDish) : undefined;
+  const slotTitle = mealSlotTitle(item);
+  const assigned = hasMealAssignment(item);
   const selectionReasons = selectionReasonsList(item);
   const showLock = mode === "plan";
-
-  useEffect(() => {
-    if (mode !== "plan" || !item.dish_id) {
-      setRecipes([]);
-      setRecipesLoading(false);
-      return;
-    }
-    let cancelled = false;
-    setRecipesLoading(true);
-    fetchRecipes(accessToken, item.dish_id)
-      .then((data) => {
-        if (!cancelled) {
-          setRecipes(data);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setRecipes([]);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setRecipesLoading(false);
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [accessToken, item.dish_id, mode]);
 
   useEffect(() => {
     if (!showReviewRating(item)) {
@@ -226,26 +190,6 @@ export function MealSlotCard({
     }
   }
 
-  async function handleDishChange(dishId: string) {
-    if (dishId === "") {
-      await run(() => updateMealPlanItem(accessToken, item.id, { dish_id: null }));
-      return;
-    }
-    await run(() => updateMealPlanItem(accessToken, item.id, { dish_id: Number(dishId) }));
-  }
-
-  async function handleRecipeChange(recipeId: string) {
-    if (!item.dish_id) {
-      return;
-    }
-    await run(() =>
-      updateMealPlanItem(accessToken, item.id, {
-        dish_id: item.dish_id,
-        recipe_id: recipeId === "" ? null : Number(recipeId),
-      }),
-    );
-  }
-
   const cardClass = [
     "meal-slot-card",
     mode === "today" ? "meal-hero-card" : "",
@@ -271,15 +215,16 @@ export function MealSlotCard({
               <p className="meal-slot-label">{formatSlotLabel(item.meal_slot)}</p>
               <StatusBadge variant={statusBadgeVariant}>{statusLabel}</StatusBadge>
             </div>
-            {item.dish_id ? (
-              <Link to={`/dishes/${item.dish_id}`} className="meal-hero-title">
-                {item.dish_name}
+            {assigned && primaryDish ? (
+              <Link to={`/dishes/${primaryDish}`} className="meal-hero-title">
+                {slotTitle}
               </Link>
             ) : (
-              <p className="muted meal-slot-empty">No dish assigned</p>
+              <p className="muted meal-slot-empty">{slotTitle}</p>
             )}
-            {item.recipe_variant_name ? (
-              <p className="muted meal-hero-recipe">{item.recipe_variant_name}</p>
+            <MealSlotLinesSummary item={item} />
+            {assigned && item.computed_traits_json ? (
+              <MealCompositionChart traits={item.computed_traits_json} />
             ) : null}
           </div>
         </div>
@@ -287,15 +232,16 @@ export function MealSlotCard({
         <div className="meal-slot-header">
           <div>
             <p className="meal-slot-label">{formatSlotLabel(item.meal_slot)}</p>
-            {item.dish_id ? (
-              <Link to={`/dishes/${item.dish_id}`} className="meal-slot-dish">
-                {item.dish_name}
+            {assigned && primaryDish ? (
+              <Link to={`/dishes/${primaryDish}`} className="meal-slot-dish">
+                {slotTitle}
               </Link>
             ) : (
-              <p className="muted meal-slot-empty">No dish assigned</p>
+              <p className="muted meal-slot-empty">{slotTitle}</p>
             )}
-            {item.recipe_variant_name && !(mode === "plan" && item.dish_id && recipes.length > 0) ? (
-              <p className="muted meal-slot-recipe">{item.recipe_variant_name}</p>
+            {mode !== "plan" ? <MealSlotLinesSummary item={item} /> : null}
+            {mode !== "plan" && assigned && item.computed_traits_json ? (
+              <MealCompositionChart traits={item.computed_traits_json} />
             ) : null}
           </div>
           <div className="meal-slot-header-aside">
@@ -329,44 +275,14 @@ export function MealSlotCard({
 
       {mode === "plan" ? (
         <>
-          <label className="meal-slot-assign">
-            <span className="muted">Assign dish</span>
-            <SearchSelect
-              ariaLabel="Assign dish"
-              value={item.dish_id ? String(item.dish_id) : ""}
-              options={dishOptions}
-              disabled={busy || item.is_locked}
-              placeholder="Search dishes…"
-              allowEmptyOption
-              emptyLabel="Clear assignment"
-              onChange={(nextValue) => void handleDishChange(nextValue)}
-            />
-          </label>
-
-          {item.dish_id && recipesLoading ? (
-            <p className="muted meal-slot-recipe">Loading recipes…</p>
-          ) : item.dish_id && recipes.length === 0 ? (
-            <p className="muted meal-slot-recipe">No recipes for this dish yet.</p>
-          ) : item.dish_id && recipes.length === 1 ? (
-            <p className="muted meal-slot-recipe">
-              Recipe: <strong>{recipes[0]?.variant_name}</strong>
-              {recipes[0]?.is_main ? " (main)" : ""}
-            </p>
-          ) : item.dish_id && recipes.length > 1 ? (
-            <label className="meal-slot-assign">
-              <span className="muted">Recipe variant</span>
-              <SearchSelect
-                ariaLabel="Recipe variant"
-                value={item.recipe_id ? String(item.recipe_id) : ""}
-                options={recipeOptions}
-                disabled={busy || item.is_locked}
-                placeholder="Search recipes…"
-                allowEmptyOption
-                emptyLabel="Main recipe"
-                onChange={(nextValue) => void handleRecipeChange(nextValue)}
-              />
-            </label>
-          ) : null}
+          <MealSlotPlanEditor
+            item={item}
+            dishes={dishes}
+            accessToken={accessToken}
+            disabled={actionBusy}
+            onChanged={onChanged}
+            onError={onError}
+          />
 
           {selectionReasons.length > 0 ? (
             <DisclosureSection title="Why this meal">
@@ -376,6 +292,10 @@ export function MealSlotCard({
                 ))}
               </ul>
             </DisclosureSection>
+          ) : null}
+
+          {assigned && item.computed_traits_json ? (
+            <MealCompositionChart traits={item.computed_traits_json} />
           ) : null}
 
           <div className="meal-slot-plan-actions">
@@ -408,7 +328,7 @@ export function MealSlotCard({
                 variant="secondary"
                 size="sm"
                 className="meal-slot-secondary-action"
-                disabled={actionBusy || (!item.is_locked && !item.dish_id)}
+                disabled={actionBusy || (!item.is_locked && !assigned)}
                 onClick={() =>
                   void run(() =>
                     item.is_locked
@@ -436,9 +356,9 @@ export function MealSlotCard({
         </>
       ) : null}
 
-      {mode === "today" && (item.dish_id || showReviewExecutionActions(item)) ? (
+      {mode === "today" && (assigned || showReviewExecutionActions(item)) ? (
         <ResponsiveActionGroup className="meal-hero-actions" stackOnMobile>
-          {item.dish_id ? (
+          {assigned ? (
             canOpenCookMode(item) ? (
               cookRecipeId ? (
                 <Link to={`/recipes/${cookRecipeId}/cook`} className="button">
@@ -478,7 +398,7 @@ export function MealSlotCard({
                   title: "Ate as planned",
                   description: "Mark this meal as eaten.",
                   icon: "✓",
-                  disabled: busy || !item.dish_id,
+                  disabled: busy || !assigned,
                   onSelect: () => void run(() => markMealPlanItemEaten(accessToken, item.id)),
                 },
                 {

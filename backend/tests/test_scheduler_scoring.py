@@ -2,7 +2,7 @@ from datetime import date
 
 import pytest
 
-from mealroulette.models.enums import MealPlanItemStatus, MealSlot
+from mealroulette.models.enums import MealComposition, MealPlanItemStatus, MealPlanningState, MealSlot
 from mealroulette.schemas.scheduler import PlanningRulesConfig, WeeklyTargetSpec
 from mealroulette.services.scheduler.constraints import (
     build_dish_date_index,
@@ -37,6 +37,8 @@ def _candidate(
         dish_id=dish_id,
         dish_name=name,
         recipe_id=dish_id * 10,
+        meal_composition=MealComposition.main_dish,
+        simple_dish_part=None,
         tag_names=tag_names or frozenset(),
         protein_tags=protein_tags or frozenset(),
         carb_tags=frozenset(),
@@ -89,6 +91,14 @@ def test_slot_is_regenerable_respects_lock_and_past_dates():
         is_locked=True,
         manually_selected=False,
         status=MealPlanItemStatus.planned,
+    )
+    assert not slot_is_regenerable(
+        meal_date=date(2026, 7, 2),
+        today=today,
+        is_locked=False,
+        manually_selected=False,
+        status=MealPlanItemStatus.planned,
+        planning_state=MealPlanningState.do_not_plan,
     )
 
 

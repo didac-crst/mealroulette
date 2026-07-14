@@ -43,9 +43,10 @@ Desserts may appear on the plan for shopping and review but must not be picked b
 
 ## Out of scope (Phase 11)
 
-- Multi-component `MealPlanItem` rows (one slot, two dishes)
 - Scheduler candidate generation and half-meal pairing
 - Weekly target counting per slot vs per component
+
+Phase 12 composable meals: see [composable-meals.md](composable-meals.md).
 
 ## API
 

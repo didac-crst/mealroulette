@@ -14,9 +14,9 @@ Execution tracker for what has been built, what is in progress, and what comes n
 This file is the **status board**. It does not replace the product spec or build plan:
 
 - [SPECS.md](../SPECS.md) — product requirements and long-term version roadmap (v0.1 → v1.0)
-- [CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) — implementation phases (Phase 0 → Phase 13)
+- [CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) — implementation phases
 - [README.md](README.md) — documentation authority map
-- [features/localization.md](features/localization.md) — multilingual content design (Phase 12)
+- [features/localization.md](features/localization.md) — multilingual content design (future phase)
 - [MVP.md](MVP.md) — MVP goal and acceptance test
 
 Update this file when a phase or version milestone lands.
@@ -25,11 +25,11 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Phase 12 — LLM-assisted entry & localization** on `main` (from `v0.8.0`).
+**v0.10.0 release candidate — composable meals and simple dishes** on PR [#14](https://github.com/didac-crst/mealroulette/pull/14).
 
-Phase 11 shipped taxonomy hardening and backup/export/import as [`v0.8.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.8.0). See [features/backup-export-import.md](features/backup-export-import.md), [operations/restore.md](operations/restore.md), and [ADR 002](adr/002-canonical-taxonomy-before-backup.md).
+`v0.9.0` shipped documentation harmonization, UI/UX design-system reconciliation, and live computed traits. See [releases/v0.9.0.md](releases/v0.9.0.md).
 
-**v0.8 shipped** as [`v0.8.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.8.0) — taxonomy tables, computed-trait weekly targets, meal composition metadata, JSON backup/import, scheduled backups, restore docs. Release notes: [docs/releases/v0.8.0.md](releases/v0.8.0.md).
+`v0.10.0` is ready to tag after PR #14 merges: multi-dish meal slots, `Do not plan`, simple-dish fixture import, stricter canonical ingredient validation, faster roulette pair generation, and parallel backend CI. Release notes: [releases/v0.10.0.md](releases/v0.10.0.md).
 
 ---
 
@@ -62,8 +62,10 @@ Use one branch per milestone, then merge via pull request:
 - `phase-7/telegram-review` — Telegram bot, reminders, on-demand commands, recipe links (merged in PR #7, `v0.4.0`)
 - `phase-8/scheduler` — explainable scheduler, family-vector similarity, scheduled roulette (merged, `v0.5.0`, PR #8)
 - `phase-9/computed-recipe-traits` — public keys, food groups, computed recipe traits, taxonomy & resolver (merged in PR #9, `v0.6.0`)
-- `phase-10/cooking-mode` — interactive cooking mode with step timers & Telegram alerts (PR #10)
+- `phase-10/cooking-mode` — interactive cooking mode with step timers & Telegram alerts (merged in PR #10, `v0.7.0`)
 - `phase-11/taxonomy-backup` — taxonomy hardening and backup/export/import (merged in PR #11, `v0.8.0`)
+- `phase-12/ui-ux-design-system` — documentation harmonization, UI/UX reconciliation, live computed traits (merged in PR #12 and PR #13, `v0.9.0`)
+- `phase-13/composable-fixtures-scheduler-ci` — composable meal slots, simple dishes, scheduler performance, parallel CI (PR #14, release target `v0.10.0`)
 
 ---
 
@@ -81,8 +83,9 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.6** | Catalog keys & computed traits — public keys, food groups, recipe trait metadata | **Done** ([`v0.6.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.6.0), merge `322c30c`, PR #9) |
 | **v0.7** | Cooking mode — Today home, step-by-step cooking, timers, dish search | **Done** ([`v0.7.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.7.0), merge `9f8fe92`, PR #10) |
 | **v0.8** | Taxonomy hardening + backup — canonical taxonomy tables, backup/export/import | **Done** ([`v0.8.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.8.0), merge `f5ec043`, PR #11) |
-| **v0.9** | LLM-assisted entry — draft enrichment, review before save | Not started |
-| **Future** | Composable meals — complete / half / dessert roles, paired halves, manual desserts | Backlog only (see below) |
+| **v0.9** | UI/UX design system + live recipe traits — shared shell, visual QA, fresh trait reads | **Done** ([`v0.9.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.9.0), merge `9647509`, PR #12/#13) |
+| **v0.10** | Composable meals — multi-dish slots, simple dishes, do-not-plan, faster roulette | In review (PR [#14](https://github.com/didac-crst/mealroulette/pull/14), release notes [v0.10.0](releases/v0.10.0.md)) |
+| **Future** | LLM-assisted entry — draft enrichment, review before save | Not started |
 | **v1.0** | Stable home version — backups, auth hardening, scheduler reliability | Not started |
 
 > **v0.6 shipped** as [`v0.6.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.6.0). Catalog keys, computed traits, taxonomy APIs, resolver, taxonomy navigator UI. Release notes: [docs/releases/v0.6.0.md](releases/v0.6.0.md).
@@ -247,20 +250,22 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 - [x] Optional `pg_dump` backup with timeout and failure propagation
 - [x] Restore documentation and admin backup UI
 
-### v0.9 — LLM-Assisted Entry
+### v0.9 — UI/UX Design System and Live Traits
 
-- [ ] LLM dish enrichment
-- [ ] Suggest ingredients
-- [ ] Suggest tags
-- [ ] Suggest steps
-- [ ] Suggest seasonality
-- [ ] Review before save
+- [x] Documentation harmonization and release map.
+- [x] Shared app shell, navigation, tokens, and UI primitives.
+- [x] Dish, recipe, planning, settings, review, and shopping UI reconciliation.
+- [x] Live recipe/dish computed traits from current ingredients and taxonomy.
+- [x] Recipe public-key lookup endpoint.
+- [x] Recipe composition chart and food-group display threshold.
+- [x] Playwright visual QA fixtures.
+- [x] Release notes [`v0.9.0.md`](releases/v0.9.0.md).
 
-### Future — composable meals (meal composition)
+### v0.10 — Composable Meals and Simple Dishes
 
-**Status:** Catalog metadata implemented in Phase 11 (`meal_composition`, `simple_dish_part` on `dishes`). Scheduler pairing and multi-component slots remain backlog.
+**Status:** In review on PR [#14](https://github.com/didac-crst/mealroulette/pull/14). Release target: [`v0.10.0`](releases/v0.10.0.md).
 
-See [features/meal-composition.md](features/meal-composition.md).
+See [features/composable-meals.md](features/composable-meals.md) and [features/meal-composition.md](features/meal-composition.md).
 
 | Composition | Scheduler | Example |
 | --- | --- | --- |
@@ -270,30 +275,30 @@ See [features/meal-composition.md](features/meal-composition.md).
 
 When `meal_composition = simple_dish`, **`simple_dish_part`** is required: `centerpiece` or `sidedish`.
 
-**Product rules (draft):**
+**Product rules:**
 
 - A lunch/dinner slot is satisfied by either **1× main_dish** or **2× simple_dish** (centerpiece + sidedish).
 - Do **not** model “beans + croquettes” as a single synthetic dish — keep real dishes separate.
 - Desserts may appear on the plan but are **excluded from** auto generation.
 - Half-meal pairing should prefer variety/compatibility (rules TBD).
 
-**Checklist (when scheduled):**
+**Checklist:**
 
 - [x] Data model: `meal_composition` + `simple_dish_part` on `dishes` (migration `027`, catalog UI).
-- [ ] **Multi-component slots:** `MealPlanItem` currently has one `dish_id` / `recipe_id` per slot — need components without breaking the unique `(plan, date, meal_slot)` constraint.
-- [ ] Scheduler: candidate generation for main vs compatible simple-dish pairs; desserts filtered out of auto pool.
-- [ ] Weekly targets: count **per slot** (one fish dinner), not per component — document edge cases.
-- [ ] Similarity / vectors: score pairs (or each half vs neighbours); avoid double-counting same slot in neighbour logic.
-- [ ] Shopping list: aggregate ingredients from **all** components in a slot.
-- [ ] Plan UI: show two lines per slot when composed; swap/reroll semantics (reroll pair? one half?).
-- [ ] Telegram / cooking mode: display multiple dishes per slot.
-- [ ] Map legacy `course=starter` → half meal or drop starter enum (product decision).
+- [x] Multi-component slots via `meal_plan_item_dishes`.
+- [x] Scheduler candidate generation for one main dish or a compatible centerpiece/side pair; desserts excluded from auto pool.
+- [x] Similarity and vectors score meal-slot candidates without full cartesian rescoring.
+- [x] Shopping list aggregates ingredients from all dish lines in a slot.
+- [x] Plan UI shows multiple dish lines, manual extras, and do-not-plan state.
+- [x] Strict fixture import for canonical ingredients and alias conflicts.
+- [x] Parallel backend test execution and split CI jobs.
+- [x] Release notes [`v0.10.0.md`](releases/v0.10.0.md).
 
 **Open questions:**
 
-- Manual “add second half” on an existing slot vs scheduler-only pairing?
-- Can a half meal be promoted to complete for simple weeks (catalog convenience)?
 - Rating: one rating per slot or per component?
+- Day/week analytics beyond slot-level meal composition.
+- Whether Telegram/cooking mode need richer per-line presentation beyond current compatibility behavior.
 
 ### v1.0 — Stable Home Version
 
@@ -326,8 +331,10 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 9 | Computed recipe traits & catalog keys | v0.6 | Done (PR #9, `v0.6.0`) |
 | 10 | Cooking mode | v0.7 | Done (PR #10, `v0.7.0`) |
 | 11 | Taxonomy hardening + backup, export, import | v0.8 | Done (PR #11, `v0.8.0`) |
-| 12 | LLM-assisted entry & localization | v0.9 | Not started |
-| 13 | v1 hardening | v1.0 | Not started |
+| 12 | UI/UX design system and live traits | v0.9 | Done (PR #12/#13, `v0.9.0`) |
+| 13 | Composable meals and simple dishes | v0.10 | In review (PR #14) |
+| 14 | LLM-assisted entry & localization | Future | Not started |
+| 15 | v1 hardening | v1.0 | Not started |
 
 ### Phase 0 — Project bootstrap ✅
 
@@ -435,7 +442,7 @@ Branch: `phase-6/shopping`.
 - [x] Ingredient seed import and conversion approval bootstrap
 - [x] Ingredient conversions CRUD API (unique triplet constraint, migration `018`)
 - [x] Ingredient admin UI — catalog list, edit aliases/conversions/unit behavior
-- [x] Localization design documented ([features/localization.md](features/localization.md)); implementation deferred to Phase 12
+- [x] Localization design documented ([features/localization.md](features/localization.md)); implementation deferred to Phase 14
 
 ### Phase 7 — Telegram reminders ✅
 

@@ -567,6 +567,47 @@ button:disabled {
   font-size: 0.85rem;
 }
 
+.meal-slot-lines {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.meal-slot-line {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.meal-slot-line-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.75rem;
+}
+
+.meal-slot-line-dish {
+  font-weight: 600;
+}
+
+.meal-slot-line-meta {
+  font-size: 0.8rem;
+}
+
+.meal-slot-line-recipe {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.meal-slot-plan-editor {
+  margin-top: 0.75rem;
+}
+
+.meal-slot-add-form {
+  margin-top: 0.5rem;
+}
+
 .meal-slot-assign select {
   width: 100%;
 }

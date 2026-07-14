@@ -84,6 +84,7 @@ export function PlanForMealDialog({
         meal_slot: mealSlot,
         dish_id: dishId,
         recipe_id: recipeId ? Number(recipeId) : null,
+        mode: "add",
       });
       const assignedWeek = weekStartForDate(item.date);
       setSuccess(`Planned for ${formatPlanDate(item.date)} · ${formatSlotLabel(item.meal_slot)}`);
@@ -105,7 +106,7 @@ export function PlanForMealDialog({
           </Button>
         </div>
         <p className="muted">
-          Assign <strong>{dishName}</strong> to a lunch or dinner slot.
+          Add <strong>{dishName}</strong> to a lunch or dinner slot without replacing existing dishes.
         </p>
 
         <WeekNavigator

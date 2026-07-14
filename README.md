@@ -1,8 +1,8 @@
 # MealRoulette
 
-Self-hosted household meal planning: dishes and recipes, weekly lunch/dinner plans, shopping lists, Telegram reminders, explainable scheduling, cooking mode, and JSON backup/restore.
+Self-hosted household meal planning: dishes and recipes, composable weekly lunch/dinner plans, shopping lists, Telegram reminders, explainable scheduling, cooking mode, and JSON backup/restore.
 
-Current release: **v0.8.0** — see [docs/releases/v0.8.0.md](docs/releases/v0.8.0.md).
+Current release: **v0.10.0** — see [docs/releases/v0.10.0.md](docs/releases/v0.10.0.md).
 
 ## Documentation
 
@@ -57,11 +57,14 @@ Ingredient taxonomy YAML: `backend/mealroulette/data/taxonomy/`. Canonical seed:
 ```bash
 make free-ports   # if ports 3000/8000/5432 are busy
 make test-backend
+make test-backend-parallel
+make test-backend TESTS="tests/test_import_ingredients.py tests/test_import_dishes.py"
 make test-frontend
+make test-frontend FRONTEND_TESTS="src/features/planning/planFormat.test.ts"
 cd backend && alembic upgrade head && pytest
 cd frontend && npm run dev
 ```
 
-Integration tests use PostgreSQL `mealroulette_test` — `make test-db-setup` from the repo root.
+Integration tests use PostgreSQL. `make test-db-setup` creates `mealroulette_test` plus one database per CPU core (`mealroulette_test_gw0`, …) for parallel pytest workers. Use `make test-backend` for sequential runs and `make test-backend-parallel` for `pytest -n auto`.
 
 Telegram, scheduler, and backup operations are documented under [docs/features/](docs/features/) and [docs/operations/](docs/operations/).

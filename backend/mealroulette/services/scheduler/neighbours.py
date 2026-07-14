@@ -61,5 +61,17 @@ def build_similarity_neighbours(
                 item_id=assignment.item_id,
             )
         )
+        for line in assignment.lines[1:]:
+            side_candidate = candidates_by_id.get(line.dish_id)
+            if side_candidate is None:
+                continue
+            neighbours.append(
+                snapshot_from_candidate(
+                    side_candidate,
+                    meal_date=meal_date,
+                    source="generated_side",
+                    item_id=assignment.item_id,
+                )
+            )
 
     return neighbours
