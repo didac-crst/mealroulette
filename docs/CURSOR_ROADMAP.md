@@ -151,7 +151,7 @@ The default commit hook should fail if tests fail. Lint/format hooks may run in 
 
 ## Implementation Phases
 
-Phases 0–11 shipped through **`v0.8.0`**. Later phases continue from the documentation/UI reconciliation work in `v0.9.0` and the composable-meals work targeting `v0.10.0`.
+Phases 0–14 shipped through **`v0.11.0`**. Later phases continue from the pair-compatibility and reroll-memory work shipped in `v0.11.0`.
 
 | Phase | Name | Target version |
 | --- | --- | --- |
@@ -160,7 +160,7 @@ Phases 0–11 shipped through **`v0.8.0`**. Later phases continue from the docum
 | 11 | Taxonomy hardening + backup, export, import | v0.8 |
 | 12 | UI/UX design system and live traits | v0.9 |
 | 13 | Composable meals and simple dishes | v0.10 |
-| 14 | Pair compatibility and reroll memory | Next |
+| 14 | Pair compatibility and reroll memory | v0.11 |
 | 15 | Household users and memberships | Future |
 | 16 | LLM-assisted entry & localization | Future |
 | 17 | v1 hardening | v1.0 |

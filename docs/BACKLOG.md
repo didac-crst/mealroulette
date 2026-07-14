@@ -25,13 +25,13 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Next focus — pair compatibility and reroll memory.**
+**Next focus — household users and memberships architecture.**
 
 `v0.9.0` shipped documentation harmonization, UI/UX design-system reconciliation, and live computed traits. See [releases/v0.9.0.md](releases/v0.9.0.md).
 
 `v0.10.0` shipped multi-dish meal slots, `Do not plan`, simple-dish fixture import, stricter canonical ingredient validation, faster roulette pair generation, and parallel backend CI. Release notes: [releases/v0.10.0.md](releases/v0.10.0.md).
 
-The next scheduler phase is specified in [features/pair-compatibility-reroll.md](features/pair-compatibility-reroll.md): it should prevent compositionally bad centerpiece/side pairs and stop reroll from cycling through already-seen alternatives.
+`v0.11.0` shipped pair compatibility, reroll memory, structure-first generation, and package-level swap fixes. Release notes: [releases/v0.11.0.md](releases/v0.11.0.md).
 
 ---
 
@@ -68,6 +68,7 @@ Use one branch per milestone, then merge via pull request:
 - `phase-11/taxonomy-backup` — taxonomy hardening and backup/export/import (merged in PR #11, `v0.8.0`)
 - `phase-12/ui-ux-design-system` — documentation harmonization, UI/UX reconciliation, live computed traits (merged in PR #12 and PR #13, `v0.9.0`)
 - `phase-13/composable-fixtures-scheduler-ci` — composable meal slots, simple dishes, scheduler performance, parallel CI (PR #14, release target `v0.10.0`)
+- `phase-14/pair-compatibility-reroll` — pair compatibility, reroll memory, structure-first generation, package swap fixes (merged in PR #15, `v0.11.0`)
 
 ---
 
@@ -87,7 +88,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.8** | Taxonomy hardening + backup — canonical taxonomy tables, backup/export/import | **Done** ([`v0.8.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.8.0), merge `f5ec043`, PR #11) |
 | **v0.9** | UI/UX design system + live recipe traits — shared shell, visual QA, fresh trait reads | **Done** ([`v0.9.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.9.0), merge `9647509`, PR #12/#13) |
 | **v0.10** | Composable meals — multi-dish slots, simple dishes, do-not-plan, faster roulette | **Done** ([`v0.10.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.10.0), merge `a2e29de`, PR #14) |
-| **Next** | Pair compatibility and reroll memory — prevent bad simple-dish pairs and reroll cycles | Spec ready |
+| **v0.11** | Pair compatibility and reroll memory — prevent bad simple-dish pairs and reroll cycles | **Done** ([`v0.11.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.11.0), merge `82f20de`, PR #15) |
 | **Future** | Household users and memberships — user creation, household scoping, Telegram linking | Architecture needed |
 | **Future** | LLM-assisted entry — draft enrichment, review before save | Not started |
 | **v1.0** | Stable home version — backups, auth hardening, scheduler reliability | Not started |
@@ -304,25 +305,25 @@ When `meal_composition = simple_dish`, **`simple_dish_part`** is required: `cent
 - Day/week analytics beyond slot-level meal composition.
 - Whether Telegram/cooking mode need richer per-line presentation beyond current compatibility behavior.
 
-### Next — Pair Compatibility and Reroll Memory
+### v0.11 — Pair Compatibility and Reroll Memory
 
-**Status:** Spec ready. See [features/pair-compatibility-reroll.md](features/pair-compatibility-reroll.md).
+**Status:** Done — merged in PR [#15](https://github.com/didac-crst/mealroulette/pull/15), tag [`v0.11.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.11.0), merge `82f20de`. See [features/pair-compatibility-reroll.md](features/pair-compatibility-reroll.md).
 
 **Problem:** `v0.10.0` makes composed meals possible, but the scheduler can still pair individually valid dishes into bad meals, such as fish plus tuna salad or beans plus green beans. Reroll can also cycle back to previously shown choices.
 
 **Checklist:**
 
-- [ ] Derive primary canonical ingredients and primary ingredient families from recipe lines.
-- [ ] Derive scheduler-facing simple-dish roles such as `protein_centerpiece`, `vegetable_side`, and `carb_side`.
-- [ ] Reject duplicate dominant canonical ingredients.
-- [ ] Reject duplicate dominant protein families.
-- [ ] Penalize or reject excessive primary-family overlap.
-- [ ] Add positive complementarity scoring for useful centerpiece/side pairs.
-- [ ] Score composed meals as one candidate before selection.
-- [ ] Add pair-level "Why this meal?" reasons and internal rejection reason codes.
-- [ ] Track reroll history per meal slot/combo and avoid silent A/B cycling.
-- [ ] Add explicit reroll exhaustion behavior.
-- [ ] Add table-driven tests for the bad screenshot examples and good expected pairs.
+- [x] Derive primary canonical ingredients and primary ingredient families from recipe lines.
+- [x] Derive scheduler-facing simple-dish roles such as `protein_centerpiece`, `vegetable_side`, and `carb_side`.
+- [x] Reject duplicate dominant canonical ingredients.
+- [x] Reject duplicate dominant protein families.
+- [x] Penalize or reject excessive primary-family overlap.
+- [x] Add positive complementarity scoring for useful centerpiece/side pairs.
+- [x] Score composed meals as one candidate before selection.
+- [x] Add pair-level "Why this meal?" reasons and internal rejection reason codes.
+- [x] Track reroll history per meal slot/combo and avoid silent A/B cycling.
+- [x] Add explicit reroll exhaustion behavior.
+- [x] Add table-driven tests for the bad screenshot examples and good expected pairs.
 
 ### Future — Household Users and Memberships
 
@@ -385,7 +386,7 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 11 | Taxonomy hardening + backup, export, import | v0.8 | Done (PR #11, `v0.8.0`) |
 | 12 | UI/UX design system and live traits | v0.9 | Done (PR #12/#13, `v0.9.0`) |
 | 13 | Composable meals and simple dishes | v0.10 | Done (PR #14, `v0.10.0`) |
-| 14 | Pair compatibility and reroll memory | Next | Spec ready |
+| 14 | Pair compatibility and reroll memory | v0.11 | Done (PR #15, `v0.11.0`) |
 | 15 | Household users and memberships | Future | Architecture needed |
 | 16 | LLM-assisted entry & localization | Future | Not started |
 | 17 | v1 hardening | v1.0 | Not started |
