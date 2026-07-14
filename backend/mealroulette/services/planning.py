@@ -791,7 +791,12 @@ class PlanningService:
             dish_id = updates.get("dish_id", line.dish_id)
             if dish_id is None:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="dish_id is required")
-            recipe_id = updates.get("recipe_id", line.recipe_id)
+            if "recipe_id" in updates:
+                recipe_id = updates["recipe_id"]
+            elif "dish_id" in updates:
+                recipe_id = None
+            else:
+                recipe_id = line.recipe_id
             line.dish_id = dish_id
             line.recipe_id = self._resolve_recipe_for_dish(dish_id, recipe_id)
             dish = self.db.get(Dish, dish_id)
@@ -815,6 +820,7 @@ class PlanningService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Can only remove dishes from planned meals",
             )
+        item.lines.remove(line)
         self.db.delete(line)
         self.db.flush()
         for index, remaining in enumerate(sorted(item.lines, key=lambda row: row.position)):
