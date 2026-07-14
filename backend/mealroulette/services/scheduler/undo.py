@@ -18,6 +18,7 @@ def capture_item_state(item: MealPlanItem) -> dict:
         "recipe_id": item.recipe_id,
         "selection_reasons_json": item.selection_reasons_json,
         "manually_selected": item.manually_selected,
+        "reroll_history_json": item.reroll_history_json,
         "lines": [
             {
                 "dish_id": line.dish_id,
@@ -55,6 +56,7 @@ def _restore_legacy_only(item: MealPlanItem, entry: dict) -> None:
     item.recipe_id = entry.get("recipe_id")
     item.selection_reasons_json = entry.get("selection_reasons_json")
     item.manually_selected = entry.get("manually_selected", False)
+    item.reroll_history_json = entry.get("reroll_history_json")
     item.lines.clear()
     if item.dish_id is not None:
         item.lines.append(
@@ -90,6 +92,7 @@ def restore_undo_snapshot(db: Session, plan: MealPlan) -> bool:
             continue
 
         item.planning_state = MealPlanningState(entry.get("planning_state", MealPlanningState.open.value))
+        item.reroll_history_json = entry.get("reroll_history_json")
         db.execute(delete(MealPlanItemDish).where(MealPlanItemDish.meal_plan_item_id == item.id))
         db.flush()
         item.lines.clear()

@@ -8,6 +8,7 @@ from mealroulette.models.catalog import Dish
 from mealroulette.models.enums import MealPlanItemStatus, MealSlot
 from mealroulette.models.planning import MealPlanItem
 from mealroulette.services.planning import PlanningService
+from mealroulette.services.scheduler.reroll_memory import load_reroll_history
 from mealroulette.services.scheduler_service import SchedulerService
 
 pytestmark = pytest.mark.integration
@@ -92,11 +93,13 @@ def test_reroll_and_undo_restore_previous_assignment(db_session, catalog_seed, s
     db_session.refresh(target_item)
     assert target_item.dish_id is not None
     assert target_item.dish_id != previous_dish_id
+    assert len(load_reroll_history(target_item)) == 1
 
     service.undo_last_roulette(plan.id)
     db_session.refresh(target_item)
     assert target_item.dish_id == previous_dish_id
     assert target_item.recipe_id == previous_recipe_id
+    assert len(load_reroll_history(target_item)) == 0
 
     with pytest.raises(Exception) as exc_info:
         service.undo_last_roulette(plan.id)

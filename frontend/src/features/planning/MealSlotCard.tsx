@@ -61,6 +61,8 @@ type Props = {
   onChanged: (item: MealPlanItem) => void;
   onError: (message: string) => void;
   onReroll?: (item: MealPlanItem) => void;
+  onStartOverReroll?: (item: MealPlanItem) => void;
+  rerollExhaustedMessage?: string;
   onSwap?: (source: MealPlanItem, targetItemId: number) => void;
 };
 
@@ -80,6 +82,8 @@ export function MealSlotCard({
   onChanged,
   onError,
   onReroll,
+  onStartOverReroll,
+  rerollExhaustedMessage,
   onSwap,
 }: Props) {
   const [busy, setBusy] = useState(false);
@@ -299,6 +303,24 @@ export function MealSlotCard({
           ) : null}
 
           <div className="meal-slot-plan-actions">
+            {rerollExhaustedMessage ? (
+              <div className="stack reroll-exhausted-notice">
+                <p className="muted">{rerollExhaustedMessage}</p>
+                <div className="row-actions">
+                  {onStartOverReroll ? (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      disabled={actionBusy}
+                      onClick={() => onStartOverReroll(item)}
+                    >
+                      Start over
+                    </Button>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
             {showReroll ? (
               <Button
                 type="button"

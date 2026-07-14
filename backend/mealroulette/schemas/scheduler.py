@@ -1,6 +1,9 @@
 from datetime import datetime, time, date
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
+
+from mealroulette.schemas.planning import MealPlanItemPublic
 
 
 class WeeklyTargetSpec(BaseModel):
@@ -60,6 +63,16 @@ class SchedulerSettingsUpdateRequest(BaseModel):
     target_week_offset: int | None = Field(default=None, ge=0, le=4)
     notify_telegram: bool | None = None
     notify_planning_days: int | None = Field(default=None, ge=1, le=14)
+
+
+class MealPlanRerollResponse(BaseModel):
+    status: Literal["success", "exhausted"]
+    item: MealPlanItemPublic
+    message: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+    variety: dict | None = None
+    total_score: float | None = None
+    can_undo: bool = False
 
 
 class MealPlanRouletteResponse(BaseModel):

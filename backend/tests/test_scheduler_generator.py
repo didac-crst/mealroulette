@@ -230,6 +230,7 @@ def test_build_slot_options_skips_hard_rejected_centerpiece_side_pairs():
         sides=sides,
         assigned_dish_ids=[],
         forbidden_dish_ids=None,
+        forbidden_combination_keys=None,
         dish_date_index={},
         neighbours=[],
         candidates_by_id={candidate.dish_id: candidate for candidate in centerpieces + sides},
@@ -243,6 +244,32 @@ def test_build_slot_options_skips_hard_rejected_centerpiece_side_pairs():
         if len(option.assignment.lines) == 2
     }
     assert pair_dish_ids == {(1, 3)}
+
+
+def test_build_slot_options_respects_forbidden_combination_keys():
+    candidates = [
+        _candidate(1, {"a": 1.0}, meal_composition=MealComposition.main_dish),
+        _candidate(2, {"b": 1.0}, meal_composition=MealComposition.main_dish),
+        _candidate(3, {"c": 1.0}, meal_composition=MealComposition.main_dish),
+    ]
+    slot = GenerationSlot(item_id=101, meal_date=date(2026, 7, 7), meal_slot=MealSlot.lunch)
+    options = _build_slot_options(
+        slot,
+        mains=candidates,
+        centerpieces=[],
+        sides=[],
+        assigned_dish_ids=[],
+        forbidden_dish_ids=None,
+        forbidden_combination_keys=frozenset({("main", 1), ("main", 2)}),
+        dish_date_index={},
+        neighbours=[],
+        candidates_by_id={candidate.dish_id: candidate for candidate in candidates},
+        rules=_rules(),
+        rng=random.Random(0),
+    )
+
+    assert len(options) == 1
+    assert options[0].assignment.dish_id == 3
 
 
 def _large_catalog_candidates() -> list[DishCandidate]:
@@ -448,6 +475,7 @@ def test_build_slot_options_caps_pair_exploration_for_large_catalog():
         sides=partitions.sides,
         assigned_dish_ids=[],
         forbidden_dish_ids=None,
+        forbidden_combination_keys=None,
         dish_date_index={},
         neighbours=[],
         candidates_by_id=candidates_by_id,
@@ -481,6 +509,7 @@ def test_build_slot_options_scores_each_eligible_candidate_once_per_slot(monkeyp
         sides=partitions.sides,
         assigned_dish_ids=[],
         forbidden_dish_ids=None,
+        forbidden_combination_keys=None,
         dish_date_index={},
         neighbours=[],
         candidates_by_id=candidates_by_id,

@@ -21,6 +21,7 @@ from mealroulette.services.scheduler.constraints import (
 from mealroulette.services.scheduler.neighbours import build_similarity_neighbours
 from mealroulette.services.scheduler.pair_rejections import pair_is_hard_rejected
 from mealroulette.services.scheduler.pair_scoring import score_pair_compatibility
+from mealroulette.services.scheduler.reroll_memory import combination_key_from_assignment
 from mealroulette.services.scheduler.scoring import score_candidate_for_slot
 from mealroulette.services.scheduler.targets import weekly_target_warnings
 from mealroulette.services.scheduler.types import (
@@ -166,6 +167,7 @@ def _build_slot_options(
     sides: list[DishCandidate],
     assigned_dish_ids: list[int],
     forbidden_dish_ids: frozenset[int] | None,
+    forbidden_combination_keys: frozenset[tuple] | None,
     dish_date_index: dict[int, list[date]],
     neighbours: list[MealNeighbourSnapshot],
     candidates_by_id: dict[int, DishCandidate],
@@ -173,6 +175,11 @@ def _build_slot_options(
     rng: random.Random,
 ) -> list[_SlotPickOption]:
     options: list[_SlotPickOption] = []
+
+    def _option_is_forbidden(option: _SlotPickOption) -> bool:
+        if forbidden_combination_keys is None:
+            return False
+        return combination_key_from_assignment(option.assignment) in forbidden_combination_keys
 
     for scored in _score_eligible_candidates(
         mains,
@@ -196,6 +203,8 @@ def _build_slot_options(
                 assigned_dish_ids=(scored.candidate.dish_id,),
             )
         )
+
+    options = [option for option in options if not _option_is_forbidden(option)]
 
     scored_centerpieces = _score_eligible_candidates(
         centerpieces,
@@ -258,19 +267,20 @@ def _build_slot_options(
                 "package_type": "centerpiece_side",
                 "pair_reason_codes": list(pair_compatibility.reason_codes),
             }
-            options.append(
-                _SlotPickOption(
+            option = _SlotPickOption(
+                score=total_score,
+                assignment=assignment_from_pair(
+                    item_id=slot.item_id,
+                    centerpiece=centerpiece.candidate,
+                    side=side.candidate,
                     score=total_score,
-                    assignment=assignment_from_pair(
-                        item_id=slot.item_id,
-                        centerpiece=centerpiece.candidate,
-                        side=side.candidate,
-                        score=total_score,
-                        payload=payload,
-                    ),
-                    assigned_dish_ids=(centerpiece.candidate.dish_id, side.candidate.dish_id),
-                )
+                    payload=payload,
+                ),
+                assigned_dish_ids=(centerpiece.candidate.dish_id, side.candidate.dish_id),
             )
+            if _option_is_forbidden(option):
+                continue
+            options.append(option)
 
     return options
 
@@ -286,6 +296,7 @@ def generate_week_assignments(
     today: date,
     rng: random.Random | None = None,
     forbidden_dish_ids: frozenset[int] | None = None,
+    forbidden_combination_keys: frozenset[tuple] | None = None,
 ) -> WeekGenerationResult:
     random_source = rng or random.Random()
     if not slots:
@@ -333,6 +344,7 @@ def generate_week_assignments(
                 sides=candidate_partitions.sides,
                 assigned_dish_ids=assigned_dish_ids,
                 forbidden_dish_ids=forbidden_dish_ids,
+                forbidden_combination_keys=forbidden_combination_keys,
                 dish_date_index=dish_date_index,
                 neighbours=neighbours,
                 candidates_by_id=candidates_by_id,

@@ -74,6 +74,16 @@ export type MealPlanRouletteResponse = {
   can_undo: boolean;
 };
 
+export type MealPlanRerollResponse = {
+  status: "success" | "exhausted";
+  item: MealPlanItem;
+  message?: string | null;
+  warnings?: string[];
+  variety?: MealPlanRouletteResponse["variety"] | null;
+  total_score?: number | null;
+  can_undo?: boolean;
+};
+
 export type MealPlanUndoRouletteResponse = {
   restored: boolean;
   can_undo: boolean;
@@ -223,8 +233,15 @@ export async function generateMealPlanWeekDetails(
   });
 }
 
-export async function rerollMealPlanItem(token: string, itemId: number): Promise<MealPlanItem> {
-  return apiRequest<MealPlanItem>(`/api/meal-plan-items/${itemId}/reroll`, {
+export async function rerollMealPlanItem(token: string, itemId: number): Promise<MealPlanRerollResponse> {
+  return apiRequest<MealPlanRerollResponse>(`/api/meal-plan-items/${itemId}/reroll`, {
+    method: "POST",
+    token,
+  });
+}
+
+export async function startOverMealPlanReroll(token: string, itemId: number): Promise<MealPlanItem> {
+  return apiRequest<MealPlanItem>(`/api/meal-plan-items/${itemId}/reroll/start-over`, {
     method: "POST",
     token,
   });

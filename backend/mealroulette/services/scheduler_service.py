@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import date, timedelta
+from typing import Literal
 
 from fastapi import HTTPException, status
 from sqlalchemy import select
@@ -12,13 +14,27 @@ from mealroulette.services.meal_plan_lines import sync_legacy_mirror
 from mealroulette.services.planning import PlanningService
 from mealroulette.services.planning_rule_service import PlanningRuleService
 from mealroulette.services.scheduler.catalog import load_dish_candidates, load_eaten_meal_snapshots
-from mealroulette.services.scheduler.composition import item_has_roulette_lines, roulette_dish_ids
+from mealroulette.services.scheduler.composition import item_has_roulette_lines
 from mealroulette.services.scheduler.constraints import slot_is_regenerable
 from mealroulette.services.scheduler.generator import generate_week_assignments
 from mealroulette.services.scheduler.neighbours import build_similarity_neighbours
+from mealroulette.services.scheduler.reroll_memory import (
+    append_reroll_combination,
+    clear_reroll_history,
+    combination_key_from_item,
+    forbidden_combination_keys,
+)
 from mealroulette.services.scheduler.types import GenerationSlot, WeekGenerationResult
 from mealroulette.services.scheduler.undo import clear_undo_snapshot, restore_undo_snapshot, save_undo_snapshot
 from mealroulette.services.scheduler.variety import build_variety_assessment
+
+
+@dataclass(frozen=True)
+class RerollItemResult:
+    status: Literal["success", "exhausted"]
+    result: WeekGenerationResult | None
+    variety: dict | None
+    message: str | None = None
 
 
 class SchedulerService:
@@ -71,6 +87,9 @@ class SchedulerService:
         )
         undo_items = [item for item in plan.items if item.id in {slot.item_id for slot in regenerable_slots}]
         save_undo_snapshot(plan, action="generate_week", items=undo_items)
+        for assignment in result.assignments:
+            item = next(plan_item for plan_item in plan.items if plan_item.id == assignment.item_id)
+            clear_reroll_history(item)
         self._apply_assignments(result)
         return result, variety
 
@@ -79,7 +98,7 @@ class SchedulerService:
         item_id: int,
         *,
         today: date | None = None,
-    ) -> tuple[WeekGenerationResult, dict]:
+    ) -> RerollItemResult:
         reference_date = today or household_local_today(self.db)
         rules = self.rules_service.get_active_rules()
         item = self._load_item(item_id)
@@ -89,7 +108,6 @@ class SchedulerService:
                 detail="This meal slot cannot be rerolled",
             )
 
-        previous_roulette_dish_ids = roulette_dish_ids(item)
         plan = self._load_plan_for_update(item.meal_plan_id)
         item = next(plan_item for plan_item in plan.items if plan_item.id == item_id)
         candidates = self._load_candidates(rules)
@@ -103,7 +121,7 @@ class SchedulerService:
             fixed_assignments[plan_item.id] = plan_item.dish_id
             fixed_dates_by_item[plan_item.id] = plan_item.date
 
-        forbidden_dish_ids = frozenset(previous_roulette_dish_ids) if previous_roulette_dish_ids else None
+        excluded_combinations = forbidden_combination_keys(item)
         eaten_meals = self._load_eaten_meals([slot], rules)
         result = generate_week_assignments(
             [slot],
@@ -113,10 +131,15 @@ class SchedulerService:
             eaten_meals=eaten_meals,
             rules=rules,
             today=reference_date,
-            forbidden_dish_ids=forbidden_dish_ids,
+            forbidden_combination_keys=excluded_combinations,
         )
         if not result.assignments:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=result.warnings[0])
+            return RerollItemResult(
+                status="exhausted",
+                result=None,
+                variety=None,
+                message="You've seen all suitable alternatives.",
+            )
 
         variety = self._build_variety(
             result,
@@ -127,8 +150,22 @@ class SchedulerService:
             plan,
         )
         save_undo_snapshot(plan, action="reroll", items=[item])
+        current_key = combination_key_from_item(item)
+        if current_key is not None:
+            append_reroll_combination(item, current_key)
         self._apply_assignments(result)
-        return result, variety
+        return RerollItemResult(status="success", result=result, variety=variety)
+
+    def start_over_reroll(self, item_id: int, *, today: date | None = None) -> None:
+        reference_date = today or household_local_today(self.db)
+        item = self._load_item(item_id)
+        if not self._slot_can_reroll(item, reference_date=reference_date):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="This meal slot cannot be rerolled",
+            )
+        clear_reroll_history(item)
+        self.db.commit()
 
     def undo_last_roulette(self, meal_plan_id: int) -> bool:
         plan = self._load_plan(meal_plan_id)

@@ -73,6 +73,7 @@ class MealPlanItem(Base):
         ForeignKey("meal_plan_items.id", ondelete="SET NULL"), nullable=True
     )
     selection_reasons_json: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    reroll_history_json: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     review_saved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(

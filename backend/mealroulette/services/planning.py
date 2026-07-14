@@ -29,6 +29,7 @@ from mealroulette.services.recipe_traits import (
     effective_traits_for_meal_slot,
 )
 from mealroulette.services.scheduler.catalog import load_reference_units
+from mealroulette.services.scheduler.reroll_memory import clear_reroll_history
 from mealroulette.schemas.planning import (
     MealPlanCreateRequest,
     MealPlanDishLineCreateRequest,
@@ -755,6 +756,7 @@ class PlanningService:
             )
 
         clear_undo_snapshot(plan)
+        clear_reroll_history(item)
         self._apply_assignment(item, dish_id, recipe_id, mode=mode)
         self.db.commit()
         return self.to_item_public(self._load_item(item.id))
