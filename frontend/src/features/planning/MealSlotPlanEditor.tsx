@@ -24,7 +24,6 @@ import {
 import {
   formatSlotLabel,
   isFutureMealDate,
-  lineSelectionReasonsList,
   sortedMealLines,
 } from "./planFormat";
 
@@ -45,35 +44,25 @@ export function MealSlotLinesSummary({ item }: { item: MealPlanItem }) {
 
   return (
     <ul className="meal-slot-lines">
-      {lines.map((line) => {
-        const reasons = line.source === "roulette" ? lineSelectionReasonsList(line) : [];
-        return (
-          <li key={line.id} className="meal-slot-line">
-            <div className="meal-slot-line-main">
-              {line.dish_id ? (
-                <Link to={`/dishes/${line.dish_id}`} className="meal-slot-line-dish">
-                  {line.dish_name}
-                </Link>
-              ) : (
-                <span className="muted">Unknown dish</span>
-              )}
-              <span className="meal-slot-line-meta muted">
-                {formatMealLineSource(line.source)} · {formatMealLineRole(line.role)}
-              </span>
-            </div>
-            {line.recipe_variant_name ? (
-              <p className="muted meal-slot-line-recipe">{line.recipe_variant_name}</p>
-            ) : null}
-            {reasons.length > 0 ? (
-              <ul className="selection-reasons-list">
-                {reasons.map((reason, index) => (
-                  <li key={`${line.id}-${index}`}>{reason}</li>
-                ))}
-              </ul>
-            ) : null}
-          </li>
-        );
-      })}
+      {lines.map((line) => (
+        <li key={line.id} className="meal-slot-line">
+          <div className="meal-slot-line-main">
+            {line.dish_id ? (
+              <Link to={`/dishes/${line.dish_id}`} className="meal-slot-line-dish">
+                {line.dish_name}
+              </Link>
+            ) : (
+              <span className="muted">Unknown dish</span>
+            )}
+            <span className="meal-slot-line-meta muted">
+              {formatMealLineSource(line.source)} · {formatMealLineRole(line.role)}
+            </span>
+          </div>
+          {line.recipe_variant_name ? (
+            <p className="muted meal-slot-line-recipe">{line.recipe_variant_name}</p>
+          ) : null}
+        </li>
+      ))}
     </ul>
   );
 }

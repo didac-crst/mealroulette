@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from datetime import date
 
 from mealroulette.models.enums import MealComposition, MealPlanDishLineRole, MealSlot, SeasonalityMode, SimpleDishPart
+from mealroulette.services.scheduler.pair_diagnostics import CandidatePairSummary
 
 
 @dataclass(frozen=True)
@@ -24,6 +25,7 @@ class DishCandidate:
     suitable_for_lunch: bool | None
     suitable_for_dinner: bool | None
     computed_traits_json: dict | None = None
+    pair_summary: CandidatePairSummary | None = None
 
 
 @dataclass(frozen=True)

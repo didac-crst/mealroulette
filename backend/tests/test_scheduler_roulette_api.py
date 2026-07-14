@@ -47,7 +47,9 @@ def test_reroll_and_undo_api(client, catalog_seed, scheduler_seed, user_headers,
 
     reroll = client.post(f"/api/meal-plan-items/{target['id']}/reroll", headers=user_headers)
     assert reroll.status_code == 200
-    assert reroll.json()["dish_id"] != previous_dish_id
+    reroll_body = reroll.json()
+    assert reroll_body["status"] == "success"
+    assert reroll_body["item"]["dish_id"] != previous_dish_id
 
     undo = client.post(f"/api/meal-plans/{plan.id}/undo-roulette", headers=user_headers)
     assert undo.status_code == 200

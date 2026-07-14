@@ -25,6 +25,7 @@ def build_variety_assessment(
         if not relevant_neighbours:
             items.append(
                 {
+                    "item_id": item_id,
                     "dish_id": dish_id,
                     "dish_name": dish_name,
                     "nearest_neighbour_dish": None,
@@ -42,6 +43,7 @@ def build_variety_assessment(
         distances.append(distance)
         items.append(
             {
+                "item_id": item_id,
                 "dish_id": dish_id,
                 "dish_name": dish_name,
                 "nearest_neighbour_dish": nearest.dish_name,

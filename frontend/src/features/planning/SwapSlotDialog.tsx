@@ -16,7 +16,7 @@ export function SwapSlotDialog({ item, targets, busy, onClose, onConfirm }: Prop
       <div className="bottom-sheet-content stack">
         <h3 id="swap-slot-title">Swap meal</h3>
         <p className="muted">
-          Exchange <strong>{item.dish_name ?? "this slot"}</strong> ({formatPlanDate(item.date)} ·{" "}
+          Exchange <strong>{item.title ?? item.dish_name ?? "this slot"}</strong> ({formatPlanDate(item.date)} ·{" "}
           {formatSlotLabel(item.meal_slot)}) with:
         </p>
         {targets.length === 0 ? (
@@ -27,7 +27,7 @@ export function SwapSlotDialog({ item, targets, busy, onClose, onConfirm }: Prop
               <ChoiceCard
                 key={target.id}
                 title={`${formatPlanDate(target.date)} · ${formatSlotLabel(target.meal_slot)}`}
-                description={target.dish_name ?? "Empty slot"}
+                description={target.title ?? target.dish_name ?? "Empty slot"}
                 disabled={busy}
                 onClick={() => onConfirm(target.id)}
               />

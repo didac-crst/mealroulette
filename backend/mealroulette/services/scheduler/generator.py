@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import random
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date
 
 from mealroulette.schemas.scheduler import PlanningRulesConfig
@@ -18,7 +18,18 @@ from mealroulette.services.scheduler.constraints import (
     passes_same_dish_window,
     passes_slot_suitability,
 )
+from mealroulette.services.scheduler.meal_structure import (
+    STRUCTURE_FALLBACK_COMPOSED_REASON,
+    STRUCTURE_FALLBACK_MAIN_REASON,
+    MealStructure,
+    assignment_structure,
+    count_week_structures,
+    select_preferred_structure,
+)
 from mealroulette.services.scheduler.neighbours import build_similarity_neighbours
+from mealroulette.services.scheduler.pair_rejections import pair_is_hard_rejected
+from mealroulette.services.scheduler.pair_scoring import composed_pair_score_from_prescored
+from mealroulette.services.scheduler.reroll_memory import combination_key_from_assignment
 from mealroulette.services.scheduler.scoring import score_candidate_for_slot
 from mealroulette.services.scheduler.targets import weekly_target_warnings
 from mealroulette.services.scheduler.types import (
@@ -29,7 +40,6 @@ from mealroulette.services.scheduler.types import (
     WeekGenerationResult,
 )
 
-SIDE_PAIR_SCORE_WEIGHT = 0.25
 MAX_PAIR_CENTERPIECES = 15
 MAX_PAIR_SIDES = 25
 PAIR_GUARANTEED_TOP_CENTERPIECES = 8
@@ -37,6 +47,7 @@ PAIR_RANDOM_CENTERPIECES = 7
 PAIR_GUARANTEED_TOP_SIDES = 12
 PAIR_RANDOM_SIDES = 13
 LARGE_PAIR_SPACE_THRESHOLD = 2_000
+TOP_PICK_COUNT = 5
 
 
 @dataclass(frozen=True)
@@ -58,6 +69,7 @@ class _SlotPickOption:
     score: float
     assignment: SlotAssignment
     assigned_dish_ids: tuple[int, ...]
+    structure: MealStructure
 
 
 def _candidate_is_eligible(
@@ -156,22 +168,28 @@ def _effective_plan_attempts(rules: PlanningRulesConfig, candidates: list[DishCa
     return min(rules.plan_attempts, max(10, rules.plan_attempts // 3))
 
 
-def _build_slot_options(
+def _option_is_forbidden(
+    option: _SlotPickOption,
+    forbidden_combination_keys: frozenset[tuple] | None,
+) -> bool:
+    if forbidden_combination_keys is None:
+        return False
+    return combination_key_from_assignment(option.assignment) in forbidden_combination_keys
+
+
+def _build_main_options(
     slot: GenerationSlot,
     *,
     mains: list[DishCandidate],
-    centerpieces: list[DishCandidate],
-    sides: list[DishCandidate],
     assigned_dish_ids: list[int],
     forbidden_dish_ids: frozenset[int] | None,
+    forbidden_combination_keys: frozenset[tuple] | None,
     dish_date_index: dict[int, list[date]],
     neighbours: list[MealNeighbourSnapshot],
     candidates_by_id: dict[int, DishCandidate],
     rules: PlanningRulesConfig,
-    rng: random.Random,
 ) -> list[_SlotPickOption]:
     options: list[_SlotPickOption] = []
-
     for scored in _score_eligible_candidates(
         mains,
         slot=slot,
@@ -182,18 +200,37 @@ def _build_slot_options(
         candidates_by_id=candidates_by_id,
         rules=rules,
     ):
-        options.append(
-            _SlotPickOption(
+        option = _SlotPickOption(
+            score=scored.score,
+            assignment=assignment_from_main(
+                item_id=slot.item_id,
+                candidate=scored.candidate,
                 score=scored.score,
-                assignment=assignment_from_main(
-                    item_id=slot.item_id,
-                    candidate=scored.candidate,
-                    score=scored.score,
-                    payload=scored.payload,
-                ),
-                assigned_dish_ids=(scored.candidate.dish_id,),
-            )
+                payload=scored.payload,
+            ),
+            assigned_dish_ids=(scored.candidate.dish_id,),
+            structure=MealStructure.main_dish,
         )
+        if not _option_is_forbidden(option, forbidden_combination_keys):
+            options.append(option)
+    return options
+
+
+def _build_pair_options(
+    slot: GenerationSlot,
+    *,
+    centerpieces: list[DishCandidate],
+    sides: list[DishCandidate],
+    assigned_dish_ids: list[int],
+    forbidden_dish_ids: frozenset[int] | None,
+    forbidden_combination_keys: frozenset[tuple] | None,
+    dish_date_index: dict[int, list[date]],
+    neighbours: list[MealNeighbourSnapshot],
+    candidates_by_id: dict[int, DishCandidate],
+    rules: PlanningRulesConfig,
+    rng: random.Random,
+) -> list[_SlotPickOption]:
+    options: list[_SlotPickOption] = []
 
     scored_centerpieces = _score_eligible_candidates(
         centerpieces,
@@ -235,34 +272,192 @@ def _build_slot_options(
         for side in shortlisted_sides:
             if side.candidate.dish_id == centerpiece.candidate.dish_id:
                 continue
-            # Pair total uses pre-scored side estimates; sides are not rescored with the
-            # centerpiece already assigned, and combined pair traits/targets are not scored
-            # yet. Future work: score the package as one unit (aggregate vector/traits).
-            total_score = centerpiece.score + (SIDE_PAIR_SCORE_WEIGHT * side.score)
-            payload = {
-                **centerpiece.payload,
-                "reasons": [
-                    *centerpiece.payload.get("reasons", []),
-                    f"Paired with {side.candidate.dish_name}",
-                ],
-                "score": round(total_score, 3),
-                "package_type": "centerpiece_side",
-            }
-            options.append(
-                _SlotPickOption(
-                    score=total_score,
-                    assignment=assignment_from_pair(
-                        item_id=slot.item_id,
-                        centerpiece=centerpiece.candidate,
-                        side=side.candidate,
-                        score=total_score,
-                        payload=payload,
-                    ),
-                    assigned_dish_ids=(centerpiece.candidate.dish_id, side.candidate.dish_id),
-                )
+            if pair_is_hard_rejected(centerpiece.candidate, side.candidate):
+                continue
+            total_score, payload = composed_pair_score_from_prescored(
+                centerpiece.candidate,
+                side.candidate,
+                centerpiece_score=centerpiece.score,
+                centerpiece_payload=centerpiece.payload,
+                slot=slot,
+                rules=rules,
             )
-
+            option = _SlotPickOption(
+                score=total_score,
+                assignment=assignment_from_pair(
+                    item_id=slot.item_id,
+                    centerpiece=centerpiece.candidate,
+                    side=side.candidate,
+                    score=total_score,
+                    payload=payload,
+                ),
+                assigned_dish_ids=(centerpiece.candidate.dish_id, side.candidate.dish_id),
+                structure=MealStructure.composed_pair,
+            )
+            if not _option_is_forbidden(option, forbidden_combination_keys):
+                options.append(option)
     return options
+
+
+def _build_slot_options(
+    slot: GenerationSlot,
+    *,
+    mains: list[DishCandidate],
+    centerpieces: list[DishCandidate],
+    sides: list[DishCandidate],
+    assigned_dish_ids: list[int],
+    forbidden_dish_ids: frozenset[int] | None,
+    forbidden_combination_keys: frozenset[tuple] | None,
+    dish_date_index: dict[int, list[date]],
+    neighbours: list[MealNeighbourSnapshot],
+    candidates_by_id: dict[int, DishCandidate],
+    rules: PlanningRulesConfig,
+    rng: random.Random,
+) -> list[_SlotPickOption]:
+    """Return all main and pair options (diagnostics/tests). Generation uses structure-first picking."""
+    return [
+        *_build_main_options(
+            slot,
+            mains=mains,
+            assigned_dish_ids=assigned_dish_ids,
+            forbidden_dish_ids=forbidden_dish_ids,
+            forbidden_combination_keys=forbidden_combination_keys,
+            dish_date_index=dish_date_index,
+            neighbours=neighbours,
+            candidates_by_id=candidates_by_id,
+            rules=rules,
+        ),
+        *_build_pair_options(
+            slot,
+            centerpieces=centerpieces,
+            sides=sides,
+            assigned_dish_ids=assigned_dish_ids,
+            forbidden_dish_ids=forbidden_dish_ids,
+            forbidden_combination_keys=forbidden_combination_keys,
+            dish_date_index=dish_date_index,
+            neighbours=neighbours,
+            candidates_by_id=candidates_by_id,
+            rules=rules,
+            rng=rng,
+        ),
+    ]
+
+
+def _attach_structure_reasons(option: _SlotPickOption, reasons: list[str], codes: list[str]) -> _SlotPickOption:
+    if not reasons and not codes:
+        return option
+    payload = dict(option.assignment.selection_reasons_json)
+    merged_reasons = list(payload.get("reasons", []))
+    for reason in reasons:
+        if reason not in merged_reasons:
+            merged_reasons.append(reason)
+    payload["reasons"] = merged_reasons
+    if codes:
+        payload["structure_reason_codes"] = list(dict.fromkeys([*payload.get("structure_reason_codes", []), *codes]))
+    updated_lines = []
+    for line in option.assignment.lines:
+        if line.selection_reasons_json is None:
+            updated_lines.append(line)
+            continue
+        line_payload = dict(line.selection_reasons_json)
+        line_payload["reasons"] = merged_reasons
+        if codes:
+            line_payload["structure_reason_codes"] = payload["structure_reason_codes"]
+        updated_lines.append(replace(line, selection_reasons_json=line_payload))
+    updated_assignment = SlotAssignment(
+        item_id=option.assignment.item_id,
+        lines=tuple(updated_lines),
+        score=option.assignment.score,
+        selection_reasons_json=payload,
+    )
+    return _SlotPickOption(
+        score=option.score,
+        assignment=updated_assignment,
+        assigned_dish_ids=option.assigned_dish_ids,
+        structure=option.structure,
+    )
+
+
+def _weighted_pick(options: list[_SlotPickOption], rng: random.Random) -> _SlotPickOption:
+    ranked = sorted(options, key=lambda entry: entry.score, reverse=True)
+    top = ranked[:TOP_PICK_COUNT]
+    weights = [max(entry.score, 0.1) for entry in top]
+    return rng.choices(top, weights=weights, k=1)[0]
+
+
+def _pick_slot_option(
+    slot: GenerationSlot,
+    *,
+    mains: list[DishCandidate],
+    centerpieces: list[DishCandidate],
+    sides: list[DishCandidate],
+    assigned_dish_ids: list[int],
+    forbidden_dish_ids: frozenset[int] | None,
+    forbidden_combination_keys: frozenset[tuple] | None,
+    dish_date_index: dict[int, list[date]],
+    neighbours: list[MealNeighbourSnapshot],
+    candidates_by_id: dict[int, DishCandidate],
+    fixed_assignments: dict[int, int],
+    attempt_assignments: list[SlotAssignment],
+    rules: PlanningRulesConfig,
+    rng: random.Random,
+) -> _SlotPickOption | None:
+    composed_count, _main_count = count_week_structures(
+        fixed_assignments=fixed_assignments,
+        attempt_assignments=attempt_assignments,
+        candidates_by_id=candidates_by_id,
+    )
+    preferred, structure_reasons, structure_codes = select_preferred_structure(
+        composed_count,
+        rules=rules,
+        rng=rng,
+    )
+
+    common_kwargs = dict(
+        slot=slot,
+        assigned_dish_ids=assigned_dish_ids,
+        forbidden_dish_ids=forbidden_dish_ids,
+        forbidden_combination_keys=forbidden_combination_keys,
+        dish_date_index=dish_date_index,
+        neighbours=neighbours,
+        candidates_by_id=candidates_by_id,
+        rules=rules,
+    )
+
+    if preferred == MealStructure.main_dish:
+        main_options = _build_main_options(mains=mains, **common_kwargs)
+        if main_options:
+            picked = _weighted_pick(main_options, rng)
+            return _attach_structure_reasons(picked, structure_reasons, structure_codes)
+        pair_options = _build_pair_options(
+            centerpieces=centerpieces,
+            sides=sides,
+            rng=rng,
+            **common_kwargs,
+        )
+        if pair_options:
+            fallback_reasons = [STRUCTURE_FALLBACK_COMPOSED_REASON, *structure_reasons]
+            fallback_codes = ["structure_fallback_no_candidates", *structure_codes]
+            picked = _weighted_pick(pair_options, rng)
+            return _attach_structure_reasons(picked, fallback_reasons, fallback_codes)
+        return None
+
+    pair_options = _build_pair_options(
+        centerpieces=centerpieces,
+        sides=sides,
+        rng=rng,
+        **common_kwargs,
+    )
+    if pair_options:
+        picked = _weighted_pick(pair_options, rng)
+        return _attach_structure_reasons(picked, structure_reasons, structure_codes)
+    main_options = _build_main_options(mains=mains, **common_kwargs)
+    if main_options:
+        fallback_reasons = [STRUCTURE_FALLBACK_MAIN_REASON, *structure_reasons]
+        fallback_codes = ["structure_fallback_no_candidates", *structure_codes]
+        picked = _weighted_pick(main_options, rng)
+        return _attach_structure_reasons(picked, fallback_reasons, fallback_codes)
+    return None
 
 
 def generate_week_assignments(
@@ -276,6 +471,7 @@ def generate_week_assignments(
     today: date,
     rng: random.Random | None = None,
     forbidden_dish_ids: frozenset[int] | None = None,
+    forbidden_combination_keys: frozenset[tuple] | None = None,
 ) -> WeekGenerationResult:
     random_source = rng or random.Random()
     if not slots:
@@ -316,27 +512,25 @@ def generate_week_assignments(
                 exclude_item_id=slot.item_id,
             )
 
-            options = _build_slot_options(
+            picked = _pick_slot_option(
                 slot,
                 mains=candidate_partitions.mains,
                 centerpieces=candidate_partitions.centerpieces,
                 sides=candidate_partitions.sides,
                 assigned_dish_ids=assigned_dish_ids,
                 forbidden_dish_ids=forbidden_dish_ids,
+                forbidden_combination_keys=forbidden_combination_keys,
                 dish_date_index=dish_date_index,
                 neighbours=neighbours,
                 candidates_by_id=candidates_by_id,
+                fixed_assignments=fixed_assignments,
+                attempt_assignments=attempt_assignments,
                 rules=rules,
                 rng=random_source,
             )
-            if not options:
+            if picked is None:
                 failed = True
                 break
-
-            options.sort(key=lambda entry: entry.score, reverse=True)
-            top = options[:5]
-            weights = [max(entry.score, 0.1) for entry in top]
-            picked = random_source.choices(top, weights=weights, k=1)[0]
 
             attempt_assignments.append(picked.assignment)
             assigned_dish_ids.extend(picked.assigned_dish_ids)

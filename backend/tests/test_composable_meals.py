@@ -75,7 +75,7 @@ def test_meal_slot_supports_multiple_manual_lines(client, catalog_seed, admin_he
     assert "food_group_weights" in added_body["computed_traits_json"]
     assert "food_group_grams" in added_body["computed_traits_json"]
     assert "total_trait_grams" in added_body["computed_traits_json"]
-    assert added_body["title"] == "Composable Main + 1 more"
+    assert added_body["title"] == "Composable Main + Composable Side"
 
     line_id = added_body["lines"][1]["id"]
     removed = client.delete(f"/api/meal-plan-item-lines/{line_id}", headers=user_headers)

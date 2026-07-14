@@ -16,6 +16,7 @@ from mealroulette.services.scheduler.generator import (
     _partition_candidates,
     generate_week_assignments,
 )
+from mealroulette.services.scheduler.pair_diagnostics import CandidatePairSummary, SimpleDishSemanticRole
 from mealroulette.services.scheduler.types import DishCandidate, GenerationSlot
 
 pytestmark = pytest.mark.unit
@@ -27,6 +28,8 @@ def _candidate(
     *,
     meal_composition: MealComposition = MealComposition.main_dish,
     simple_dish_part: SimpleDishPart | None = None,
+    computed_traits_json: dict | None = None,
+    pair_summary: CandidatePairSummary | None = None,
 ) -> DishCandidate:
     return DishCandidate(
         dish_id=dish_id,
@@ -39,7 +42,8 @@ def _candidate(
         carb_tags=frozenset(),
         style_tags=frozenset(),
         vector=vector,
-        computed_traits_json=None,
+        computed_traits_json=computed_traits_json,
+        pair_summary=pair_summary,
         average_rating=None,
         seasonality_mode=SeasonalityMode.all_year,
         preferred_months=frozenset(),
@@ -161,6 +165,111 @@ def test_generate_week_can_assign_centerpiece_side_pair():
     assert len(assignment.lines) == 2
     roles = {line.role.value for line in assignment.lines}
     assert roles == {"centerpiece", "side"}
+
+
+def test_build_slot_options_skips_hard_rejected_centerpiece_side_pairs():
+    fish_traits = {
+        "food_group_weights": {"fish": 70.0, "vegetable": 30.0},
+        "dominant_protein": "sardine_family",
+        "total_trait_grams": 400.0,
+    }
+    potato_traits = {
+        "food_group_weights": {"carbohydrate": 75.0, "vegetable": 25.0},
+        "dominant_carb": "potato_family",
+        "total_trait_grams": 320.0,
+    }
+    centerpieces = [
+        _candidate(
+            1,
+            {"fish": 1.0},
+            meal_composition=MealComposition.simple_dish,
+            simple_dish_part=SimpleDishPart.centerpiece,
+            computed_traits_json=fish_traits,
+            pair_summary=CandidatePairSummary(
+                primary_ingredient_ids=frozenset(),
+                primary_family_keys=frozenset({"sardine_family"}),
+                semantic_role=SimpleDishSemanticRole.protein_centerpiece,
+            ),
+        )
+    ]
+    sides = [
+        _candidate(
+            2,
+            {"fish-side": 1.0},
+            meal_composition=MealComposition.simple_dish,
+            simple_dish_part=SimpleDishPart.sidedish,
+            computed_traits_json={
+                "food_group_weights": {"fish": 35.0, "vegetable": 65.0},
+                "dominant_protein": "tuna_family",
+                "total_trait_grams": 250.0,
+            },
+            pair_summary=CandidatePairSummary(
+                primary_ingredient_ids=frozenset(),
+                primary_family_keys=frozenset({"tuna_family"}),
+                semantic_role=SimpleDishSemanticRole.protein_side,
+            ),
+        ),
+        _candidate(
+            3,
+            {"potato": 1.0},
+            meal_composition=MealComposition.simple_dish,
+            simple_dish_part=SimpleDishPart.sidedish,
+            computed_traits_json=potato_traits,
+            pair_summary=CandidatePairSummary(
+                primary_ingredient_ids=frozenset(),
+                primary_family_keys=frozenset({"potato_family"}),
+                semantic_role=SimpleDishSemanticRole.carb_side,
+            ),
+        ),
+    ]
+    slot = GenerationSlot(item_id=101, meal_date=date(2026, 7, 7), meal_slot=MealSlot.lunch)
+    options = _build_slot_options(
+        slot,
+        mains=[],
+        centerpieces=centerpieces,
+        sides=sides,
+        assigned_dish_ids=[],
+        forbidden_dish_ids=None,
+        forbidden_combination_keys=None,
+        dish_date_index={},
+        neighbours=[],
+        candidates_by_id={candidate.dish_id: candidate for candidate in centerpieces + sides},
+        rules=_rules(),
+        rng=random.Random(0),
+    )
+
+    pair_dish_ids = {
+        tuple(sorted(line.dish_id for line in option.assignment.lines))
+        for option in options
+        if len(option.assignment.lines) == 2
+    }
+    assert pair_dish_ids == {(1, 3)}
+
+
+def test_build_slot_options_respects_forbidden_combination_keys():
+    candidates = [
+        _candidate(1, {"a": 1.0}, meal_composition=MealComposition.main_dish),
+        _candidate(2, {"b": 1.0}, meal_composition=MealComposition.main_dish),
+        _candidate(3, {"c": 1.0}, meal_composition=MealComposition.main_dish),
+    ]
+    slot = GenerationSlot(item_id=101, meal_date=date(2026, 7, 7), meal_slot=MealSlot.lunch)
+    options = _build_slot_options(
+        slot,
+        mains=candidates,
+        centerpieces=[],
+        sides=[],
+        assigned_dish_ids=[],
+        forbidden_dish_ids=None,
+        forbidden_combination_keys=frozenset({("main", 1), ("main", 2)}),
+        dish_date_index={},
+        neighbours=[],
+        candidates_by_id={candidate.dish_id: candidate for candidate in candidates},
+        rules=_rules(),
+        rng=random.Random(0),
+    )
+
+    assert len(options) == 1
+    assert options[0].assignment.dish_id == 3
 
 
 def _large_catalog_candidates() -> list[DishCandidate]:
@@ -366,6 +475,7 @@ def test_build_slot_options_caps_pair_exploration_for_large_catalog():
         sides=partitions.sides,
         assigned_dish_ids=[],
         forbidden_dish_ids=None,
+        forbidden_combination_keys=None,
         dish_date_index={},
         neighbours=[],
         candidates_by_id=candidates_by_id,
@@ -399,6 +509,7 @@ def test_build_slot_options_scores_each_eligible_candidate_once_per_slot(monkeyp
         sides=partitions.sides,
         assigned_dish_ids=[],
         forbidden_dish_ids=None,
+        forbidden_combination_keys=None,
         dish_date_index={},
         neighbours=[],
         candidates_by_id=candidates_by_id,

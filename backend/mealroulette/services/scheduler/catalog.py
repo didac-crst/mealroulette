@@ -12,6 +12,10 @@ from mealroulette.schemas.scheduler import PlanningRulesConfig
 from mealroulette.services.recipe_traits import compute_recipe_traits_now
 from mealroulette.services.quantities import UnitInfo
 from mealroulette.services.scheduler.family_vector import build_family_vector_for_dish_main_recipe, unit_info_from_model
+from mealroulette.services.scheduler.pair_diagnostics import (
+    CandidatePairSummary,
+    build_recipe_pair_diagnostics,
+)
 from mealroulette.services.scheduler.types import DishCandidate, EatenMealSnapshot
 
 
@@ -64,6 +68,30 @@ def load_dish_candidates(db: Session, *, rules: PlanningRulesConfig) -> list[Dis
             default_grams_per_count=rules.default_grams_per_count,
         )
         seasonality = dish.seasonality
+        tag_names = frozenset(tag.name for tag in dish.tags)
+        traits = compute_recipe_traits_now(
+            db,
+            main_recipe,
+            gram_unit=gram_unit,
+            ml_unit=ml_unit,
+        )
+        pair_summary: CandidatePairSummary | None = None
+        if dish.meal_composition == MealComposition.simple_dish:
+            diagnostics = build_recipe_pair_diagnostics(
+                main_recipe,
+                gram_unit=gram_unit,
+                ml_unit=ml_unit,
+                traits=traits,
+                simple_dish_part=dish.simple_dish_part,
+                tag_names=tag_names,
+                vector_min_grams=rules.vector_min_grams,
+                default_grams_per_count=rules.default_grams_per_count,
+            )
+            pair_summary = CandidatePairSummary(
+                primary_ingredient_ids=diagnostics.primary_ingredient_ids,
+                primary_family_keys=diagnostics.primary_family_keys,
+                semantic_role=diagnostics.semantic_role,
+            )
         candidates.append(
             DishCandidate(
                 dish_id=dish.id,
@@ -71,17 +99,13 @@ def load_dish_candidates(db: Session, *, rules: PlanningRulesConfig) -> list[Dis
                 recipe_id=main_recipe.id,
                 meal_composition=dish.meal_composition,
                 simple_dish_part=dish.simple_dish_part,
-                tag_names=frozenset(tag.name for tag in dish.tags),
+                tag_names=tag_names,
                 protein_tags=frozenset(tag.name for tag in dish.tags if tag.family == "protein"),
                 carb_tags=frozenset(tag.name for tag in dish.tags if tag.family == "carb"),
                 style_tags=frozenset(tag.name for tag in dish.tags if tag.family == "style"),
                 vector=vector_result.weights,
-                computed_traits_json=compute_recipe_traits_now(
-                    db,
-                    main_recipe,
-                    gram_unit=gram_unit,
-                    ml_unit=ml_unit,
-                ),
+                computed_traits_json=traits,
+                pair_summary=pair_summary,
                 average_rating=ratings.get(dish.id),
                 seasonality_mode=seasonality.seasonality_mode if seasonality else SeasonalityMode.all_year,
                 preferred_months=frozenset(seasonality.preferred_months if seasonality else []),

@@ -61,6 +61,7 @@ export type MealPlanRouletteResponse = {
   variety: {
     average_distance_to_neighbours: number | null;
     items: Array<{
+      item_id?: number;
       dish_id: number;
       dish_name: string;
       nearest_neighbour_dish: string | null;
@@ -72,6 +73,16 @@ export type MealPlanRouletteResponse = {
   assignments_count: number;
   total_score: number;
   can_undo: boolean;
+};
+
+export type MealPlanRerollResponse = {
+  status: "success" | "exhausted";
+  item: MealPlanItem;
+  message?: string | null;
+  warnings?: string[];
+  variety?: MealPlanRouletteResponse["variety"] | null;
+  total_score?: number | null;
+  can_undo?: boolean;
 };
 
 export type MealPlanUndoRouletteResponse = {
@@ -223,8 +234,15 @@ export async function generateMealPlanWeekDetails(
   });
 }
 
-export async function rerollMealPlanItem(token: string, itemId: number): Promise<MealPlanItem> {
-  return apiRequest<MealPlanItem>(`/api/meal-plan-items/${itemId}/reroll`, {
+export async function rerollMealPlanItem(token: string, itemId: number): Promise<MealPlanRerollResponse> {
+  return apiRequest<MealPlanRerollResponse>(`/api/meal-plan-items/${itemId}/reroll`, {
+    method: "POST",
+    token,
+  });
+}
+
+export async function startOverMealPlanReroll(token: string, itemId: number): Promise<MealPlanItem> {
+  return apiRequest<MealPlanItem>(`/api/meal-plan-items/${itemId}/reroll/start-over`, {
     method: "POST",
     token,
   });

@@ -20,6 +20,8 @@ DEFAULT_PLANNING_RULES_JSON: dict = {
     "vector_min_grams": 5,
     "plan_attempts": 50,
     "history_window_days": 14,
+    "composed_meals_per_week": {"min": 4, "max": 7},
+    "structure_neutral_share": {"main": 0.60, "composed_pair": 0.40},
 }
 
 DEFAULT_PLANNING_RULE_NAME = "default"

@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { fetchRecipes, type Dish, type Recipe } from "../../api/catalog";
 import type { MealPlanItem } from "../../api/planning";
 import { MealSlotCard } from "./MealSlotCard";
-import { canOpenCookMode, resolveCookRecipeId } from "./todayMeals";
+import { buildCookOptions, canOpenCookMode, cookableDishIds } from "./todayMeals";
 
 type Props = {
   item: MealPlanItem;
@@ -27,26 +27,36 @@ export function TodayMealCard({
   onError,
 }: Props) {
   const [reviewOpen, setReviewOpen] = useState(false);
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [recipesByDishId, setRecipesByDishId] = useState<Map<number, Recipe[]>>(new Map());
   const [recipesLoading, setRecipesLoading] = useState(false);
+  const dishIds = useMemo(
+    () => (canOpenCookMode(item) ? cookableDishIds(item) : []),
+    [item],
+  );
 
   useEffect(() => {
-    if (!accessToken || !item.dish_id || !canOpenCookMode(item)) {
-      setRecipes([]);
+    if (!accessToken || dishIds.length === 0) {
+      setRecipesByDishId(new Map());
       setRecipesLoading(false);
       return;
     }
     let cancelled = false;
     setRecipesLoading(true);
-    fetchRecipes(accessToken, item.dish_id)
-      .then((recipeData) => {
+    Promise.allSettled(
+      dishIds.map(async (dishId) => {
+        const recipes = await fetchRecipes(accessToken, dishId);
+        return [dishId, recipes] as const;
+      }),
+    )
+      .then((results) => {
         if (!cancelled) {
-          setRecipes(recipeData);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setRecipes([]);
+          const entries = results
+            .filter(
+              (result): result is PromiseFulfilledResult<readonly [number, Recipe[]]> =>
+                result.status === "fulfilled",
+            )
+            .map((result) => result.value);
+          setRecipesByDishId(new Map(entries));
         }
       })
       .finally(() => {
@@ -57,9 +67,12 @@ export function TodayMealCard({
     return () => {
       cancelled = true;
     };
-  }, [accessToken, item.dish_id, item.status]);
+  }, [accessToken, dishIds]);
 
-  const cookRecipeId = canOpenCookMode(item) ? resolveCookRecipeId(item, recipes) : null;
+  const cookOptions = useMemo(
+    () => (canOpenCookMode(item) ? buildCookOptions(item, recipesByDishId) : []),
+    [item, recipesByDishId],
+  );
   const reviewExpanded = reviewOpen || item.status !== "planned";
 
   return (
@@ -71,8 +84,8 @@ export function TodayMealCard({
       sourceLookupItems={sourceLookupItems}
       accessToken={accessToken}
       mode="today"
-      cookRecipeId={cookRecipeId}
-      cookRecipesLoading={recipesLoading}
+      cookOptions={cookOptions}
+      cookOptionsLoading={recipesLoading}
       reviewExpanded={reviewExpanded}
       onReviewToggle={() => setReviewOpen((open) => !open)}
       onChanged={onChanged}

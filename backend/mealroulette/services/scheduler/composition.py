@@ -5,6 +5,77 @@ from mealroulette.models.planning import MealPlanItem
 from mealroulette.services.scheduler.types import DishCandidate, SlotAssignment, SlotAssignmentLine
 
 
+def _candidate_trait_grams(candidate: DishCandidate) -> float:
+    traits = candidate.computed_traits_json or {}
+    grams = traits.get("total_trait_grams")
+    if isinstance(grams, (int, float)) and grams > 0:
+        return float(grams)
+    return 1.0
+
+
+def aggregate_meal_vector(candidates: list[DishCandidate]) -> dict[str, float]:
+    if not candidates:
+        return {}
+    if len(candidates) == 1:
+        return dict(candidates[0].vector)
+
+    total_weight = sum(_candidate_trait_grams(candidate) for candidate in candidates)
+    if total_weight <= 0:
+        total_weight = float(len(candidates))
+
+    combined: dict[str, float] = {}
+    for candidate in candidates:
+        weight = _candidate_trait_grams(candidate) / total_weight
+        for key, value in candidate.vector.items():
+            combined[key] = combined.get(key, 0.0) + (value * weight)
+    return combined
+
+
+def assignment_line_candidates(
+    assignment: SlotAssignment,
+    candidates_by_id: dict[int, DishCandidate],
+) -> list[DishCandidate]:
+    ordered = sorted(assignment.lines, key=lambda line: line.position)
+    return [
+        candidates_by_id[line.dish_id]
+        for line in ordered
+        if line.dish_id in candidates_by_id
+    ]
+
+
+def assignment_meal_label(
+    assignment: SlotAssignment,
+    candidates_by_id: dict[int, DishCandidate],
+) -> str:
+    ordered = sorted(assignment.lines, key=lambda line: line.position)
+    names = [
+        candidates_by_id[line.dish_id].dish_name
+        for line in ordered
+        if line.dish_id in candidates_by_id
+    ]
+    if not names:
+        return "Unassigned"
+    if len(names) == 1:
+        return names[0]
+    if len(ordered) == 2:
+        roles = {line.role for line in ordered}
+        if roles == {MealPlanDishLineRole.centerpiece, MealPlanDishLineRole.side}:
+            centerpiece = next(line for line in ordered if line.role == MealPlanDishLineRole.centerpiece)
+            side = next(line for line in ordered if line.role == MealPlanDishLineRole.side)
+            cp_name = candidates_by_id.get(centerpiece.dish_id)
+            side_name = candidates_by_id.get(side.dish_id)
+            if cp_name is not None and side_name is not None:
+                return f"{cp_name.dish_name} with {side_name.dish_name}"
+    return " + ".join(names)
+
+
+def assignment_meal_vector(
+    assignment: SlotAssignment,
+    candidates_by_id: dict[int, DishCandidate],
+) -> dict[str, float]:
+    return aggregate_meal_vector(assignment_line_candidates(assignment, candidates_by_id))
+
+
 def is_main_candidate(candidate: DishCandidate) -> bool:
     return candidate.meal_composition == MealComposition.main_dish
 

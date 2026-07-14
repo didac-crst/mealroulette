@@ -56,12 +56,38 @@ dish suitability + pair compatibility + whole-meal completeness
 - Do not add line-level ratings or line-level leftovers.
 - Do not implement per-component locking in this phase unless already present.
 - Do not implement full day/week nutrition analytics in this phase.
+- Do not redesign manual swap as a dish-line swap; swap remains a meal-slot/package operation.
 
 Food-group and ingredient percentages are composition heuristics, not nutritional truth.
 
 ---
 
-## Core Concepts
+## Scheduler policy separation
+
+Week generation, historical cooldown, and reroll memory are **three separate policies**. Do not conflate them.
+
+| Policy | Purpose | Scope | Default / config |
+| --- | --- | --- | --- |
+| **Week structure** | Keep the intended mix of complete mains vs composed pairs across the planning week | Generate week (and structure-aware reroll when at composed max) | `composed_meals_per_week` min 4 / max 7; neutral share 60% main / 40% composed — see [scheduler.md](scheduler.md) |
+| **History cooldown** | Avoid repeating dishes or overly similar meals across weeks | Eaten history + planned meals in temporal windows | `avoid_same_dish_within_days` 21; `avoid_similar_meals_within_days` 14; `history_window_days` 14 — planning rules |
+| **Reroll seen memory** | Prevent `A → B → A` while editing **one slot** in the current planning interaction | Per meal-plan item, short-lived | Stored in `reroll_history_json`; not long-term taste memory |
+
+### History cooldown (planning memory)
+
+- **Same dish ID:** hard exclusion within `avoid_same_dish_within_days` (default **21 days**). After ~3 weeks the same dish may appear again. Use **28 days** if the product goal is roughly monthly variety.
+- **Similar meals:** soft penalty within `avoid_similar_meals_within_days` (default **14 days**).
+- **Pair-combination cooldown** (e.g. same centerpiece+side for 21–28 days) is **not** implemented in Phase 14. Add separately if pair repetition remains noticeable despite dish-level cooldown.
+
+### Reroll seen memory (interaction memory)
+
+- Prevents cycling through already-seen alternatives **for the slot being edited**.
+- Must **not** persist as permanent taste memory and must **not** carry across planning weeks.
+- Resets when: week regenerated; slot manually assigned; user **Start over**; item deleted; **plan week is before the current planning week**; **slot date is in the past**.
+- May persist across browser refresh **only** while the slot remains today/future in the current or a future planning week.
+
+Reroll can feel pair-heavy when many pair combinations exist. That is a separate product choice from week structure: “show many reroll alternatives” vs “reroll preserves weekly balance more strictly”. Phase 14 keeps generation structure-strict and reroll looser except when the week is already at composed max.
+
+---
 
 ## Meal Candidate
 
@@ -288,9 +314,7 @@ A -> reroll -> B -> reroll -> A
 
 This is compliant with "exclude current dish" but poor product behavior.
 
-## Required Behavior
-
-For each meal slot, reroll must maintain a seen set for the current planning interaction:
+## Required Reroll Behavior
 
 ```text
 initial: A
@@ -318,7 +342,8 @@ Preferred implementation:
 - reset when the slot is manually assigned;
 - reset when the user explicitly chooses "Start over";
 - reset when the plan item is deleted;
-- keep across browser refreshes while the plan is being edited.
+- reset when the **plan week is before the current planning week** or the **slot date is before today** (stale interaction memory cleanup on plan load);
+- keep across browser refreshes while the slot remains editable in the current or a future planning week.
 
 Acceptable first implementation if backend persistence is too large:
 
@@ -360,6 +385,47 @@ Rules:
 - if component locking is added later, preserve locked components and reroll only unlocked roulette lines.
 
 Do not implement "replace only the bad component" in this phase. It is a future enhancement once pair rejection reasons are reliable.
+
+---
+
+## Swap Semantics for Composed Meals
+
+Swap is currently a meal-level action. After composable meals, it must continue to swap the whole meal package, not one dish line.
+
+## Required Swap Behavior
+
+- the chooser must show target meal slots, not individual dish lines;
+- each target option must display the whole menu for that slot;
+- a composed target should display all lines, for example `Buttered Pasta + Greek Salad`;
+- a main-dish target should display its single main dish;
+- a `Do not plan` target should be displayed as a slot state and should either be excluded or explicitly labelled according to existing swap eligibility rules;
+- selecting a target swaps the full slot assignment package between the two meal slots.
+
+The full package includes:
+
+- all meal dish lines;
+- line order/position;
+- roles;
+- source/manual vs roulette markers;
+- recipe selections;
+- selection reasons;
+- legacy mirror fields while they still exist;
+- slot planning state where the existing product semantics require it.
+
+Swap must not show only the first dish in a composed meal. Showing only one dish creates a false target and makes users think they are swapping a single component.
+
+## Eligibility
+
+Preserve existing safety rules:
+
+- locked slots cannot be swapped unless existing behavior already allows it;
+- past slots cannot be swapped unless existing behavior already allows it;
+- `do_not_plan` slots must not be accidentally converted into planned slots without explicit behavior;
+- manual extras must move with their meal package.
+
+If the existing API only swaps `dish_id`, `recipe_id`, and direct item fields, update it to swap line packages as well.
+
+Do not implement component-level swap in this phase. A future component-level swap would need a distinct UI label such as `Swap side`, not the current meal-level `Swap`.
 
 ---
 
@@ -457,11 +523,22 @@ Table-driven backend tests:
 ## Reroll
 
 - Initial result A, reroll returns B, next reroll must not return A.
-- Composed history excludes complete combinations, not only the current first line.
+- Composed reroll history excludes complete combinations.
 - Reroll preserves manual extras.
 - `do_not_plan`, locked, and past slots cannot reroll.
-- Exhaustion returns an explicit exhausted state and does not silently cycle.
+- Exhaustion returns explicit exhausted state and does not cycle.
 - Start-over clears reroll history.
+- Stale reroll history clears when the plan week is before the current planning week or the slot date is in the past.
+
+## Swap
+
+- Swap target list displays complete meal-slot menus, not only the first dish line.
+- Swapping a composed meal with another composed meal exchanges all dish lines and metadata.
+- Swapping a composed meal with a main-dish meal exchanges the whole meal package in both directions.
+- Manual extras move with the swapped meal package.
+- Selection reasons and roulette/manual source markers remain attached to the moved lines.
+- Locked, past, and `do_not_plan` eligibility follows existing slot-level swap rules.
+- No component-level swap is exposed under the meal-level `Swap` action.
 
 ## Explainability
 

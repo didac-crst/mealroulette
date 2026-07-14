@@ -70,7 +70,7 @@ def test_compute_meal_title_multi_line():
         MealPlanItemDish(position=0, role=MealPlanDishLineRole.main, source=MealPlanDishLineSource.roulette, dish=main_dish),
         MealPlanItemDish(position=1, role=MealPlanDishLineRole.dessert, source=MealPlanDishLineSource.manual, dish=dessert),
     ]
-    assert compute_meal_title(item, lines) == "Pasta + 1 more"
+    assert compute_meal_title(item, lines) == "Pasta + Fruit crumble"
 
 
 def test_primary_line_prefers_roulette_main():

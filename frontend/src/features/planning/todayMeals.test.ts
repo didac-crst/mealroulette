@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { canOpenCookMode, resolveCookRecipeId } from "./todayMeals";
+import { canOpenCookMode, buildCookOptions, cookableDishIds, resolveCookRecipeId } from "./todayMeals";
 import type { MealPlanItem, MealPlanDishLine } from "../../api/planning";
 
 function item(overrides: Partial<MealPlanItem> = {}): MealPlanItem {
@@ -52,5 +52,51 @@ describe("todayMeals helpers", () => {
     expect(canOpenCookMode(item({ dish_id: null, lines: [] }))).toBe(false);
     expect(canOpenCookMode(item({ dish_id: null, lines: [{ id: 1, dish_id: 10 } as unknown as MealPlanDishLine] }))).toBe(true);
     expect(canOpenCookMode(item())).toBe(true);
+  });
+
+  it("builds cook options for composed meals", () => {
+    const composed = item({
+      dish_id: 10,
+      dish_name: "Fish dinner",
+      lines: [
+        {
+          id: 1,
+          meal_plan_item_id: 1,
+          dish_id: 10,
+          recipe_id: 100,
+          dish_name: "Grilled sardines",
+          recipe_variant_name: "Standard",
+          role: "centerpiece",
+          source: "roulette",
+          position: 0,
+          selection_reasons_json: null,
+          computed_traits_json: null,
+        },
+        {
+          id: 2,
+          meal_plan_item_id: 1,
+          dish_id: 20,
+          recipe_id: 200,
+          dish_name: "Boiled potatoes",
+          recipe_variant_name: "Standard",
+          role: "side",
+          source: "roulette",
+          position: 1,
+          selection_reasons_json: null,
+          computed_traits_json: null,
+        },
+      ],
+    });
+    expect(cookableDishIds(composed)).toEqual([10, 20]);
+    const options = buildCookOptions(
+      composed,
+      new Map([
+        [10, [{ id: 100, is_main: true } as never]],
+        [20, [{ id: 200, is_main: true } as never]],
+      ]),
+    );
+    expect(options).toHaveLength(2);
+    expect(options[0]?.dishName).toBe("Grilled sardines");
+    expect(options[1]?.recipeId).toBe(200);
   });
 });

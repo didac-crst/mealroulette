@@ -4,6 +4,7 @@ import { ApiError } from "../../api/client";
 import {
   generateMealPlanWeekDetails,
   rerollMealPlanItem,
+  startOverMealPlanReroll,
   swapMealPlanItems,
   undoMealPlanRoulette,
   type MealPlanItem,
@@ -22,6 +23,7 @@ export function PlanWeekPage() {
   const nav = weekNavigationHandlers(plan?.week_start_date ?? null, load);
   const [rouletteBusy, setRouletteBusy] = useState(false);
   const [lastRoulette, setLastRoulette] = useState<MealPlanRouletteResponse | null>(null);
+  const [rerollExhaustedByItemId, setRerollExhaustedByItemId] = useState<Record<number, string>>({});
 
   const grouped = useMemo(
     (): Map<string, MealPlanItem[]> => (plan ? groupItemsByDate(plan.items) : new Map()),
@@ -71,12 +73,44 @@ export function PlanWeekPage() {
     setRouletteBusy(true);
     setError(null);
     try {
-      const updated = await rerollMealPlanItem(accessToken, item.id);
-      replaceItem(updated);
+      const result = await rerollMealPlanItem(accessToken, item.id);
+      if (result.status === "exhausted") {
+        setRerollExhaustedByItemId((current) => ({
+          ...current,
+          [item.id]: result.message ?? "You've seen all suitable alternatives.",
+        }));
+        return;
+      }
+      setRerollExhaustedByItemId((current) => {
+        const next = { ...current };
+        delete next[item.id];
+        return next;
+      });
+      replaceItem(result.item);
       setLastRoulette(null);
       await load(plan.week_start_date);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Failed to reroll meal");
+    } finally {
+      setRouletteBusy(false);
+    }
+  }
+
+  async function handleStartOverReroll(item: MealPlanItem) {
+    if (!accessToken || !plan) {
+      return;
+    }
+    setRouletteBusy(true);
+    setError(null);
+    try {
+      await startOverMealPlanReroll(accessToken, item.id);
+      setRerollExhaustedByItemId((current) => {
+        const next = { ...current };
+        delete next[item.id];
+        return next;
+      });
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Failed to reset reroll history");
     } finally {
       setRouletteBusy(false);
     }
@@ -154,7 +188,7 @@ export function PlanWeekPage() {
             </p>
             <ul className="variety-list">
               {lastRoulette.variety.items.map((entry) => (
-                <li key={entry.dish_id}>
+                <li key={entry.item_id ?? entry.dish_id}>
                   <strong>{entry.dish_name}</strong>
                   <span className="muted">
                     {" "}
@@ -191,6 +225,8 @@ export function PlanWeekPage() {
                       onChanged={replaceItem}
                       onError={setError}
                       onReroll={handleReroll}
+                      onStartOverReroll={handleStartOverReroll}
+                      rerollExhaustedMessage={rerollExhaustedByItemId[item.id]}
                       onSwap={handleSwap}
                     />
                   ))}

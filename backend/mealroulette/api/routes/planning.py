@@ -23,7 +23,7 @@ from mealroulette.schemas.planning import (
     MealRatingPublic,
     MealRatingUpsertResponse,
 )
-from mealroulette.schemas.scheduler import MealPlanRouletteResponse, MealPlanUndoRouletteResponse
+from mealroulette.schemas.scheduler import MealPlanRerollResponse, MealPlanRouletteResponse, MealPlanUndoRouletteResponse
 from mealroulette.services.planning import PlanningService
 from mealroulette.services.scheduler_service import SchedulerService
 
@@ -180,30 +180,58 @@ def generate_meal_plan_week_details(
     )
 
 
-@router.post("/meal-plan-items/{item_id}/reroll", response_model=MealPlanItemPublic)
+@router.post("/meal-plan-items/{item_id}/reroll", response_model=MealPlanRerollResponse)
 def reroll_meal_plan_item(
+    item_id: int,
+    _user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MealPlanRerollResponse:
+    planning = PlanningService(db)
+    reroll = SchedulerService(db).reroll_item(item_id)
+    item = planning.to_item_public(planning._load_item(item_id))
+    if reroll.status == "exhausted":
+        return MealPlanRerollResponse(status="exhausted", item=item, message=reroll.message)
+    assert reroll.result is not None
+    return MealPlanRerollResponse(
+        status="success",
+        item=item,
+        warnings=reroll.result.warnings,
+        variety=reroll.variety,
+        total_score=reroll.result.total_score,
+        can_undo=True,
+    )
+
+
+@router.post("/meal-plan-items/{item_id}/reroll/start-over", response_model=MealPlanItemPublic)
+def start_over_meal_plan_reroll(
     item_id: int,
     _user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> MealPlanItemPublic:
     planning = PlanningService(db)
-    SchedulerService(db).reroll_item(item_id)
+    SchedulerService(db).start_over_reroll(item_id)
     return planning.to_item_public(planning._load_item(item_id))
 
 
-@router.post("/meal-plan-items/{item_id}/reroll/details", response_model=MealPlanRouletteResponse)
+@router.post("/meal-plan-items/{item_id}/reroll/details", response_model=MealPlanRerollResponse)
 def reroll_meal_plan_item_details(
     item_id: int,
     _user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-) -> MealPlanRouletteResponse:
+) -> MealPlanRerollResponse:
     service = SchedulerService(db)
-    result, variety = service.reroll_item(item_id)
-    return MealPlanRouletteResponse(
-        warnings=result.warnings,
-        variety=variety,
-        assignments_count=len(result.assignments),
-        total_score=result.total_score,
+    planning = PlanningService(db)
+    reroll = service.reroll_item(item_id)
+    item = planning.to_item_public(planning._load_item(item_id))
+    if reroll.status == "exhausted":
+        return MealPlanRerollResponse(status="exhausted", item=item, message=reroll.message)
+    assert reroll.result is not None
+    return MealPlanRerollResponse(
+        status="success",
+        item=item,
+        warnings=reroll.result.warnings,
+        variety=reroll.variety,
+        total_score=reroll.result.total_score,
         can_undo=True,
     )
 
