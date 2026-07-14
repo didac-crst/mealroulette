@@ -546,6 +546,13 @@ Simple first implementation:
 - score side compatibility with a smaller modifier;
 - aggregate pair vector for similarity and weekly target counting.
 
+**Current generator behaviour (Phase 12 performance guard):**
+
+- eligible centerpieces and sides are **pre-scored once per slot**;
+- pair total = `centerpiece_score + 0.25 × side_score` using those pre-scored estimates;
+- sides are **not** rescored with the centerpiece already in `assigned_dish_ids`, and the pair is **not** yet scored as a combined package (aggregate traits/vector/target contribution). This is an acceptable approximation for interactive latency; longer term, score pairs as one unit per the bullets above.
+- large simple-dish catalogs use a **bounded shortlist** (top scorers plus a random sample from the remainder) and **adaptive `plan_attempts`** — see [scheduler.md](scheduler.md) § Sequential week generation.
+
 Pair vector options:
 
 1. compute aggregate from the two recipes' ingredient grams; preferred;

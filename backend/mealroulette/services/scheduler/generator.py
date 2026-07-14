@@ -30,6 +30,20 @@ from mealroulette.services.scheduler.types import (
 )
 
 SIDE_PAIR_SCORE_WEIGHT = 0.25
+MAX_PAIR_CENTERPIECES = 15
+MAX_PAIR_SIDES = 25
+PAIR_GUARANTEED_TOP_CENTERPIECES = 8
+PAIR_RANDOM_CENTERPIECES = 7
+PAIR_GUARANTEED_TOP_SIDES = 12
+PAIR_RANDOM_SIDES = 13
+LARGE_PAIR_SPACE_THRESHOLD = 2_000
+
+
+@dataclass(frozen=True)
+class _ScoredCandidate:
+    candidate: DishCandidate
+    score: float
+    payload: dict
 
 
 @dataclass(frozen=True)
@@ -62,21 +76,21 @@ def _candidate_is_eligible(
     )
 
 
-def _build_slot_options(
-    slot: GenerationSlot,
-    *,
+def _score_eligible_candidates(
     candidates: list[DishCandidate],
+    *,
+    predicate,
+    slot: GenerationSlot,
     assigned_dish_ids: list[int],
     forbidden_dish_ids: frozenset[int] | None,
     dish_date_index: dict[int, list[date]],
     neighbours: list[MealNeighbourSnapshot],
     candidates_by_id: dict[int, DishCandidate],
     rules: PlanningRulesConfig,
-) -> list[_SlotPickOption]:
-    options: list[_SlotPickOption] = []
-
+) -> list[_ScoredCandidate]:
+    scored: list[_ScoredCandidate] = []
     for candidate in candidates:
-        if not is_main_candidate(candidate):
+        if not predicate(candidate):
             continue
         if not _candidate_is_eligible(
             candidate,
@@ -95,65 +109,130 @@ def _build_slot_options(
             neighbours=neighbours,
             rules=rules,
         )
+        scored.append(_ScoredCandidate(candidate=candidate, score=score, payload=payload))
+    return scored
+
+
+def _diverse_shortlist(
+    scored: list[_ScoredCandidate],
+    *,
+    max_count: int,
+    guaranteed_top: int,
+    random_pick: int,
+    rng: random.Random,
+) -> list[_ScoredCandidate]:
+    if len(scored) <= max_count:
+        return scored
+
+    ranked = sorted(scored, key=lambda entry: entry.score, reverse=True)
+    top_count = min(guaranteed_top, max_count, len(ranked))
+    top = ranked[:top_count]
+    remaining = ranked[top_count:]
+    sample_size = min(random_pick, max_count - top_count, len(remaining))
+    sampled = rng.sample(remaining, sample_size) if sample_size > 0 else []
+    return top + sampled
+
+
+def _effective_plan_attempts(rules: PlanningRulesConfig, candidates: list[DishCandidate]) -> int:
+    centerpiece_count = sum(1 for candidate in candidates if is_centerpiece_candidate(candidate))
+    side_count = sum(1 for candidate in candidates if is_side_candidate(candidate))
+    pair_space = centerpiece_count * side_count
+    if pair_space <= LARGE_PAIR_SPACE_THRESHOLD:
+        return rules.plan_attempts
+    if pair_space <= 10_000:
+        return min(rules.plan_attempts, max(15, rules.plan_attempts // 2))
+    return min(rules.plan_attempts, max(10, rules.plan_attempts // 3))
+
+
+def _build_slot_options(
+    slot: GenerationSlot,
+    *,
+    candidates: list[DishCandidate],
+    assigned_dish_ids: list[int],
+    forbidden_dish_ids: frozenset[int] | None,
+    dish_date_index: dict[int, list[date]],
+    neighbours: list[MealNeighbourSnapshot],
+    candidates_by_id: dict[int, DishCandidate],
+    rules: PlanningRulesConfig,
+    rng: random.Random,
+) -> list[_SlotPickOption]:
+    options: list[_SlotPickOption] = []
+
+    for scored in _score_eligible_candidates(
+        candidates,
+        predicate=is_main_candidate,
+        slot=slot,
+        assigned_dish_ids=assigned_dish_ids,
+        forbidden_dish_ids=forbidden_dish_ids,
+        dish_date_index=dish_date_index,
+        neighbours=neighbours,
+        candidates_by_id=candidates_by_id,
+        rules=rules,
+    ):
         options.append(
             _SlotPickOption(
-                score=score,
+                score=scored.score,
                 assignment=assignment_from_main(
                     item_id=slot.item_id,
-                    candidate=candidate,
-                    score=score,
-                    payload=payload,
+                    candidate=scored.candidate,
+                    score=scored.score,
+                    payload=scored.payload,
                 ),
-                assigned_dish_ids=(candidate.dish_id,),
+                assigned_dish_ids=(scored.candidate.dish_id,),
             )
         )
 
-    centerpieces = [candidate for candidate in candidates if is_centerpiece_candidate(candidate)]
-    sides = [candidate for candidate in candidates if is_side_candidate(candidate)]
-    for centerpiece in centerpieces:
-        if not _candidate_is_eligible(
-            centerpiece,
-            slot=slot,
-            assigned_dish_ids=assigned_dish_ids,
-            forbidden_dish_ids=forbidden_dish_ids,
-            dish_date_index=dish_date_index,
-            rules=rules,
-        ):
-            continue
-        centerpiece_score, centerpiece_payload = score_candidate_for_slot(
-            centerpiece,
-            slot,
-            assigned_dish_ids=assigned_dish_ids,
-            candidates_by_id=candidates_by_id,
-            neighbours=neighbours,
-            rules=rules,
-        )
-        for side in sides:
-            if side.dish_id == centerpiece.dish_id:
+    scored_centerpieces = _score_eligible_candidates(
+        candidates,
+        predicate=is_centerpiece_candidate,
+        slot=slot,
+        assigned_dish_ids=assigned_dish_ids,
+        forbidden_dish_ids=forbidden_dish_ids,
+        dish_date_index=dish_date_index,
+        neighbours=neighbours,
+        candidates_by_id=candidates_by_id,
+        rules=rules,
+    )
+    scored_sides = _score_eligible_candidates(
+        candidates,
+        predicate=is_side_candidate,
+        slot=slot,
+        assigned_dish_ids=assigned_dish_ids,
+        forbidden_dish_ids=forbidden_dish_ids,
+        dish_date_index=dish_date_index,
+        neighbours=neighbours,
+        candidates_by_id=candidates_by_id,
+        rules=rules,
+    )
+
+    shortlisted_centerpieces = _diverse_shortlist(
+        scored_centerpieces,
+        max_count=MAX_PAIR_CENTERPIECES,
+        guaranteed_top=PAIR_GUARANTEED_TOP_CENTERPIECES,
+        random_pick=PAIR_RANDOM_CENTERPIECES,
+        rng=rng,
+    )
+    shortlisted_sides = _diverse_shortlist(
+        scored_sides,
+        max_count=MAX_PAIR_SIDES,
+        guaranteed_top=PAIR_GUARANTEED_TOP_SIDES,
+        random_pick=PAIR_RANDOM_SIDES,
+        rng=rng,
+    )
+
+    for centerpiece in shortlisted_centerpieces:
+        for side in shortlisted_sides:
+            if side.candidate.dish_id == centerpiece.candidate.dish_id:
                 continue
-            if not _candidate_is_eligible(
-                side,
-                slot=slot,
-                assigned_dish_ids=[*assigned_dish_ids, centerpiece.dish_id],
-                forbidden_dish_ids=forbidden_dish_ids,
-                dish_date_index=dish_date_index,
-                rules=rules,
-            ):
-                continue
-            side_score, _ = score_candidate_for_slot(
-                side,
-                slot,
-                assigned_dish_ids=[*assigned_dish_ids, centerpiece.dish_id],
-                candidates_by_id=candidates_by_id,
-                neighbours=neighbours,
-                rules=rules,
-            )
-            total_score = centerpiece_score + (SIDE_PAIR_SCORE_WEIGHT * side_score)
+            # Pair total uses pre-scored side estimates; sides are not rescored with the
+            # centerpiece already assigned, and combined pair traits/targets are not scored
+            # yet. Future work: score the package as one unit (aggregate vector/traits).
+            total_score = centerpiece.score + (SIDE_PAIR_SCORE_WEIGHT * side.score)
             payload = {
-                **centerpiece_payload,
+                **centerpiece.payload,
                 "reasons": [
-                    *centerpiece_payload.get("reasons", []),
-                    f"Paired with {side.dish_name}",
+                    *centerpiece.payload.get("reasons", []),
+                    f"Paired with {side.candidate.dish_name}",
                 ],
                 "score": round(total_score, 3),
                 "package_type": "centerpiece_side",
@@ -163,12 +242,12 @@ def _build_slot_options(
                     score=total_score,
                     assignment=assignment_from_pair(
                         item_id=slot.item_id,
-                        centerpiece=centerpiece,
-                        side=side,
+                        centerpiece=centerpiece.candidate,
+                        side=side.candidate,
                         score=total_score,
                         payload=payload,
                     ),
-                    assigned_dish_ids=(centerpiece.dish_id, side.dish_id),
+                    assigned_dish_ids=(centerpiece.candidate.dish_id, side.candidate.dish_id),
                 )
             )
 
@@ -195,12 +274,13 @@ def generate_week_assignments(
     best_assignments: list[SlotAssignment] = []
     best_score = float("-inf")
     best_warnings: list[str] = []
+    plan_attempts = _effective_plan_attempts(rules, candidates)
 
     ordered_slots = sorted(slots, key=lambda slot: (slot.meal_date, meal_slot_sort_key(slot.meal_slot)))
     slot_dates_by_item = {slot.item_id: slot.meal_date for slot in ordered_slots}
     slot_dates_by_item.update(fixed_dates_by_item)
 
-    for _ in range(rules.plan_attempts):
+    for _ in range(plan_attempts):
         attempt_assignments: list[SlotAssignment] = []
         attempt_score = 0.0
         assigned_dish_ids = [dish_id for dish_id in fixed_assignments.values()]
@@ -233,6 +313,7 @@ def generate_week_assignments(
                 neighbours=neighbours,
                 candidates_by_id=candidates_by_id,
                 rules=rules,
+                rng=random_source,
             )
             if not options:
                 failed = True

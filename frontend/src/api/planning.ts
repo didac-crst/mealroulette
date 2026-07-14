@@ -219,6 +219,7 @@ export async function generateMealPlanWeekDetails(
   return apiRequest<MealPlanRouletteResponse>(`/api/meal-plans/${mealPlanId}/generate/details`, {
     method: "POST",
     token,
+    timeoutMs: 60_000,
   });
 }
 
