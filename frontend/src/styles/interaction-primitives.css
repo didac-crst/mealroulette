@@ -763,6 +763,12 @@
   padding-top: 2px;
 }
 
+.settings-section-header-trailing-only {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-4);
+}
+
 .swap-target-grid {
   display: grid;
   gap: var(--space-3);

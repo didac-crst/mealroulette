@@ -8,6 +8,7 @@ import { ADMIN_NAV, PRIMARY_NAV } from "./navigation";
 type DesktopSidebarProps = {
   username: string;
   isAdmin: boolean;
+  reviewAttention?: boolean;
   onSignOut: () => void;
 };
 
@@ -31,7 +32,7 @@ function SignOutIcon() {
   );
 }
 
-export function DesktopSidebar({ username, isAdmin, onSignOut }: DesktopSidebarProps) {
+export function DesktopSidebar({ username, isAdmin, reviewAttention = false, onSignOut }: DesktopSidebarProps) {
   return (
     <aside className="desktop-sidebar" aria-label="Application navigation">
       <div className="desktop-sidebar-brand">
@@ -55,8 +56,18 @@ export function DesktopSidebar({ username, isAdmin, onSignOut }: DesktopSidebarP
               `desktop-sidebar-link${isActive ? " desktop-sidebar-link-active" : ""}`
             }
           >
-            <NavIcon name={icon} />
-            <span>{label}</span>
+            <span className="desktop-sidebar-link-icon-wrap">
+              <NavIcon name={icon} />
+              {reviewAttention && to === "/review" ? (
+                <span className="desktop-sidebar-link-badge" aria-hidden />
+              ) : null}
+            </span>
+            <span>
+              {label}
+              {reviewAttention && to === "/review" ? (
+                <span className="desktop-sidebar-link-attention"> · needs review</span>
+              ) : null}
+            </span>
           </NavLink>
         ))}
       </nav>

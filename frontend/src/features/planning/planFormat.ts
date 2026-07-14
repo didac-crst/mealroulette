@@ -5,6 +5,13 @@ const DAY_FORMAT = new Intl.DateTimeFormat(undefined, { weekday: "long", month: 
 
 const SLOT_ORDER: Record<MealSlot, number> = { lunch: 0, dinner: 1 };
 
+export function formatNeedsReviewCount(count: number): string {
+  if (count === 1) {
+    return "1 meal needs review";
+  }
+  return `${count} meals need review`;
+}
+
 export function formatPlanDate(isoDate: string): string {
   return DAY_FORMAT.format(new Date(`${isoDate}T12:00:00`));
 }

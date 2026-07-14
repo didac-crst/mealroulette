@@ -18,16 +18,31 @@ type RouteParams = {
   ingredientId?: string;
 };
 
+function entityCrumb(
+  labelId: number | null | undefined,
+  paramId: string | undefined,
+  name: string | null | undefined,
+  fallbackLabel: string,
+  toPrefix: string,
+): BreadcrumbItem {
+  const id = labelId ?? (paramId ? Number(paramId) : null);
+  const label = name?.trim() || fallbackLabel;
+  return id ? { label, to: `${toPrefix}/${id}` } : { label };
+}
+
 function dishCrumb(labels: BreadcrumbLabels, dishId?: string): BreadcrumbItem {
-  const id = labels.dishId ?? (dishId ? Number(dishId) : null);
-  const label = labels.dishName?.trim() || "Dish";
-  return id ? { label, to: `/dishes/${id}` } : { label };
+  return entityCrumb(labels.dishId, dishId, labels.dishName, "Dish", "/dishes");
 }
 
 function ingredientCrumb(labels: BreadcrumbLabels, ingredientId?: string): BreadcrumbItem {
-  const id = labels.ingredientId ?? (ingredientId ? Number(ingredientId) : null);
-  const label = labels.ingredientName?.trim() || "Ingredient";
-  return id ? { label, to: `/ingredients/${id}` } : { label };
+  return entityCrumb(labels.ingredientId, ingredientId, labels.ingredientName, "Ingredient", "/ingredients");
+}
+
+function recipeCrumb(labels: BreadcrumbLabels, dishId?: string, recipeId?: string): BreadcrumbItem {
+  const id = labels.recipeId ?? (recipeId ? Number(recipeId) : null);
+  const label = labels.recipeName?.trim() || "Recipe";
+  const dish = labels.dishId ?? (dishId ? Number(dishId) : null);
+  return id && dish ? { label, to: `/dishes/${dish}/recipes/${id}` } : { label };
 }
 
 export function resolveBreadcrumbs(
@@ -64,15 +79,10 @@ export function resolveBreadcrumbs(
     return [dishes, dishCrumb(labels, params.dishId), { label: "New recipe" }];
   }
   if (pathname === `/dishes/${params.dishId}/recipes/${params.recipeId}/edit`) {
-    const recipeLabel = labels.recipeName?.trim() || "Recipe";
-    const recipeId = labels.recipeId ?? (params.recipeId ? Number(params.recipeId) : null);
-    const recipeCrumb: BreadcrumbItem = recipeId
-      ? { label: recipeLabel, to: `/dishes/${params.dishId}/recipes/${recipeId}` }
-      : { label: recipeLabel };
-    return [dishes, dishCrumb(labels, params.dishId), recipeCrumb, { label: "Edit" }];
+    return [dishes, dishCrumb(labels, params.dishId), recipeCrumb(labels, params.dishId, params.recipeId), { label: "Edit" }];
   }
   if (pathname === `/dishes/${params.dishId}/recipes/${params.recipeId}`) {
-    return [dishes, dishCrumb(labels, params.dishId), { label: labels.recipeName?.trim() || "Recipe" }];
+    return [dishes, dishCrumb(labels, params.dishId), recipeCrumb(labels, params.dishId, params.recipeId)];
   }
   if (pathname === `/dishes/${params.dishId}`) {
     return [dishes, { label: labels.dishName?.trim() || "Dish" }];

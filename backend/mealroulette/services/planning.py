@@ -10,7 +10,11 @@ from mealroulette.models.enums import MealPlanItemStatus, MealPlanStatus, MealSl
 from mealroulette.models.planning import MealPlan, MealPlanItem, MealRating
 from mealroulette.services.household_time import household_local_today
 from mealroulette.services.scheduler.undo import clear_undo_snapshot
-from mealroulette.services.recipe_traits import effective_traits_for_meal_plan_item
+from mealroulette.services.recipe_traits import (
+    RECIPE_TRAIT_INGREDIENT_LOAD,
+    effective_traits_for_meal_plan_item,
+)
+from mealroulette.services.scheduler.catalog import load_reference_units
 from mealroulette.schemas.planning import (
     MealPlanCreateRequest,
     MealPlanItemPublic,
@@ -35,6 +39,15 @@ class PlanningService:
         self.db = db
 
     @staticmethod
+    def _meal_plan_item_trait_options() -> tuple:
+        return (
+            selectinload(MealPlanItem.recipe).options(*RECIPE_TRAIT_INGREDIENT_LOAD),
+            selectinload(MealPlanItem.dish)
+            .selectinload(Dish.recipes)
+            .options(*RECIPE_TRAIT_INGREDIENT_LOAD),
+        )
+
+    @staticmethod
     def week_start_for(date_value: date) -> date:
         return date_value - timedelta(days=date_value.weekday())
 
@@ -47,7 +60,13 @@ class PlanningService:
             cook = cook if cook is not None else item.dish.default_cook_time_minutes
         return prep, cook
 
-    def to_item_public(self, item: MealPlanItem) -> MealPlanItemPublic:
+    def to_item_public(
+        self,
+        item: MealPlanItem,
+        *,
+        gram_unit=None,
+        ml_unit=None,
+    ) -> MealPlanItemPublic:
         prep_time_minutes, cook_time_minutes = self._meal_times(item)
         return MealPlanItemPublic(
             id=item.id,
@@ -71,6 +90,8 @@ class PlanningService:
                 db=self.db,
                 recipe=item.recipe,
                 dish_recipes=item.dish.recipes if item.dish is not None else None,
+                gram_unit=gram_unit,
+                ml_unit=ml_unit,
             ),
             review_saved_at=item.review_saved_at,
             created_at=item.created_at,
@@ -78,12 +99,13 @@ class PlanningService:
         )
 
     def to_plan_public(self, plan: MealPlan) -> MealPlanPublic:
+        gram_unit, ml_unit = load_reference_units(self.db)
         items = sorted(plan.items, key=lambda item: (item.date, meal_slot_sort_key(item.meal_slot)))
         return MealPlanPublic(
             id=plan.id,
             week_start_date=plan.week_start_date,
             status=plan.status,
-            items=[self.to_item_public(item) for item in items],
+            items=[self.to_item_public(item, gram_unit=gram_unit, ml_unit=ml_unit) for item in items],
             roulette_undo_available=plan.last_roulette_undo_json is not None,
             created_at=plan.created_at,
             updated_at=plan.updated_at,
@@ -94,8 +116,7 @@ class PlanningService:
             select(MealPlan)
             .where(MealPlan.id == plan_id)
             .options(
-                selectinload(MealPlan.items).selectinload(MealPlanItem.dish).selectinload(Dish.recipes),
-                selectinload(MealPlan.items).selectinload(MealPlanItem.recipe),
+                selectinload(MealPlan.items).options(*self._meal_plan_item_trait_options()),
             )
         )
         if plan is None:
@@ -107,8 +128,7 @@ class PlanningService:
             select(MealPlanItem)
             .where(MealPlanItem.id == item_id)
             .options(
-                selectinload(MealPlanItem.dish).selectinload(Dish.recipes),
-                selectinload(MealPlanItem.recipe),
+                *self._meal_plan_item_trait_options(),
                 selectinload(MealPlanItem.meal_rating),
             )
         )
@@ -148,8 +168,7 @@ class PlanningService:
             select(MealPlan)
             .where(MealPlan.week_start_date == week_start)
             .options(
-                selectinload(MealPlan.items).selectinload(MealPlanItem.dish).selectinload(Dish.recipes),
-                selectinload(MealPlan.items).selectinload(MealPlanItem.recipe),
+                selectinload(MealPlan.items).options(*self._meal_plan_item_trait_options()),
             )
         )
 
@@ -452,6 +471,7 @@ class PlanningService:
         )
 
     def list_history(self, *, limit: int = 50) -> list[MealPlanItemPublic]:
+        gram_unit, ml_unit = load_reference_units(self.db)
         items = self.db.scalars(
             select(MealPlanItem)
             .where(
@@ -463,14 +483,11 @@ class PlanningService:
                     ]
                 )
             )
-            .options(
-                selectinload(MealPlanItem.dish).selectinload(Dish.recipes),
-                selectinload(MealPlanItem.recipe),
-            )
+            .options(*self._meal_plan_item_trait_options())
             .order_by(MealPlanItem.date.desc(), MealPlanItem.meal_slot.desc())
             .limit(limit)
         )
-        return [self.to_item_public(item) for item in items]
+        return [self.to_item_public(item, gram_unit=gram_unit, ml_unit=ml_unit) for item in items]
 
     def swap_items(self, source_item_id: int, target_item_id: int) -> tuple[MealPlanItemPublic, MealPlanItemPublic]:
         source = self._load_item(source_item_id)

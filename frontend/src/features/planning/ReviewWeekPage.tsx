@@ -7,6 +7,7 @@ import { useAuth } from "../auth/AuthContext";
 import { MealSlotCard } from "./MealSlotCard";
 import {
   filterReviewItems,
+  formatNeedsReviewCount,
   formatPlanDate,
   groupItemsByDate,
   leftoverSourcesFor,
@@ -77,9 +78,7 @@ export function ReviewWeekPage() {
   );
 
   const reviewSubtitle =
-    needsReviewCount > 0
-      ? `${needsReviewCount} meal${needsReviewCount === 1 ? "" : "s"} need review`
-      : "You are up to date";
+    needsReviewCount > 0 ? formatNeedsReviewCount(needsReviewCount) : "You are up to date";
 
   function handleItemChanged(updated: MealPlanItem) {
     replaceItem(updated);

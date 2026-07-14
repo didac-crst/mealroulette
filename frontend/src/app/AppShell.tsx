@@ -27,6 +27,7 @@ export function AppShell() {
         <DesktopSidebar
           username={username}
           isAdmin={isAdmin}
+          reviewAttention={reviewAttention}
           onSignOut={() => void logout()}
         />
       ) : null}

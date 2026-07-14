@@ -156,7 +156,11 @@ export function PlanningTargetsPage() {
 
   if (authLoading || loading) {
     return (
-      <SettingsPageShell title="Weekly targets" subtitle="Meals per week by food type." loading>
+      <SettingsPageShell
+        title="Weekly targets"
+        subtitle="The roulette tries to hit these counts each Mon–Sun week. Uses dish tags."
+        loading
+      >
         {null}
       </SettingsPageShell>
     );

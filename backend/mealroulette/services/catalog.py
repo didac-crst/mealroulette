@@ -142,12 +142,19 @@ class CatalogService:
         )
 
     def to_recipe_public(self, recipe: Recipe, *, computed_traits: dict | None = None) -> RecipePublic:
-        traits = computed_traits if computed_traits is not None else compute_recipe_traits_now(self.db, recipe)
+        if computed_traits is None:
+            gram_unit, ml_unit = self._reference_units()
+            traits = compute_recipe_traits_now(self.db, recipe, gram_unit=gram_unit, ml_unit=ml_unit)
+        else:
+            traits = computed_traits
         return RecipePublic.model_validate(recipe).model_copy(update={"computed_traits_json": traits})
 
     def to_dish_public(self, dish: Dish) -> DishPublic:
         main_recipe = self._main_recipe(dish)
-        traits = compute_recipe_traits_now(self.db, main_recipe) if main_recipe is not None else None
+        traits = None
+        if main_recipe is not None:
+            gram_unit, ml_unit = self._reference_units()
+            traits = compute_recipe_traits_now(self.db, main_recipe, gram_unit=gram_unit, ml_unit=ml_unit)
         return DishPublic(
             id=dish.id,
             public_key=dish.public_key,
@@ -739,6 +746,12 @@ class CatalogService:
             self.db.scalars(
                 select(Recipe)
                 .where(Recipe.dish_id == dish_id)
+                .options(
+                    selectinload(Recipe.ingredients)
+                    .selectinload(RecipeIngredient.ingredient)
+                    .selectinload(Ingredient.unit_conversions),
+                    selectinload(Recipe.ingredients).selectinload(RecipeIngredient.unit),
+                )
                 .order_by(Recipe.is_main.desc(), Recipe.id)
             )
         )

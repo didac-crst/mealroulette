@@ -62,7 +62,7 @@ Excluded lines do not contribute grams (keeps vectors sparse; negligible effect 
 
 | Rule | Rationale |
 | --- | --- |
-| Converted mass **&lt; `min_vector_grams`** (default **5 g**) | Drops pinch-sized salt/spices; negligible after normalize. |
+| Converted mass **&lt; `vector_min_grams`** (default **5 g**) | Drops pinch-sized salt/spices; negligible after normalize. |
 
 Configurable in `planning_rules.rules_json`:
 

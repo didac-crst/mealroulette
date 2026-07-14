@@ -90,7 +90,6 @@
   color: var(--color-text-primary);
   text-decoration: none;
   overflow-wrap: anywhere;
-  word-break: break-word;
   width: 100%;
   max-width: 100%;
   min-width: 0;

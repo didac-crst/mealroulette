@@ -22,10 +22,15 @@ export function MobileBottomNav({ reviewAttention = false }: MobileBottomNavProp
           <span className="mobile-bottom-nav-icon-wrap">
             <NavIcon name={icon} />
             {reviewAttention && to === "/review" ? (
-              <span className="mobile-bottom-nav-badge" aria-label="Needs review" />
+              <span className="mobile-bottom-nav-badge" aria-hidden />
             ) : null}
           </span>
-          <span className="mobile-bottom-nav-label">{label}</span>
+          <span className="mobile-bottom-nav-label">
+            {label}
+            {reviewAttention && to === "/review" ? (
+              <span className="mobile-bottom-nav-attention"> · needs review</span>
+            ) : null}
+          </span>
         </NavLink>
       ))}
     </nav>

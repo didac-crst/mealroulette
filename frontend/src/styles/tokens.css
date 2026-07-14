@@ -63,7 +63,7 @@
   --color-info: var(--info-600);
 
   /* Typography */
-  --font-family: Inter, system-ui, -apple-system, sans-serif;
+  --font-family: inter, system-ui, sans-serif;
   --font-size-body: 1rem;
   --font-size-sm: 0.875rem;
   --font-size-xs: 0.8125rem;

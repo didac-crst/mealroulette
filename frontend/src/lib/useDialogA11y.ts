@@ -12,6 +12,11 @@ function focusableElements(container: HTMLElement): HTMLElement[] {
 export function useDialogA11y(open: boolean, onClose: () => void) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!open) {
@@ -39,7 +44,7 @@ export function useDialogA11y(open: boolean, onClose: () => void) {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
-        onClose();
+        onCloseRef.current();
         return;
       }
 
@@ -80,7 +85,7 @@ export function useDialogA11y(open: boolean, onClose: () => void) {
         previous?.focus();
       });
     };
-  }, [open, onClose]);
+  }, [open]);
 
   return dialogRef;
 }

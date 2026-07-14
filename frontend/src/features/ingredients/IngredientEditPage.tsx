@@ -594,12 +594,6 @@ export function IngredientEditPage() {
 
       {!isNew && detail ? (
         <div className="catalog-form-disclosure-stack">
-          {error && !saving ? (
-            <p className="error" role="alert">
-              {error}
-            </p>
-          ) : null}
-
           <DisclosureSection
             title="Aliases"
             meta={`${detail.aliases.length}`}

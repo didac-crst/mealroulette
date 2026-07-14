@@ -23,7 +23,7 @@ export function FormSaveStatus({ status, errorMessage, className }: FormSaveStat
     <p
       className={["form-save-status", `form-save-status-${status}`, className].filter(Boolean).join(" ")}
       role={status === "error" ? "alert" : "status"}
-      aria-live="polite"
+      aria-live={status === "error" ? undefined : "polite"}
     >
       {label}
     </p>

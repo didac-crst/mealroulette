@@ -23,6 +23,10 @@ vi.mock("../features/auth/authStorage", () => ({
   clearTokens: vi.fn(),
 }));
 
+vi.mock("../features/planning/useReviewAttentionCount", () => ({
+  useReviewAttentionCount: vi.fn(() => false),
+}));
+
 function renderShell(initialPath = "/today") {
   return render(
     <MemoryRouter initialEntries={[initialPath]}>
@@ -31,6 +35,7 @@ function renderShell(initialPath = "/today") {
           <Route element={<AppShell />}>
             <Route path="/today" element={<p>Today content</p>} />
             <Route path="/settings" element={<p>Settings content</p>} />
+            <Route path="/recipes/:id/cook" element={<p>Cooking content</p>} />
           </Route>
         </Routes>
       </AuthProvider>
@@ -61,5 +66,14 @@ describe("AppShell", () => {
     expect(await screen.findByText("Today content")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Skip to main content" })).toHaveAttribute("href", "#main-content");
     expect(screen.getByRole("main")).toHaveAttribute("id", "main-content");
+  });
+
+  it("hides shell navigation in cooking mode", async () => {
+    renderShell("/recipes/1/cook");
+
+    expect(await screen.findByText("Cooking content")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Skip to main content" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("complementary", { name: "Application navigation" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("navigation", { name: "Primary navigation" })).not.toBeInTheDocument();
   });
 });

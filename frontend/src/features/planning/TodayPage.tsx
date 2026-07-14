@@ -8,7 +8,7 @@ import { Button, Card, EmptyState, PageShell } from "../../components/ui";
 import { todayIsoInTimeZone } from "../../lib/datetime";
 import { useAuth } from "../auth/AuthContext";
 import { TodayMealCard } from "./TodayMealCard";
-import { countNeedsReviewForDate, formatPlanDate, formatSlotLabel, todayMealSlots } from "./planFormat";
+import { countNeedsReviewForDate, formatNeedsReviewCount, formatPlanDate, formatSlotLabel, todayMealSlots } from "./planFormat";
 import { useWeekPlan } from "./useWeekPlan";
 
 const DEFAULT_TIMEZONE = "Europe/Paris";
@@ -58,9 +58,7 @@ export function TodayPage() {
 
   const subtitleParts = [formatPlanDate(today)];
   if (needsReviewCount > 0) {
-    subtitleParts.push(
-      `${needsReviewCount} meal${needsReviewCount === 1 ? "" : "s"} need review`,
-    );
+    subtitleParts.push(formatNeedsReviewCount(needsReviewCount));
   } else if (hasAnyMeals) {
     subtitleParts.push("All meals reviewed for today");
   }

@@ -12,7 +12,7 @@ import {
   type TelegramSubscriber,
 } from "../../api/telegram";
 import { ApiError } from "../../api/client";
-import { Button, EmptyState, FormSection, FormStickyActions, NumberStepper, SettingsSectionHeader, Switch, TimezoneSelect } from "../../components/ui";
+import { Button, EmptyState, FormSection, FormStickyActions, NumberStepper, Switch, TimezoneSelect } from "../../components/ui";
 import { formatInstantInTimeZone } from "../../lib/datetime";
 // planning window is now a 1–7 day stepper
 import { useAuth } from "../auth/AuthContext";
@@ -202,18 +202,14 @@ export function TelegramSettingsPage() {
       </FormSection>
 
       <form onSubmit={(event) => void handleSubmit(event)} className="admin-form">
-        <FormSection title="Daily reminders">
-          <SettingsSectionHeader
-            title="Daily reminders"
-            description="Send a daily shopping reminder through the household bot."
-            trailing={
-              <Switch
-                checked={form.enabled ?? false}
-                onChange={(event) => setForm({ ...form, enabled: event.target.checked })}
-                label="Enable daily reminders"
-              />
-            }
-          />
+        <FormSection title="Daily reminders" description="Send a daily shopping reminder through the household bot.">
+          <div className="settings-section-header-trailing-only">
+            <Switch
+              checked={form.enabled ?? false}
+              onChange={(event) => setForm({ ...form, enabled: event.target.checked })}
+              label="Enable daily reminders"
+            />
+          </div>
 
           <div className="grid-2">
             <label>

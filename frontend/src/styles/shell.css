@@ -99,6 +99,30 @@
     color: var(--color-interactive-hover);
   }
 
+  .desktop-sidebar-link-icon-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .desktop-sidebar-link-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-roulette);
+    border: 1.5px solid var(--surface-card);
+  }
+
+  .desktop-sidebar-link-attention {
+    color: var(--color-roulette);
+    font-weight: 600;
+  }
+
   .desktop-sidebar-separator {
     height: 1px;
     margin: var(--space-4) var(--space-2);
@@ -222,6 +246,11 @@
   border-radius: 50%;
   background: var(--color-roulette);
   border: 1.5px solid var(--surface-card);
+}
+
+.mobile-bottom-nav-attention {
+  color: var(--color-roulette);
+  font-weight: 600;
 }
 
 @media (min-width: 768px) {

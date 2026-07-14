@@ -35,7 +35,27 @@ describe("mealStatusBadgeVariant", () => {
     expect(mealStatusBadgeVariant(item({ status: "planned" }), "review")).toBe("warning");
   });
 
+  it("marks past planned meals as warning in today mode", () => {
+    expect(mealStatusBadgeVariant(item({ status: "planned" }), "today")).toBe("warning");
+  });
+
+  it("does not mark future planned meals as warning in review mode", () => {
+    expect(mealStatusBadgeVariant(item({ status: "planned", date: "2099-12-31" }), "review")).toBe("default");
+  });
+
+  it("marks manually selected planned meals as info in plan mode", () => {
+    expect(mealStatusBadgeVariant(item({ manually_selected: true, status: "planned" }), "plan")).toBe("info");
+  });
+
+  it("marks locked planned meals as info in plan mode", () => {
+    expect(mealStatusBadgeVariant(item({ is_locked: true, status: "planned" }), "plan")).toBe("info");
+  });
+
   it("marks eaten meals as success", () => {
     expect(mealStatusBadgeVariant(item({ status: "eaten" }), "plan")).toBe("success");
+  });
+
+  it("marks skipped meals as muted", () => {
+    expect(mealStatusBadgeVariant(item({ status: "skipped" }), "plan")).toBe("muted");
   });
 });
