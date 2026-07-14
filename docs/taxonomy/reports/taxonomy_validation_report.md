@@ -1,7 +1,5 @@
 # Taxonomy Validation Report
 
-<!-- Generated report — regenerate with `make validate-taxonomy`; do not hand-edit. -->
-
 ## Summary
 
 - Taxonomy: `backend/mealroulette/data/taxonomy`
@@ -10,7 +8,7 @@
 
 | Metric | Count |
 | --- | ---: |
-| Candidates | 412 |
+| Candidates | 434 |
 | Food Groups | 22 |
 | Families | 69 |
 | Blockers | 0 |
@@ -18,11 +16,11 @@
 | Suggestions | 0 |
 | Alias Collisions | 0 |
 | Suspicious Conversions | 0 |
-| Auto Accepted | 412 |
+| Auto Accepted | 434 |
 
 ## Review tiers
 
-- **auto_accepted**: 412
+- **auto_accepted**: 434
 - **blocked**: 0
 - **needs_human_review**: 0
 

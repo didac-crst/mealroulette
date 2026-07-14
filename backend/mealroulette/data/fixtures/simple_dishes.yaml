@@ -1,0 +1,7116 @@
+---
+version: 1
+dishes:
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: &id001
+    seasonality_mode: all_year
+    preferred_months: []
+  name: Steamed Broccoli
+  description: Broccoli florets steamed until tender and lightly seasoned.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Basic steamed broccoli.
+    steps:
+    - step_number: 1
+      instruction: Cut the broccoli into florets and rinse well.
+    - step_number: 2
+      instruction: Steam until tender but still bright green.
+    - step_number: 3
+      instruction: Season with salt
+      olive oil: null
+      and lemon if desired.: null
+    ingredients:
+    - name: broccoli
+      quantity: 700
+      unit: g
+    - name: lemon
+      quantity: 1
+      unit: unit
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Steamed Cauliflower
+  description: Simple steamed cauliflower with olive oil or butter.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Basic steamed cauliflower.
+    steps:
+    - step_number: 1
+      instruction: Cut cauliflower into florets and rinse.
+    - step_number: 2
+      instruction: Steam until tender.
+    - step_number: 3
+      instruction: Season with salt and olive oil or butter.
+    ingredients:
+    - name: cauliflower
+      quantity: 1
+      unit: head
+    - name: butter
+      quantity: 30
+      unit: g
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Steamed Carrots
+  description: Carrots steamed and finished with butter or olive oil.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Basic steamed carrots.
+    steps:
+    - step_number: 1
+      instruction: Peel and slice the carrots.
+    - step_number: 2
+      instruction: Steam until tender.
+    - step_number: 3
+      instruction: Season and serve warm.
+    ingredients:
+    - name: carrot
+      quantity: 700
+      unit: g
+    - name: butter
+      quantity: 30
+      unit: g
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Steamed Green Beans
+  description: Green beans steamed and seasoned simply.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Basic steamed green beans.
+    steps:
+    - step_number: 1
+      instruction: Trim the green beans.
+    - step_number: 2
+      instruction: Steam until tender.
+    - step_number: 3
+      instruction: Season with olive oil and salt.
+    ingredients:
+    - name: green beans
+      quantity: 700
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Green Beans with Potatoes
+  description: Boiled green beans and potatoes dressed with olive oil.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple green beans and potatoes.
+    steps:
+    - step_number: 1
+      instruction: Peel and cut the potatoes.
+    - step_number: 2
+      instruction: Boil the potatoes and green beans until tender.
+    - step_number: 3
+      instruction: Drain and dress with olive oil and salt.
+    ingredients:
+    - name: green beans
+      quantity: 500
+      unit: g
+    - name: potato
+      quantity: 600
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Peas and Carrots
+  description: Peas and carrots cooked together with a little butter.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple peas and carrots.
+    steps:
+    - step_number: 1
+      instruction: Dice the carrots.
+    - step_number: 2
+      instruction: Cook carrots and peas until tender.
+    - step_number: 3
+      instruction: Finish with butter and salt.
+    ingredients:
+    - name: frozen peas
+      quantity: 400
+      unit: g
+    - name: carrot
+      quantity: 4
+      unit: unit
+    - name: butter
+      quantity: 30
+      unit: g
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Buttered Peas
+  description: Peas warmed with butter and light seasoning.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple buttered peas.
+    steps:
+    - step_number: 1
+      instruction: Cook peas in boiling water until tender.
+    - step_number: 2
+      instruction: Drain and toss with butter.
+    - step_number: 3
+      instruction: Season and serve warm.
+    ingredients:
+    - name: frozen peas
+      quantity: 600
+      unit: g
+    - name: butter
+      quantity: 40
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Braised Cabbage
+  description: Cabbage slowly cooked with onion until soft.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple braised cabbage.
+    steps:
+    - step_number: 1
+      instruction: Slice the cabbage and onion.
+    - step_number: 2
+      instruction: Cook gently with a splash of water until soft.
+    - step_number: 3
+      instruction: Season and finish with olive oil or butter.
+    ingredients:
+    - name: white cabbage
+      quantity: 800
+      unit: g
+    - name: onion
+      quantity: 1
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Sauteed Cabbage
+  description: Cabbage quickly sauteed until lightly browned.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple sauteed cabbage.
+    steps:
+    - step_number: 1
+      instruction: Slice the cabbage thinly.
+    - step_number: 2
+      instruction: Saute in olive oil until tender and lightly browned.
+    - step_number: 3
+      instruction: Season and serve hot.
+    ingredients:
+    - name: white cabbage
+      quantity: 800
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+  name: Roasted Zucchini
+  description: Zucchini roasted with olive oil until tender.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple roasted zucchini.
+    steps:
+    - step_number: 1
+      instruction: Slice the zucchini.
+    - step_number: 2
+      instruction: Toss with olive oil and roast until tender.
+    - step_number: 3
+      instruction: Season and serve.
+    ingredients:
+    - name: zucchini
+      quantity: 4
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+  name: Grilled Zucchini
+  description: Zucchini slices grilled and dressed with olive oil.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple grilled zucchini.
+    steps:
+    - step_number: 1
+      instruction: Slice zucchini lengthwise.
+    - step_number: 2
+      instruction: Grill or pan-grill until marked and tender.
+    - step_number: 3
+      instruction: Season with salt and olive oil.
+    ingredients:
+    - name: zucchini
+      quantity: 4
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+  name: Grilled Eggplant
+  description: Eggplant slices grilled and finished with olive oil.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple grilled eggplant.
+    steps:
+    - step_number: 1
+      instruction: Slice the eggplant and salt lightly.
+    - step_number: 2
+      instruction: Grill or pan-grill until soft and browned.
+    - step_number: 3
+      instruction: Finish with olive oil.
+    ingredients:
+    - name: eggplant
+      quantity: 3
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 9
+    - 10
+    - 11
+    - 12
+    - 1
+    - 2
+  name: Roasted Pumpkin
+  description: Pumpkin roasted until sweet and tender.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple roasted pumpkin.
+    steps:
+    - step_number: 1
+      instruction: Cut pumpkin into wedges or cubes.
+    - step_number: 2
+      instruction: Roast with olive oil until tender.
+    - step_number: 3
+      instruction: Season and serve.
+    ingredients:
+    - name: pumpkin
+      quantity: 900
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 9
+    - 10
+    - 11
+    - 12
+    - 1
+    - 2
+  name: Roasted Butternut Squash
+  description: Butternut squash roasted with olive oil.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple roasted butternut squash.
+    steps:
+    - step_number: 1
+      instruction: Peel and cube the squash.
+    - step_number: 2
+      instruction: Roast with olive oil until tender and browned.
+    - step_number: 3
+      instruction: Season and serve hot.
+    ingredients:
+    - name: butternut squash
+      quantity: 900
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+  name: Ratatouille
+  description: Stewed zucchini, eggplant, peppers, tomato, and onion.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple vegetable ratatouille.
+    steps:
+    - step_number: 1
+      instruction: Dice the vegetables.
+    - step_number: 2
+      instruction: Cook onion
+      eggplant: null
+      zucchini: null
+      pepper: null
+      and tomato until soft.: null
+    - step_number: 3
+      instruction: Simmer until saucy and season.
+    ingredients:
+    - name: zucchini
+      quantity: 2
+      unit: unit
+    - name: eggplant
+      quantity: 1
+      unit: unit
+    - name: bell pepper
+      quantity: 2
+      unit: unit
+    - name: tomato
+      quantity: 5
+      unit: unit
+    - name: onion
+      quantity: 1
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Spinach with Garlic
+  description: Spinach quickly cooked with garlic.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple garlic spinach.
+    steps:
+    - step_number: 1
+      instruction: Wash the spinach and slice the garlic.
+    - step_number: 2
+      instruction: Saute garlic briefly
+      then add spinach.: null
+    - step_number: 3
+      instruction: Cook until wilted and season.
+    ingredients:
+    - name: spinach
+      quantity: 600
+      unit: g
+    - name: garlic
+      quantity: 3
+      unit: clove
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Sauteed Swiss Chard
+  description: Swiss chard sauteed with garlic and olive oil.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple sauteed Swiss chard.
+    steps:
+    - step_number: 1
+      instruction: Wash and chop the Swiss chard.
+    - step_number: 2
+      instruction: Saute garlic
+      then add the chard stems and leaves.: null
+    - step_number: 3
+      instruction: Cook until tender and season.
+    ingredients:
+    - name: chard
+      quantity: 700
+      unit: g
+    - name: garlic
+      quantity: 2
+      unit: clove
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Oven-Roasted Vegetables
+  description: Mixed vegetables roasted on a tray until browned.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple tray of roasted vegetables.
+    steps:
+    - step_number: 1
+      instruction: Cut the vegetables into similar-sized pieces.
+    - step_number: 2
+      instruction: Toss with olive oil and roast until tender.
+    - step_number: 3
+      instruction: Season and serve.
+    ingredients:
+    - name: carrot
+      quantity: 3
+      unit: unit
+    - name: zucchini
+      quantity: 2
+      unit: unit
+    - name: bell pepper
+      quantity: 2
+      unit: unit
+    - name: onion
+      quantity: 1
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Sauteed Mushrooms
+  description: Mushrooms sauteed until browned.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple sauteed mushrooms.
+    steps:
+    - step_number: 1
+      instruction: Clean and slice the mushrooms.
+    - step_number: 2
+      instruction: Saute until browned and their moisture evaporates.
+    - step_number: 3
+      instruction: Season and finish with parsley if desired.
+    ingredients:
+    - name: mixed mushrooms
+      quantity: 700
+      unit: g
+    - name: parsley
+      quantity: 1
+      unit: bunch
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Fried Mushrooms
+  description: Mushrooms fried until crisp around the edges.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple fried mushrooms.
+    steps:
+    - step_number: 1
+      instruction: Slice the mushrooms.
+    - step_number: 2
+      instruction: Fry in a hot pan until browned.
+    - step_number: 3
+      instruction: Season and serve hot.
+    ingredients:
+    - name: mixed mushrooms
+      quantity: 700
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+  name: Tomato Salad
+  description: Sliced tomatoes with olive oil and salt.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple tomato salad.
+    steps:
+    - step_number: 1
+      instruction: Slice the tomatoes.
+    - step_number: 2
+      instruction: Dress with olive oil and salt.
+    - step_number: 3
+      instruction: Rest briefly before serving.
+    ingredients:
+    - name: tomato
+      quantity: 6
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+  name: Cucumber Salad
+  description: Sliced cucumber dressed lightly.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple cucumber salad.
+    steps:
+    - step_number: 1
+      instruction: Slice the cucumbers thinly.
+    - step_number: 2
+      instruction: Dress with salt
+      vinegar or lemon: null
+      and olive oil.: null
+    - step_number: 3
+      instruction: Chill briefly if desired.
+    ingredients:
+    - name: cucumber
+      quantity: 2
+      unit: unit
+    - name: lemon
+      quantity: 1
+      unit: unit
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Mixed Green Salad
+  description: Simple green salad with a light vinaigrette.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple green salad.
+    steps:
+    - step_number: 1
+      instruction: Wash and dry the salad leaves.
+    - step_number: 2
+      instruction: Prepare a light vinaigrette.
+    - step_number: 3
+      instruction: Toss just before serving.
+    ingredients:
+    - name: mixed salad leaves
+      quantity: 250
+      unit: g
+    - name: lemon
+      quantity: 1
+      unit: unit
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Caesar Salad
+  description: Romaine salad with croutons, parmesan, and Caesar dressing.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple Caesar salad.
+    steps:
+    - step_number: 1
+      instruction: Wash and chop the romaine.
+    - step_number: 2
+      instruction: Prepare or add Caesar dressing.
+    - step_number: 3
+      instruction: Toss with croutons and parmesan.
+    ingredients:
+    - name: lettuce
+      quantity: 2
+      unit: head
+    - name: croutons
+      quantity: 120
+      unit: g
+    - name: parmesan
+      quantity: 80
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Beetroot Salad
+  description: Beetroot salad with a simple vinaigrette.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple beetroot salad.
+    steps:
+    - step_number: 1
+      instruction: Cook or use cooked beetroot.
+    - step_number: 2
+      instruction: Slice or dice the beetroot.
+    - step_number: 3
+      instruction: Dress and serve cold.
+    ingredients:
+    - name: beetroot
+      quantity: 600
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Coleslaw
+  description: Shredded cabbage and carrot salad with a creamy dressing.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple coleslaw.
+    steps:
+    - step_number: 1
+      instruction: Shred the cabbage and carrots.
+    - step_number: 2
+      instruction: Mix with mayonnaise or yogurt dressing.
+    - step_number: 3
+      instruction: Chill briefly before serving.
+    ingredients:
+    - name: white cabbage
+      quantity: 500
+      unit: g
+    - name: carrot
+      quantity: 3
+      unit: unit
+    - name: mayonnaise
+      quantity: 4
+      unit: tbsp
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+  name: Avocado Salad
+  description: Avocado salad with tomato and lime.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple avocado salad.
+    steps:
+    - step_number: 1
+      instruction: Dice avocado and tomato.
+    - step_number: 2
+      instruction: Dress with lime and olive oil.
+    - step_number: 3
+      instruction: Season and serve immediately.
+    ingredients:
+    - name: avocado
+      quantity: 3
+      unit: unit
+    - name: tomato
+      quantity: 3
+      unit: unit
+    - name: lime
+      quantity: 1
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Potato Salad
+  description: Boiled potato salad with a simple dressing.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple potato salad.
+    steps:
+    - step_number: 1
+      instruction: Boil potatoes until tender.
+    - step_number: 2
+      instruction: Cool and cut into chunks.
+    - step_number: 3
+      instruction: Dress and season.
+    ingredients:
+    - name: potato
+      quantity: 900
+      unit: g
+    - name: mayonnaise
+      quantity: 4
+      unit: tbsp
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+  name: Tomato and Mozzarella
+  description: Sliced tomato and mozzarella with olive oil.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple tomato and mozzarella.
+    steps:
+    - step_number: 1
+      instruction: Slice tomato and mozzarella.
+    - step_number: 2
+      instruction: Arrange on a plate.
+    - step_number: 3
+      instruction: Dress with olive oil and salt.
+    ingredients:
+    - name: tomato
+      quantity: 5
+      unit: unit
+    - name: mozzarella
+      quantity: 300
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+  name: Tomato with Tuna
+  description: Tomato salad topped with canned tuna.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple tomato and tuna salad.
+    steps:
+    - step_number: 1
+      instruction: Slice the tomatoes.
+    - step_number: 2
+      instruction: Drain the tuna and place over the tomatoes.
+    - step_number: 3
+      instruction: Dress with olive oil and season.
+    ingredients:
+    - name: tomato
+      quantity: 5
+      unit: unit
+    - name: canned tuna
+      quantity: 3
+      unit: can
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Soft-Boiled Eggs
+  description: Eggs boiled until the yolks remain soft.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple soft-boiled eggs.
+    steps:
+    - step_number: 1
+      instruction: Bring water to a boil.
+    - step_number: 2
+      instruction: Add eggs and boil until the yolks are soft.
+    - step_number: 3
+      instruction: Cool briefly
+      peel if desired: null
+      and serve.: null
+    ingredients:
+    - name: egg
+      quantity: 8
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Hard-Boiled Eggs
+  description: Eggs boiled until fully set.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple hard-boiled eggs.
+    steps:
+    - step_number: 1
+      instruction: Place eggs in boiling water.
+    - step_number: 2
+      instruction: Boil until fully set.
+    - step_number: 3
+      instruction: Cool
+      peel: null
+      and serve.: null
+    ingredients:
+    - name: egg
+      quantity: 8
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Poached Eggs
+  description: Eggs gently poached in simmering water.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple poached eggs.
+    steps:
+    - step_number: 1
+      instruction: Bring water to a gentle simmer.
+    - step_number: 2
+      instruction: Crack in eggs and poach until whites are set.
+    - step_number: 3
+      instruction: Lift out
+      drain: null
+      and season.: null
+    ingredients:
+    - name: egg
+      quantity: 8
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Baked Eggs
+  description: Eggs baked in a small dish until just set.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple baked eggs.
+    steps:
+    - step_number: 1
+      instruction: Grease a baking dish.
+    - step_number: 2
+      instruction: Crack in eggs and bake until set.
+    - step_number: 3
+      instruction: Season and serve hot.
+    ingredients:
+    - name: egg
+      quantity: 8
+      unit: unit
+    - name: cream
+      quantity: 80
+      unit: ml
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Potato Omelette
+  description: Omelette made with eggs and potatoes.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple potato omelette.
+    steps:
+    - step_number: 1
+      instruction: Cook sliced potatoes until tender.
+    - step_number: 2
+      instruction: Mix with beaten eggs.
+    - step_number: 3
+      instruction: Cook in a pan until set.
+    ingredients:
+    - name: egg
+      quantity: 8
+      unit: unit
+    - name: potato
+      quantity: 700
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Onion Omelette
+  description: Omelette with slowly cooked onion.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple onion omelette.
+    steps:
+    - step_number: 1
+      instruction: Slice and cook the onion until soft.
+    - step_number: 2
+      instruction: Add beaten eggs.
+    - step_number: 3
+      instruction: Cook until set.
+    ingredients:
+    - name: egg
+      quantity: 8
+      unit: unit
+    - name: onion
+      quantity: 2
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Herb Omelette
+  description: Omelette with fresh herbs.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple herb omelette.
+    steps:
+    - step_number: 1
+      instruction: Beat eggs with chopped herbs.
+    - step_number: 2
+      instruction: Cook gently in a pan.
+    - step_number: 3
+      instruction: Fold and serve.
+    ingredients:
+    - name: egg
+      quantity: 8
+      unit: unit
+    - name: parsley
+      quantity: 1
+      unit: bunch
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: French Omelette
+  description: Soft plain omelette cooked gently.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple French omelette.
+    steps:
+    - step_number: 1
+      instruction: Beat the eggs with salt.
+    - step_number: 2
+      instruction: Cook gently while stirring.
+    - step_number: 3
+      instruction: Fold while still soft and serve.
+    ingredients:
+    - name: egg
+      quantity: 8
+      unit: unit
+    - name: butter
+      quantity: 30
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Boiled Potatoes
+  description: Plain boiled potatoes with olive oil or butter.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple boiled potatoes.
+    steps:
+    - step_number: 1
+      instruction: Peel or scrub the potatoes.
+    - step_number: 2
+      instruction: Boil until tender.
+    - step_number: 3
+      instruction: Drain
+      season: null
+      and serve.: null
+    ingredients:
+    - name: potato
+      quantity: 900
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Baked Potatoes
+  description: Whole potatoes baked until tender.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple baked potatoes.
+    steps:
+    - step_number: 1
+      instruction: Scrub the potatoes.
+    - step_number: 2
+      instruction: Bake until soft inside.
+    - step_number: 3
+      instruction: Split and season.
+    ingredients:
+    - name: potato
+      quantity: 4
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Home Fries
+  description: Pan-fried potatoes with onion.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple home fries.
+    steps:
+    - step_number: 1
+      instruction: Dice potatoes and onion.
+    - step_number: 2
+      instruction: Fry potatoes until browned and tender.
+    - step_number: 3
+      instruction: Add onion
+      season: null
+      and finish cooking.: null
+    ingredients:
+    - name: potato
+      quantity: 900
+      unit: g
+    - name: onion
+      quantity: 1
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Dauphinoise Potatoes
+  description: Sliced potatoes baked with cream.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple dauphinoise potatoes.
+    steps:
+    - step_number: 1
+      instruction: Slice potatoes thinly.
+    - step_number: 2
+      instruction: Layer with cream and seasoning.
+    - step_number: 3
+      instruction: Bake until tender and browned.
+    ingredients:
+    - name: potato
+      quantity: 900
+      unit: g
+    - name: cream
+      quantity: 350
+      unit: ml
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Potato Croquettes
+  description: Breaded mashed potato croquettes fried until crisp.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple potato croquettes.
+    steps:
+    - step_number: 1
+      instruction: Make or use mashed potatoes.
+    - step_number: 2
+      instruction: Shape
+      coat with egg and breadcrumbs.: null
+    - step_number: 3
+      instruction: Fry or bake until crisp.
+    ingredients:
+    - name: potato
+      quantity: 900
+      unit: g
+    - name: egg
+      quantity: 2
+      unit: unit
+    - name: breadcrumbs
+      quantity: 120
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Hash Browns
+  description: Grated potatoes fried until crisp.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple hash browns.
+    steps:
+    - step_number: 1
+      instruction: Grate and squeeze the potatoes dry.
+    - step_number: 2
+      instruction: Fry in a thin layer until crisp.
+    - step_number: 3
+      instruction: Flip
+      finish cooking: null
+      and season.: null
+    ingredients:
+    - name: potato
+      quantity: 900
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Smashed Potatoes
+  description: Boiled potatoes smashed and roasted until crisp.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple smashed potatoes.
+    steps:
+    - step_number: 1
+      instruction: Boil small potatoes until tender.
+    - step_number: 2
+      instruction: Smash on a tray and drizzle with oil.
+    - step_number: 3
+      instruction: Roast until crisp.
+    ingredients:
+    - name: potato
+      quantity: 900
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Vegetable Rice
+  description: Rice cooked with simple vegetables.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple vegetable rice.
+    steps:
+    - step_number: 1
+      instruction: Dice the vegetables.
+    - step_number: 2
+      instruction: Cook rice with the vegetables and stock or water.
+    - step_number: 3
+      instruction: Rest and fluff before serving.
+    ingredients:
+    - name: rice
+      quantity: 320
+      unit: g
+    - name: carrot
+      quantity: 2
+      unit: unit
+    - name: frozen peas
+      quantity: 200
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Mushroom Rice
+  description: Rice cooked with mushrooms.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple mushroom rice.
+    steps:
+    - step_number: 1
+      instruction: Saute sliced mushrooms.
+    - step_number: 2
+      instruction: Add rice and liquid
+      then cook until tender.: null
+    - step_number: 3
+      instruction: Rest
+      fluff: null
+      and season.: null
+    ingredients:
+    - name: rice
+      quantity: 320
+      unit: g
+    - name: mixed mushrooms
+      quantity: 400
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Tomato Rice
+  description: Rice cooked with tomato sauce.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple tomato rice.
+    steps:
+    - step_number: 1
+      instruction: Toast the rice briefly in oil.
+    - step_number: 2
+      instruction: Add tomato sauce and liquid
+      then cook until tender.: null
+    - step_number: 3
+      instruction: Rest and fluff.
+    ingredients:
+    - name: rice
+      quantity: 320
+      unit: g
+    - name: tomato passata
+      quantity: 400
+      unit: ml
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Vegetable Couscous
+  description: Couscous mixed with cooked vegetables.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple vegetable couscous.
+    steps:
+    - step_number: 1
+      instruction: Cook diced vegetables until tender.
+    - step_number: 2
+      instruction: Hydrate couscous with hot stock or water.
+    - step_number: 3
+      instruction: Fluff and mix with vegetables.
+    ingredients:
+    - name: couscous
+      quantity: 320
+      unit: g
+    - name: zucchini
+      quantity: 1
+      unit: unit
+    - name: carrot
+      quantity: 2
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Bulgur
+  description: Plain cooked bulgur wheat.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple cooked bulgur.
+    steps:
+    - step_number: 1
+      instruction: Rinse the bulgur.
+    - step_number: 2
+      instruction: Cook or soak with hot water until tender.
+    - step_number: 3
+      instruction: Fluff and season.
+    ingredients:
+    - name: bulgur
+      quantity: 320
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Barley Risotto
+  description: Pearl barley cooked risotto-style.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple barley risotto.
+    steps:
+    - step_number: 1
+      instruction: Soften onion in olive oil.
+    - step_number: 2
+      instruction: Add barley and stock
+      then simmer until tender.: null
+    - step_number: 3
+      instruction: Stir in parmesan if desired.
+    ingredients:
+    - name: barley
+      quantity: 320
+      unit: g
+    - name: onion
+      quantity: 1
+      unit: unit
+    - name: parmesan
+      quantity: 80
+      unit: g
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Creamy Polenta
+  description: Soft polenta cooked until creamy.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple creamy polenta.
+    steps:
+    - step_number: 1
+      instruction: Bring water or milk to a simmer.
+    - step_number: 2
+      instruction: Whisk in polenta and cook until thick.
+    - step_number: 3
+      instruction: Stir in butter or cheese if desired.
+    ingredients:
+    - name: polenta
+      quantity: 300
+      unit: g
+    - name: butter
+      quantity: 40
+      unit: g
+      optional: true
+    - name: parmesan
+      quantity: 60
+      unit: g
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Buttered Pasta
+  description: Plain pasta tossed with butter.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple buttered pasta.
+    steps:
+    - step_number: 1
+      instruction: Boil pasta until al dente.
+    - step_number: 2
+      instruction: Drain
+      reserving a little pasta water.: null
+    - step_number: 3
+      instruction: Toss with butter and season.
+    ingredients:
+    - name: generic dry pasta
+      quantity: 400
+      unit: g
+    - name: butter
+      quantity: 60
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Pasta with Garlic and Olive Oil
+  description: Pasta tossed with garlic and olive oil.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple garlic and olive oil pasta.
+    steps:
+    - step_number: 1
+      instruction: Boil pasta until al dente.
+    - step_number: 2
+      instruction: Gently cook sliced garlic in olive oil.
+    - step_number: 3
+      instruction: Toss pasta with the garlic oil.
+    ingredients:
+    - name: generic dry pasta
+      quantity: 400
+      unit: g
+    - name: garlic
+      quantity: 4
+      unit: clove
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+  name: Pasta Salad
+  description: Cold pasta salad with vegetables.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple pasta salad.
+    steps:
+    - step_number: 1
+      instruction: Boil pasta
+      drain: null
+      and cool.: null
+    - step_number: 2
+      instruction: Chop vegetables.
+    - step_number: 3
+      instruction: Toss pasta and vegetables with dressing.
+    ingredients:
+    - name: generic dry pasta
+      quantity: 400
+      unit: g
+    - name: tomato
+      quantity: 3
+      unit: unit
+    - name: cucumber
+      quantity: 1
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Cheese Tortellini
+  description: Cheese-filled tortellini with a simple finish.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple cheese tortellini.
+    steps:
+    - step_number: 1
+      instruction: Boil tortellini until tender.
+    - step_number: 2
+      instruction: Drain and toss with butter or sauce.
+    - step_number: 3
+      instruction: Serve hot.
+    ingredients:
+    - name: stuffed pasta
+      quantity: 600
+      unit: g
+    - name: butter
+      quantity: 40
+      unit: g
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Spinach Ravioli
+  description: Spinach-filled ravioli with butter or tomato sauce.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple spinach ravioli.
+    steps:
+    - step_number: 1
+      instruction: Boil ravioli until tender.
+    - step_number: 2
+      instruction: Warm butter or tomato sauce.
+    - step_number: 3
+      instruction: Toss gently and serve.
+    ingredients:
+    - name: stuffed pasta
+      quantity: 600
+      unit: g
+    - name: tomato passata
+      quantity: 300
+      unit: ml
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Gnocchi with Butter
+  description: Potato gnocchi tossed with butter.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple buttered gnocchi.
+    steps:
+    - step_number: 1
+      instruction: Boil gnocchi until they float.
+    - step_number: 2
+      instruction: Drain and toss with butter.
+    - step_number: 3
+      instruction: Season and serve.
+    ingredients:
+    - name: gnocchi
+      quantity: 700
+      unit: g
+    - name: butter
+      quantity: 60
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Gnocchi with Tomato Sauce
+  description: Potato gnocchi served with tomato sauce.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple gnocchi with tomato sauce.
+    steps:
+    - step_number: 1
+      instruction: Warm tomato sauce.
+    - step_number: 2
+      instruction: Boil gnocchi until they float.
+    - step_number: 3
+      instruction: Toss with sauce and serve.
+    ingredients:
+    - name: gnocchi
+      quantity: 700
+      unit: g
+    - name: tomato passata
+      quantity: 500
+      unit: ml
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: White Beans with Vegetables
+  description: White beans cooked with simple vegetables.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple white beans with vegetables.
+    steps:
+    - step_number: 1
+      instruction: Dice the vegetables.
+    - step_number: 2
+      instruction: Simmer beans and vegetables until tender.
+    - step_number: 3
+      instruction: Season and serve warm.
+    ingredients:
+    - name: white beans
+      quantity: 2
+      unit: can
+    - name: carrot
+      quantity: 2
+      unit: unit
+    - name: onion
+      quantity: 1
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Baked Beans
+  description: Beans baked or warmed in tomato sauce.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple baked beans.
+    steps:
+    - step_number: 1
+      instruction: Place beans and sauce in a pan or baking dish.
+    - step_number: 2
+      instruction: Warm until bubbling.
+    - step_number: 3
+      instruction: Season to taste.
+    ingredients:
+    - name: baked beans
+      quantity: 2
+      unit: can
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Butter Beans
+  description: Butter beans warmed with olive oil and herbs.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple butter beans.
+    steps:
+    - step_number: 1
+      instruction: Drain and rinse the beans.
+    - step_number: 2
+      instruction: Warm gently with olive oil.
+    - step_number: 3
+      instruction: Season and add herbs if desired.
+    ingredients:
+    - name: butter beans
+      quantity: 2
+      unit: can
+    - name: parsley
+      quantity: 1
+      unit: bunch
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Black Beans
+  description: Simple seasoned black beans.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple black beans.
+    steps:
+    - step_number: 1
+      instruction: Drain and rinse black beans.
+    - step_number: 2
+      instruction: Warm with onion or spices if desired.
+    - step_number: 3
+      instruction: Season and serve.
+    ingredients:
+    - name: black beans
+      quantity: 2
+      unit: can
+    - name: onion
+      quantity: 1
+      unit: unit
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Red Kidney Beans
+  description: Red kidney beans warmed with simple seasoning.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple red kidney beans.
+    steps:
+    - step_number: 1
+      instruction: Drain and rinse kidney beans.
+    - step_number: 2
+      instruction: Warm with a little liquid.
+    - step_number: 3
+      instruction: Season and serve.
+    ingredients:
+    - name: kidney beans
+      quantity: 2
+      unit: can
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Chickpeas with Spinach
+  description: Chickpeas and spinach cooked with garlic.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple chickpeas with spinach.
+    steps:
+    - step_number: 1
+      instruction: Cook garlic briefly in olive oil.
+    - step_number: 2
+      instruction: Add chickpeas and spinach.
+    - step_number: 3
+      instruction: Cook until hot and season.
+    ingredients:
+    - name: chickpeas
+      quantity: 2
+      unit: can
+    - name: spinach
+      quantity: 500
+      unit: g
+    - name: garlic
+      quantity: 3
+      unit: clove
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Lentils with Vegetables
+  description: Lentils simmered with vegetables.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple lentils with vegetables.
+    steps:
+    - step_number: 1
+      instruction: Dice onion
+      carrot: null
+      and celery.: null
+    - step_number: 2
+      instruction: Simmer lentils and vegetables until tender.
+    - step_number: 3
+      instruction: Season and serve.
+    ingredients:
+    - name: lentils
+      quantity: 320
+      unit: g
+    - name: carrot
+      quantity: 2
+      unit: unit
+    - name: onion
+      quantity: 1
+      unit: unit
+    - name: celery stalk
+      quantity: 2
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Bean Puree
+  description: Smooth white bean puree with olive oil.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple bean puree.
+    steps:
+    - step_number: 1
+      instruction: Warm the beans with a little liquid.
+    - step_number: 2
+      instruction: Blend or mash until smooth.
+    - step_number: 3
+      instruction: Season and finish with olive oil.
+    ingredients:
+    - name: white beans
+      quantity: 2
+      unit: can
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Roasted Chicken
+  description: Simple oven-roasted chicken.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple roasted chicken.
+    steps:
+    - step_number: 1
+      instruction: Season the chicken.
+    - step_number: 2
+      instruction: Roast until cooked through.
+    - step_number: 3
+      instruction: Rest briefly before serving.
+    ingredients:
+    - name: whole chicken
+      quantity: 1
+      unit: unit
+    - name: lemon
+      quantity: 1
+      unit: unit
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Chicken Drumsticks
+  description: Chicken drumsticks baked or pan-roasted.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple chicken drumsticks.
+    steps:
+    - step_number: 1
+      instruction: Season the drumsticks.
+    - step_number: 2
+      instruction: Bake or pan-roast until cooked through.
+    - step_number: 3
+      instruction: Rest and serve.
+    ingredients:
+    - name: chicken drumstick
+      quantity: 900
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Chicken Wings
+  description: Chicken wings baked until browned.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple chicken wings.
+    steps:
+    - step_number: 1
+      instruction: Season the wings.
+    - step_number: 2
+      instruction: Bake until browned and cooked through.
+    - step_number: 3
+      instruction: Serve hot.
+    ingredients:
+    - name: chicken wings
+      quantity: 900
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Chicken Nuggets
+  description: Simple chicken nuggets cooked until crisp.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple chicken nuggets.
+    steps:
+    - step_number: 1
+      instruction: Arrange nuggets on a tray or in a pan.
+    - step_number: 2
+      instruction: Cook until hot and crisp.
+    - step_number: 3
+      instruction: Serve immediately.
+    ingredients:
+    - name: chicken nuggets
+      quantity: 700
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Turkey Breast
+  description: Simple grilled or pan-cooked turkey breast.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple turkey breast.
+    steps:
+    - step_number: 1
+      instruction: Season the turkey breast.
+    - step_number: 2
+      instruction: Grill or pan-cook until done.
+    - step_number: 3
+      instruction: Rest briefly and slice.
+    ingredients:
+    - name: turkey breast
+      quantity: 650
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Turkey Meatballs
+  description: Simple meatballs made with ground turkey.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple turkey meatballs.
+    steps:
+    - step_number: 1
+      instruction: Mix turkey with egg and breadcrumbs.
+    - step_number: 2
+      instruction: Shape into meatballs.
+    - step_number: 3
+      instruction: Pan-cook or bake until cooked through.
+    ingredients:
+    - name: turkey mince
+      quantity: 600
+      unit: g
+    - name: egg
+      quantity: 1
+      unit: unit
+    - name: breadcrumbs
+      quantity: 80
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Pork Chop
+  description: Simple pan-cooked pork chops.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple pork chops.
+    steps:
+    - step_number: 1
+      instruction: Season the pork chops.
+    - step_number: 2
+      instruction: Pan-cook until browned and cooked through.
+    - step_number: 3
+      instruction: Rest briefly before serving.
+    ingredients:
+    - name: pork chop
+      quantity: 700
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Grilled Pork Loin
+  description: Pork loin cooked on a grill or hot pan.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple grilled pork loin.
+    steps:
+    - step_number: 1
+      instruction: Season pork loin slices.
+    - step_number: 2
+      instruction: Grill or pan-cook until done.
+    - step_number: 3
+      instruction: Rest and serve.
+    ingredients:
+    - name: pork loin
+      quantity: 650
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Beef Steak
+  description: Simple pan-seared beef steak.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple beef steak.
+    steps:
+    - step_number: 1
+      instruction: Season the steaks.
+    - step_number: 2
+      instruction: Sear in a hot pan to desired doneness.
+    - step_number: 3
+      instruction: Rest before serving.
+    ingredients:
+    - name: beef steak
+      quantity: 650
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Hamburger Patty
+  description: Plain hamburger patties cooked in a pan or on a grill.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple hamburger patties.
+    steps:
+    - step_number: 1
+      instruction: Shape ground beef into patties.
+    - step_number: 2
+      instruction: Cook on a grill or hot pan.
+    - step_number: 3
+      instruction: Season and serve.
+    ingredients:
+    - name: ground beef
+      quantity: 650
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Swedish Meatballs
+  description: Meatballs served with a simple creamy sauce.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple Swedish-style meatballs.
+    steps:
+    - step_number: 1
+      instruction: Mix ground meat with egg and breadcrumbs.
+    - step_number: 2
+      instruction: Shape and brown meatballs.
+    - step_number: 3
+      instruction: Simmer briefly with cream or gravy.
+    ingredients:
+    - name: ground beef
+      quantity: 600
+      unit: g
+    - name: egg
+      quantity: 1
+      unit: unit
+    - name: breadcrumbs
+      quantity: 80
+      unit: g
+    - name: cream
+      quantity: 150
+      unit: ml
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Grilled Sausages
+  description: Sausages grilled or pan-cooked.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple grilled sausages.
+    steps:
+    - step_number: 1
+      instruction: Heat a grill or pan.
+    - step_number: 2
+      instruction: Cook sausages until browned and hot throughout.
+    - step_number: 3
+      instruction: Rest briefly and serve.
+    ingredients:
+    - name: pork sausage
+      quantity: 700
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Bratwurst
+  description: Bratwurst sausages cooked until browned.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple bratwurst.
+    steps:
+    - step_number: 1
+      instruction: Heat a pan or grill.
+    - step_number: 2
+      instruction: Cook bratwurst until browned and cooked through.
+    - step_number: 3
+      instruction: Serve hot.
+    ingredients:
+    - name: bratwurst
+      quantity: 700
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Roast Beef Slices
+  description: Warm or cold slices of roast beef.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple roast beef slices.
+    steps:
+    - step_number: 1
+      instruction: Warm roast beef slices gently if serving hot.
+    - step_number: 2
+      instruction: Season or add pan juices if available.
+    - step_number: 3
+      instruction: Serve sliced.
+    ingredients:
+    - name: roast beef slices
+      quantity: 500
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Veal Escalope
+  description: Thin veal cutlets pan-cooked quickly.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple veal escalope.
+    steps:
+    - step_number: 1
+      instruction: Season thin veal cutlets.
+    - step_number: 2
+      instruction: Pan-cook quickly on both sides.
+    - step_number: 3
+      instruction: Serve hot.
+    ingredients:
+    - name: veal escalope
+      quantity: 650
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Breaded Veal
+  description: Breaded veal cutlets fried until crisp.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple breaded veal.
+    steps:
+    - step_number: 1
+      instruction: Coat veal in flour
+      egg: null
+      and breadcrumbs.: null
+    - step_number: 2
+      instruction: Fry until golden and cooked through.
+    - step_number: 3
+      instruction: Drain and serve.
+    ingredients:
+    - name: veal escalope
+      quantity: 650
+      unit: g
+    - name: egg
+      quantity: 2
+      unit: unit
+    - name: breadcrumbs
+      quantity: 120
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Lamb Chops
+  description: Lamb chops grilled or pan-seared.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple lamb chops.
+    steps:
+    - step_number: 1
+      instruction: Season the lamb chops.
+    - step_number: 2
+      instruction: Grill or pan-sear to desired doneness.
+    - step_number: 3
+      instruction: Rest briefly before serving.
+    ingredients:
+    - name: lamb chops
+      quantity: 700
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Pulled Pork
+  description: Slow-cooked shredded pork.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple pulled pork.
+    steps:
+    - step_number: 1
+      instruction: Season pork shoulder.
+    - step_number: 2
+      instruction: Cook slowly until tender enough to shred.
+    - step_number: 3
+      instruction: Shred and moisten with cooking juices.
+    ingredients:
+    - name: pork shoulder
+      quantity: 900
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Pan-Fried Salmon
+  description: Salmon fillets cooked in a pan.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple pan-fried salmon.
+    steps:
+    - step_number: 1
+      instruction: Season salmon fillets.
+    - step_number: 2
+      instruction: Pan-fry until cooked through.
+    - step_number: 3
+      instruction: Serve with lemon if desired.
+    ingredients:
+    - name: salmon fillet
+      quantity: 650
+      unit: g
+    - name: lemon
+      quantity: 1
+      unit: unit
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Grilled Cod
+  description: Cod fillets grilled or pan-grilled.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple grilled cod.
+    steps:
+    - step_number: 1
+      instruction: Season cod fillets.
+    - step_number: 2
+      instruction: Grill or pan-grill until flaky.
+    - step_number: 3
+      instruction: Serve hot.
+    ingredients:
+    - name: cod fillet
+      quantity: 650
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Fish Fillet
+  description: Plain fish fillets cooked simply.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple fish fillet.
+    steps:
+    - step_number: 1
+      instruction: Season fish fillets.
+    - step_number: 2
+      instruction: Cook in a pan or oven until flaky.
+    - step_number: 3
+      instruction: Serve immediately.
+    ingredients:
+    - name: fish fillet
+      quantity: 650
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Breaded Fish
+  description: Fish fillets coated in breadcrumbs and cooked until crisp.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple breaded fish.
+    steps:
+    - step_number: 1
+      instruction: Coat fish in flour
+      egg: null
+      and breadcrumbs.: null
+    - step_number: 2
+      instruction: Fry or bake until crisp and cooked through.
+    - step_number: 3
+      instruction: Serve with lemon.
+    ingredients:
+    - name: fish fillet
+      quantity: 650
+      unit: g
+    - name: egg
+      quantity: 2
+      unit: unit
+    - name: breadcrumbs
+      quantity: 120
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Fish Fingers
+  description: Fish fingers cooked until crisp.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple fish fingers.
+    steps:
+    - step_number: 1
+      instruction: Arrange fish fingers on a tray or in a pan.
+    - step_number: 2
+      instruction: Cook until hot and crisp.
+    - step_number: 3
+      instruction: Serve immediately.
+    ingredients:
+    - name: fish fingers
+      quantity: 700
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Tuna Steak
+  description: Tuna steaks seared quickly.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple tuna steak.
+    steps:
+    - step_number: 1
+      instruction: Season tuna steaks.
+    - step_number: 2
+      instruction: Sear quickly in a hot pan.
+    - step_number: 3
+      instruction: Rest briefly and serve.
+    ingredients:
+    - name: tuna
+      quantity: 650
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+  name: Grilled Sardines
+  description: Sardines grilled with salt and olive oil.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple grilled sardines.
+    steps:
+    - step_number: 1
+      instruction: Clean and season sardines.
+    - step_number: 2
+      instruction: Grill until cooked through.
+    - step_number: 3
+      instruction: Serve with lemon.
+    ingredients:
+    - name: sardines
+      quantity: 800
+      unit: g
+    - name: lemon
+      quantity: 1
+      unit: unit
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Grilled Mackerel
+  description: Mackerel fillets grilled or pan-grilled.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple grilled mackerel.
+    steps:
+    - step_number: 1
+      instruction: Season mackerel fillets.
+    - step_number: 2
+      instruction: Grill or pan-grill until cooked through.
+    - step_number: 3
+      instruction: Serve hot.
+    ingredients:
+    - name: mackerel
+      quantity: 650
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Baked Trout
+  description: Trout baked with lemon.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple baked trout.
+    steps:
+    - step_number: 1
+      instruction: Season trout fillets.
+    - step_number: 2
+      instruction: Bake until flaky.
+    - step_number: 3
+      instruction: Serve with lemon.
+    ingredients:
+    - name: trout
+      quantity: 650
+      unit: g
+    - name: lemon
+      quantity: 1
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Grilled Shrimp
+  description: Shrimp grilled or pan-cooked quickly.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple grilled shrimp.
+    steps:
+    - step_number: 1
+      instruction: Season shrimp.
+    - step_number: 2
+      instruction: Grill or pan-cook until pink and cooked through.
+    - step_number: 3
+      instruction: Serve immediately.
+    ingredients:
+    - name: shrimp
+      quantity: 650
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Steamed Mussels
+  description: Mussels steamed until open.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple steamed mussels.
+    steps:
+    - step_number: 1
+      instruction: Clean the mussels and discard any that stay open.
+    - step_number: 2
+      instruction: Steam with a little liquid until opened.
+    - step_number: 3
+      instruction: Discard unopened mussels and serve.
+    ingredients:
+    - name: mussels
+      quantity: 1
+      unit: kg
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Fried Calamari
+  description: Calamari rings fried until crisp.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple fried calamari.
+    steps:
+    - step_number: 1
+      instruction: Coat calamari with flour.
+    - step_number: 2
+      instruction: Fry quickly until crisp.
+    - step_number: 3
+      instruction: Drain
+      season: null
+      and serve with lemon.: null
+    ingredients:
+    - name: calamari
+      quantity: 700
+      unit: g
+    - name: wheat flour
+      quantity: 150
+      unit: g
+    - name: lemon
+      quantity: 1
+      unit: unit
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Octopus Salad
+  description: Cold octopus salad with olive oil and paprika.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple octopus salad.
+    steps:
+    - step_number: 1
+      instruction: Slice cooked octopus.
+    - step_number: 2
+      instruction: Dress with olive oil and seasoning.
+    - step_number: 3
+      instruction: Serve cold or room temperature.
+    ingredients:
+    - name: octopus
+      quantity: 600
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Lentil Patties
+  description: Simple patties made from lentils.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple lentil patties.
+    steps:
+    - step_number: 1
+      instruction: Mash cooked lentils.
+    - step_number: 2
+      instruction: Mix with egg and breadcrumbs
+      then shape patties.: null
+    - step_number: 3
+      instruction: Pan-fry until browned.
+    ingredients:
+    - name: lentils
+      quantity: 2
+      unit: can
+    - name: egg
+      quantity: 1
+      unit: unit
+    - name: breadcrumbs
+      quantity: 100
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Chickpea Patties
+  description: Simple patties made from chickpeas.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple chickpea patties.
+    steps:
+    - step_number: 1
+      instruction: Mash chickpeas.
+    - step_number: 2
+      instruction: Mix with egg and breadcrumbs
+      then shape patties.: null
+    - step_number: 3
+      instruction: Pan-fry until browned.
+    ingredients:
+    - name: chickpeas
+      quantity: 2
+      unit: can
+    - name: egg
+      quantity: 1
+      unit: unit
+    - name: breadcrumbs
+      quantity: 100
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Grilled Tofu
+  description: Tofu slices grilled or pan-grilled.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple grilled tofu.
+    steps:
+    - step_number: 1
+      instruction: Slice and season tofu.
+    - step_number: 2
+      instruction: Grill or pan-grill until browned.
+    - step_number: 3
+      instruction: Serve hot.
+    ingredients:
+    - name: firm tofu
+      quantity: 600
+      unit: g
+    - name: soy sauce
+      quantity: 3
+      unit: tbsp
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Crispy Tofu
+  description: Tofu cooked until crisp.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple crispy tofu.
+    steps:
+    - step_number: 1
+      instruction: Press and cube tofu.
+    - step_number: 2
+      instruction: Coat lightly with starch or flour if desired.
+    - step_number: 3
+      instruction: Pan-fry until crisp.
+    ingredients:
+    - name: firm tofu
+      quantity: 600
+      unit: g
+    - name: wheat flour
+      quantity: 50
+      unit: g
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Tempeh
+  description: Tempeh sliced and pan-cooked.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple tempeh.
+    steps:
+    - step_number: 1
+      instruction: Slice tempeh.
+    - step_number: 2
+      instruction: Pan-cook until browned.
+    - step_number: 3
+      instruction: Season and serve.
+    ingredients:
+    - name: tempeh
+      quantity: 500
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Seitan
+  description: Seitan slices pan-cooked until browned.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple seitan.
+    steps:
+    - step_number: 1
+      instruction: Slice seitan.
+    - step_number: 2
+      instruction: Pan-cook until browned.
+    - step_number: 3
+      instruction: Season and serve.
+    ingredients:
+    - name: seitan
+      quantity: 500
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Stuffed Mushrooms
+  description: Mushrooms filled and baked.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple stuffed mushrooms.
+    steps:
+    - step_number: 1
+      instruction: Remove mushroom stems and chop them.
+    - step_number: 2
+      instruction: Mix stems with breadcrumbs and cheese
+      then fill caps.: null
+    - step_number: 3
+      instruction: Bake until tender and browned.
+    ingredients:
+    - name: mixed mushrooms
+      quantity: 700
+      unit: g
+    - name: breadcrumbs
+      quantity: 100
+      unit: g
+    - name: grated cheese
+      quantity: 120
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Creamed Spinach
+  description: Spinach cooked in a light cream sauce.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple creamed spinach.
+    steps:
+    - step_number: 1
+      instruction: Wash the spinach and cook it until wilted.
+    - step_number: 2
+      instruction: Add cream and simmer briefly.
+    - step_number: 3
+      instruction: Season and serve warm.
+    ingredients:
+    - name: spinach
+      quantity: 700
+      unit: g
+    - name: cream
+      quantity: 200
+      unit: ml
+    - name: garlic
+      quantity: 1
+      unit: clove
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Swiss Chard with Potatoes
+  description: Swiss chard and potatoes cooked together and dressed with olive oil.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple Swiss chard with potatoes.
+    steps:
+    - step_number: 1
+      instruction: Peel and cut the potatoes.
+    - step_number: 2
+      instruction: Cook potatoes and Swiss chard until tender.
+    - step_number: 3
+      instruction: Drain
+      season: null
+      and dress with olive oil.: null
+    ingredients:
+    - name: chard
+      quantity: 700
+      unit: g
+    - name: potato
+      quantity: 700
+      unit: g
+    - name: garlic
+      quantity: 2
+      unit: clove
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Braised Leeks
+  description: Leeks cooked gently until soft and sweet.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple braised leeks.
+    steps:
+    - step_number: 1
+      instruction: Trim
+      wash: null
+      and slice the leeks.: null
+    - step_number: 2
+      instruction: Braise gently with a little water or stock until tender.
+    - step_number: 3
+      instruction: Season and finish with olive oil or butter.
+    ingredients:
+    - name: leek
+      quantity: 5
+      unit: unit
+    - name: butter
+      quantity: 30
+      unit: g
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Creamed Leeks
+  description: Leeks cooked in a simple cream sauce.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple creamed leeks.
+    steps:
+    - step_number: 1
+      instruction: Trim
+      wash: null
+      and slice the leeks.: null
+    - step_number: 2
+      instruction: Cook until soft
+      then add cream.: null
+    - step_number: 3
+      instruction: Simmer briefly and season.
+    ingredients:
+    - name: leek
+      quantity: 5
+      unit: unit
+    - name: cream
+      quantity: 200
+      unit: ml
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 3
+    - 4
+    - 5
+    - 6
+  name: Steamed Asparagus
+  description: Asparagus steamed until tender.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple steamed asparagus.
+    steps:
+    - step_number: 1
+      instruction: Trim the asparagus.
+    - step_number: 2
+      instruction: Steam until tender.
+    - step_number: 3
+      instruction: Season and serve with lemon if desired.
+    ingredients:
+    - name: asparagus
+      quantity: 700
+      unit: g
+    - name: lemon
+      quantity: 1
+      unit: unit
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 3
+    - 4
+    - 5
+    - 6
+  name: Grilled Asparagus
+  description: Asparagus grilled or pan-grilled.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple grilled asparagus.
+    steps:
+    - step_number: 1
+      instruction: Trim the asparagus.
+    - step_number: 2
+      instruction: Grill or pan-grill until tender and lightly marked.
+    - step_number: 3
+      instruction: Season and serve.
+    ingredients:
+    - name: asparagus
+      quantity: 700
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 10
+    - 11
+    - 12
+    - 1
+    - 2
+    - 3
+  name: Roasted Brussels Sprouts
+  description: Brussels sprouts roasted until browned.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple roasted Brussels sprouts.
+    steps:
+    - step_number: 1
+      instruction: Trim and halve the Brussels sprouts.
+    - step_number: 2
+      instruction: Roast with olive oil until browned and tender.
+    - step_number: 3
+      instruction: Season and serve hot.
+    ingredients:
+    - name: Brussels sprouts
+      quantity: 800
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Mixed Roasted Vegetables
+  description: Mixed vegetables roasted together on a tray.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple mixed roasted vegetables.
+    steps:
+    - step_number: 1
+      instruction: Cut the vegetables into even pieces.
+    - step_number: 2
+      instruction: Roast with olive oil until tender and browned.
+    - step_number: 3
+      instruction: Season and serve.
+    ingredients:
+    - name: carrot
+      quantity: 3
+      unit: unit
+    - name: zucchini
+      quantity: 2
+      unit: unit
+    - name: bell pepper
+      quantity: 2
+      unit: unit
+    - name: onion
+      quantity: 1
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+  name: Grilled Vegetables
+  description: Assorted vegetables grilled and dressed simply.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple grilled vegetables.
+    steps:
+    - step_number: 1
+      instruction: Slice the vegetables.
+    - step_number: 2
+      instruction: Grill or pan-grill until tender.
+    - step_number: 3
+      instruction: Season with olive oil and salt.
+    ingredients:
+    - name: zucchini
+      quantity: 2
+      unit: unit
+    - name: eggplant
+      quantity: 1
+      unit: unit
+    - name: bell pepper
+      quantity: 2
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Mushrooms with Garlic
+  description: Mushrooms sauteed with garlic.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple garlic mushrooms.
+    steps:
+    - step_number: 1
+      instruction: Clean and slice the mushrooms.
+    - step_number: 2
+      instruction: Saute mushrooms with garlic until browned.
+    - step_number: 3
+      instruction: Season and serve hot.
+    ingredients:
+    - name: mixed mushrooms
+      quantity: 700
+      unit: g
+    - name: garlic
+      quantity: 3
+      unit: clove
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Bell Peppers with Onion
+  description: Bell peppers and onion sauteed until soft.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple peppers and onion.
+    steps:
+    - step_number: 1
+      instruction: Slice bell peppers and onion.
+    - step_number: 2
+      instruction: Saute until tender and lightly browned.
+    - step_number: 3
+      instruction: Season and serve.
+    ingredients:
+    - name: bell pepper
+      quantity: 4
+      unit: unit
+    - name: onion
+      quantity: 2
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Caramelized Onions
+  description: Onions cooked slowly until sweet and browned.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple caramelized onions.
+    steps:
+    - step_number: 1
+      instruction: Slice the onions thinly.
+    - step_number: 2
+      instruction: Cook slowly with oil or butter until deeply soft.
+    - step_number: 3
+      instruction: Season and serve warm.
+    ingredients:
+    - name: onion
+      quantity: 6
+      unit: unit
+    - name: butter
+      quantity: 40
+      unit: g
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+  name: Greek Salad
+  description: Tomato, cucumber, onion, olives, and feta salad.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple Greek salad.
+    steps:
+    - step_number: 1
+      instruction: Chop the tomatoes
+      cucumber: null
+      and onion.: null
+    - step_number: 2
+      instruction: Add olives and feta.
+    - step_number: 3
+      instruction: Dress with olive oil and season.
+    ingredients:
+    - name: tomato
+      quantity: 4
+      unit: unit
+    - name: cucumber
+      quantity: 1
+      unit: unit
+    - name: red onion
+      quantity: 1
+      unit: unit
+    - name: black olives
+      quantity: 120
+      unit: g
+    - name: feta
+      quantity: 200
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Lentil Salad
+  description: Cold lentil salad with vegetables and herbs.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple lentil salad.
+    steps:
+    - step_number: 1
+      instruction: Drain cooked lentils.
+    - step_number: 2
+      instruction: Dice vegetables and herbs.
+    - step_number: 3
+      instruction: Toss everything with dressing.
+    ingredients:
+    - name: lentils
+      quantity: 2
+      unit: can
+    - name: carrot
+      quantity: 2
+      unit: unit
+    - name: celery stalk
+      quantity: 2
+      unit: unit
+    - name: parsley
+      quantity: 1
+      unit: bunch
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Chickpea Salad
+  description: Cold chickpea salad with vegetables.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple chickpea salad.
+    steps:
+    - step_number: 1
+      instruction: Drain and rinse chickpeas.
+    - step_number: 2
+      instruction: Chop vegetables.
+    - step_number: 3
+      instruction: Toss with dressing and season.
+    ingredients:
+    - name: chickpeas
+      quantity: 2
+      unit: can
+    - name: tomato
+      quantity: 3
+      unit: unit
+    - name: cucumber
+      quantity: 1
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Bean Salad
+  description: Cold bean salad with onion and herbs.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple bean salad.
+    steps:
+    - step_number: 1
+      instruction: Drain and rinse the beans.
+    - step_number: 2
+      instruction: Chop onion and herbs.
+    - step_number: 3
+      instruction: Toss with dressing and season.
+    ingredients:
+    - name: white beans
+      quantity: 2
+      unit: can
+    - name: red onion
+      quantity: 1
+      unit: unit
+    - name: parsley
+      quantity: 1
+      unit: bunch
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Russian Salad
+  description: Potato, carrot, peas, egg, and mayonnaise salad.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple Russian salad.
+    steps:
+    - step_number: 1
+      instruction: Boil potatoes
+      carrots: null
+      peas: null
+      and eggs.: null
+    - step_number: 2
+      instruction: Dice and cool the cooked ingredients.
+    - step_number: 3
+      instruction: Mix with mayonnaise and chill.
+    ingredients:
+    - name: potato
+      quantity: 700
+      unit: g
+    - name: carrot
+      quantity: 3
+      unit: unit
+    - name: frozen peas
+      quantity: 200
+      unit: g
+    - name: egg
+      quantity: 4
+      unit: unit
+    - name: mayonnaise
+      quantity: 5
+      unit: tbsp
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+  name: Caprese Salad
+  description: Tomato and mozzarella salad with basil.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple Caprese salad.
+    steps:
+    - step_number: 1
+      instruction: Slice tomatoes and mozzarella.
+    - step_number: 2
+      instruction: Arrange with basil.
+    - step_number: 3
+      instruction: Dress with olive oil and season.
+    ingredients:
+    - name: tomato
+      quantity: 5
+      unit: unit
+    - name: mozzarella
+      quantity: 300
+      unit: g
+    - name: basil
+      quantity: 1
+      unit: bunch
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Fried Eggs
+  description: Eggs fried in a pan.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple fried eggs.
+    steps:
+    - step_number: 1
+      instruction: Heat a pan with a little oil or butter.
+    - step_number: 2
+      instruction: Crack in the eggs and fry to preference.
+    - step_number: 3
+      instruction: Season and serve.
+    ingredients:
+    - name: egg
+      quantity: 8
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Scrambled Eggs
+  description: Soft scrambled eggs cooked gently.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple scrambled eggs.
+    steps:
+    - step_number: 1
+      instruction: Beat the eggs with salt.
+    - step_number: 2
+      instruction: Cook gently while stirring.
+    - step_number: 3
+      instruction: Stop while still soft and serve.
+    ingredients:
+    - name: egg
+      quantity: 8
+      unit: unit
+    - name: butter
+      quantity: 30
+      unit: g
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Spanish Omelette
+  description: Spanish-style omelette with potato and onion.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple Spanish omelette.
+    steps:
+    - step_number: 1
+      instruction: Cook sliced potatoes and onion until tender.
+    - step_number: 2
+      instruction: Mix with beaten eggs.
+    - step_number: 3
+      instruction: Cook in a pan until set.
+    ingredients:
+    - name: egg
+      quantity: 8
+      unit: unit
+    - name: potato
+      quantity: 700
+      unit: g
+    - name: onion
+      quantity: 1
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Cheese Omelette
+  description: Omelette filled with cheese.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple cheese omelette.
+    steps:
+    - step_number: 1
+      instruction: Beat the eggs.
+    - step_number: 2
+      instruction: Cook in a pan and add cheese.
+    - step_number: 3
+      instruction: Fold and serve hot.
+    ingredients:
+    - name: egg
+      quantity: 8
+      unit: unit
+    - name: grated cheese
+      quantity: 160
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Ham Omelette
+  description: Omelette with ham.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple ham omelette.
+    steps:
+    - step_number: 1
+      instruction: Dice or slice the ham.
+    - step_number: 2
+      instruction: Cook beaten eggs in a pan and add ham.
+    - step_number: 3
+      instruction: Fold and serve.
+    ingredients:
+    - name: egg
+      quantity: 8
+      unit: unit
+    - name: cooked ham
+      quantity: 200
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Mushroom Omelette
+  description: Omelette with sauteed mushrooms.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple mushroom omelette.
+    steps:
+    - step_number: 1
+      instruction: Saute sliced mushrooms.
+    - step_number: 2
+      instruction: Add beaten eggs.
+    - step_number: 3
+      instruction: Cook until set and serve.
+    ingredients:
+    - name: egg
+      quantity: 8
+      unit: unit
+    - name: mixed mushrooms
+      quantity: 300
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Spinach Omelette
+  description: Omelette with spinach.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple spinach omelette.
+    steps:
+    - step_number: 1
+      instruction: Wilt the spinach.
+    - step_number: 2
+      instruction: Add beaten eggs to the pan.
+    - step_number: 3
+      instruction: Cook until set and serve.
+    ingredients:
+    - name: egg
+      quantity: 8
+      unit: unit
+    - name: spinach
+      quantity: 300
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+  name: Zucchini Omelette
+  description: Omelette with zucchini.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple zucchini omelette.
+    steps:
+    - step_number: 1
+      instruction: Slice and cook the zucchini until tender.
+    - step_number: 2
+      instruction: Add beaten eggs.
+    - step_number: 3
+      instruction: Cook until set and serve.
+    ingredients:
+    - name: egg
+      quantity: 8
+      unit: unit
+    - name: zucchini
+      quantity: 2
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Mashed Potatoes
+  description: Potatoes mashed with milk and butter.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple mashed potatoes.
+    steps:
+    - step_number: 1
+      instruction: Boil peeled potatoes until tender.
+    - step_number: 2
+      instruction: Mash with milk and butter.
+    - step_number: 3
+      instruction: Season and serve hot.
+    ingredients:
+    - name: potato
+      quantity: 900
+      unit: g
+    - name: milk
+      quantity: 150
+      unit: ml
+    - name: butter
+      quantity: 50
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Roasted Potatoes
+  description: Potatoes roasted until browned.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple roasted potatoes.
+    steps:
+    - step_number: 1
+      instruction: Cut potatoes into chunks.
+    - step_number: 2
+      instruction: Roast with olive oil until tender and browned.
+    - step_number: 3
+      instruction: Season and serve.
+    ingredients:
+    - name: potato
+      quantity: 900
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Potato Wedges
+  description: Potato wedges baked until crisp.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple potato wedges.
+    steps:
+    - step_number: 1
+      instruction: Cut potatoes into wedges.
+    - step_number: 2
+      instruction: Bake with olive oil until crisp outside and tender inside.
+    - step_number: 3
+      instruction: Season and serve hot.
+    ingredients:
+    - name: potato
+      quantity: 900
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: French Fries
+  description: Potatoes cut into fries and cooked until crisp.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple French fries.
+    steps:
+    - step_number: 1
+      instruction: Cut potatoes into fries.
+    - step_number: 2
+      instruction: Fry or bake until crisp and golden.
+    - step_number: 3
+      instruction: Season and serve immediately.
+    ingredients:
+    - name: potato
+      quantity: 900
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Potato Gratin
+  description: Sliced potatoes baked with cream and cheese.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple potato gratin.
+    steps:
+    - step_number: 1
+      instruction: Slice potatoes thinly.
+    - step_number: 2
+      instruction: Layer with cream and cheese.
+    - step_number: 3
+      instruction: Bake until tender and browned.
+    ingredients:
+    - name: potato
+      quantity: 900
+      unit: g
+    - name: cream
+      quantity: 300
+      unit: ml
+    - name: grated cheese
+      quantity: 150
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: White Rice
+  description: Plain cooked white rice.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple white rice.
+    steps:
+    - step_number: 1
+      instruction: Rinse the rice.
+    - step_number: 2
+      instruction: Cook with water until tender.
+    - step_number: 3
+      instruction: Rest
+      fluff: null
+      and serve.: null
+    ingredients:
+    - name: rice
+      quantity: 320
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Brown Rice
+  description: Plain cooked brown rice.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple brown rice.
+    steps:
+    - step_number: 1
+      instruction: Rinse the rice.
+    - step_number: 2
+      instruction: Cook with water until tender.
+    - step_number: 3
+      instruction: Rest
+      fluff: null
+      and serve.: null
+    ingredients:
+    - name: brown rice
+      quantity: 320
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Fried Rice
+  description: Rice fried with egg and vegetables.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple fried rice.
+    steps:
+    - step_number: 1
+      instruction: Cook or use leftover rice.
+    - step_number: 2
+      instruction: Stir-fry egg and vegetables.
+    - step_number: 3
+      instruction: Add rice
+      season: null
+      and fry together.: null
+    ingredients:
+    - name: rice
+      quantity: 320
+      unit: g
+    - name: egg
+      quantity: 3
+      unit: unit
+    - name: frozen peas
+      quantity: 200
+      unit: g
+    - name: carrot
+      quantity: 2
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Couscous
+  description: Plain couscous hydrated with hot water or stock.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple couscous.
+    steps:
+    - step_number: 1
+      instruction: Place couscous in a bowl.
+    - step_number: 2
+      instruction: Add hot water or stock and cover.
+    - step_number: 3
+      instruction: Fluff with a fork and season.
+    ingredients:
+    - name: couscous
+      quantity: 320
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Quinoa
+  description: Plain cooked quinoa.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple quinoa.
+    steps:
+    - step_number: 1
+      instruction: Rinse the quinoa.
+    - step_number: 2
+      instruction: Simmer with water until tender.
+    - step_number: 3
+      instruction: Rest
+      fluff: null
+      and season.: null
+    ingredients:
+    - name: quinoa
+      quantity: 320
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Polenta
+  description: Basic cooked polenta.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple polenta.
+    steps:
+    - step_number: 1
+      instruction: Bring water to a simmer.
+    - step_number: 2
+      instruction: Whisk in polenta and cook until thick.
+    - step_number: 3
+      instruction: Season and serve.
+    ingredients:
+    - name: polenta
+      quantity: 300
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Pasta with Tomato Sauce
+  description: Pasta served with tomato sauce.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple pasta with tomato sauce.
+    steps:
+    - step_number: 1
+      instruction: Boil pasta until al dente.
+    - step_number: 2
+      instruction: Warm tomato sauce.
+    - step_number: 3
+      instruction: Toss pasta with sauce and serve.
+    ingredients:
+    - name: generic dry pasta
+      quantity: 400
+      unit: g
+    - name: tomato passata
+      quantity: 500
+      unit: ml
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Pasta with Pesto
+  description: Pasta tossed with pesto.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple pasta with pesto.
+    steps:
+    - step_number: 1
+      instruction: Boil pasta until al dente.
+    - step_number: 2
+      instruction: Drain
+      reserving a little pasta water.: null
+    - step_number: 3
+      instruction: Toss pasta with pesto and serve.
+    ingredients:
+    - name: generic dry pasta
+      quantity: 400
+      unit: g
+    - name: pesto
+      quantity: 120
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Mac and Cheese
+  description: Pasta baked or mixed with cheese sauce.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple mac and cheese.
+    steps:
+    - step_number: 1
+      instruction: Boil macaroni until just tender.
+    - step_number: 2
+      instruction: Make a cheese sauce with milk
+      butter: null
+      flour: null
+      and cheese.: null
+    - step_number: 3
+      instruction: Mix pasta with sauce and serve or bake briefly.
+    ingredients:
+    - name: macaroni
+      quantity: 400
+      unit: g
+    - name: milk
+      quantity: 500
+      unit: ml
+    - name: butter
+      quantity: 40
+      unit: g
+    - name: wheat flour
+      quantity: 40
+      unit: g
+    - name: cheddar
+      quantity: 250
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Lentil Stew
+  description: Lentils simmered with vegetables.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple lentil stew.
+    steps:
+    - step_number: 1
+      instruction: Dice onion
+      carrot: null
+      and celery.: null
+    - step_number: 2
+      instruction: Simmer vegetables and lentils until tender.
+    - step_number: 3
+      instruction: Season and serve hot.
+    ingredients:
+    - name: lentils
+      quantity: 350
+      unit: g
+    - name: onion
+      quantity: 1
+      unit: unit
+    - name: carrot
+      quantity: 3
+      unit: unit
+    - name: celery stalk
+      quantity: 2
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Chickpea Stew
+  description: Chickpeas simmered with vegetables and tomato.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple chickpea stew.
+    steps:
+    - step_number: 1
+      instruction: Cook onion and vegetables until soft.
+    - step_number: 2
+      instruction: Add chickpeas and tomato
+      then simmer.: null
+    - step_number: 3
+      instruction: Season and serve hot.
+    ingredients:
+    - name: chickpeas
+      quantity: 2
+      unit: can
+    - name: onion
+      quantity: 1
+      unit: unit
+    - name: carrot
+      quantity: 2
+      unit: unit
+    - name: canned chopped tomatoes
+      quantity: 1
+      unit: can
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Hummus
+  description: Chickpea and tahini dip.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple hummus.
+    steps:
+    - step_number: 1
+      instruction: Drain and rinse chickpeas.
+    - step_number: 2
+      instruction: Blend with tahini
+      lemon: null
+      and garlic.: null
+    - step_number: 3
+      instruction: Adjust seasoning and texture.
+    ingredients:
+    - name: chickpeas
+      quantity: 2
+      unit: can
+    - name: tahini
+      quantity: 4
+      unit: tbsp
+    - name: lemon
+      quantity: 1
+      unit: unit
+    - name: garlic
+      quantity: 1
+      unit: clove
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Grilled Chicken Breast
+  description: Chicken breast cooked on a grill or hot pan.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple grilled chicken breast.
+    steps:
+    - step_number: 1
+      instruction: Season the chicken breast.
+    - step_number: 2
+      instruction: Grill or pan-cook until cooked through.
+    - step_number: 3
+      instruction: Rest briefly and serve.
+    ingredients:
+    - name: chicken breast
+      quantity: 650
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Breaded Chicken
+  description: Chicken coated in breadcrumbs and cooked until crisp.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple breaded chicken.
+    steps:
+    - step_number: 1
+      instruction: Coat chicken in flour
+      egg: null
+      and breadcrumbs.: null
+    - step_number: 2
+      instruction: Fry or bake until crisp and cooked through.
+    - step_number: 3
+      instruction: Rest briefly and serve.
+    ingredients:
+    - name: chicken breast
+      quantity: 650
+      unit: g
+    - name: wheat flour
+      quantity: 80
+      unit: g
+    - name: egg
+      quantity: 2
+      unit: unit
+    - name: breadcrumbs
+      quantity: 120
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Meatballs
+  description: Simple meatballs cooked in a pan or sauce.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple meatballs.
+    steps:
+    - step_number: 1
+      instruction: Mix ground meat with egg and breadcrumbs.
+    - step_number: 2
+      instruction: Shape into meatballs.
+    - step_number: 3
+      instruction: Cook until browned and cooked through.
+    ingredients:
+    - name: ground beef
+      quantity: 600
+      unit: g
+    - name: egg
+      quantity: 1
+      unit: unit
+    - name: breadcrumbs
+      quantity: 80
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Sausages
+  description: Sausages cooked in a pan or oven.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple sausages.
+    steps:
+    - step_number: 1
+      instruction: Heat a pan or oven.
+    - step_number: 2
+      instruction: Cook sausages until browned and hot throughout.
+    - step_number: 3
+      instruction: Rest briefly and serve.
+    ingredients:
+    - name: pork sausage
+      quantity: 700
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Grilled Salmon
+  description: Salmon fillets grilled or pan-grilled.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple grilled salmon.
+    steps:
+    - step_number: 1
+      instruction: Season salmon fillets.
+    - step_number: 2
+      instruction: Grill or pan-grill until cooked through.
+    - step_number: 3
+      instruction: Serve with lemon if desired.
+    ingredients:
+    - name: salmon fillet
+      quantity: 650
+      unit: g
+    - name: lemon
+      quantity: 1
+      unit: unit
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Baked Cod
+  description: Cod fillets baked until flaky.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple baked cod.
+    steps:
+    - step_number: 1
+      instruction: Season cod fillets.
+    - step_number: 2
+      instruction: Bake until flaky and cooked through.
+    - step_number: 3
+      instruction: Serve hot.
+    ingredients:
+    - name: cod fillet
+      quantity: 650
+      unit: g
+    - name: lemon
+      quantity: 1
+      unit: unit
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Garlic Shrimp
+  description: Shrimp cooked quickly with garlic.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple garlic shrimp.
+    steps:
+    - step_number: 1
+      instruction: Slice the garlic.
+    - step_number: 2
+      instruction: Cook shrimp with garlic until pink and cooked through.
+    - step_number: 3
+      instruction: Season and serve immediately.
+    ingredients:
+    - name: shrimp
+      quantity: 650
+      unit: g
+    - name: garlic
+      quantity: 4
+      unit: clove
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Falafel
+  description: Chickpea patties fried or baked until crisp.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple falafel.
+    steps:
+    - step_number: 1
+      instruction: Blend chickpeas with herbs and garlic.
+    - step_number: 2
+      instruction: Shape into small patties or balls.
+    - step_number: 3
+      instruction: Fry or bake until crisp.
+    ingredients:
+    - name: chickpeas
+      quantity: 2
+      unit: can
+    - name: parsley
+      quantity: 1
+      unit: bunch
+    - name: garlic
+      quantity: 2
+      unit: clove
+    - name: wheat flour
+      quantity: 60
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Veggie Burger
+  description: Simple vegetarian burger patties.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple veggie burger.
+    steps:
+    - step_number: 1
+      instruction: Mash beans or vegetables with breadcrumbs.
+    - step_number: 2
+      instruction: Shape into patties.
+    - step_number: 3
+      instruction: Pan-cook until browned.
+    ingredients:
+    - name: black beans
+      quantity: 2
+      unit: can
+    - name: breadcrumbs
+      quantity: 120
+      unit: g
+    - name: egg
+      quantity: 1
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Tofu Stir-Fry
+  description: Tofu stir-fried with vegetables.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple tofu stir-fry.
+    steps:
+    - step_number: 1
+      instruction: Cube tofu and chop vegetables.
+    - step_number: 2
+      instruction: Stir-fry tofu until browned.
+    - step_number: 3
+      instruction: Add vegetables and sauce
+      then cook until tender.: null
+    ingredients:
+    - name: firm tofu
+      quantity: 600
+      unit: g
+    - name: broccoli
+      quantity: 400
+      unit: g
+    - name: carrot
+      quantity: 2
+      unit: unit
+    - name: soy sauce
+      quantity: 4
+      unit: tbsp
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Vegetable Gratin
+  description: Mixed vegetables baked with a creamy sauce and cheese.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple vegetable gratin.
+    steps:
+    - step_number: 1
+      instruction: Cut and lightly cook the vegetables.
+    - step_number: 2
+      instruction: Place in a baking dish with cream and cheese.
+    - step_number: 3
+      instruction: Bake until bubbling and browned.
+    ingredients:
+    - name: cauliflower
+      quantity: 1
+      unit: head
+    - name: carrot
+      quantity: 3
+      unit: unit
+    - name: cream
+      quantity: 250
+      unit: ml
+    - name: grated cheese
+      quantity: 180
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Stuffed Peppers
+  description: Bell peppers filled with rice and vegetables.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple stuffed peppers.
+    steps:
+    - step_number: 1
+      instruction: Halve and seed the peppers.
+    - step_number: 2
+      instruction: Fill with cooked rice and vegetables.
+    - step_number: 3
+      instruction: Bake until peppers are tender.
+    ingredients:
+    - name: bell pepper
+      quantity: 6
+      unit: unit
+    - name: rice
+      quantity: 220
+      unit: g
+    - name: tomato passata
+      quantity: 300
+      unit: ml
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Croquettes
+  description: Simple breaded croquettes fried or baked.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple croquettes.
+    steps:
+    - step_number: 1
+      instruction: Prepare or shape croquette filling.
+    - step_number: 2
+      instruction: Coat with egg and breadcrumbs.
+    - step_number: 3
+      instruction: Fry or bake until crisp.
+    ingredients:
+    - name: croquettes
+      quantity: 16
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Cheese Quesadilla
+  description: Tortilla filled with cheese and toasted until melted.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple cheese quesadilla.
+    steps:
+    - step_number: 1
+      instruction: Fill tortillas with cheese.
+    - step_number: 2
+      instruction: Toast in a pan until cheese melts.
+    - step_number: 3
+      instruction: Cut and serve hot.
+    ingredients:
+    - name: flour tortilla
+      quantity: 8
+      unit: unit
+    - name: grated cheese
+      quantity: 350
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 6
+    - 7
+    - 8
+    - 9
+  name: Gazpacho
+  description: Cold tomato and vegetable soup.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple gazpacho.
+    steps:
+    - step_number: 1
+      instruction: Chop tomatoes
+      cucumber: null
+      and pepper.: null
+    - step_number: 2
+      instruction: Blend with olive oil and a little water.
+    - step_number: 3
+      instruction: Chill and season before serving.
+    ingredients:
+    - name: tomato
+      quantity: 8
+      unit: unit
+    - name: cucumber
+      quantity: 1
+      unit: unit
+    - name: bell pepper
+      quantity: 1
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 6
+    - 7
+    - 8
+    - 9
+  name: Salmorejo
+  description: Thick cold tomato soup with bread and olive oil.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple salmorejo.
+    steps:
+    - step_number: 1
+      instruction: Soak bread with chopped tomatoes.
+    - step_number: 2
+      instruction: Blend with olive oil until smooth.
+    - step_number: 3
+      instruction: Chill and serve cold.
+    ingredients:
+    - name: tomato
+      quantity: 8
+      unit: unit
+    - name: country bread
+      quantity: 150
+      unit: g
+    - name: egg
+      quantity: 2
+      unit: unit
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+  name: Escalivada
+  description: Roasted eggplant, peppers, and onion.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple escalivada.
+    steps:
+    - step_number: 1
+      instruction: Roast eggplant
+      peppers: null
+      and onion until soft.: null
+    - step_number: 2
+      instruction: Peel and tear into strips.
+    - step_number: 3
+      instruction: Dress with olive oil and season.
+    ingredients:
+    - name: eggplant
+      quantity: 2
+      unit: unit
+    - name: red bell pepper
+      quantity: 3
+      unit: unit
+    - name: onion
+      quantity: 2
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Pa amb Tomaquet
+  description: Bread rubbed with tomato and olive oil.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple pa amb tomaquet.
+    steps:
+    - step_number: 1
+      instruction: Toast or slice the bread.
+    - step_number: 2
+      instruction: Rub with cut tomato.
+    - step_number: 3
+      instruction: Dress with olive oil and salt.
+    ingredients:
+    - name: country bread
+      quantity: 8
+      unit: slice
+    - name: tomato
+      quantity: 4
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: White Beans with Botifarra
+  description: White beans served with botifarra sausage.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple white beans with botifarra.
+    steps:
+    - step_number: 1
+      instruction: Warm the white beans.
+    - step_number: 2
+      instruction: Grill or pan-cook the botifarra.
+    - step_number: 3
+      instruction: Serve together and season.
+    ingredients:
+    - name: white beans
+      quantity: 2
+      unit: can
+    - name: botifarra
+      quantity: 600
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+  name: Pisto
+  description: Spanish vegetable stew with tomato, zucchini, pepper, and onion.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple pisto.
+    steps:
+    - step_number: 1
+      instruction: Dice the vegetables.
+    - step_number: 2
+      instruction: Cook onion
+      pepper: null
+      zucchini: null
+      and tomato until soft.: null
+    - step_number: 3
+      instruction: Simmer until thick and season.
+    ingredients:
+    - name: zucchini
+      quantity: 2
+      unit: unit
+    - name: bell pepper
+      quantity: 2
+      unit: unit
+    - name: tomato
+      quantity: 6
+      unit: unit
+    - name: onion
+      quantity: 1
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Leek Vinaigrette
+  description: Cooked leeks served cold with vinaigrette.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple leek vinaigrette.
+    steps:
+    - step_number: 1
+      instruction: Trim and wash leeks.
+    - step_number: 2
+      instruction: Cook until tender
+      then cool.: null
+    - step_number: 3
+      instruction: Dress with vinaigrette and serve cold.
+    ingredients:
+    - name: leek
+      quantity: 5
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Quiche Lorraine
+  description: Bacon, egg, and cream quiche.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple Quiche Lorraine.
+    steps:
+    - step_number: 1
+      instruction: Line a tin with pastry and add bacon.
+    - step_number: 2
+      instruction: Whisk eggs with cream and pour into the pastry.
+    - step_number: 3
+      instruction: Bake until set and browned.
+    ingredients:
+    - name: shortcrust pastry
+      quantity: 1
+      unit: unit
+    - name: bacon
+      quantity: 200
+      unit: g
+    - name: egg
+      quantity: 4
+      unit: unit
+    - name: cream
+      quantity: 250
+      unit: ml
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Minestrone
+  description: Italian vegetable and bean soup.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple minestrone.
+    steps:
+    - step_number: 1
+      instruction: Dice vegetables.
+    - step_number: 2
+      instruction: Simmer vegetables
+      beans: null
+      and tomato with stock.: null
+    - step_number: 3
+      instruction: Season and serve hot.
+    ingredients:
+    - name: white beans
+      quantity: 1
+      unit: can
+    - name: zucchini
+      quantity: 1
+      unit: unit
+    - name: carrot
+      quantity: 2
+      unit: unit
+    - name: canned chopped tomatoes
+      quantity: 1
+      unit: can
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Pasta e Fagioli
+  description: Pasta and beans in a simple tomato broth.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple pasta e fagioli.
+    steps:
+    - step_number: 1
+      instruction: Simmer beans with tomato and stock.
+    - step_number: 2
+      instruction: Add small pasta and cook until tender.
+    - step_number: 3
+      instruction: Season and serve hot.
+    ingredients:
+    - name: white beans
+      quantity: 2
+      unit: can
+    - name: generic dry pasta
+      quantity: 200
+      unit: g
+    - name: canned chopped tomatoes
+      quantity: 1
+      unit: can
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Abendbrot
+  description: German-style bread meal with cheese and cold cuts.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple Abendbrot.
+    steps:
+    - step_number: 1
+      instruction: Slice bread and prepare toppings.
+    - step_number: 2
+      instruction: Arrange cheese
+      cold cuts: null
+      and vegetables.: null
+    - step_number: 3
+      instruction: Serve cold or room temperature.
+    ingredients:
+    - name: rye bread
+      quantity: 8
+      unit: slice
+    - name: grated cheese
+      quantity: 250
+      unit: g
+    - name: cold cuts
+      quantity: 200
+      unit: g
+    - name: cucumber
+      quantity: 1
+      unit: unit
+      optional: true
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Sauerkraut
+  description: Sauerkraut warmed gently.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple sauerkraut.
+    steps:
+    - step_number: 1
+      instruction: Place sauerkraut in a pan.
+    - step_number: 2
+      instruction: Warm gently with a little water if needed.
+    - step_number: 3
+      instruction: Season and serve.
+    ingredients:
+    - name: sauerkraut
+      quantity: 700
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Baked Beans on Toast
+  description: Baked beans served on toasted bread.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple baked beans on toast.
+    steps:
+    - step_number: 1
+      instruction: Warm the baked beans.
+    - step_number: 2
+      instruction: Toast the bread.
+    - step_number: 3
+      instruction: Spoon beans over toast and serve.
+    ingredients:
+    - name: baked beans
+      quantity: 2
+      unit: can
+    - name: country bread
+      quantity: 8
+      unit: slice
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Tzatziki
+  description: Yogurt, cucumber, and garlic dip.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple tzatziki.
+    steps:
+    - step_number: 1
+      instruction: Grate cucumber and squeeze out excess water.
+    - step_number: 2
+      instruction: Mix with yogurt and garlic.
+    - step_number: 3
+      instruction: Chill and season before serving.
+    ingredients:
+    - name: yogurt
+      quantity: 400
+      unit: g
+    - name: cucumber
+      quantity: 1
+      unit: unit
+    - name: garlic
+      quantity: 1
+      unit: clove
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+  name: Tabbouleh
+  description: Bulgur salad with parsley, tomato, and lemon.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple tabbouleh.
+    steps:
+    - step_number: 1
+      instruction: Hydrate bulgur and let it cool.
+    - step_number: 2
+      instruction: Chop parsley
+      tomato: null
+      and cucumber.: null
+    - step_number: 3
+      instruction: Toss with lemon and olive oil.
+    ingredients:
+    - name: bulgur
+      quantity: 220
+      unit: g
+    - name: parsley
+      quantity: 2
+      unit: bunch
+    - name: tomato
+      quantity: 3
+      unit: unit
+    - name: lemon
+      quantity: 1
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Miso Soup
+  description: Light miso soup with tofu and spring onion.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple miso soup.
+    steps:
+    - step_number: 1
+      instruction: Warm water or stock without boiling hard.
+    - step_number: 2
+      instruction: Dissolve miso paste and add tofu.
+    - step_number: 3
+      instruction: Finish with spring onion and serve.
+    ingredients:
+    - name: miso paste
+      quantity: 3
+      unit: tbsp
+    - name: tofu
+      quantity: 250
+      unit: g
+    - name: spring onion
+      quantity: 1
+      unit: bunch
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Gyoza
+  description: Japanese-style dumplings pan-fried or steamed.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple gyoza.
+    steps:
+    - step_number: 1
+      instruction: Heat a pan and add gyoza.
+    - step_number: 2
+      instruction: Brown the bottoms
+      then steam until cooked through.: null
+    - step_number: 3
+      instruction: Serve hot.
+    ingredients:
+    - name: gyoza
+      quantity: 24
+      unit: unit
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Kimchi
+  description: Fermented spicy cabbage served cold.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple served kimchi.
+    steps:
+    - step_number: 1
+      instruction: Open and drain kimchi lightly if needed.
+    - step_number: 2
+      instruction: Cut into bite-sized pieces if needed.
+    - step_number: 3
+      instruction: Serve cold.
+    ingredients:
+    - name: kimchi
+      quantity: 500
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality:
+    seasonality_mode: seasonal
+    preferred_months:
+    - 10
+    - 11
+    - 12
+    - 1
+    - 2
+    - 3
+  name: Borscht
+  description: Beetroot soup with cabbage and vegetables.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple borscht.
+    steps:
+    - step_number: 1
+      instruction: Prepare beetroot
+      cabbage: null
+      carrot: null
+      and onion.: null
+    - step_number: 2
+      instruction: Simmer vegetables in stock until tender.
+    - step_number: 3
+      instruction: Season and serve hot.
+    ingredients:
+    - name: beetroot
+      quantity: 600
+      unit: g
+    - name: white cabbage
+      quantity: 300
+      unit: g
+    - name: carrot
+      quantity: 2
+      unit: unit
+    - name: vegetable stock
+      quantity: 1
+      unit: l
+  meal_composition: simple_dish
+  simple_dish_part: sidedish
+- course: main
+  status: active
+  suitable_for_lunch: true
+  suitable_for_dinner: true
+  weekday_friendly: true
+  leftovers_possible: true
+  freezer_friendly: false
+  kids_friendly: true
+  seasonality: *id001
+  name: Pierogi
+  description: Filled dumplings boiled or pan-fried.
+  recipes:
+  - variant_name: Simple
+    is_main: true
+    recipe_type: standard
+    servings: 4
+    prep_time_minutes: 10
+    cook_time_minutes: 20
+    difficulty: easy
+    source_url: null
+    description: Simple pierogi.
+    steps:
+    - step_number: 1
+      instruction: Boil pierogi until tender.
+    - step_number: 2
+      instruction: Pan-fry briefly if desired.
+    - step_number: 3
+      instruction: Serve hot.
+    ingredients:
+    - name: pierogi
+      quantity: 800
+      unit: g
+  meal_composition: simple_dish
+  simple_dish_part: centerpiece

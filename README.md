@@ -57,7 +57,9 @@ Ingredient taxonomy YAML: `backend/mealroulette/data/taxonomy/`. Canonical seed:
 ```bash
 make free-ports   # if ports 3000/8000/5432 are busy
 make test-backend
+make test-backend TESTS="tests/test_import_ingredients.py tests/test_import_dishes.py"
 make test-frontend
+make test-frontend FRONTEND_TESTS="src/features/planning/planFormat.test.ts"
 cd backend && alembic upgrade head && pytest
 cd frontend && npm run dev
 ```

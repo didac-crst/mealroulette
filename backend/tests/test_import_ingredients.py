@@ -1,6 +1,10 @@
 import pytest
 
-from mealroulette.data.import_ingredients import DEFAULT_INGREDIENT_SEED_PATH, import_ingredient_seed
+from mealroulette.data.import_ingredients import (
+    DEFAULT_INGREDIENT_SEED_PATH,
+    import_ingredient_seed,
+    load_ingredient_seed,
+)
 from mealroulette.models.catalog import Ingredient, IngredientUnitConversion
 from sqlalchemy import select
 
@@ -75,3 +79,41 @@ def test_import_ingredient_seed_is_idempotent(db_session, catalog_seed):
     assert second.ingredients_updated == 0
     assert second.aliases_added == 0
     assert second.conversions_added == 0
+
+
+def test_load_ingredient_seed_rejects_duplicate_canonical_names(tmp_path):
+    seed = tmp_path / "ingredients.yaml"
+    seed.write_text(
+        """
+ingredients:
+  - canonical_name: carrot
+    display_name: Carrot
+  - canonical_name: carrot
+    display_name: Carrot duplicate
+""".lstrip(),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="duplicate canonical_name"):
+        load_ingredient_seed(seed)
+
+
+def test_load_ingredient_seed_rejects_alias_collision(tmp_path):
+    seed = tmp_path / "ingredients.yaml"
+    seed.write_text(
+        """
+ingredients:
+  - canonical_name: carrot
+    display_name: Carrot
+    aliases:
+      - orange vegetable
+  - canonical_name: pumpkin
+    display_name: Pumpkin
+    aliases:
+      - orange vegetable
+""".lstrip(),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="clashing identities"):
+        load_ingredient_seed(seed)

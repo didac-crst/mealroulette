@@ -7,11 +7,10 @@ from decimal import Decimal
 from pathlib import Path
 
 import yaml
-from fastapi import HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from mealroulette.models.catalog import Dish, Tag, Unit
+from mealroulette.models.catalog import Dish, Ingredient, IngredientAlias, Tag, Unit
 from mealroulette.models.enums import (
     DifficultyLevel,
     DishCourse,
@@ -23,17 +22,20 @@ from mealroulette.models.enums import (
 )
 from mealroulette.schemas.catalog import (
     DishCreateRequest,
-    IngredientConfirmAction,
     RecipeCreateRequest,
     RecipeIngredientCreateRequest,
     RecipeStepCreateRequest,
     SeasonalityUpsertRequest,
 )
+from mealroulette.data.import_ingredients import DEFAULT_INGREDIENT_SEED_PATH, import_ingredient_seed
 from mealroulette.data.seed_catalog import seed_ingredient_conversions
 from mealroulette.services.catalog import CatalogService
+from mealroulette.services.names import normalize_alias
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 DEFAULT_FIXTURE_PATH = FIXTURES_DIR / "sample_dishes.yaml"
+SIMPLE_DISH_FIXTURE_PATH = FIXTURES_DIR / "simple_dishes.yaml"
+DEFAULT_FIXTURE_PATHS = (DEFAULT_FIXTURE_PATH, SIMPLE_DISH_FIXTURE_PATH)
 
 
 @dataclass(frozen=True)
@@ -71,10 +73,34 @@ def _parse_tag_specs(raw: list | None) -> list[tuple[str, str]]:
     return specs
 
 
-def _build_lookup_maps(db: Session) -> tuple[dict[str, int], dict[tuple[str, str], int]]:
+def _build_lookup_maps(
+    db: Session,
+) -> tuple[dict[str, int], dict[tuple[str, str], int], dict[str, Ingredient]]:
     units = {unit.symbol: unit.id for unit in db.scalars(select(Unit))}
     tags = {(tag.family, tag.name): tag.id for tag in db.scalars(select(Tag))}
-    return units, tags
+    ingredients: dict[str, Ingredient] = {}
+
+    def register(key: str, ingredient: Ingredient) -> None:
+        normalized = normalize_alias(key)
+        if not normalized:
+            return
+        existing = ingredients.get(normalized)
+        if existing is not None and existing.id != ingredient.id:
+            raise ValueError(
+                f"Ingredient identity {key!r} resolves to both "
+                f"{existing.canonical_name!r} and {ingredient.canonical_name!r}; "
+                "fix the ingredient seed before importing dish fixtures."
+            )
+        ingredients[normalized] = ingredient
+
+    for ingredient in db.scalars(select(Ingredient)):
+        register(ingredient.canonical_name, ingredient)
+        register(ingredient.canonical_name.replace("_", " "), ingredient)
+        register(ingredient.display_name, ingredient)
+    for alias in db.scalars(select(IngredientAlias)):
+        register(alias.alias, alias.ingredient)
+
+    return units, tags, ingredients
 
 
 def _resolve_tag_ids(tag_specs: list[tuple[str, str]], tag_lookup: dict[tuple[str, str], int]) -> list[int]:
@@ -94,53 +120,46 @@ def _parse_meal_composition_fields(dish_data: dict) -> tuple[MealComposition, Si
         meal_composition = MealComposition(raw_composition)
         simple_dish_part = SimpleDishPart(raw_part) if raw_part else None
         return meal_composition, simple_dish_part
+    legacy_simple_role = dish_data.get("simple_dish_role")
+    if legacy_simple_role:
+        simple_part = "sidedish" if legacy_simple_role == "side" else legacy_simple_role
+        return MealComposition.simple_dish, SimpleDishPart(simple_part)
     course = dish_data.get("course")
     if course == DishCourse.dessert.value or course == "dessert":
         return MealComposition.dessert, None
     return MealComposition.main_dish, None
 
 
-def _get_or_create_ingredient(
-    service: CatalogService,
+def _resolve_fixture_ingredient_id(
     *,
     name: str,
-    default_unit_id: int | None,
-    created_count: list[int],
+    ingredient_lookup: dict[str, Ingredient],
+    dish_name: str,
+    recipe_name: str,
 ) -> int:
-    resolved = service.resolve_ingredient(name)
-    if resolved.status == "exact" and resolved.ingredient is not None:
-        return resolved.ingredient.id
-
-    try:
-        ingredient = service.confirm_ingredient(
-            action=IngredientConfirmAction.create,
-            proposed_name=name,
-            display_name=name.strip(),
-            default_unit_id=default_unit_id,
+    ingredient = ingredient_lookup.get(normalize_alias(name))
+    if ingredient is None:
+        raise ValueError(
+            "Dish fixture uses a non-canonical ingredient: "
+            f"{name!r} in dish {dish_name!r}, recipe {recipe_name!r}. "
+            "Add it to the canonical ingredient seed or replace it with an approved alias."
         )
-    except HTTPException as exc:
-        if exc.status_code == 409:
-            resolved = service.resolve_ingredient(name)
-            if resolved.ingredient is not None:
-                return resolved.ingredient.id
-        raise ValueError(f"Could not create ingredient '{name}': {exc.detail}") from exc
-
-    created_count[0] += 1
     return ingredient.id
 
 
 def import_dish_fixtures(db: Session, path: Path | str = DEFAULT_FIXTURE_PATH) -> ImportResult:
     """Import dishes from a YAML fixture. Skips dishes that already exist by name."""
     data = load_fixture(path)
+    import_ingredient_seed(db, DEFAULT_INGREDIENT_SEED_PATH)
     service = CatalogService(db)
-    unit_lookup, tag_lookup = _build_lookup_maps(db)
+    unit_lookup, tag_lookup, ingredient_lookup = _build_lookup_maps(db)
 
     dishes_added = 0
     dishes_skipped = 0
     recipes_added = 0
     steps_added = 0
     ingredients_added = 0
-    ingredients_created = [0]
+    ingredients_created = 0
 
     for dish_data in data["dishes"]:
         dish_name = dish_data["name"]
@@ -219,11 +238,11 @@ def import_dish_fixtures(db: Session, path: Path | str = DEFAULT_FIXTURE_PATH) -
                 if unit_symbol and unit_id is None:
                     raise ValueError(f"Unknown unit symbol: {unit_symbol}")
 
-                ingredient_id = _get_or_create_ingredient(
-                    service,
+                ingredient_id = _resolve_fixture_ingredient_id(
                     name=ingredient_data["name"],
-                    default_unit_id=unit_id,
-                    created_count=ingredients_created,
+                    ingredient_lookup=ingredient_lookup,
+                    dish_name=dish_name,
+                    recipe_name=recipe_data["variant_name"],
                 )
                 quantity = ingredient_data.get("quantity")
                 service.add_recipe_ingredient(
@@ -248,5 +267,5 @@ def import_dish_fixtures(db: Session, path: Path | str = DEFAULT_FIXTURE_PATH) -
         recipes_added=recipes_added,
         steps_added=steps_added,
         ingredients_added=ingredients_added,
-        ingredients_created=ingredients_created[0],
+        ingredients_created=ingredients_created,
     )

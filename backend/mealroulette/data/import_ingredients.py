@@ -19,7 +19,7 @@ from mealroulette.models.enums import (
     ConversionConfidence,
     ConversionSource,
 )
-from mealroulette.services.names import normalize_name
+from mealroulette.services.names import normalize_alias, normalize_name
 from mealroulette.services.food_groups import food_group_for_ingredient
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
@@ -60,7 +60,53 @@ def load_ingredient_seed(path: Path | str = DEFAULT_INGREDIENT_SEED_PATH) -> dic
         data = yaml.safe_load(handle)
     if not isinstance(data, dict) or "ingredients" not in data:
         raise ValueError(f"Invalid ingredient seed file: {fixture_path}")
+    _validate_seed_identity_uniqueness(data["ingredients"])
     return data
+
+
+def _seed_identity_keys(row: dict) -> set[str]:
+    canonical = str(row.get("canonical_name") or "").strip()
+    candidates = [
+        canonical,
+        canonical.replace("_", " "),
+        str(row.get("display_name") or ""),
+        *(str(alias) for alias in row.get("aliases") or []),
+    ]
+    return {normalize_alias(candidate) for candidate in candidates if normalize_alias(candidate)}
+
+
+def _validate_seed_identity_uniqueness(rows: list[dict]) -> None:
+    canonical_names: dict[str, int] = {}
+    identity_owners: dict[str, str] = {}
+    errors: list[str] = []
+
+    for index, row in enumerate(rows):
+        if not isinstance(row, dict):
+            continue
+        raw_canonical = str(row.get("canonical_name") or "").strip()
+        canonical = normalize_name(raw_canonical)
+        if not canonical:
+            continue
+
+        previous_index = canonical_names.get(canonical)
+        if previous_index is not None:
+            errors.append(
+                f"ingredients[{index}]: duplicate canonical_name {canonical!r} "
+                f"(also at index {previous_index})"
+            )
+        canonical_names[canonical] = index
+
+        for key in _seed_identity_keys(row):
+            owner = identity_owners.get(key)
+            if owner is not None and owner != canonical:
+                errors.append(
+                    f"ingredients[{index}]: ingredient identity {key!r} is used by "
+                    f"both {owner!r} and {canonical!r}"
+                )
+            identity_owners[key] = canonical
+
+    if errors:
+        raise ValueError("Ingredient seed has duplicate or clashing identities:\n" + "\n".join(errors))
 
 
 def _parse_confidence(raw: str | None) -> ConversionConfidence:
@@ -132,14 +178,20 @@ def _find_ingredient_for_row(
     ingredients_by_canonical: dict[str, Ingredient],
     alias_to_ingredient: dict[str, Ingredient],
 ) -> Ingredient | None:
+    matched: Ingredient | None = None
     for key in _row_lookup_keys(row):
         ingredient = ingredients_by_canonical.get(key)
-        if ingredient is not None:
-            return ingredient
-        ingredient = alias_to_ingredient.get(key)
-        if ingredient is not None:
-            return ingredient
-    return None
+        if ingredient is None:
+            ingredient = alias_to_ingredient.get(key)
+        if ingredient is None:
+            continue
+        if matched is not None and matched.id != ingredient.id:
+            raise ValueError(
+                f"Ingredient seed row {row['canonical_name']!r} matches multiple existing "
+                "ingredients; resolve the canonical/alias collision before importing."
+            )
+        matched = ingredient
+    return matched
 
 
 def _apply_seed_row_to_ingredient(
@@ -185,6 +237,12 @@ def _register_ingredient_lookup(
 ) -> None:
     ingredients_by_canonical[normalize_name(ingredient.canonical_name)] = ingredient
     for key in _row_lookup_keys(row):
+        existing = alias_to_ingredient.get(key)
+        if existing is not None and existing.id != ingredient.id:
+            raise ValueError(
+                f"Ingredient alias/display identity {key!r} is already assigned to "
+                f"{existing.canonical_name!r}; it cannot also identify {ingredient.canonical_name!r}."
+            )
         alias_to_ingredient[key] = ingredient
 
 
@@ -327,21 +385,27 @@ def import_ingredient_seed(
             if apply_canonical != previous_canonical:
                 ingredients_by_canonical.pop(previous_canonical, None)
 
-        _register_ingredient_lookup(
-            ingredient,
-            row,
-            ingredients_by_canonical=ingredients_by_canonical,
-            alias_to_ingredient=alias_to_ingredient,
-        )
-
         alias_candidates = {canonical, *(normalize_name(alias) for alias in row.get("aliases", []))}
         for alias in alias_candidates:
+            existing_owner = alias_to_ingredient.get(alias) if alias in existing_aliases else None
+            if existing_owner is not None and existing_owner.id != ingredient.id:
+                raise ValueError(
+                    f"Ingredient alias {alias!r} is already assigned to "
+                    f"{existing_owner.canonical_name!r}; it cannot also identify {canonical!r}."
+                )
             if alias in existing_aliases:
                 continue
             db.add(IngredientAlias(ingredient_id=ingredient.id, alias=alias))
             existing_aliases.add(alias)
             alias_to_ingredient[alias] = ingredient
             aliases_added += 1
+
+        _register_ingredient_lookup(
+            ingredient,
+            row,
+            ingredients_by_canonical=ingredients_by_canonical,
+            alias_to_ingredient=alias_to_ingredient,
+        )
 
         for conversion_row in row.get("unit_conversions") or []:
             from_unit = units_by_symbol.get(conversion_row["from_unit"])
