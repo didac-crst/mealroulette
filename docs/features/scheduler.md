@@ -153,7 +153,9 @@ The generator fills slots **in calendar order** (Mon lunch → Mon dinner → �
 | Locked / manual meals | Yes — via `planned` neighbours |
 | Eaten history | Yes — via `eaten` neighbours |
 
-**Algorithm:** up to `plan_attempts` (default 50) full passes. Each pass fills all open slots in order; keep the pass with highest total score. Per slot: filter hard constraints → score → take top 5 → weighted random pick.
+**Algorithm:** up to `plan_attempts` (default 50) full passes. Each pass fills all open slots in order; keep the pass with highest total score. Per slot: filter hard constraints → choose meal structure (`main_dish` or `composed_pair`) using weekly min/max targets → score candidates only within that structure → take top 5 within the class → weighted random pick. Fall back to the other structure only when the preferred class has no valid candidates.
+
+**Meal structure policy (Phase 14):** complete mains and composed pairs are separate candidate classes; they are not ranked in one raw score pool. Default weekly composed-meal target: min 4, max 7 of 14 lunch/dinner slots. When composed count is below min, prefer composed pairs; at or above max, prefer complete mains; inside the range use neutral share (default 60% main / 40% composed). Configured via `composed_meals_per_week` and `structure_neutral_share` on planning rules.
 
 **Composable simple-dish catalogs (Phase 12):** centerpiece×side pairing can explode when many simple dishes exist. The generator bounds exploration per slot:
 

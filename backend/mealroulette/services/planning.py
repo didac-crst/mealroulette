@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta, timezone
+from dataclasses import dataclass
 
 from fastapi import HTTPException, status
 from sqlalchemy import select
@@ -29,7 +30,7 @@ from mealroulette.services.recipe_traits import (
     effective_traits_for_meal_slot,
 )
 from mealroulette.services.scheduler.catalog import load_reference_units
-from mealroulette.services.scheduler.reroll_memory import clear_reroll_history
+from mealroulette.services.scheduler.reroll_memory import clear_reroll_history, clear_stale_reroll_history
 from mealroulette.schemas.planning import (
     MealPlanCreateRequest,
     MealPlanDishLineCreateRequest,
@@ -51,6 +52,21 @@ from mealroulette.services.planning_rules import (
     is_within_leftover_window,
     meal_slot_sort_key,
 )
+
+
+@dataclass(frozen=True)
+class _MealLineSnapshot:
+    dish_id: int | None
+    recipe_id: int | None
+    role: MealPlanDishLineRole
+    source: MealPlanDishLineSource
+    position: int
+    selection_reasons_json: dict | None
+
+
+@dataclass(frozen=True)
+class _MealPackageSnapshot:
+    lines: tuple[_MealLineSnapshot, ...]
 
 
 class PlanningService:
@@ -156,6 +172,21 @@ class PlanningService:
             updated_at=item.updated_at,
         )
 
+    def _maybe_clear_stale_reroll_history(
+        self,
+        plan: MealPlan,
+        *,
+        reference_date: date | None = None,
+    ) -> None:
+        effective_date = reference_date or household_local_today(self.db)
+        current_week_start = self.week_start_for(effective_date)
+        if clear_stale_reroll_history(
+            plan,
+            reference_date=effective_date,
+            current_week_start=current_week_start,
+        ):
+            self.db.commit()
+
     def to_plan_public(self, plan: MealPlan) -> MealPlanPublic:
         gram_unit, ml_unit = load_reference_units(self.db)
         items = sorted(plan.items, key=lambda item: (item.date, meal_slot_sort_key(item.meal_slot)))
@@ -179,6 +210,7 @@ class PlanningService:
         )
         if plan is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Meal plan not found")
+        self._maybe_clear_stale_reroll_history(plan)
         return plan
 
     def _load_item(self, item_id: int) -> MealPlanItem:
@@ -234,6 +266,7 @@ class PlanningService:
         normalized = self.week_start_for(week_start)
         plan = self._load_plan_by_week_start(normalized)
         if plan is not None:
+            self._maybe_clear_stale_reroll_history(plan)
             return plan
 
         plan = MealPlan(week_start_date=normalized, status=status)
@@ -668,6 +701,58 @@ class PlanningService:
         )
         return [self.to_item_public(item, gram_unit=gram_unit, ml_unit=ml_unit) for item in items]
 
+    def _snapshot_item_package(self, item: MealPlanItem) -> _MealPackageSnapshot:
+        if item.lines:
+            lines = tuple(
+                _MealLineSnapshot(
+                    dish_id=line.dish_id,
+                    recipe_id=line.recipe_id,
+                    role=line.role,
+                    source=line.source,
+                    position=line.position,
+                    selection_reasons_json=line.selection_reasons_json,
+                )
+                for line in sorted(item.lines, key=lambda row: row.position)
+            )
+            return _MealPackageSnapshot(lines=lines)
+
+        if item.dish_id is not None:
+            return _MealPackageSnapshot(
+                lines=(
+                    _MealLineSnapshot(
+                        dish_id=item.dish_id,
+                        recipe_id=item.recipe_id,
+                        role=MealPlanDishLineRole.main,
+                        source=(
+                            MealPlanDishLineSource.manual
+                            if item.manually_selected
+                            else MealPlanDishLineSource.roulette
+                        ),
+                        position=0,
+                        selection_reasons_json=item.selection_reasons_json,
+                    ),
+                )
+            )
+        return _MealPackageSnapshot(lines=())
+
+    def _apply_item_package(self, item: MealPlanItem, snapshot: _MealPackageSnapshot) -> None:
+        self.db.execute(delete(MealPlanItemDish).where(MealPlanItemDish.meal_plan_item_id == item.id))
+        self.db.flush()
+        item.lines.clear()
+        for entry in snapshot.lines:
+            item.lines.append(
+                MealPlanItemDish(
+                    meal_plan_item_id=item.id,
+                    dish_id=entry.dish_id,
+                    recipe_id=entry.recipe_id,
+                    position=entry.position,
+                    role=entry.role,
+                    source=entry.source,
+                    selection_reasons_json=entry.selection_reasons_json,
+                )
+            )
+        sync_legacy_mirror(item)
+
     def swap_items(self, source_item_id: int, target_item_id: int) -> tuple[MealPlanItemPublic, MealPlanItemPublic]:
         source = self._load_item(source_item_id)
         target = self._load_item(target_item_id)
@@ -700,17 +785,10 @@ class PlanningService:
                     detail="Cannot swap past meals",
                 )
 
-        source_dish_id = source.dish_id
-        source_recipe_id = source.recipe_id
-        source_reasons = source.selection_reasons_json
-
-        source.dish_id = target.dish_id
-        source.recipe_id = target.recipe_id
-        source.selection_reasons_json = target.selection_reasons_json
-
-        target.dish_id = source_dish_id
-        target.recipe_id = source_recipe_id
-        target.selection_reasons_json = source_reasons
+        source_snapshot = self._snapshot_item_package(source)
+        target_snapshot = self._snapshot_item_package(target)
+        self._apply_item_package(source, target_snapshot)
+        self._apply_item_package(target, source_snapshot)
 
         plan = self.db.get(MealPlan, source.meal_plan_id)
         if plan is not None:

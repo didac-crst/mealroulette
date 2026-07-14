@@ -1,14 +1,18 @@
+from datetime import date
+
 import pytest
 
 from mealroulette.models.enums import MealPlanDishLineRole, MealPlanDishLineSource, MealPlanItemStatus, MealSlot
-from mealroulette.models.planning import MealPlanItem, MealPlanItemDish
+from mealroulette.models.planning import MealPlan, MealPlanItem, MealPlanItemDish
 from mealroulette.services.scheduler.reroll_memory import (
     append_reroll_combination,
     clear_reroll_history,
+    clear_stale_reroll_history,
     combination_key_from_assignment,
     combination_key_from_item,
     combination_key_from_role_dish_pairs,
     forbidden_combination_keys,
+    item_reroll_history_is_stale,
     load_reroll_history,
 )
 from mealroulette.services.scheduler.types import SlotAssignment, SlotAssignmentLine
@@ -124,3 +128,64 @@ def test_combination_key_from_item_uses_roulette_lines_only():
         ],
     )
     assert combination_key_from_item(item) == ("centerpiece", 10, "side", 20)
+
+
+def test_item_reroll_history_is_stale_for_past_slot():
+    item = _item()
+    item.date = date(2026, 7, 10)
+    append_reroll_combination(item, ("main", 5))
+
+    assert item_reroll_history_is_stale(
+        item,
+        reference_date=date(2026, 7, 14),
+        current_week_start=date(2026, 7, 13),
+        plan_week_start=date(2026, 7, 13),
+    )
+
+
+def test_item_reroll_history_is_stale_for_past_plan_week():
+    item = _item()
+    item.date = date(2026, 7, 7)
+    append_reroll_combination(item, ("main", 5))
+
+    assert item_reroll_history_is_stale(
+        item,
+        reference_date=date(2026, 7, 14),
+        current_week_start=date(2026, 7, 13),
+        plan_week_start=date(2026, 7, 6),
+    )
+
+
+def test_item_reroll_history_is_fresh_for_current_week_future_slot():
+    item = _item()
+    item.date = date(2026, 7, 16)
+    append_reroll_combination(item, ("main", 5))
+
+    assert not item_reroll_history_is_stale(
+        item,
+        reference_date=date(2026, 7, 14),
+        current_week_start=date(2026, 7, 13),
+        plan_week_start=date(2026, 7, 13),
+    )
+
+
+def test_clear_stale_reroll_history_clears_only_stale_items():
+    plan = MealPlan(id=10, week_start_date=date(2026, 7, 13))
+    past_item = _item()
+    past_item.date = date(2026, 7, 13)
+    future_item = _item()
+    future_item.id = 2
+    future_item.date = date(2026, 7, 18)
+    append_reroll_combination(past_item, ("main", 5))
+    append_reroll_combination(future_item, ("main", 6))
+    plan.items = [past_item, future_item]
+
+    cleared = clear_stale_reroll_history(
+        plan,
+        reference_date=date(2026, 7, 14),
+        current_week_start=date(2026, 7, 13),
+    )
+
+    assert cleared == 1
+    assert past_item.reroll_history_json is None
+    assert load_reroll_history(future_item) == {("main", 6)}

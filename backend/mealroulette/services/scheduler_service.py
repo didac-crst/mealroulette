@@ -14,13 +14,18 @@ from mealroulette.services.meal_plan_lines import sync_legacy_mirror
 from mealroulette.services.planning import PlanningService
 from mealroulette.services.planning_rule_service import PlanningRuleService
 from mealroulette.services.scheduler.catalog import load_dish_candidates, load_eaten_meal_snapshots
-from mealroulette.services.scheduler.composition import item_has_roulette_lines
+from mealroulette.services.scheduler.composition import (
+    assignment_meal_label,
+    assignment_meal_vector,
+    item_has_roulette_lines,
+)
 from mealroulette.services.scheduler.constraints import slot_is_regenerable
 from mealroulette.services.scheduler.generator import generate_week_assignments
 from mealroulette.services.scheduler.neighbours import build_similarity_neighbours
 from mealroulette.services.scheduler.reroll_memory import (
     append_reroll_combination,
     clear_reroll_history,
+    clear_stale_reroll_history,
     combination_key_from_item,
     forbidden_combination_keys,
 )
@@ -52,6 +57,7 @@ class SchedulerService:
         reference_date = today or household_local_today(self.db)
         rules = self.rules_service.get_active_rules()
         plan = self._load_plan_for_update(meal_plan_id)
+        self.planning_service._maybe_clear_stale_reroll_history(plan, reference_date=reference_date)
         candidates = self._load_candidates(rules)
 
         regenerable_slots, fixed_assignments, fixed_dates_by_item = self._partition_plan_items(
@@ -109,6 +115,7 @@ class SchedulerService:
             )
 
         plan = self._load_plan_for_update(item.meal_plan_id)
+        self.planning_service._maybe_clear_stale_reroll_history(plan)
         item = next(plan_item for plan_item in plan.items if plan_item.id == item_id)
         candidates = self._load_candidates(rules)
         slot = GenerationSlot(item_id=item.id, meal_date=item.date, meal_slot=item.meal_slot)
@@ -259,8 +266,8 @@ class SchedulerService:
                 (
                     assignment.item_id,
                     assignment.dish_id,
-                    candidates_by_id[assignment.dish_id].dish_name,
-                    candidates_by_id[assignment.dish_id].vector,
+                    assignment_meal_label(assignment, candidates_by_id),
+                    assignment_meal_vector(assignment, candidates_by_id),
                 )
                 for assignment in result.assignments
             ],

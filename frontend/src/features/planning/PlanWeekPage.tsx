@@ -188,7 +188,7 @@ export function PlanWeekPage() {
             </p>
             <ul className="variety-list">
               {lastRoulette.variety.items.map((entry) => (
-                <li key={entry.dish_id}>
+                <li key={entry.item_id ?? entry.dish_id}>
                   <strong>{entry.dish_name}</strong>
                   <span className="muted">
                     {" "}

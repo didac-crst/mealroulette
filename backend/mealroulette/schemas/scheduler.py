@@ -11,8 +11,20 @@ class WeeklyTargetSpec(BaseModel):
     max: int = Field(ge=0)
 
 
+class ComposedMealsPerWeekSpec(BaseModel):
+    min: int = Field(default=4, ge=0)
+    max: int = Field(default=7, ge=0)
+
+
+class StructureNeutralShare(BaseModel):
+    main: float = Field(default=0.60, ge=0.0, le=1.0)
+    composed_pair: float = Field(default=0.40, ge=0.0, le=1.0)
+
+
 class PlanningRulesConfig(BaseModel):
     weekly_targets: dict[str, WeeklyTargetSpec] = Field(default_factory=dict)
+    composed_meals_per_week: ComposedMealsPerWeekSpec = Field(default_factory=ComposedMealsPerWeekSpec)
+    structure_neutral_share: StructureNeutralShare = Field(default_factory=StructureNeutralShare)
     weekly_target_tolerance: int = Field(default=1, ge=0)
     avoid_same_dish_within_days: int = Field(default=21, ge=1)
     avoid_similar_meals_within_days: int = Field(default=14, ge=1)

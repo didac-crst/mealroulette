@@ -2,7 +2,38 @@ from __future__ import annotations
 
 from datetime import date
 
+from mealroulette.services.scheduler.composition import (
+    aggregate_meal_vector,
+    assignment_meal_label,
+    assignment_line_candidates,
+)
 from mealroulette.services.scheduler.types import DishCandidate, MealNeighbourSnapshot, SlotAssignment
+
+
+def snapshot_from_meal_package(
+    *,
+    candidates: list[DishCandidate],
+    meal_date: date,
+    source: str,
+    item_id: int | None = None,
+    primary_dish_id: int | None = None,
+) -> MealNeighbourSnapshot | None:
+    if not candidates:
+        return None
+    primary_id = primary_dish_id if primary_dish_id is not None else candidates[0].dish_id
+    label = candidates[0].dish_name if len(candidates) == 1 else " + ".join(
+        candidate.dish_name for candidate in candidates
+    )
+    if len(candidates) == 2:
+        label = f"{candidates[0].dish_name} with {candidates[1].dish_name}"
+    return MealNeighbourSnapshot(
+        dish_id=primary_id,
+        dish_name=label,
+        meal_date=meal_date,
+        vector=aggregate_meal_vector(candidates),
+        source=source,
+        item_id=item_id,
+    )
 
 
 def snapshot_from_candidate(
@@ -49,28 +80,27 @@ def build_similarity_neighbours(
     for assignment in attempt_assignments:
         if assignment.item_id == exclude_item_id:
             continue
-        candidate = candidates_by_id.get(assignment.dish_id)
         meal_date = slot_dates_by_item.get(assignment.item_id)
-        if candidate is None or meal_date is None:
+        if meal_date is None:
             continue
-        neighbours.append(
-            snapshot_from_candidate(
-                candidate,
-                meal_date=meal_date,
-                source="generated",
-                item_id=assignment.item_id,
-            )
+        line_candidates = assignment_line_candidates(assignment, candidates_by_id)
+        snapshot = snapshot_from_meal_package(
+            candidates=line_candidates,
+            meal_date=meal_date,
+            source="generated",
+            item_id=assignment.item_id,
+            primary_dish_id=assignment.dish_id,
         )
-        for line in assignment.lines[1:]:
-            side_candidate = candidates_by_id.get(line.dish_id)
-            if side_candidate is None:
-                continue
+        if snapshot is not None:
+            label = assignment_meal_label(assignment, candidates_by_id)
             neighbours.append(
-                snapshot_from_candidate(
-                    side_candidate,
-                    meal_date=meal_date,
-                    source="generated_side",
-                    item_id=assignment.item_id,
+                MealNeighbourSnapshot(
+                    dish_id=snapshot.dish_id,
+                    dish_name=label,
+                    meal_date=snapshot.meal_date,
+                    vector=snapshot.vector,
+                    source=snapshot.source,
+                    item_id=snapshot.item_id,
                 )
             )
 

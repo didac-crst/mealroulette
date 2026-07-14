@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from datetime import date
+
 from mealroulette.models.enums import MealPlanDishLineRole, MealPlanDishLineSource
-from mealroulette.models.planning import MealPlanItem
+from mealroulette.models.planning import MealPlan, MealPlanItem
 from mealroulette.services.scheduler.composition import item_has_roulette_lines
 from mealroulette.services.scheduler.types import SlotAssignment
 
@@ -72,6 +74,41 @@ def save_reroll_history(item: MealPlanItem, combinations: frozenset[tuple]) -> N
 
 def clear_reroll_history(item: MealPlanItem) -> None:
     item.reroll_history_json = None
+
+
+def item_reroll_history_is_stale(
+    item: MealPlanItem,
+    *,
+    reference_date: date,
+    current_week_start: date,
+    plan_week_start: date,
+) -> bool:
+    if item.reroll_history_json is None:
+        return False
+    if plan_week_start < current_week_start:
+        return True
+    if item.date < reference_date:
+        return True
+    return False
+
+
+def clear_stale_reroll_history(
+    plan: MealPlan,
+    *,
+    reference_date: date,
+    current_week_start: date,
+) -> int:
+    cleared = 0
+    for item in plan.items:
+        if item_reroll_history_is_stale(
+            item,
+            reference_date=reference_date,
+            current_week_start=current_week_start,
+            plan_week_start=plan.week_start_date,
+        ):
+            clear_reroll_history(item)
+            cleared += 1
+    return cleared
 
 
 def append_reroll_combination(item: MealPlanItem, combination: tuple) -> None:

@@ -109,9 +109,19 @@
 }
 
 .meal-hero-actions > .button,
-.meal-hero-actions > a.button {
+.meal-hero-actions > a.button,
+.meal-hero-actions > .cook-meal-menu > .button {
   flex: 0 1 auto;
   min-width: min(100%, 7.5rem);
+}
+
+.cook-meal-menu-trigger::after {
+  content: " ▾";
+}
+
+.overflow-menu-panel .overflow-menu-item {
+  text-decoration: none;
+  display: block;
 }
 
 .meal-hero-undo {

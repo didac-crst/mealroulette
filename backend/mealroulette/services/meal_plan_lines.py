@@ -67,8 +67,12 @@ def compute_meal_title(item: MealPlanItem, lines: list[MealPlanItemDish]) -> str
         return "Unassigned"
 
     ordered = sorted(lines, key=lambda line: line.position)
-    if len(ordered) == 1:
-        return _dish_display_name(ordered[0]) or "Unassigned"
+    names = [_dish_display_name(line) for line in ordered]
+    names = [name for name in names if name]
+    if not names:
+        return "Unassigned"
+    if len(names) == 1:
+        return names[0]
 
     roulette_lines = [line for line in ordered if line.source == MealPlanDishLineSource.roulette]
     if len(ordered) == 2 and len(roulette_lines) == 2:
@@ -80,12 +84,7 @@ def compute_meal_title(item: MealPlanItem, lines: list[MealPlanItemDish]) -> str
             if centerpiece_name and side_name:
                 return f"{centerpiece_name} with {side_name}"
 
-    primary = primary_line(ordered)
-    primary_name = _dish_display_name(primary) if primary is not None else None
-    if primary_name is None:
-        return "Unassigned"
-    extra_count = len(ordered) - 1
-    return f"{primary_name} + {extra_count} more"
+    return " + ".join(names)
 
 
 def _dish_display_name(line: MealPlanItemDish) -> str | None:

@@ -1,4 +1,5 @@
 import type { MealPlanItem } from "../../api/planning";
+import { DisclosureSection } from "../../components/ui";
 import { selectionReasonsList } from "./planFormat";
 
 type Props = {
@@ -12,13 +13,12 @@ export function SelectionReasons({ item }: Props) {
   }
 
   return (
-    <div className="selection-reasons">
-      <p className="selection-reasons-title muted">Why this meal</p>
+    <DisclosureSection title="Why this meal">
       <ul className="selection-reasons-list">
         {reasons.map((reason, index) => (
           <li key={`${index}-${reason}`}>{reason}</li>
         ))}
       </ul>
-    </div>
+    </DisclosureSection>
   );
 }

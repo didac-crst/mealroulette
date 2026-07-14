@@ -3,8 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from mealroulette.services.food_groups import CARB_FOOD_GROUP, PROTEIN_FOOD_GROUPS
+from mealroulette.schemas.scheduler import PlanningRulesConfig
 from mealroulette.services.scheduler.pair_diagnostics import SimpleDishSemanticRole, derive_simple_dish_semantic_role
-from mealroulette.services.scheduler.types import DishCandidate
+from mealroulette.services.scheduler.scoring import rating_score, score_candidate_for_slot, seasonality_score
+from mealroulette.services.scheduler.types import DishCandidate, GenerationSlot, MealNeighbourSnapshot
 
 COMPLEMENTARITY_BONUS = 0.75
 POOR_COMPLEMENT_PENALTY = 0.5
@@ -314,3 +316,87 @@ def score_pair_compatibility(centerpiece: DishCandidate, side: DishCandidate) ->
         reasons=tuple(deduped_reasons),
         reason_codes=tuple(deduped_codes),
     )
+
+
+SIDE_LIGHT_SCORE_WEIGHT = 0.25
+
+
+def _score_side_light_for_pair(
+    side: DishCandidate,
+    slot: GenerationSlot,
+    *,
+    rules: PlanningRulesConfig,
+) -> float:
+    month = slot.meal_date.month
+    season_score, _ = seasonality_score(side, month=month, prefer_seasonal=rules.prefer_seasonal)
+    rating_component, _ = rating_score(side, prefer_high_rated=rules.prefer_high_rated)
+    return season_score + rating_component
+
+
+def composed_pair_score_from_prescored(
+    centerpiece: DishCandidate,
+    side: DishCandidate,
+    *,
+    centerpiece_score: float,
+    centerpiece_payload: dict,
+    slot: GenerationSlot,
+    rules: PlanningRulesConfig,
+) -> tuple[float, dict]:
+    side_light = _score_side_light_for_pair(side, slot, rules=rules)
+    pair_compatibility = score_pair_compatibility(centerpiece, side)
+    total_score = centerpiece_score + (SIDE_LIGHT_SCORE_WEIGHT * side_light) + pair_compatibility.adjustment
+
+    pair_reasons = list(pair_compatibility.reasons)
+    if not pair_reasons:
+        pair_reasons.append(f"Paired with {side.dish_name}")
+
+    payload = {
+        **centerpiece_payload,
+        "reasons": [
+            *centerpiece_payload.get("reasons", []),
+            *pair_reasons,
+        ],
+        "score": round(total_score, 3),
+        "package_type": "centerpiece_side",
+        "pair_reason_codes": list(pair_compatibility.reason_codes),
+    }
+    return total_score, payload
+
+
+def score_pair_for_slot(
+    centerpiece: DishCandidate,
+    side: DishCandidate,
+    slot: GenerationSlot,
+    *,
+    assigned_dish_ids: list[int],
+    candidates_by_id: dict[int, DishCandidate],
+    neighbours: list[MealNeighbourSnapshot],
+    rules: PlanningRulesConfig,
+) -> tuple[float, dict]:
+    centerpiece_score, centerpiece_payload = score_candidate_for_slot(
+        centerpiece,
+        slot,
+        assigned_dish_ids=assigned_dish_ids,
+        candidates_by_id=candidates_by_id,
+        neighbours=neighbours,
+        rules=rules,
+    )
+    side_light = _score_side_light_for_pair(side, slot, rules=rules)
+    pair_compatibility = score_pair_compatibility(centerpiece, side)
+    total_score = centerpiece_score + (SIDE_LIGHT_SCORE_WEIGHT * side_light) + pair_compatibility.adjustment
+
+    pair_reasons = list(pair_compatibility.reasons)
+    if not pair_reasons:
+        pair_reasons.append(f"Paired with {side.dish_name}")
+
+    payload = {
+        **centerpiece_payload,
+        "reasons": [
+            *centerpiece_payload.get("reasons", []),
+            *pair_reasons,
+        ],
+        "score": round(total_score, 3),
+        "package_type": "centerpiece_side",
+        "pair_reason_codes": list(pair_compatibility.reason_codes),
+    }
+    return total_score, payload

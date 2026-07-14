@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 import type { Dish } from "../../api/catalog";
 import { ApiError } from "../../api/client";
-import { Button, DisclosureSection, ResponsiveActionGroup, ReviewOutcomeSelector, StatusBadge } from "../../components/ui";
+import { Button, ResponsiveActionGroup, ReviewOutcomeSelector, StatusBadge } from "../../components/ui";
 import { dishPlaceholderEmoji } from "../dishes/dishVisual";
 import {
   fetchMealRating,
@@ -29,7 +29,6 @@ import {
   leftoverSourceLabel,
   mealSlotTitle,
   primaryDishId,
-  selectionReasonsList,
   showLeftoverSourcePicker,
   showLeftoverSourceSummary,
   showReviewExecutionActions,
@@ -38,9 +37,12 @@ import {
   showUndoStatus,
   swappableMeals,
 } from "./planFormat";
+import { CookMealMenu } from "./CookMealMenu";
 import { MealSlotLinesSummary, MealSlotPlanEditor } from "./MealSlotPlanEditor";
 import { MealCompositionChart } from "./MealCompositionChart";
+import { SelectionReasons } from "./SelectionReasons";
 import { mealStatusBadgeVariant } from "./mealStatusBadge";
+import type { CookOption } from "./todayMeals";
 import { canOpenCookMode } from "./todayMeals";
 import { StarRatingDisplay, StarRatingInput } from "./StarRating";
 import { SwapSlotDialog } from "./SwapSlotDialog";
@@ -54,8 +56,8 @@ type Props = {
   accessToken: string;
   mode: "plan" | "review" | "today";
   rouletteBusy?: boolean;
-  cookRecipeId?: number | null;
-  cookRecipesLoading?: boolean;
+  cookOptions?: CookOption[];
+  cookOptionsLoading?: boolean;
   reviewExpanded?: boolean;
   onReviewToggle?: () => void;
   onChanged: (item: MealPlanItem) => void;
@@ -75,8 +77,8 @@ export function MealSlotCard({
   accessToken,
   mode,
   rouletteBusy = false,
-  cookRecipeId = null,
-  cookRecipesLoading = false,
+  cookOptions = [],
+  cookOptionsLoading = false,
   reviewExpanded = true,
   onReviewToggle,
   onChanged,
@@ -118,7 +120,6 @@ export function MealSlotCard({
   const dish = primaryDish ? dishes.find((entry) => entry.id === primaryDish) : undefined;
   const slotTitle = mealSlotTitle(item);
   const assigned = hasMealAssignment(item);
-  const selectionReasons = selectionReasonsList(item);
   const showLock = mode === "plan";
 
   useEffect(() => {
@@ -227,6 +228,7 @@ export function MealSlotCard({
               <p className="muted meal-slot-empty">{slotTitle}</p>
             )}
             <MealSlotLinesSummary item={item} />
+            <SelectionReasons item={item} />
             {assigned && item.computed_traits_json ? (
               <MealCompositionChart traits={item.computed_traits_json} />
             ) : null}
@@ -244,6 +246,7 @@ export function MealSlotCard({
               <p className="muted meal-slot-empty">{slotTitle}</p>
             )}
             {mode !== "plan" ? <MealSlotLinesSummary item={item} /> : null}
+            {mode !== "plan" ? <SelectionReasons item={item} /> : null}
             {mode !== "plan" && assigned && item.computed_traits_json ? (
               <MealCompositionChart traits={item.computed_traits_json} />
             ) : null}
@@ -288,15 +291,7 @@ export function MealSlotCard({
             onError={onError}
           />
 
-          {selectionReasons.length > 0 ? (
-            <DisclosureSection title="Why this meal">
-              <ul className="selection-reasons-list">
-                {selectionReasons.map((reason, index) => (
-                  <li key={`${index}-${reason}`}>{reason}</li>
-                ))}
-              </ul>
-            </DisclosureSection>
-          ) : null}
+          <SelectionReasons item={item} />
 
           {assigned && item.computed_traits_json ? (
             <MealCompositionChart traits={item.computed_traits_json} />
@@ -382,17 +377,7 @@ export function MealSlotCard({
         <ResponsiveActionGroup className="meal-hero-actions" stackOnMobile>
           {assigned ? (
             canOpenCookMode(item) ? (
-              cookRecipeId ? (
-                <Link to={`/recipes/${cookRecipeId}/cook`} className="button">
-                  Cook
-                </Link>
-              ) : cookRecipesLoading ? (
-                <button type="button" className="button" disabled>
-                  Cook
-                </button>
-              ) : (
-                <span className="muted">No recipe to cook</span>
-              )
+              <CookMealMenu options={cookOptions} loading={cookOptionsLoading} />
             ) : (
               <span className="muted">Leftovers — no cooking steps</span>
             )
@@ -538,7 +523,9 @@ export function MealSlotCard({
 
           {showReviewRating(item) && item.dish_id ? (
             <div className="meal-slot-review-panel stack">
-              <p className="section-title">Rate this meal</p>
+              <p className="section-title">
+                {item.dish_name ? `Rate ${item.dish_name}` : "Rate this meal"}
+              </p>
               {item.review_saved_at && !reviewEditing && savedRating ? (
                 <div className="meal-review-readonly stack">
                   <StarRatingDisplay value={savedRating} />

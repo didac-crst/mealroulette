@@ -61,6 +61,7 @@ export type MealPlanRouletteResponse = {
   variety: {
     average_distance_to_neighbours: number | null;
     items: Array<{
+      item_id?: number;
       dish_id: number;
       dish_name: string;
       nearest_neighbour_dish: string | null;
