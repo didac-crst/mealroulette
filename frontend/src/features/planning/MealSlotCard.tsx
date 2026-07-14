@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 import type { Dish } from "../../api/catalog";
 import { ApiError } from "../../api/client";
-import { Button, DisclosureSection, ResponsiveActionGroup, ReviewOutcomeSelector, SearchSelect, StatusBadge } from "../../components/ui";
+import { Button, DisclosureSection, ResponsiveActionGroup, ReviewOutcomeSelector, StatusBadge } from "../../components/ui";
 import { dishPlaceholderEmoji } from "../dishes/dishVisual";
 import {
   fetchMealRating,
@@ -222,8 +222,8 @@ export function MealSlotCard({
             ) : (
               <p className="muted meal-slot-empty">{slotTitle}</p>
             )}
-            {mode !== "plan" ? <MealSlotLinesSummary item={item} /> : null}
-            {mode !== "plan" && assigned && item.computed_traits_json ? (
+            <MealSlotLinesSummary item={item} />
+            {assigned && item.computed_traits_json ? (
               <MealCompositionChart traits={item.computed_traits_json} />
             ) : null}
           </div>

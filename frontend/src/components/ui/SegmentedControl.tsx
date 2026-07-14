@@ -11,6 +11,7 @@ export type SegmentedControlProps<T extends string | number> = {
   onChange: (value: T) => void;
   ariaLabel: string;
   className?: string;
+  disabled?: boolean;
 };
 
 export function SegmentedControl<T extends string | number>({
@@ -19,6 +20,7 @@ export function SegmentedControl<T extends string | number>({
   onChange,
   ariaLabel,
   className,
+  disabled = false,
 }: SegmentedControlProps<T>) {
   return (
     <div
@@ -34,6 +36,7 @@ export function SegmentedControl<T extends string | number>({
             type="button"
             className={`segmented-control-option${active ? " segmented-control-option-active" : ""}`}
             aria-pressed={active}
+            disabled={disabled}
             onClick={() => onChange(option.value)}
           >
             {option.label}
