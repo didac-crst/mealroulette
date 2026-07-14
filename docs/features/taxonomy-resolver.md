@@ -112,7 +112,7 @@ Recipe similarity vector:
 }
 ```
 
-After pantry exclusion and normalization, pantry/background families may disappear.
+After **`vector_min_grams`** filtering (default **5 g**) and normalization, pinch-sized lines drop out; see [computed-traits.md](computed-traits.md) for composition rules. **`pantry_item`** does not exclude an ingredient from similarity vectors — it affects shopping lists and Telegram reminders only.
 
 Layer responsibilities:
 
@@ -139,9 +139,11 @@ if ingredient.family is missing:
 Long-term invariant:
 
 ```text
-Every non-pantry ingredient should have an ingredient_family.
+Every ingredient should have an ingredient_family.
 Every ingredient_family should belong to exactly one food_group.
 ```
+
+`pantry_item` describes storage/shopping behaviour (long-life ambient staples). It is not a composition exclusion flag; canned tomatoes and similar pantry-marked ingredients still contribute to traits when their recipe mass is above **`vector_min_grams`**.
 
 ## Why Split Files
 
@@ -531,12 +533,12 @@ Recommended UI capabilities:
 - show unit conversions with confidence, source, and approval status
 - highlight ingredients missing family or food group
 - highlight duplicate or ambiguous aliases
-- show whether the ingredient contributes to similarity vectors
-- show whether the ingredient is excluded as pantry
+- show whether the ingredient contributes to similarity vectors (mass in recipes ≥ **`vector_min_grams`**)
+- show **`pantry_item`** flag (shopping/Telegram exclusion — separate from composition)
 - show computed impact examples:
   - family vector key: `tomato_family`
   - food group: `vegetable`
-  - pantry excluded: yes/no
+  - included in composition when recipe mass ≥ **`vector_min_grams`**: yes/no
 
 Overview examples:
 

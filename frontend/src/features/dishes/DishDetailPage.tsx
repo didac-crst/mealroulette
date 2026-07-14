@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import {
   deleteDish,
@@ -14,6 +14,7 @@ import {
 } from "../../api/catalog";
 import { ApiError } from "../../api/client";
 import { ButtonLink } from "../../components/ButtonLink";
+import { Button, Card, EmptyState, PageShell, ResponsiveActionGroup, TechnicalValue } from "../../components/ui";
 import { useAuth } from "../auth/AuthContext";
 import { formatRecipeDifficulty, formatRecipeTime } from "./effectiveValues";
 import { DishClassificationSummary } from "./DishClassificationSummary";
@@ -103,85 +104,89 @@ export function DishDetailPage() {
 
   if (loading) {
     return (
-      <section className="card">
-        <p className="muted">Loading dish…</p>
-      </section>
+      <div className="catalog-page">
+        <PageShell title="Dish" loading loadingMessage="Loading dish…" />
+      </div>
     );
   }
 
   if (error || !dish) {
     return (
-      <section className="card">
-        <p className="error" role="alert">
-          {error ?? "Dish not found"}
-        </p>
-        <ButtonLink to="/dishes" variant="secondary">
-          Back to dishes
-        </ButtonLink>
-      </section>
+      <div className="catalog-page">
+        <EmptyState
+          title="Dish not found"
+          description={error ?? "This dish could not be loaded."}
+          action={
+            <ButtonLink to="/dishes" variant="secondary">
+              Back to dishes
+            </ButtonLink>
+          }
+        />
+      </div>
     );
   }
 
   return (
-    <section className="card stack">
-      <div className="row-between dish-detail-header">
-        <div className="dish-detail-intro">
-          <div className="dish-detail-media" aria-hidden={!dish.image_url}>
+    <div className="catalog-page">
+      <PageShell
+        title={dish.name}
+        subtitle={dish.description ?? undefined}
+        breadcrumbLabels={{ dishId: dish.id, dishName: dish.name }}
+      />
+      <Card density="comfortable" className="catalog-detail-hero">
+        <div className="catalog-detail-intro">
+          <div className="catalog-detail-media" aria-hidden={!dish.image_url}>
             {dish.image_url ? (
-              <img src={dish.image_url} alt="" className="dish-detail-image" />
+              <img src={dish.image_url} alt="" className="catalog-detail-image" />
             ) : (
-              <span className="dish-detail-emoji">{dishPlaceholderEmoji(dish)}</span>
+              <span className="catalog-detail-emoji">{dishPlaceholderEmoji(dish)}</span>
             )}
           </div>
           <div>
-            <h2>{dish.name}</h2>
-            {dish.description ? <p>{dish.description}</p> : null}
-            <p className="muted">Public key: {dish.public_key}</p>
+            <TechnicalValue label="Public key" value={dish.public_key} />
           </div>
         </div>
-        <div className="row-actions">
-          <ButtonLink to="/dishes" variant="secondary">
-            Back
-          </ButtonLink>
-          <button type="button" className="button" onClick={() => setPlanDialogOpen(true)}>
+        <ResponsiveActionGroup className="catalog-detail-actions" stackOnMobile>
+          <Button type="button" onClick={() => setPlanDialogOpen(true)}>
             Plan for…
-          </button>
-          {isAdmin ? <ButtonLink to={`/dishes/${dish.id}/edit`}>Edit dish</ButtonLink> : null}
+          </Button>
           {isAdmin ? (
-            <ButtonLink to={`/dishes/${dish.id}/recipes/new`}>Add recipe</ButtonLink>
+            <ButtonLink to={`/dishes/${dish.id}/recipes/new`} variant="secondary">
+              Add recipe
+            </ButtonLink>
+          ) : null}
+          {isAdmin ? (
+            <ButtonLink to={`/dishes/${dish.id}/edit`} variant="ghost">
+              Edit dish
+            </ButtonLink>
           ) : null}
           {isAdmin ? (
             <button
               type="button"
-              className="button button-danger"
+              className="button button-danger-subtle"
+              disabled={deleting}
               onClick={() => setConfirmingDelete(true)}
-              disabled={confirmingDelete || deleting}
             >
-              Delete
+              Delete dish
             </button>
           ) : null}
-        </div>
-      </div>
+        </ResponsiveActionGroup>
+      </Card>
 
       {confirmingDelete ? (
-        <div className="confirm-panel" role="alertdialog" aria-labelledby="delete-dish-title">
+        <Card className="confirm-panel" role="alertdialog" aria-labelledby="delete-dish-title">
           <p id="delete-dish-title">
             Are you sure you want to delete <strong>{dish.name}</strong>? This cannot be undone.
           </p>
-          <div className="row-actions">
-            <button
-              type="button"
-              className="button button-secondary"
-              onClick={() => setConfirmingDelete(false)}
-              disabled={deleting}
-            >
+          <div className="catalog-detail-actions">
+            <Button type="button" variant="secondary" onClick={() => setConfirmingDelete(false)} disabled={deleting}>
               Cancel
-            </button>
-            <button type="button" className="button button-danger" onClick={() => void handleDelete()} disabled={deleting}>
-              {deleting ? "Deleting…" : "Yes, delete dish"}
-            </button>
+            </Button>
+            <Button type="button" variant="danger" onClick={() => void handleDelete()} loading={deleting}>
+              Yes, delete dish
+            </Button>
           </div>
-        </div>
+        </Card>
       ) : null}
 
       {error ? (
@@ -192,12 +197,20 @@ export function DishDetailPage() {
 
       <DishClassificationSummary dish={dish} tags={tags} />
 
-      <div className="stack">
-        <h3 className="section-title">Recipe variants</h3>
+      <Card density="comfortable">
+        <h2 className="catalog-section-title">Recipe variants</h2>
         {recipeSummaries.length === 0 ? (
-          <p className="muted">No recipe variants yet.</p>
+          <EmptyState
+            title="No recipe variants yet"
+            description="Add a recipe variant to cook or plan this dish."
+            action={
+              isAdmin ? (
+                <ButtonLink to={`/dishes/${dish.id}/recipes/new`}>Add recipe</ButtonLink>
+              ) : undefined
+            }
+          />
         ) : (
-          <ul className="recipe-card-list">
+          <ul className="catalog-recipe-list">
             {recipeSummaries.map(({ recipe, stepCount, ingredientCount }) => {
               const incomplete = stepCount === 0 || ingredientCount === 0;
               const meta = [
@@ -211,27 +224,24 @@ export function DishDetailPage() {
                 .filter(Boolean)
                 .join(" · ");
               return (
-                <li key={recipe.id} className="recipe-card">
-                  <div>
-                    <strong>{recipe.variant_name}</strong>
-                    <p className="muted">
+                <li key={recipe.id} className="catalog-recipe-card">
+                  <Link to={`/dishes/${dish.id}/recipes/${recipe.id}`} className="catalog-recipe-card-link">
+                    <p className="catalog-recipe-card-title">{recipe.variant_name}</p>
+                    <p className="catalog-recipe-card-meta muted">
                       {incomplete ? `Incomplete recipe · ${meta}` : meta}
                     </p>
-                  </div>
-                  <div className="row-actions">
-                    <ButtonLink to={`/dishes/${dish.id}/recipes/${recipe.id}`} variant="secondary">
-                      View
+                  </Link>
+                  {isAdmin ? (
+                    <ButtonLink to={`/dishes/${dish.id}/recipes/${recipe.id}/edit`} variant="secondary">
+                      Edit recipe
                     </ButtonLink>
-                    {isAdmin ? (
-                      <ButtonLink to={`/dishes/${dish.id}/recipes/${recipe.id}/edit`}>Edit</ButtonLink>
-                    ) : null}
-                  </div>
+                  ) : null}
                 </li>
               );
             })}
           </ul>
         )}
-      </div>
+      </Card>
 
       {accessToken ? (
         <PlanForMealDialog
@@ -243,6 +253,6 @@ export function DishDetailPage() {
           onClose={() => setPlanDialogOpen(false)}
         />
       ) : null}
-    </section>
+    </div>
   );
 }

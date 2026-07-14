@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import {
   cancelCookingTimerAlert,
@@ -20,6 +20,9 @@ import {
   type Unit,
 } from "../../api/catalog";
 import { ApiError } from "../../api/client";
+import { ButtonLink } from "../../components/ButtonLink";
+import { Button, DisclosureSection, PageLoadingState, PageShell } from "../../components/ui";
+import { CookingIngredientList } from "./CookingIngredientList";
 import { useAuth } from "../auth/AuthContext";
 import { CookingActiveTimersBar } from "./CookingActiveTimersBar";
 import { CookingStepTimer } from "./CookingStepTimer";
@@ -39,19 +42,6 @@ import {
   sortRecipeSteps,
   stepTimerDurationSeconds,
 } from "./recipeCooking";
-
-function formatIngredientLine(
-  item: RecipeIngredient,
-  ingredientNames: Record<number, string>,
-  units: Unit[],
-): string {
-  const name = ingredientNames[item.ingredient_id] ?? `ingredient #${item.ingredient_id}`;
-  const unitSymbol = units.find((unit) => unit.id === item.unit_id)?.symbol;
-  const quantity =
-    item.quantity && unitSymbol ? `${item.quantity} ${unitSymbol}` : item.quantity ?? "";
-  const optional = item.optional ? " (optional)" : "";
-  return quantity ? `${name} — ${quantity}${optional}` : `${name}${optional}`;
-}
 
 export function RecipeCookingPage() {
   const { recipeId } = useParams();
@@ -273,11 +263,7 @@ export function RecipeCookingPage() {
   }
 
   if (loading) {
-    return (
-      <section className="cooking-mode">
-        <p className="muted">Loading cooking mode…</p>
-      </section>
-    );
+    return <PageLoadingState message="Loading cooking mode…" />;
   }
 
   if (error || !recipe || !dish) {
@@ -286,9 +272,9 @@ export function RecipeCookingPage() {
         <p className="error" role="alert">
           {error ?? "Recipe not found"}
         </p>
-        <Link to="/dishes" className="button button-secondary">
+        <ButtonLink to="/dishes" variant="secondary">
           Back to dishes
-        </Link>
+        </ButtonLink>
       </section>
     );
   }
@@ -297,15 +283,16 @@ export function RecipeCookingPage() {
 
   return (
     <section className="cooking-mode stack">
-      <header className="cooking-mode-header">
-        <div>
-          <p className="cooking-mode-context">{dish.name}</p>
-          <h1 className="cooking-mode-title">{recipe.variant_name}</h1>
-        </div>
-        <Link to={recipeDetailPath} className="button button-secondary cooking-mode-exit">
-          Exit
-        </Link>
-      </header>
+      <PageShell
+        title="Cook"
+        subtitle={`${dish.name} · ${recipe.variant_name}`}
+        breadcrumbLabels={{ dishId: dish.id, dishName: dish.name }}
+        actions={
+          <ButtonLink to={recipeDetailPath} variant="secondary" className="cooking-mode-exit">
+            Exit
+          </ButtonLink>
+        }
+      />
 
       <CookingActiveTimersBar
         timers={activeTimers}
@@ -316,18 +303,13 @@ export function RecipeCookingPage() {
         onDismiss={handleDismissTimer}
       />
 
-      <details className="cooking-mode-ingredients">
-        <summary>Ingredients ({ingredients.length})</summary>
-        {ingredients.length === 0 ? (
-          <p className="muted">No ingredients listed.</p>
-        ) : (
-          <ul className="cooking-mode-ingredient-list">
-            {ingredients.map((item) => (
-              <li key={item.id}>{formatIngredientLine(item, ingredientNames, units)}</li>
-            ))}
-          </ul>
-        )}
-      </details>
+      <DisclosureSection title="Ingredients" meta={`${ingredients.length}`} defaultOpen>
+        <CookingIngredientList
+          items={ingredients}
+          ingredientNames={ingredientNames}
+          units={units}
+        />
+      </DisclosureSection>
 
       <div className="cooking-mode-step-panel" aria-live="polite">
         {stepCount === 0 ? (
@@ -358,22 +340,23 @@ export function RecipeCookingPage() {
       </div>
 
       <footer className="cooking-mode-controls">
-        <button
+        <Button
           type="button"
-          className="button button-secondary"
+          variant="secondary"
+          size="lg"
           disabled={!canGoPrevious(stepIndex)}
           onClick={() => setStepIndex((index) => previousStepIndex(index))}
         >
           Previous
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
-          className="button"
+          size="lg"
           disabled={!canGoNext(stepIndex, stepCount)}
           onClick={() => setStepIndex((index) => nextStepIndex(index, stepCount))}
         >
-          Next
-        </button>
+          Next step
+        </Button>
       </footer>
     </section>
   );

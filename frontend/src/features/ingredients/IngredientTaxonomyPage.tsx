@@ -17,6 +17,7 @@ import {
 } from "../../api/taxonomy";
 import { ApiError } from "../../api/client";
 import { ButtonLink } from "../../components/ButtonLink";
+import { Button, Card, FormSection, FormStickyActions, PageShell } from "../../components/ui";
 import { useAuth } from "../auth/AuthContext";
 
 export function IngredientTaxonomyPage() {
@@ -105,23 +106,23 @@ export function IngredientTaxonomyPage() {
 
   if (loading) {
     return (
-      <section className="card">
-        <p className="muted">Loading taxonomy…</p>
-      </section>
+      <div className="admin-page">
+        <PageShell title="Ingredient taxonomy" loading loadingMessage="Loading taxonomy…" />
+      </div>
     );
   }
 
   return (
-    <section className="card stack">
-      <div className="row-between">
-        <div>
-          <h2>Ingredient taxonomy</h2>
-          <p className="muted">Browse food groups, families, and ingredients. Test name resolution.</p>
-        </div>
-        <ButtonLink to="/ingredients" variant="secondary">
-          Ingredient list
-        </ButtonLink>
-      </div>
+    <div className="admin-page">
+      <PageShell
+        title="Ingredient taxonomy"
+        subtitle="Browse food groups, families, and ingredients. Test name resolution."
+        actions={
+          <ButtonLink to="/ingredients" variant="secondary">
+            Ingredient list
+          </ButtonLink>
+        }
+      />
 
       {error ? (
         <p className="error" role="alert">
@@ -130,63 +131,83 @@ export function IngredientTaxonomyPage() {
       ) : null}
 
       {overview ? (
-        <div className="grid-2">
-          <p>Food groups: {overview.totals.food_groups}</p>
-          <p>Families: {overview.totals.families}</p>
-          <p>Ingredients: {overview.totals.ingredients}</p>
-          <p>Aliases: {overview.totals.aliases}</p>
-          <p>Approved conversions: {overview.totals.approved_conversions}</p>
-          <p>Unapproved conversions: {overview.totals.unapproved_conversions}</p>
+        <div className="admin-stats-grid">
+          <div className="admin-stat-card">
+            <span className="admin-stat-label">Food groups</span>
+            <span className="admin-stat-value">{overview.totals.food_groups}</span>
+          </div>
+          <div className="admin-stat-card">
+            <span className="admin-stat-label">Families</span>
+            <span className="admin-stat-value">{overview.totals.families}</span>
+          </div>
+          <div className="admin-stat-card">
+            <span className="admin-stat-label">Ingredients</span>
+            <span className="admin-stat-value">{overview.totals.ingredients}</span>
+          </div>
+          <div className="admin-stat-card">
+            <span className="admin-stat-label">Aliases</span>
+            <span className="admin-stat-value">{overview.totals.aliases}</span>
+          </div>
+          <div className="admin-stat-card">
+            <span className="admin-stat-label">Approved conversions</span>
+            <span className="admin-stat-value">{overview.totals.approved_conversions}</span>
+          </div>
+          <div className="admin-stat-card">
+            <span className="admin-stat-label">Unapproved conversions</span>
+            <span className="admin-stat-value">{overview.totals.unapproved_conversions}</span>
+          </div>
         </div>
       ) : null}
 
-      <div className="grid-2">
-        <div className="stack">
-          <h3>Food groups</h3>
-          <ul className="bulleted-list">
+      <div className="taxonomy-browser">
+        <Card density="comfortable" className="stack">
+          <h2 className="catalog-section-title">Food groups</h2>
+          <ul className="taxonomy-pill-list">
             {foodGroups.map((group) => (
               <li key={group.id}>
-                <button
+                <Button
                   type="button"
-                  className={selectedGroupId === group.id ? "button" : "button button-secondary"}
+                  variant={selectedGroupId === group.id ? "primary" : "secondary"}
+                  size="sm"
                   onClick={() => {
                     setSelectedGroupId(group.id);
                     setSelectedFamilyId(null);
                   }}
                 >
                   {group.label}
-                </button>
+                </Button>
               </li>
             ))}
           </ul>
           {selectedGroupId ? (
             <>
-              <h3>Families</h3>
-              <ul className="bulleted-list">
+              <h2 className="catalog-section-title">Families</h2>
+              <ul className="taxonomy-pill-list">
                 {families.map((family) => (
                   <li key={family.id}>
-                    <button
+                    <Button
                       type="button"
-                      className={selectedFamilyId === family.id ? "button" : "button button-secondary"}
+                      variant={selectedFamilyId === family.id ? "primary" : "secondary"}
+                      size="sm"
                       onClick={() => setSelectedFamilyId(family.id)}
                     >
                       {family.label}
-                    </button>
+                    </Button>
                   </li>
                 ))}
               </ul>
             </>
           ) : null}
-        </div>
+        </Card>
 
-        <div className="stack">
-          <h3>Ingredients</h3>
+        <Card density="comfortable">
+          <h2 className="catalog-section-title">Ingredients</h2>
           {!selectedFamilyId ? (
             <p className="muted">Select a food group and family to browse catalog ingredients.</p>
           ) : (
-            <ul className="bulleted-list">
+            <ul className="taxonomy-ingredient-list">
               {ingredients.map((ingredient) => (
-                <li key={ingredient.id}>
+                <li key={ingredient.id} className="taxonomy-ingredient-item">
                   <Link to={`/ingredients/${ingredient.id}/edit`}>{ingredient.display_name}</Link>
                   <span className="muted">
                     {" "}
@@ -197,35 +218,38 @@ export function IngredientTaxonomyPage() {
               ))}
             </ul>
           )}
-        </div>
+        </Card>
       </div>
 
-      <form className="stack" onSubmit={(event) => void handleResolve(event)}>
-        <h3>Resolver</h3>
-        <label>
-          Ingredient text
-          <input
-            value={resolverInput}
-            onChange={(event) => setResolverInput(event.target.value)}
-            placeholder="e.g. tomate cerise"
-          />
-        </label>
-        <label>
-          Context (optional)
-          <input
-            value={resolverContext}
-            onChange={(event) => setResolverContext(event.target.value)}
-            placeholder="Usage context for classification"
-          />
-        </label>
-        <button type="submit" className="button" disabled={resolverBusy}>
-          {resolverBusy ? "Resolving…" : "Resolve"}
-        </button>
+      <form className="admin-form" onSubmit={(event) => void handleResolve(event)}>
+        <FormSection title="Resolver">
+          <label>
+            Ingredient text
+            <input
+              value={resolverInput}
+              onChange={(event) => setResolverInput(event.target.value)}
+              placeholder="e.g. tomate cerise"
+            />
+          </label>
+          <label>
+            Context (optional)
+            <input
+              value={resolverContext}
+              onChange={(event) => setResolverContext(event.target.value)}
+              placeholder="Usage context for classification"
+            />
+          </label>
+        </FormSection>
+        <FormStickyActions>
+          <Button type="submit" loading={resolverBusy}>
+            Resolve
+          </Button>
+        </FormStickyActions>
       </form>
 
       {resolveResult ? (
-        <div className="stack">
-          <h4>Resolve result</h4>
+        <Card density="comfortable" className="stack">
+          <h2 className="catalog-section-title">Resolve result</h2>
           <p>
             Status: <strong>{resolveResult.status}</strong>
             {resolveResult.matched_on ? ` · matched on ${resolveResult.matched_on}` : ""}
@@ -244,12 +268,12 @@ export function IngredientTaxonomyPage() {
               ))}
             </ul>
           ) : null}
-        </div>
+        </Card>
       ) : null}
 
       {classifyResult ? (
-        <div className="stack">
-          <h4>Classification</h4>
+        <Card density="comfortable" className="stack">
+          <h2 className="catalog-section-title">Classification</h2>
           <p>Status: {classifyResult.status}</p>
           {classifyResult.families.length > 0 ? (
             <>
@@ -278,8 +302,8 @@ export function IngredientTaxonomyPage() {
           {classifyResult.draft ? (
             <pre>{JSON.stringify(classifyResult.draft, null, 2)}</pre>
           ) : null}
-        </div>
+        </Card>
       ) : null}
-    </section>
+    </div>
   );
 }

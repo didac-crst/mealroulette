@@ -10,6 +10,7 @@ import {
   type BackupSettingsInput,
 } from "../../api/backup";
 import { ApiError } from "../../api/client";
+import { Button, EmptyState, FormSection, FormStickyActions, NumberStepper, SettingsSectionHeader, Switch, TimezoneSelect } from "../../components/ui";
 import { formatInstantInTimeZone } from "../../lib/datetime";
 import { useAuth } from "../auth/AuthContext";
 import { SettingsPageShell } from "./SettingsPageShell";
@@ -116,8 +117,8 @@ export function BackupSettingsPage() {
 
   if (loading) {
     return (
-      <SettingsPageShell title="Backups" subtitle="JSON export, schedule, and retention.">
-        <p className="muted">Loading…</p>
+      <SettingsPageShell title="Backups" subtitle="JSON export, schedule, and retention." loading>
+        {null}
       </SettingsPageShell>
     );
   }
@@ -127,106 +128,113 @@ export function BackupSettingsPage() {
       title="Backups"
       subtitle="Full JSON export to /backups, optional pg_dump, and nightly schedule."
     >
-      <form onSubmit={handleSubmit} className="stack">
-        <label className="checkbox-pill">
-          <input
-            type="checkbox"
-            checked={form.enabled === true}
-            onChange={(event) => setForm({ ...form, enabled: event.target.checked })}
-          />
-          Enable scheduled backups
-        </label>
-        <div className="grid-2">
-          <label>
-            Run time
-            <input
-              type="time"
-              value={form.run_time ?? "03:00"}
-              onChange={(event) => setForm({ ...form, run_time: event.target.value })}
-            />
-          </label>
-          <label>
-            Timezone
-            <input
-              value={form.timezone ?? "Europe/Paris"}
-              onChange={(event) => setForm({ ...form, timezone: event.target.value })}
-            />
-          </label>
-        </div>
-        <label>
-          Retention (days)
-          <input
-            type="number"
-            min={1}
-            value={form.retention_days ?? 30}
-            onChange={(event) => setForm({ ...form, retention_days: Number(event.target.value) })}
-          />
-        </label>
-        <label>
-          Backup path
-          <input
-            value={form.backup_path ?? "/backups"}
-            onChange={(event) => setForm({ ...form, backup_path: event.target.value })}
-          />
-        </label>
-        <div className="tag-grid">
-          <label className="checkbox-pill">
-            <input
-              type="checkbox"
-              checked={form.include_json_export === true}
-              onChange={(event) => setForm({ ...form, include_json_export: event.target.checked })}
-            />
-            JSON export
-          </label>
-          <label className="checkbox-pill">
-            <input
-              type="checkbox"
-              checked={form.include_pg_dump === true}
-              onChange={(event) => setForm({ ...form, include_pg_dump: event.target.checked })}
-            />
-            PostgreSQL dump
-          </label>
-        </div>
-        <button type="submit" className="button" disabled={saving}>
-          {saving ? "Saving…" : "Save settings"}
-        </button>
-      </form>
-
-      <div className="stack">
-        <button type="button" className="button" onClick={handleRunNow} disabled={running}>
-          {running ? "Running backup…" : "Run backup now"}
-        </button>
-        {settings?.last_backup_at ? (
-          <p className="muted">
-            Last backup: {formatInstantInTimeZone(settings.last_backup_at, settings.timezone)}
-          </p>
-        ) : null}
-        {settings?.last_error ? <p className="error">{settings.last_error}</p> : null}
-      </div>
-
-      <div>
-        <h3 className="section-title">Recent runs</h3>
-        {runs.length === 0 ? (
-          <p className="muted">No backup runs yet.</p>
-        ) : (
-          <ul className="stack">
-            {runs.map((run) => (
-              <li key={run.id} className="card subtle">
-                <strong>{run.backup_type}</strong> — {run.status}
-                {run.file_path ? ` · ${run.file_path}` : ""}
-                {run.error_message ? <p className="error">{run.error_message}</p> : null}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      {notice ? <p className="notice">{notice}</p> : null}
+      {settings?.last_backup_at ? (
+        <p className="muted admin-notice">
+          Last backup: {formatInstantInTimeZone(settings.last_backup_at, settings.timezone)}
+        </p>
+      ) : null}
+      {settings?.last_error ? <p className="error">{settings.last_error}</p> : null}
       {error ? (
         <p className="error" role="alert">
           {error}
         </p>
       ) : null}
+      {notice ? <p className="muted admin-notice">{notice}</p> : null}
+
+      <form onSubmit={handleSubmit} className="admin-form">
+        <FormSection title="Schedule">
+          <SettingsSectionHeader
+            title="Scheduled backups"
+            description="Automatically create recurring backups."
+            trailing={
+              <Switch
+                checked={form.enabled === true}
+                onChange={(event) => setForm({ ...form, enabled: event.target.checked })}
+                label="Enable scheduled backups"
+              />
+            }
+          />
+          <div className="grid-2">
+            <label>
+              Run time
+              <input
+                type="time"
+                value={form.run_time ?? "03:00"}
+                onChange={(event) => setForm({ ...form, run_time: event.target.value })}
+              />
+            </label>
+            <label>
+              Timezone
+              <TimezoneSelect
+                value={form.timezone ?? "Europe/Paris"}
+                onChange={(timezone) => setForm({ ...form, timezone })}
+              />
+            </label>
+          </div>
+          <NumberStepper
+            ariaLabel="Retention days"
+            label="Retention (days)"
+            min={1}
+            max={365}
+            value={form.retention_days ?? 30}
+            onChange={(retention_days) => setForm({ ...form, retention_days })}
+          />
+          <p className="muted admin-field-hint">
+            Keeps backups for {form.retention_days ?? 30} days before cleanup. (Applies to scheduled backups.)
+          </p>
+          <label>
+            Backup path
+            <input
+              value={form.backup_path ?? "/backups"}
+              onChange={(event) => setForm({ ...form, backup_path: event.target.value })}
+            />
+          </label>
+          <div className="admin-switch-stack">
+            <Switch
+              checked={form.include_json_export === true}
+              onChange={(event) => setForm({ ...form, include_json_export: event.target.checked })}
+              label="JSON export"
+            />
+            <Switch
+              checked={form.include_pg_dump === true}
+              onChange={(event) => setForm({ ...form, include_pg_dump: event.target.checked })}
+              label="PostgreSQL dump"
+            />
+          </div>
+        </FormSection>
+
+        <FormStickyActions>
+          <Button type="submit" loading={saving} disabled={running}>
+            Save settings
+          </Button>
+        </FormStickyActions>
+      </form>
+
+      <FormSection title="Run backup now" description="Create a backup immediately using the current settings.">
+        <Button type="button" loading={running} disabled={saving} onClick={() => void handleRunNow()}>
+          Run backup now
+        </Button>
+      </FormSection>
+
+      <FormSection title="Recent runs">
+        {runs.length === 0 ? (
+          <EmptyState title="No backup runs yet" description="Run a backup manually or enable the schedule." />
+        ) : (
+          <ul className="admin-data-list">
+            {runs.map((run) => (
+              <li key={run.id} className="admin-data-card">
+                <div className="admin-data-card-header">
+                  <strong>
+                    {run.backup_type} — {run.status}
+                  </strong>
+                </div>
+                {run.file_path ? <p className="muted">{run.file_path}</p> : null}
+                {run.error_message ? <p className="error">{run.error_message}</p> : null}
+              </li>
+            ))}
+          </ul>
+        )}
+      </FormSection>
     </SettingsPageShell>
   );
 }

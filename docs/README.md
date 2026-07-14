@@ -42,6 +42,7 @@ Where to look for product truth, feature behaviour, operations, and history.
 | [features/cooking-mode.md](features/cooking-mode.md) | Today home, step-by-step cooking, timers |
 | [features/meal-composition.md](features/meal-composition.md) | Dish `meal_composition` / planner slots |
 | [features/localization.md](features/localization.md) | Multilingual content design (not yet implemented) |
+| [features/ui-ux-design-system.md](features/ui-ux-design-system.md) | Visual design system, tokens, navigation, migration plan |
 
 Implementation detail for taxonomy YAML and validation workflows: [taxonomy/README.md](taxonomy/README.md).
 

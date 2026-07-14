@@ -1,10 +1,25 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import type { Recipe } from "../../api/catalog";
 import type { MealPlanItem, MealSlot } from "../../api/planning";
 import { assignMealPlanSlot } from "../../api/planning";
 import { ApiError } from "../../api/client";
-import { addDays, formatPlanDate, formatSlotLabel, todayIso, weekDates, weekStartForDate } from "./planFormat";
+import {
+  BottomSheet,
+  Button,
+  SearchSelect,
+  SegmentedControl,
+  WeekdayPicker,
+} from "../../components/ui";
+import {
+  addDays,
+  formatPlanDate,
+  formatSlotLabel,
+  todayIso,
+  weekDates,
+  weekStartForDate,
+} from "./planFormat";
+import { WeekNavigator } from "./WeekNavigator";
 
 type Props = {
   open: boolean;
@@ -35,22 +50,28 @@ export function PlanForMealDialog({
 
   const dates = useMemo(() => weekDates(weekStart), [weekStart]);
   const selectableDates = useMemo(() => dates.filter((date) => date >= todayIso()), [dates]);
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [open, onClose]);
+  const recipeOptions = useMemo(
+    () =>
+      recipes.map((recipe) => ({
+        value: String(recipe.id),
+        label: `${recipe.variant_name}${recipe.is_main ? " (main)" : ""}`,
+      })),
+    [recipes],
+  );
 
   if (!open) {
     return null;
+  }
+
+  function shiftWeek(nextWeekStart: string) {
+    setWeekStart(nextWeekStart);
+    setMealDate((current) => {
+      const nextDates = weekDates(nextWeekStart).filter((date) => date >= todayIso());
+      if (nextDates.includes(current)) {
+        return current;
+      }
+      return nextDates[0] ?? nextWeekStart;
+    });
   }
 
   async function handleSubmit() {
@@ -75,108 +96,74 @@ export function PlanForMealDialog({
   }
 
   return (
-    <div className="modal-backdrop" role="presentation" onClick={onClose}>
-      <div
-        className="modal-card stack"
-        role="dialog"
-        aria-labelledby="plan-for-meal-title"
-        onClick={(event) => event.stopPropagation()}
-      >
+    <BottomSheet open={open} titleId="plan-for-meal-title" onClose={onClose}>
+      <div className="bottom-sheet-content stack">
         <div className="row-between">
           <h3 id="plan-for-meal-title">Plan for…</h3>
-          <button type="button" className="button button-secondary" onClick={onClose}>
+          <Button type="button" variant="ghost" size="sm" onClick={onClose}>
             Close
-          </button>
+          </Button>
         </div>
         <p className="muted">
           Assign <strong>{dishName}</strong> to a lunch or dinner slot.
         </p>
 
-        <div className="week-nav" role="group" aria-label="Plan week">
-          <button
-            type="button"
-            className="button button-secondary week-nav-button"
-            disabled={busy}
-            onClick={() => {
-              const previous = addDays(weekStart, -7);
-              setWeekStart(previous);
-              setMealDate((current) => (weekDates(previous).includes(current) ? current : previous));
+        <WeekNavigator
+          weekStart={weekStart}
+          loading={busy}
+          onPreviousWeek={() => shiftWeek(addDays(weekStart, -7))}
+          onThisWeek={() => {
+            const currentWeek = weekStartForDate(todayIso());
+            shiftWeek(currentWeek);
+            setMealDate(todayIso());
+          }}
+          onNextWeek={() => shiftWeek(addDays(weekStart, 7))}
+        />
+
+        <div className="stack">
+          <span className="muted">Day</span>
+          <WeekdayPicker
+            dates={selectableDates}
+            value={mealDate}
+            onChange={(date) => {
+              setMealDate(date);
+              setWeekStart(weekStartForDate(date));
             }}
-          >
-            ‹ Prev week
-          </button>
-          <span className="muted week-nav-label">Week of {formatPlanDate(weekStart)}</span>
-          <button
-            type="button"
-            className="button button-secondary week-nav-button"
+            formatLabel={(date) =>
+              new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(new Date(`${date}T12:00:00`))
+            }
+            formatSubLabel={(date) =>
+              new Intl.DateTimeFormat(undefined, { day: "numeric" }).format(new Date(`${date}T12:00:00`))
+            }
             disabled={busy}
-            onClick={() => {
-              const next = addDays(weekStart, 7);
-              setWeekStart(next);
-              const firstFuture = weekDates(next).find((date) => date >= todayIso()) ?? next;
-              setMealDate(firstFuture);
-            }}
-          >
-            Next week ›
-          </button>
+            ariaLabel="Day"
+          />
         </div>
 
-        <label>
-          Day
-          <select
-            value={mealDate}
-            disabled={busy}
-            onChange={(event) => {
-              setMealDate(event.target.value);
-              setWeekStart(weekStartForDate(event.target.value));
-            }}
-          >
-            {selectableDates.map((date) => (
-              <option key={date} value={date}>
-                {formatPlanDate(date)}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <fieldset className="meal-slot-toggle">
-          <legend className="muted">Meal</legend>
-          <label>
-            <input
-              type="radio"
-              name="meal-slot"
-              value="lunch"
-              checked={mealSlot === "lunch"}
-              disabled={busy}
-              onChange={() => setMealSlot("lunch")}
-            />
-            Lunch
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="meal-slot"
-              value="dinner"
-              checked={mealSlot === "dinner"}
-              disabled={busy}
-              onChange={() => setMealSlot("dinner")}
-            />
-            Dinner
-          </label>
-        </fieldset>
+        <SegmentedControl
+          className="segmented-control-full"
+          ariaLabel="Meal slot"
+          value={mealSlot}
+          options={[
+            { value: "lunch" as const, label: "Lunch" },
+            { value: "dinner" as const, label: "Dinner" },
+          ]}
+          onChange={setMealSlot}
+        />
 
         {recipes.length > 1 ? (
-          <label>
-            Recipe variant
-            <select value={recipeId} disabled={busy} onChange={(event) => setRecipeId(event.target.value)}>
-              <option value="">Main recipe</option>
-              {recipes.map((recipe) => (
-                <option key={recipe.id} value={recipe.id}>
-                  {recipe.variant_name}
-                  {recipe.is_main ? " (main)" : ""}
-                </option>
-              ))}
-            </select>
+          <label className="meal-slot-assign">
+            <span className="muted">Recipe variant</span>
+            <SearchSelect
+              ariaLabel="Recipe variant"
+              value={recipeId}
+              options={recipeOptions}
+              disabled={busy}
+              placeholder="Main recipe"
+              emptyLabel="Main recipe"
+              allowEmptyOption
+              onChange={setRecipeId}
+            />
           </label>
         ) : null}
 
@@ -191,12 +178,10 @@ export function PlanForMealDialog({
           </p>
         ) : null}
 
-        <div className="row-actions">
-          <button type="button" className="button" disabled={busy || selectableDates.length === 0} onClick={() => void handleSubmit()}>
-            {busy ? "Saving…" : "Add to plan"}
-          </button>
-        </div>
+        <Button type="button" disabled={busy || selectableDates.length === 0} loading={busy} onClick={() => void handleSubmit()}>
+          Add to plan
+        </Button>
       </div>
-    </div>
+    </BottomSheet>
   );
 }

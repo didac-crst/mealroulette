@@ -23,11 +23,15 @@ export default defineConfig({
     proxy: apiProxy,
   },
   preview: {
+    host: "127.0.0.1",
+    port: 4173,
+    strictPort: true,
     proxy: apiProxy,
   },
   test: {
     environment: "jsdom",
     setupFiles: "./src/test/setup.ts",
     globals: true,
+    exclude: ["**/node_modules/**", "**/dist/**", "**/e2e/**"],
   },
 });

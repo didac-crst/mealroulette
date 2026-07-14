@@ -20,6 +20,14 @@ import {
 } from "../../api/catalog";
 import { ApiError } from "../../api/client";
 import { ButtonLink } from "../../components/ButtonLink";
+import {
+  Button,
+  DisclosureSection,
+  FormSection,
+  FormStickyActions,
+  PageShell,
+} from "../../components/ui";
+import { useFormSaveState } from "../../lib/useFormSaveState";
 import { useAuth } from "../auth/AuthContext";
 
 const AGGREGATION_STRATEGIES = [
@@ -121,6 +129,10 @@ export function IngredientEditPage() {
   const [conversionBusy, setConversionBusy] = useState(false);
   const [conversionActionId, setConversionActionId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { status: saveStatus, setBaseline, markSaved } = useFormSaveState(form, {
+    saving: saving,
+    error: saving ? null : error,
+  });
 
   useEffect(() => {
     if (!isAdmin) {
@@ -151,6 +163,7 @@ export function IngredientEditPage() {
         if (!cancelled) {
           setDetail(data);
           setForm(ingredientToForm(data));
+          setBaseline(ingredientToForm(data));
           setError(null);
         }
       })
@@ -168,6 +181,12 @@ export function IngredientEditPage() {
       cancelled = true;
     };
   }, [accessToken, ingredientId, isNew]);
+
+  useEffect(() => {
+    if (isNew) {
+      setBaseline(emptyForm);
+    }
+  }, [isNew, setBaseline]);
 
   const sortedUnits = useMemo(() => unitOptions(units), [units]);
 
@@ -202,7 +221,11 @@ export function IngredientEditPage() {
         return;
       }
       await updateIngredient(accessToken, Number(ingredientId), form);
-      await reloadDetail();
+      const data = await fetchIngredient(accessToken, Number(ingredientId));
+      setDetail(data);
+      const savedForm = ingredientToForm(data);
+      setForm(savedForm);
+      markSaved(savedForm);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Failed to save ingredient");
     } finally {
@@ -299,30 +322,36 @@ export function IngredientEditPage() {
 
   if (loading) {
     return (
-      <section className="card">
-        <p className="muted">Loading ingredient…</p>
-      </section>
+      <div className="catalog-edit-page">
+        <PageShell title="Edit ingredient" loading loadingMessage="Loading ingredient…" />
+      </div>
     );
   }
 
   return (
-    <section className="card stack">
-      <div className="row-between">
-        <h2>{isNew ? "New ingredient" : `Edit ${detail?.display_name ?? "ingredient"}`}</h2>
-        <ButtonLink to="/ingredients" variant="secondary">
-          Back to list
-        </ButtonLink>
-      </div>
+    <div className="catalog-edit-page">
+      <PageShell
+        title={isNew ? "New ingredient" : `Edit ${detail?.display_name ?? "ingredient"}`}
+        breadcrumbLabels={
+          isNew
+            ? undefined
+            : { ingredientId: detail?.id ?? Number(ingredientId), ingredientName: detail?.display_name ?? form.display_name }
+        }
+        actions={
+          <ButtonLink to="/ingredients" variant="secondary">
+            Cancel
+          </ButtonLink>
+        }
+      />
 
-      {error ? (
+      {error && isNew ? (
         <p className="error" role="alert">
           {error}
         </p>
       ) : null}
 
-      <form onSubmit={(event) => void handleSubmit(event)} className="stack">
-        <fieldset>
-          <legend>Basic info</legend>
+      <form onSubmit={(event) => void handleSubmit(event)} className="catalog-form">
+        <FormSection title="Basic info">
           <div className="stack">
             {isNew ? (
               <label>
@@ -355,56 +384,26 @@ export function IngredientEditPage() {
                 rows={3}
               />
             </label>
-            <div className="grid-2">
-              <label>
-                Category
-                <select
-                  value={form.category ?? ""}
-                  onChange={(event) =>
-                    setForm({ ...form, category: event.target.value || null })
-                  }
-                >
-                  <option value="">—</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.label}
-                    </option>
-                  ))}
-                  {form.category &&
-                    !categories.some((category) => category.id === form.category) && (
-                      <option value={form.category}>{form.category}</option>
-                    )}
-                </select>
-              </label>
-              <label>
-                Food group
-                <select
-                  value={form.food_group ?? ""}
-                  onChange={(event) =>
-                    setForm({ ...form, food_group: event.target.value || null })
-                  }
-                >
-                  <option value="">Auto from category</option>
-                  {FOOD_GROUPS.map((group) => (
-                    <option key={group} value={group}>
-                      {group}
-                    </option>
-                  ))}
-                  {form.food_group &&
-                    !FOOD_GROUPS.includes(form.food_group as (typeof FOOD_GROUPS)[number]) && (
-                      <option value={form.food_group}>{form.food_group}</option>
-                    )}
-                </select>
-              </label>
-              <label>
-                Family
-                <input
-                  value={form.family ?? ""}
-                  onChange={(event) => setForm({ ...form, family: event.target.value })}
-                  placeholder="e.g. tomato_family"
-                />
-              </label>
-            </div>
+            <label>
+              Category
+              <select
+                value={form.category ?? ""}
+                onChange={(event) =>
+                  setForm({ ...form, category: event.target.value || null })
+                }
+              >
+                <option value="">—</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.label}
+                  </option>
+                ))}
+                {form.category &&
+                  !categories.some((category) => category.id === form.category) && (
+                    <option value={form.category}>{form.category}</option>
+                  )}
+              </select>
+            </label>
             <label className="checkbox-pill">
               <input
                 type="checkbox"
@@ -413,38 +412,6 @@ export function IngredientEditPage() {
               />
               Pantry item (exclude from shopping lists by default)
             </label>
-            <div className="grid-2">
-              <label>
-                Season start month
-                <input
-                  type="number"
-                  min={1}
-                  max={12}
-                  value={form.season_start_month ?? ""}
-                  onChange={(event) =>
-                    setForm({
-                      ...form,
-                      season_start_month: event.target.value ? Number(event.target.value) : null,
-                    })
-                  }
-                />
-              </label>
-              <label>
-                Season end month
-                <input
-                  type="number"
-                  min={1}
-                  max={12}
-                  value={form.season_end_month ?? ""}
-                  onChange={(event) =>
-                    setForm({
-                      ...form,
-                      season_end_month: event.target.value ? Number(event.target.value) : null,
-                    })
-                  }
-                />
-              </label>
-            </div>
             {isNew ? (
               <label>
                 Initial aliases (one per line)
@@ -452,109 +419,186 @@ export function IngredientEditPage() {
               </label>
             ) : null}
           </div>
-        </fieldset>
+        </FormSection>
 
-        <fieldset>
-          <legend>Unit behavior</legend>
-          <div className="stack">
-            <div className="grid-2">
-              <label>
-                Default recipe unit
-                <select
-                  value={form.default_unit_id ?? ""}
-                  onChange={(event) =>
-                    setForm({
-                      ...form,
-                      default_unit_id: event.target.value ? Number(event.target.value) : null,
-                    })
-                  }
-                >
-                  <option value="">—</option>
-                  {sortedUnits.map((unit) => (
-                    <option key={unit.id} value={unit.id}>
-                      {unit.symbol} ({unit.dimension})
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Preferred shopping unit
-                <select
-                  value={form.preferred_shopping_unit_id ?? ""}
-                  onChange={(event) =>
-                    setForm({
-                      ...form,
-                      preferred_shopping_unit_id: event.target.value ? Number(event.target.value) : null,
-                    })
-                  }
-                >
-                  <option value="">—</option>
-                  {sortedUnits.map((unit) => (
-                    <option key={unit.id} value={unit.id}>
-                      {unit.symbol} ({unit.dimension})
-                    </option>
-                  ))}
-                </select>
-              </label>
+        <div className="catalog-form-disclosure-stack">
+          <DisclosureSection
+            title="Taxonomy & seasonality"
+            description="Food group, family, and seasonal availability"
+          >
+            <div className="stack">
+              <div className="grid-2">
+                <label>
+                  Food group
+                  <select
+                    value={form.food_group ?? ""}
+                    onChange={(event) =>
+                      setForm({ ...form, food_group: event.target.value || null })
+                    }
+                  >
+                    <option value="">Auto from category</option>
+                    {FOOD_GROUPS.map((group) => (
+                      <option key={group} value={group}>
+                        {group}
+                      </option>
+                    ))}
+                    {form.food_group &&
+                      !FOOD_GROUPS.includes(form.food_group as (typeof FOOD_GROUPS)[number]) && (
+                        <option value={form.food_group}>{form.food_group}</option>
+                      )}
+                  </select>
+                </label>
+                <label>
+                  Family
+                  <input
+                    value={form.family ?? ""}
+                    onChange={(event) => setForm({ ...form, family: event.target.value })}
+                    placeholder="e.g. tomato_family"
+                  />
+                </label>
+              </div>
+              <div className="grid-2">
+                <label>
+                  Season start month
+                  <input
+                    type="number"
+                    min={1}
+                    max={12}
+                    value={form.season_start_month ?? ""}
+                    onChange={(event) =>
+                      setForm({
+                        ...form,
+                        season_start_month: event.target.value ? Number(event.target.value) : null,
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  Season end month
+                  <input
+                    type="number"
+                    min={1}
+                    max={12}
+                    value={form.season_end_month ?? ""}
+                    onChange={(event) =>
+                      setForm({
+                        ...form,
+                        season_end_month: event.target.value ? Number(event.target.value) : null,
+                      })
+                    }
+                  />
+                </label>
+              </div>
             </div>
-            <div className="grid-2">
-              <label>
-                Aggregation unit
-                <select
-                  value={form.aggregation_unit_id ?? ""}
-                  onChange={(event) =>
-                    setForm({
-                      ...form,
-                      aggregation_unit_id: event.target.value ? Number(event.target.value) : null,
-                    })
-                  }
-                >
-                  <option value="">—</option>
-                  {sortedUnits.map((unit) => (
-                    <option key={unit.id} value={unit.id}>
-                      {unit.symbol} ({unit.dimension})
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Aggregation strategy
-                <select
-                  value={form.aggregation_strategy ?? ""}
-                  onChange={(event) =>
-                    setForm({
-                      ...form,
-                      aggregation_strategy: (event.target.value || null) as IngredientInput["aggregation_strategy"],
-                    })
-                  }
-                >
-                  {AGGREGATION_STRATEGIES.map((option) => (
-                    <option key={option.value || "default"} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-          </div>
-        </fieldset>
+          </DisclosureSection>
 
-        <div className="row-between">
-          <button type="submit" className="button" disabled={saving}>
-            {saving ? "Saving…" : isNew ? "Create ingredient" : "Save changes"}
-          </button>
-          {!isNew ? (
-            <button type="button" className="button button-danger" onClick={() => void handleDelete()}>
-              Delete
-            </button>
-          ) : null}
+          <DisclosureSection
+            title="Units & aggregation"
+            description="Default units and how quantities combine in shopping lists"
+          >
+            <div className="stack">
+              <div className="grid-2">
+                <label>
+                  Default recipe unit
+                  <select
+                    value={form.default_unit_id ?? ""}
+                    onChange={(event) =>
+                      setForm({
+                        ...form,
+                        default_unit_id: event.target.value ? Number(event.target.value) : null,
+                      })
+                    }
+                  >
+                    <option value="">—</option>
+                    {sortedUnits.map((unit) => (
+                      <option key={unit.id} value={unit.id}>
+                        {unit.symbol} ({unit.dimension})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Preferred shopping unit
+                  <select
+                    value={form.preferred_shopping_unit_id ?? ""}
+                    onChange={(event) =>
+                      setForm({
+                        ...form,
+                        preferred_shopping_unit_id: event.target.value ? Number(event.target.value) : null,
+                      })
+                    }
+                  >
+                    <option value="">—</option>
+                    {sortedUnits.map((unit) => (
+                      <option key={unit.id} value={unit.id}>
+                        {unit.symbol} ({unit.dimension})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <div className="grid-2">
+                <label>
+                  Aggregation unit
+                  <select
+                    value={form.aggregation_unit_id ?? ""}
+                    onChange={(event) =>
+                      setForm({
+                        ...form,
+                        aggregation_unit_id: event.target.value ? Number(event.target.value) : null,
+                      })
+                    }
+                  >
+                    <option value="">—</option>
+                    {sortedUnits.map((unit) => (
+                      <option key={unit.id} value={unit.id}>
+                        {unit.symbol} ({unit.dimension})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Aggregation strategy
+                  <select
+                    value={form.aggregation_strategy ?? ""}
+                    onChange={(event) =>
+                      setForm({
+                        ...form,
+                        aggregation_strategy: (event.target.value || null) as IngredientInput["aggregation_strategy"],
+                      })
+                    }
+                  >
+                    {AGGREGATION_STRATEGIES.map((option) => (
+                      <option key={option.value || "default"} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            </div>
+          </DisclosureSection>
         </div>
+
+        <FormStickyActions saveStatus={saveStatus} saveErrorMessage={error}>
+          <Button type="submit" loading={saving}>
+            {isNew ? "Create ingredient" : "Save changes"}
+          </Button>
+          {!isNew ? (
+            <Button type="button" variant="danger" onClick={() => void handleDelete()}>
+              Delete
+            </Button>
+          ) : null}
+        </FormStickyActions>
       </form>
 
       {!isNew && detail ? (
-        <>
-          <fieldset>
-            <legend>Aliases</legend>
+        <div className="catalog-form-disclosure-stack">
+          <DisclosureSection
+            title="Aliases"
+            meta={`${detail.aliases.length}`}
+            description="Alternative names for matching and search"
+          >
             <ul className="bulleted-list">
               {detail.aliases.map((alias) => (
                 <li key={alias.id} className="row-between ingredient-alias-row">
@@ -562,9 +606,10 @@ export function IngredientEditPage() {
                     {alias.alias}
                     {alias.language ? <span className="muted"> ({alias.language})</span> : null}
                   </span>
-                  <button
+                  <Button
                     type="button"
-                    className="button button-secondary"
+                    variant="secondary"
+                    size="sm"
                     disabled={aliasBusy}
                     onClick={() => {
                       if (aliasBusy) {
@@ -580,7 +625,7 @@ export function IngredientEditPage() {
                     }}
                   >
                     Remove
-                  </button>
+                  </Button>
                 </li>
               ))}
             </ul>
@@ -597,15 +642,18 @@ export function IngredientEditPage() {
                   placeholder="fr, en, es…"
                 />
               </label>
-              <button type="button" className="button button-secondary" disabled={aliasBusy} onClick={() => void handleAddAlias()}>
+              <Button type="button" variant="secondary" disabled={aliasBusy} onClick={() => void handleAddAlias()}>
                 {aliasBusy ? "Adding…" : "Add alias"}
-              </button>
+              </Button>
             </div>
-          </fieldset>
+          </DisclosureSection>
 
-          <fieldset>
-            <legend>Unit conversions</legend>
-            <p className="muted">
+          <DisclosureSection
+            title="Unit conversions"
+            meta={`${detail.unit_conversions.length}`}
+            description="Factors between units for this ingredient"
+          >
+            <p className="muted admin-field-hint">
               Only approved conversions are used when aggregating shopping lists across incompatible units.
             </p>
             <div className="ingredient-conversion-table stack">
@@ -643,9 +691,10 @@ export function IngredientEditPage() {
                     {conversion.notes ? ` · ${conversion.notes}` : ""}
                     {conversion.source ? ` · ${conversion.source}` : ""}
                   </p>
-                  <button
+                  <Button
                     type="button"
-                    className="button button-secondary"
+                    variant="secondary"
+                    size="sm"
                     disabled={conversionActionId === conversion.id}
                     onClick={() => {
                       if (conversionActionId !== null) {
@@ -661,7 +710,7 @@ export function IngredientEditPage() {
                     }}
                   >
                     Delete conversion
-                  </button>
+                  </Button>
                 </div>
               ))}
             </div>
@@ -735,18 +784,18 @@ export function IngredientEditPage() {
                 />
                 Approved for shopping aggregation
               </label>
-              <button
+              <Button
                 type="button"
-                className="button button-secondary"
+                variant="secondary"
                 disabled={conversionBusy}
                 onClick={() => void handleAddConversion()}
               >
                 {conversionBusy ? "Adding…" : "Add conversion"}
-              </button>
+              </Button>
             </div>
-          </fieldset>
-        </>
+          </DisclosureSection>
+        </div>
       ) : null}
-    </section>
+    </div>
   );
 }

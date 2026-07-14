@@ -83,7 +83,7 @@ def test_count_line_uses_default_grams_per_count_fallback():
     assert fallback is True
 
 
-def test_build_family_vector_excludes_pantry_and_small_lines():
+def test_build_family_vector_excludes_small_lines():
     result = build_family_vector(
         [
             VectorIngredientLine(
@@ -92,14 +92,6 @@ def test_build_family_vector_excludes_pantry_and_small_lines():
                 canonical_name="pasta",
                 pantry_item=False,
                 quantity=Decimal("400"),
-                unit=GRAM,
-            ),
-            VectorIngredientLine(
-                family="salt_family",
-                category=None,
-                canonical_name="salt",
-                pantry_item=True,
-                quantity=Decimal("500"),
                 unit=GRAM,
             ),
             VectorIngredientLine(
@@ -118,6 +110,43 @@ def test_build_family_vector_excludes_pantry_and_small_lines():
 
     assert result.weights == {"pasta_family": 100.0}
     assert result.count_fallback_lines == 0
+
+
+def test_build_family_vector_includes_pantry_when_mass_is_significant():
+    result = build_family_vector(
+        [
+            VectorIngredientLine(
+                family="pasta_family",
+                category=None,
+                canonical_name="pasta",
+                pantry_item=False,
+                quantity=Decimal("400"),
+                unit=GRAM,
+            ),
+            VectorIngredientLine(
+                family="tomato_family",
+                category=None,
+                canonical_name="canned_tomatoes",
+                pantry_item=True,
+                quantity=Decimal("200"),
+                unit=GRAM,
+            ),
+            VectorIngredientLine(
+                family="salt_family",
+                category=None,
+                canonical_name="salt",
+                pantry_item=True,
+                quantity=Decimal("3"),
+                unit=GRAM,
+            ),
+        ],
+        gram_unit=GRAM,
+        ml_unit=MILLILITER,
+        vector_min_grams=5,
+    )
+
+    assert pytest.approx(result.weights["pasta_family"], rel=1e-6) == 66.666666
+    assert pytest.approx(result.weights["tomato_family"], rel=1e-6) == 33.333333
 
 
 def test_build_family_vector_l1_normalizes_to_one_hundred():

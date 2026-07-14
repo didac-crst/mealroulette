@@ -5,6 +5,13 @@ const DAY_FORMAT = new Intl.DateTimeFormat(undefined, { weekday: "long", month: 
 
 const SLOT_ORDER: Record<MealSlot, number> = { lunch: 0, dinner: 1 };
 
+export function formatNeedsReviewCount(count: number): string {
+  if (count === 1) {
+    return "1 meal needs review";
+  }
+  return `${count} meals need review`;
+}
+
 export function formatPlanDate(isoDate: string): string {
   return DAY_FORMAT.format(new Date(`${isoDate}T12:00:00`));
 }
@@ -18,7 +25,7 @@ export function formatStatus(status: MealPlanItemStatus): string {
     case "planned":
       return "Planned";
     case "eaten":
-      return "Eaten";
+      return "Ate as planned";
     case "skipped":
       return "Skipped";
     case "ate_leftovers":
@@ -123,7 +130,7 @@ export function isExecutionComplete(status: MealPlanItemStatus): boolean {
 
 export function formatReviewStatus(item: MealPlanItem): string {
   if (item.status === "planned" && !isFutureMealDate(item.date)) {
-    return "Not reviewed";
+    return "Needs review";
   }
   if (item.status === "planned" && isFutureMealDate(item.date)) {
     return item.is_locked ? "Planned · locked" : "Planned";
@@ -191,6 +198,10 @@ const SHORT_DAY_FORMAT = new Intl.DateTimeFormat(undefined, {
   month: "short",
   day: "numeric",
 });
+
+export function formatShortPlanDate(isoDate: string): string {
+  return SHORT_DAY_FORMAT.format(new Date(`${isoDate}T12:00:00`));
+}
 
 export function formatLeftoverSourceOption(item: MealPlanItem): string {
   const dateLabel = SHORT_DAY_FORMAT.format(new Date(`${item.date}T12:00:00`));

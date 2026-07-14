@@ -62,8 +62,7 @@ Excluded lines do not contribute grams (keeps vectors sparse; negligible effect 
 
 | Rule | Rationale |
 | --- | --- |
-| `ingredient.pantry_item == true` | Salt, oil, spices — not meal “shape”. |
-| Converted mass **&lt; `min_vector_grams`** (default **5 g**) | Drops pinch-sized spices; same effect as ~0% after normalize. |
+| Converted mass **&lt; `vector_min_grams`** (default **5 g**) | Drops pinch-sized salt/spices; negligible after normalize. |
 
 Configurable in `planning_rules.rules_json`:
 

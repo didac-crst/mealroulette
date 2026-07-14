@@ -4,13 +4,24 @@ import { useNavigate } from "react-router-dom";
 import {
   fetchSchedulerSettings,
   runSchedulerRouletteNow,
-  schedulerWeekdayLabel,
   updateSchedulerSettings,
   type SchedulerSettings,
   type SchedulerSettingsInput,
 } from "../../api/scheduler";
 import { ApiError } from "../../api/client";
+import {
+  Button,
+  FormSection,
+  FormStickyActions,
+  NumberStepper,
+  SchedulerWeekdayPicker,
+  SegmentedControl,
+  SettingsSectionHeader,
+  Switch,
+  TimezoneSelect,
+} from "../../components/ui";
 import { formatInstantInTimeZone } from "../../lib/datetime";
+import { WEEK_OFFSET_OPTIONS } from "../../lib/timezones";
 import { useAuth } from "../auth/AuthContext";
 import { SettingsPageShell } from "./SettingsPageShell";
 
@@ -133,8 +144,8 @@ export function SchedulerSettingsPage() {
 
   if (loading) {
     return (
-      <SettingsPageShell title="Auto roulette" subtitle="Scheduled week generation.">
-        <p className="muted">Loading…</p>
+      <SettingsPageShell title="Auto roulette" subtitle="Scheduled week generation." loading>
+        {null}
       </SettingsPageShell>
     );
   }
@@ -144,9 +155,8 @@ export function SchedulerSettingsPage() {
       title="Auto roulette"
       subtitle="Generate next week on a schedule; optional Telegram “New roulette”."
     >
-
       {settings?.last_roulette_at ? (
-        <p className="muted">
+        <p className="muted admin-notice">
           Last roulette ({settings.timezone}):{" "}
           {formatInstantInTimeZone(settings.last_roulette_at, settings.timezone)}
         </p>
@@ -157,96 +167,102 @@ export function SchedulerSettingsPage() {
           {error}
         </p>
       ) : null}
-      {notice ? <p className="muted">{notice}</p> : null}
+      {notice ? <p className="muted admin-notice">{notice}</p> : null}
 
-      <form onSubmit={(event) => void handleSubmit(event)} className="stack">
-        <label className="checkbox-pill">
-          <input
-            type="checkbox"
-            checked={form.enabled ?? false}
-            onChange={(event) => setForm({ ...form, enabled: event.target.checked })}
+      <form onSubmit={(event) => void handleSubmit(event)} className="admin-form">
+        <FormSection title="Schedule">
+          <SettingsSectionHeader
+            title="Schedule automatic roulette"
+            description="Automatically generate the plan on selected days."
+            trailing={
+              <Switch
+                checked={form.enabled ?? false}
+                onChange={(event) => setForm({ ...form, enabled: event.target.checked })}
+                label="Enable scheduled roulette"
+              />
+            }
           />
-          Enable scheduled roulette
-        </label>
 
-        <div className="grid-2">
-          <label>
-            Run on
-            <select
+          <div className="admin-field-stack">
+            <span className="muted">Run on</span>
+            <SchedulerWeekdayPicker
               value={form.run_weekday ?? 4}
-              onChange={(event) => setForm({ ...form, run_weekday: Number(event.target.value) })}
-            >
-              {Array.from({ length: 7 }, (_, weekday) => (
-                <option key={weekday} value={weekday}>
-                  {schedulerWeekdayLabel(weekday)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            At
-            <input
-              type="time"
-              value={form.run_time ?? "18:00"}
-              onChange={(event) => setForm({ ...form, run_time: event.target.value })}
+              onChange={(run_weekday) => setForm({ ...form, run_weekday })}
+              ariaLabel="Run on weekday"
             />
-          </label>
-        </div>
+          </div>
 
-        <div className="grid-2">
-          <label>
-            Timezone
-            <input
-              value={form.timezone ?? "Europe/Paris"}
-              onChange={(event) => setForm({ ...form, timezone: event.target.value })}
-            />
-          </label>
-          <label>
-            Target week offset
-            <input
-              type="number"
-              min={0}
-              max={4}
+          <div className="grid-2">
+            <label>
+              At
+              <input
+                type="time"
+                value={form.run_time ?? "18:00"}
+                onChange={(event) => setForm({ ...form, run_time: event.target.value })}
+              />
+            </label>
+            <label>
+              Timezone
+              <TimezoneSelect
+                value={form.timezone ?? "Europe/Paris"}
+                onChange={(timezone) => setForm({ ...form, timezone })}
+              />
+            </label>
+          </div>
+
+          <div className="stack">
+            <span className="muted">Plan for</span>
+            <SegmentedControl
+              className="segmented-control-full"
+              ariaLabel="Target week offset"
               value={form.target_week_offset ?? 1}
-              onChange={(event) => setForm({ ...form, target_week_offset: Number(event.target.value) })}
+              options={[...WEEK_OFFSET_OPTIONS]}
+              onChange={(target_week_offset) => setForm({ ...form, target_week_offset })}
             />
-            <span className="muted">0 = this week, 1 = next week</span>
-          </label>
-        </div>
+          </div>
+        </FormSection>
 
-        <label className="checkbox-pill">
-          <input
-            type="checkbox"
-            checked={form.notify_telegram ?? true}
-            onChange={(event) => setForm({ ...form, notify_telegram: event.target.checked })}
+        <FormSection title="Telegram notification">
+          <SettingsSectionHeader
+            title="Telegram notification"
+            description="Notify Telegram subscribers after roulette."
+            trailing={
+              <Switch
+                checked={form.notify_telegram ?? true}
+                onChange={(event) => setForm({ ...form, notify_telegram: event.target.checked })}
+                label="Notify Telegram subscribers after roulette"
+              />
+            }
           />
-          Notify Telegram subscribers after roulette
-        </label>
 
-        <label>
-          Planning days in Telegram message
-          <input
-            type="number"
+          <NumberStepper
+            ariaLabel="Planning days in Telegram message"
+            label="Planning days in Telegram message"
             min={1}
-            max={14}
+            max={7}
             value={form.notify_planning_days ?? 7}
-            onChange={(event) => setForm({ ...form, notify_planning_days: Number(event.target.value) })}
+            onChange={(notify_planning_days) => setForm({ ...form, notify_planning_days })}
           />
-        </label>
+          <p className="muted admin-field-hint">
+            Includes today and the following {Math.max(0, (form.notify_planning_days ?? 7) - 1)} day
+            {(form.notify_planning_days ?? 7) - 1 === 1 ? "" : "s"}.
+          </p>
+        </FormSection>
 
-        <div className="row-between">
-          <button type="submit" className="button" disabled={saving || running}>
-            {saving ? "Saving…" : "Save settings"}
-          </button>
-          <button
+        <FormStickyActions>
+          <Button type="submit" loading={saving} disabled={running}>
+            Save settings
+          </Button>
+          <Button
             type="button"
-            className="button button-secondary"
-            disabled={saving || running}
+            variant="roulette"
+            loading={running}
+            disabled={saving}
             onClick={() => void handleRunNow()}
           >
-            {running ? "Running…" : "Run roulette now"}
-          </button>
-        </div>
+            Run roulette now
+          </Button>
+        </FormStickyActions>
       </form>
     </SettingsPageShell>
   );

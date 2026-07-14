@@ -74,8 +74,8 @@ describe("planFormat", () => {
     expect(mealSlotSortKey("lunch")).toBeLessThan(mealSlotSortKey("dinner"));
   });
 
-  it('shows "Not reviewed" for past planned meals in review mode', () => {
-    expect(formatReviewStatus(item({ status: "planned", date: todayIso() }))).toBe("Not reviewed");
+  it('shows "Needs review" for past planned meals in review mode', () => {
+    expect(formatReviewStatus(item({ status: "planned", date: todayIso() }))).toBe("Needs review");
     expect(formatReviewStatus(item({ status: "planned", date: "2099-01-01" }))).toBe("Planned");
   });
 

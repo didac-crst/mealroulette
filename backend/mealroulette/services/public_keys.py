@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import secrets
+import unicodedata
 
 DISH_PUBLIC_KEY_LENGTH = 32
 DISH_PUBLIC_KEY_MAX_SLUG_LENGTH = 20
@@ -12,8 +13,10 @@ SLUG_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz"
 
 
 def slug_from_dish_name(name: str) -> str:
+    normalized = unicodedata.normalize("NFKD", name.strip().lower())
+    ascii_name = "".join(char for char in normalized if not unicodedata.combining(char))
     allowed = set(SLUG_ALPHABET)
-    slug = "".join(char for char in name.strip().lower() if char in allowed)
+    slug = "".join(char for char in ascii_name if char in allowed)
     if not slug:
         slug = "dish"
     return slug[:DISH_PUBLIC_KEY_MAX_SLUG_LENGTH]

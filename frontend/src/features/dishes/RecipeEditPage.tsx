@@ -31,6 +31,9 @@ import {
 } from "../../api/catalog";
 import { ApiError } from "../../api/client";
 import { ButtonLink } from "../../components/ButtonLink";
+import { Button, Card, DisclosureSection, FormSection, FormStickyActions, NumberStepper, PageShell, SegmentedControl, Switch } from "../../components/ui";
+import { formatQuantityWithUnit } from "../../lib/formatQuantity";
+import { useFormSaveState } from "../../lib/useFormSaveState";
 import { useAuth } from "../auth/AuthContext";
 import { formatStepTimerLabel, stepTimerDurationSeconds, timerMinutesFromSeconds, timerSecondsFromMinutesInput } from "./recipeCooking";
 import { RECIPE_TYPE_OPTIONS } from "./classification";
@@ -83,9 +86,9 @@ export function RecipeEditPage() {
   const [submitting, setSubmitting] = useState(false);
   const [showAddStep, setShowAddStep] = useState(false);
   const [showAddIngredient, setShowAddIngredient] = useState(false);
-  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [existingRecipeCount, setExistingRecipeCount] = useState(0);
+  const { status: saveStatus, setBaseline } = useFormSaveState(form, { saving: submitting, error });
 
   const loadRecipeData = useCallback(async () => {
     if (!accessToken || !recipeIdNum) {
@@ -119,7 +122,19 @@ export function RecipeEditPage() {
     setUnits(unitData);
     setAllIngredients(ingredientsCatalog);
     setIngredientNames(names);
-  }, [accessToken, recipeIdNum]);
+    setBaseline({
+      variant_name: recipe.variant_name,
+      variant_description: recipe.description ?? "",
+      servings: recipe.servings?.toString() ?? "",
+      recipe_type: recipe.recipe_type,
+      is_main: recipe.is_main,
+      prep_time_minutes: recipe.prep_time_minutes?.toString() ?? "",
+      cook_time_minutes: recipe.cook_time_minutes?.toString() ?? "",
+      difficulty: recipe.difficulty ?? "",
+      source_url: recipe.source_url ?? "",
+      notes: recipe.notes ?? "",
+    });
+  }, [accessToken, recipeIdNum, setBaseline]);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -173,6 +188,12 @@ export function RecipeEditPage() {
       cancelled = true;
     };
   }, [accessToken, isNew, loadRecipeData]);
+
+  useEffect(() => {
+    if (isNew) {
+      setBaseline(emptyRecipeForm);
+    }
+  }, [isNew, setBaseline]);
 
   const ingredientOptions = useMemo(
     () => allIngredients.map((item) => item.display_name).sort((a, b) => a.localeCompare(b)),
@@ -237,29 +258,37 @@ export function RecipeEditPage() {
 
   if (loading) {
     return (
-      <section className="card">
-        <p className="muted">Loading recipe…</p>
-      </section>
+      <div className="catalog-edit-page">
+        <PageShell title="Edit recipe" loading loadingMessage="Loading recipe…" />
+      </div>
     );
   }
 
   return (
-    <section className="card stack">
-      <div className="row-between">
-        <div>
-          <p className="muted">{dish?.name}</p>
-          <h2>{isNew ? "New recipe variant" : `Edit ${form.variant_name}`}</h2>
-        </div>
-        <ButtonLink to={isNew ? `/dishes/${dishId}` : `/dishes/${dishId}/recipes/${recipeId}`} variant="secondary">
-          Cancel
-        </ButtonLink>
-      </div>
+    <div className="catalog-edit-page">
+      <PageShell
+        title={isNew ? "New recipe variant" : `Edit ${form.variant_name}`}
+        subtitle={dish?.name}
+        breadcrumbLabels={{
+          dishId: dish?.id ?? dishIdNum,
+          dishName: dish?.name,
+          recipeId: isNew ? undefined : Number(recipeId),
+          recipeName: isNew ? undefined : form.variant_name,
+        }}
+        actions={
+          <ButtonLink
+            to={isNew ? `/dishes/${dishId}` : `/dishes/${dishId}/recipes/${recipeId}`}
+            variant="secondary"
+          >
+            Cancel
+          </ButtonLink>
+        }
+      />
 
       {dish ? <DishInheritedContext dish={dish} tags={tags} /> : null}
 
-      <form onSubmit={handleSubmit} className="stack">
-        <fieldset>
-          <legend>Recipe basics</legend>
+      <form onSubmit={handleSubmit} className="catalog-form">
+        <FormSection title="Recipe basics">
           <div className="stack">
             <label>
               Variant name
@@ -269,142 +298,118 @@ export function RecipeEditPage() {
                 required
               />
             </label>
-            <label>
-              Servings
-              <input
-                type="number"
-                min={1}
-                value={form.servings}
-                onChange={(event) => setForm({ ...form, servings: event.target.value })}
-              />
-            </label>
-            <label>
-              Recipe type
-              <select
+            <NumberStepper
+              ariaLabel="Servings"
+              label="Servings"
+              min={1}
+              max={24}
+              value={form.servings ? Number(form.servings) : 4}
+              onChange={(servings) => setForm({ ...form, servings: String(servings) })}
+            />
+            <div className="stack">
+              <span className="muted">Recipe type</span>
+              <SegmentedControl
+                className="segmented-control-full"
+                ariaLabel="Recipe type"
                 value={form.recipe_type}
-                onChange={(event) =>
-                  setForm({ ...form, recipe_type: event.target.value as Recipe["recipe_type"] })
-                }
-              >
-                {RECIPE_TYPE_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+                options={RECIPE_TYPE_OPTIONS.map((option) => ({
+                  value: option.value,
+                  label: option.label,
+                }))}
+                onChange={(recipe_type) => setForm({ ...form, recipe_type })}
+              />
+            </div>
             {isNew && existingRecipeCount === 0 ? (
               <p className="muted">This will be the main recipe and define dish defaults.</p>
             ) : (
-              <label className="checkbox-pill">
-                <input
-                  type="checkbox"
-                  checked={form.is_main}
-                  onChange={(event) => setForm({ ...form, is_main: event.target.checked })}
-                />
-                Main recipe (defines dish difficulty and times)
-              </label>
+              <Switch
+                checked={form.is_main}
+                onChange={(event) => setForm({ ...form, is_main: event.target.checked })}
+                label="Main recipe (defines dish difficulty and times)"
+              />
             )}
           </div>
-        </fieldset>
+        </FormSection>
 
-        <button
-          type="button"
-          className="button button-secondary"
-          onClick={() => setShowAdvancedSettings((current) => !current)}
-        >
-          {showAdvancedSettings ? "Hide advanced recipe settings" : "Show advanced recipe settings"}
-        </button>
-
-        {showAdvancedSettings ? (
-          <fieldset>
-            <legend>Advanced recipe settings</legend>
-            <div className="stack">
+        <DisclosureSection title="Advanced recipe settings" description="Description, timing, source, and notes">
+          <div className="stack">
+            <label>
+              Variant description
+              <textarea
+                value={form.variant_description}
+                onChange={(event) => setForm({ ...form, variant_description: event.target.value })}
+                rows={2}
+              />
+            </label>
+            <div className="grid-2">
               <label>
-                Variant description
-                <textarea
-                  value={form.variant_description}
-                  onChange={(event) => setForm({ ...form, variant_description: event.target.value })}
-                  rows={2}
-                />
+                Difficulty
+                <select
+                  value={form.difficulty}
+                  onChange={(event) => setForm({ ...form, difficulty: event.target.value })}
+                >
+                  {DIFFICULTY_OPTIONS.map((option) => (
+                    <option key={option.value || "unset"} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
               </label>
-              <div className="grid-2">
-                <label>
-                  Difficulty
-                  <select
-                    value={form.difficulty}
-                    onChange={(event) => setForm({ ...form, difficulty: event.target.value })}
-                  >
-                    {DIFFICULTY_OPTIONS.map((option) => (
-                      <option key={option.value || "unset"} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  Prep time (min)
-                  <input
-                    type="number"
-                    min={0}
-                    value={form.prep_time_minutes}
-                    onChange={(event) => setForm({ ...form, prep_time_minutes: event.target.value })}
-                  />
-                </label>
-                <label>
-                  Cook time (min)
-                  <input
-                    type="number"
-                    min={0}
-                    value={form.cook_time_minutes}
-                    onChange={(event) => setForm({ ...form, cook_time_minutes: event.target.value })}
-                  />
-                </label>
-              </div>
               <label>
-                Source URL
+                Prep time (min)
                 <input
-                  value={form.source_url}
-                  onChange={(event) => setForm({ ...form, source_url: event.target.value })}
+                  type="number"
+                  min={0}
+                  value={form.prep_time_minutes}
+                  onChange={(event) => setForm({ ...form, prep_time_minutes: event.target.value })}
                 />
               </label>
               <label>
-                Recipe notes
-                <textarea value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} rows={2} />
+                Cook time (min)
+                <input
+                  type="number"
+                  min={0}
+                  value={form.cook_time_minutes}
+                  onChange={(event) => setForm({ ...form, cook_time_minutes: event.target.value })}
+                />
               </label>
             </div>
-          </fieldset>
-        ) : null}
+            <label>
+              Source URL
+              <input
+                value={form.source_url}
+                onChange={(event) => setForm({ ...form, source_url: event.target.value })}
+              />
+            </label>
+            <label>
+              Recipe notes
+              <textarea value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} rows={2} />
+            </label>
+          </div>
+        </DisclosureSection>
 
-        {error ? (
-          <p className="error" role="alert">
-            {error}
-          </p>
-        ) : null}
-
-        <div className="row-actions">
-          <button type="submit" className="button" disabled={submitting}>
-            {submitting ? "Saving…" : "Save recipe"}
-          </button>
+        <FormStickyActions saveStatus={saveStatus} saveErrorMessage={error}>
+          <Button type="submit" loading={submitting}>
+            Save recipe
+          </Button>
           {!isNew ? (
-            <button
-              type="button"
-              className="button button-danger"
-              onClick={() => setConfirmingDelete(true)}
-              disabled={submitting}
-            >
+            <Button type="button" variant="danger" onClick={() => setConfirmingDelete(true)} disabled={submitting}>
               Delete recipe
-            </button>
+            </Button>
           ) : null}
-        </div>
+        </FormStickyActions>
       </form>
 
       {isNew ? (
         <p className="muted">Save the recipe first to add ingredients and steps.</p>
       ) : accessToken && recipeIdNum ? (
-        <div className="stack">
-          <fieldset>
-            <legend>Ingredients</legend>
+        <div className="catalog-form">
+          <DisclosureSection
+            title="Ingredients"
+            meta={`${ingredients.length}`}
+            description="Quantities for this recipe variant"
+            defaultOpen
+          >
             <div className="ingredient-table stack">
               {ingredients.length === 0 ? <p className="muted">No ingredients yet.</p> : null}
               {ingredients.map((item) => (
@@ -431,14 +436,13 @@ export function RecipeEditPage() {
                 onCancel={() => setShowAddIngredient(false)}
               />
             ) : (
-              <button type="button" className="button button-secondary" onClick={() => setShowAddIngredient(true)}>
+              <Button type="button" variant="secondary" onClick={() => setShowAddIngredient(true)}>
                 + Add ingredient
-              </button>
+              </Button>
             )}
-          </fieldset>
+          </DisclosureSection>
 
-          <fieldset>
-            <legend>Steps</legend>
+          <DisclosureSection title="Steps" meta={`${steps.length}`} description="Cooking instructions in order">
             <ol className="editable-list">
               {steps.map((step) => (
                 <StepEditorRow
@@ -461,28 +465,28 @@ export function RecipeEditPage() {
                 onCancel={() => setShowAddStep(false)}
               />
             ) : (
-              <button type="button" className="button button-secondary" onClick={() => setShowAddStep(true)}>
+              <Button type="button" variant="secondary" onClick={() => setShowAddStep(true)}>
                 + Add step
-              </button>
+              </Button>
             )}
-          </fieldset>
+          </DisclosureSection>
         </div>
       ) : null}
 
       {confirmingDelete ? (
-        <div className="confirm-panel stack">
+        <Card className="confirm-panel stack">
           <p>Delete this recipe variant? This cannot be undone.</p>
-          <div className="row-actions">
-            <button type="button" className="button button-secondary" onClick={() => setConfirmingDelete(false)}>
+          <div className="catalog-detail-actions">
+            <Button type="button" variant="secondary" onClick={() => setConfirmingDelete(false)}>
               Cancel
-            </button>
-            <button type="button" className="button button-danger" onClick={() => void handleDeleteRecipe()}>
+            </Button>
+            <Button type="button" variant="danger" onClick={() => void handleDeleteRecipe()}>
               Delete recipe
-            </button>
+            </Button>
           </div>
-        </div>
+        </Card>
       ) : null}
-    </section>
+    </div>
   );
 }
 
@@ -732,7 +736,7 @@ function IngredientEditorRow({
     <div className="ingredient-row list-item-row">
       <span>
         <strong>{ingredientName}</strong>
-        {item.quantity ? ` — ${item.quantity}${unitSymbol ? ` ${unitSymbol}` : ""}` : ""}
+        {item.quantity ? ` — ${formatQuantityWithUnit(item.quantity, unitSymbol)}` : ""}
         {item.optional ? " (optional)" : ""}
       </span>
       <div className="row-actions">

@@ -12,15 +12,22 @@ from mealroulette.services.food_groups import (
     PROTEIN_FOOD_GROUPS,
     food_group_for_ingredient,
 )
-from mealroulette.services.quantities import UnitInfo
 from mealroulette.services.scheduler.family_vector import (
     build_family_vector_for_recipe,
     family_key_for_ingredient,
     ingredient_line_to_reference_grams,
     vector_line_from_recipe_ingredient,
 )
+from mealroulette.services.quantities import UnitInfo
 
 CARB_HEAVY_THRESHOLD_PCT = 33.0
+
+RECIPE_TRAIT_INGREDIENT_LOAD = (
+    selectinload(Recipe.ingredients)
+    .selectinload(RecipeIngredient.ingredient)
+    .selectinload(Ingredient.unit_conversions),
+    selectinload(Recipe.ingredients).selectinload(RecipeIngredient.unit),
+)
 
 
 def _normalize_weights(totals: dict[str, Decimal]) -> dict[str, float]:
@@ -62,9 +69,6 @@ def build_recipe_traits(
             category=ingredient.category,
             family=ingredient.family,
         )
-
-        if line.pantry_item:
-            continue
 
         if group == "meat":
             contains_meat = True
@@ -131,15 +135,33 @@ def _dominant_family(family_grams: dict[str, Decimal]) -> str | None:
     return max(family_grams.items(), key=lambda item: item[1])[0]
 
 
+def _recipe_has_trait_inputs(recipe: Recipe) -> bool:
+    if not recipe.ingredients:
+        return False
+    return all(line.ingredient is not None and line.unit is not None for line in recipe.ingredients)
+
+
+def compute_recipe_traits_now(
+    db: Session,
+    recipe: Recipe,
+    *,
+    gram_unit: UnitInfo | None = None,
+    ml_unit: UnitInfo | None = None,
+) -> dict:
+    if gram_unit is None or ml_unit is None:
+        from mealroulette.services.scheduler.catalog import load_reference_units
+
+        loaded_gram, loaded_ml = load_reference_units(db)
+        gram_unit = gram_unit or loaded_gram
+        ml_unit = ml_unit or loaded_ml
+    loaded = recipe if _recipe_has_trait_inputs(recipe) else load_recipe_for_traits(db, recipe.id) or recipe
+    return build_recipe_traits(loaded, gram_unit=gram_unit, ml_unit=ml_unit)
+
+
 def load_recipe_for_traits(db: Session, recipe_id: int) -> Recipe | None:
     return db.scalar(
         select(Recipe)
-        .options(
-            selectinload(Recipe.ingredients)
-            .selectinload(RecipeIngredient.ingredient)
-            .selectinload(Ingredient.unit_conversions),
-            selectinload(Recipe.ingredients).selectinload(RecipeIngredient.unit),
-        )
+        .options(*RECIPE_TRAIT_INGREDIENT_LOAD)
         .where(Recipe.id == recipe_id)
     )
 
@@ -177,15 +199,18 @@ def refresh_recipes_for_ingredient(
 
 def effective_traits_for_meal_plan_item(
     *,
+    db: Session,
     recipe: Recipe | None,
     dish_recipes: list[Recipe] | None,
+    gram_unit: UnitInfo | None = None,
+    ml_unit: UnitInfo | None = None,
 ) -> dict | None:
-    if recipe is not None and recipe.computed_traits_json is not None:
-        return recipe.computed_traits_json
-    if dish_recipes:
+    target = recipe
+    if target is None and dish_recipes:
         main = next((item for item in dish_recipes if item.is_main), None)
-        if main is None:
+        if main is None and dish_recipes:
             main = min(dish_recipes, key=lambda item: item.id)
-        if main.computed_traits_json is not None:
-            return main.computed_traits_json
-    return None
+        target = main
+    if target is None:
+        return None
+    return compute_recipe_traits_now(db, target, gram_unit=gram_unit, ml_unit=ml_unit)

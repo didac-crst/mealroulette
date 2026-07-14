@@ -268,7 +268,7 @@ def list_dishes(
     db: Session = Depends(get_db),
 ) -> list[DishPublic]:
     service = CatalogService(db)
-    return [service.to_dish_public(dish) for dish in service.list_dishes(active_only)]
+    return service.list_dishes_public(active_only)
 
 
 @router.post("/dishes", response_model=DishPublic, status_code=201)
@@ -314,7 +314,8 @@ def list_recipes(
     _user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> list[RecipePublic]:
-    return [RecipePublic.model_validate(recipe) for recipe in CatalogService(db).list_recipes(dish_id)]
+    service = CatalogService(db)
+    return service.list_recipes_public(dish_id)
 
 
 @router.post("/dishes/{dish_id}/recipes", response_model=RecipePublic, status_code=201)
@@ -324,7 +325,18 @@ def create_recipe(
     _admin: User = Depends(get_current_admin),
     db: Session = Depends(get_db),
 ) -> RecipePublic:
-    return RecipePublic.model_validate(CatalogService(db).create_recipe(dish_id, payload))
+    service = CatalogService(db)
+    return service.to_recipe_public(service.create_recipe(dish_id, payload))
+
+
+@router.get("/recipes/by-key/{public_key}", response_model=RecipePublic)
+def get_recipe_by_public_key(
+    public_key: str,
+    _user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> RecipePublic:
+    service = CatalogService(db)
+    return service.to_recipe_public(service.get_recipe_by_public_key(public_key))
 
 
 @router.get("/recipes/{recipe_id}", response_model=RecipePublic)
@@ -333,7 +345,8 @@ def get_recipe(
     _user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> RecipePublic:
-    return RecipePublic.model_validate(CatalogService(db).get_recipe(recipe_id))
+    service = CatalogService(db)
+    return service.to_recipe_public(service.get_recipe(recipe_id))
 
 
 @router.put("/recipes/{recipe_id}", response_model=RecipePublic)
@@ -343,7 +356,8 @@ def update_recipe(
     _admin: User = Depends(get_current_admin),
     db: Session = Depends(get_db),
 ) -> RecipePublic:
-    return RecipePublic.model_validate(CatalogService(db).update_recipe(recipe_id, payload))
+    service = CatalogService(db)
+    return service.to_recipe_public(service.update_recipe(recipe_id, payload))
 
 
 @router.delete("/recipes/{recipe_id}", status_code=204)

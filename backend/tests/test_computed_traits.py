@@ -1,6 +1,7 @@
 from mealroulette.services.food_groups import food_group_for_ingredient
 from mealroulette.services.public_keys import (
     DISH_PUBLIC_KEY_LENGTH,
+    PUBLIC_KEY_ALPHABET,
     RECIPE_PUBLIC_KEY_MAX_LENGTH,
     generate_dish_public_key,
     generate_recipe_public_key,
@@ -22,6 +23,18 @@ def test_slug_from_dish_name_keeps_common_letters():
     slug = slug_from_dish_name("Lentil Soup")
     assert "lentil" in slug
     assert "soup" in slug
+
+
+def test_slug_from_dish_name_strips_accents():
+    slug = slug_from_dish_name("Aïoli Sauce")
+    assert "aioli" in slug
+    assert "sauce" in slug
+
+
+def test_generate_dish_public_key_suffix_uses_safe_alphabet_only():
+    public_key = generate_dish_public_key("Olive Oil Pasta")
+    suffix = public_key.split("-", 1)[1]
+    assert all(char in PUBLIC_KEY_ALPHABET for char in suffix)
 
 
 def test_generate_dish_public_key_length_and_format():

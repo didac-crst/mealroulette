@@ -32,7 +32,8 @@ from mealroulette.services.food_groups import food_group_for_ingredient
 from mealroulette.services.ingredient_resolver import IngredientResolverService
 from mealroulette.services.names import normalize_name
 from mealroulette.services.public_keys import generate_dish_public_key, generate_recipe_public_key
-from mealroulette.services.recipe_traits import refresh_recipe_traits, refresh_recipes_for_ingredient
+from mealroulette.services.recipe_traits import compute_recipe_traits_now, refresh_recipe_traits, refresh_recipes_for_ingredient
+from mealroulette.services.quantities import UnitInfo
 from mealroulette.services.scheduler.catalog import load_reference_units
 from mealroulette.schemas.catalog import (
     DishCreateRequest,
@@ -141,9 +142,35 @@ class CatalogService:
             ml_unit=ml_unit,
         )
 
-    @classmethod
-    def to_dish_public(cls, dish: Dish) -> DishPublic:
-        main_recipe = cls._main_recipe(dish)
+    def to_recipe_public(
+        self,
+        recipe: Recipe,
+        *,
+        computed_traits: dict | None = None,
+        gram_unit: UnitInfo | None = None,
+        ml_unit: UnitInfo | None = None,
+    ) -> RecipePublic:
+        if computed_traits is None:
+            if gram_unit is None or ml_unit is None:
+                gram_unit, ml_unit = self._reference_units()
+            traits = compute_recipe_traits_now(self.db, recipe, gram_unit=gram_unit, ml_unit=ml_unit)
+        else:
+            traits = computed_traits
+        return RecipePublic.model_validate(recipe).model_copy(update={"computed_traits_json": traits})
+
+    def to_dish_public(
+        self,
+        dish: Dish,
+        *,
+        gram_unit: UnitInfo | None = None,
+        ml_unit: UnitInfo | None = None,
+    ) -> DishPublic:
+        main_recipe = self._main_recipe(dish)
+        traits = None
+        if main_recipe is not None:
+            if gram_unit is None or ml_unit is None:
+                gram_unit, ml_unit = self._reference_units()
+            traits = compute_recipe_traits_now(self.db, main_recipe, gram_unit=gram_unit, ml_unit=ml_unit)
         return DishPublic(
             id=dish.id,
             public_key=dish.public_key,
@@ -164,15 +191,29 @@ class CatalogService:
             leftovers_possible=dish.leftovers_possible,
             freezer_friendly=dish.freezer_friendly,
             kids_friendly=dish.kids_friendly,
-            thermomix_possible=cls._thermomix_possible_from_recipes(dish.recipes),
+            thermomix_possible=self._thermomix_possible_from_recipes(dish.recipes),
             active=dish.status == DishStatus.active,
             notes=dish.notes,
             created_at=dish.created_at,
             updated_at=dish.updated_at,
             tag_ids=[tag.id for tag in dish.tags],
-            computed_traits_json=main_recipe.computed_traits_json if main_recipe else None,
+            computed_traits_json=traits,
             seasonality=SeasonalityPublic.model_validate(dish.seasonality) if dish.seasonality else None,
         )
+
+    def list_dishes_public(self, active_only: bool = False) -> list[DishPublic]:
+        gram_unit, ml_unit = self._reference_units()
+        return [
+            self.to_dish_public(dish, gram_unit=gram_unit, ml_unit=ml_unit)
+            for dish in self.list_dishes(active_only)
+        ]
+
+    def list_recipes_public(self, dish_id: int) -> list[RecipePublic]:
+        gram_unit, ml_unit = self._reference_units()
+        return [
+            self.to_recipe_public(recipe, gram_unit=gram_unit, ml_unit=ml_unit)
+            for recipe in self.list_recipes(dish_id)
+        ]
 
     @staticmethod
     def to_ingredient_public(ingredient: Ingredient) -> IngredientPublic:
@@ -627,21 +668,26 @@ class CatalogService:
         dish.seasonality.excluded_months = []
         dish.seasonality.seasonality_strength = SeasonalityStrength.neutral
 
-    def list_dishes(self, active_only: bool = False) -> list[Dish]:
-        query = (
-            select(Dish)
-            .options(selectinload(Dish.tags), selectinload(Dish.seasonality), selectinload(Dish.recipes))
-            .order_by(Dish.name)
+    def _dish_query_options(self):
+        return (
+            selectinload(Dish.tags),
+            selectinload(Dish.seasonality),
+            selectinload(Dish.recipes)
+            .selectinload(Recipe.ingredients)
+            .selectinload(RecipeIngredient.ingredient)
+            .selectinload(Ingredient.unit_conversions),
+            selectinload(Dish.recipes).selectinload(Recipe.ingredients).selectinload(RecipeIngredient.unit),
         )
+
+    def list_dishes(self, active_only: bool = False) -> list[Dish]:
+        query = select(Dish).options(*self._dish_query_options()).order_by(Dish.name)
         if active_only:
             query = query.where(Dish.status == DishStatus.active)
         return list(self.db.scalars(query))
 
     def get_dish(self, dish_id: int) -> Dish:
         dish = self.db.scalar(
-            select(Dish)
-            .options(selectinload(Dish.tags), selectinload(Dish.seasonality), selectinload(Dish.recipes))
-            .where(Dish.id == dish_id)
+            select(Dish).options(*self._dish_query_options()).where(Dish.id == dish_id)
         )
         if dish is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dish not found")
@@ -730,12 +776,24 @@ class CatalogService:
             self.db.scalars(
                 select(Recipe)
                 .where(Recipe.dish_id == dish_id)
+                .options(
+                    selectinload(Recipe.ingredients)
+                    .selectinload(RecipeIngredient.ingredient)
+                    .selectinload(Ingredient.unit_conversions),
+                    selectinload(Recipe.ingredients).selectinload(RecipeIngredient.unit),
+                )
                 .order_by(Recipe.is_main.desc(), Recipe.id)
             )
         )
 
     def get_recipe(self, recipe_id: int) -> Recipe:
         recipe = self.db.get(Recipe, recipe_id)
+        if recipe is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recipe not found")
+        return recipe
+
+    def get_recipe_by_public_key(self, public_key: str) -> Recipe:
+        recipe = self.db.scalar(select(Recipe).where(Recipe.public_key == public_key))
         if recipe is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recipe not found")
         return recipe

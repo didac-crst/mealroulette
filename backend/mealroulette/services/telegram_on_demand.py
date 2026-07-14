@@ -7,6 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from mealroulette.core.config import get_settings
+from mealroulette.models.catalog import Dish
 from mealroulette.models.planning import MealPlanItem
 from mealroulette.models.telegram import TelegramSettings
 from mealroulette.services.planning import PlanningService
@@ -74,13 +75,14 @@ class TelegramOnDemandService:
                     MealPlanItem.date <= to_date,
                 )
                 .options(
-                    selectinload(MealPlanItem.dish),
+                    selectinload(MealPlanItem.dish).selectinload(Dish.recipes),
                     selectinload(MealPlanItem.recipe),
                 )
             )
         )
+        planning = PlanningService(self.db)
         items.sort(key=lambda item: (item.date, meal_slot_sort_key(item.meal_slot)))
-        return [PlanningService.to_item_public(item) for item in items]
+        return [planning.to_item_public(item) for item in items]
 
     def build_planning_message(self, days: int) -> str:
         from_date, to_date = self._window(days)

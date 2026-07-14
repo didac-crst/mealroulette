@@ -1,27 +1,13 @@
 import { Link, NavLink, type LinkProps, type NavLinkProps } from "react-router-dom";
 
-export type ButtonVariant = "primary" | "secondary" | "danger";
-
-function buttonClasses(variant: ButtonVariant, extra?: string): string {
-  const classes = ["button"];
-  if (variant === "secondary") {
-    classes.push("button-secondary");
-  }
-  if (variant === "danger") {
-    classes.push("button-danger");
-  }
-  if (extra) {
-    classes.push(extra);
-  }
-  return classes.join(" ");
-}
+import { buttonClasses, type ButtonVariant } from "./ui/buttonClasses";
 
 type ButtonLinkProps = LinkProps & {
   variant?: ButtonVariant;
 };
 
 export function ButtonLink({ variant = "primary", className, ...props }: ButtonLinkProps) {
-  return <Link className={buttonClasses(variant, className)} {...props} />;
+  return <Link className={buttonClasses(variant, "md", className)} {...props} />;
 }
 
 type NavButtonLinkProps = Omit<NavLinkProps, "className"> & {
@@ -38,8 +24,12 @@ export function NavButtonLink({
 }: NavButtonLinkProps) {
   return (
     <NavLink
-      className={({ isActive }) => buttonClasses(isActive ? activeVariant : inactiveVariant, className)}
+      className={({ isActive }) =>
+        buttonClasses(isActive ? activeVariant : inactiveVariant, "md", className)
+      }
       {...props}
     />
   );
 }
+
+export type { ButtonVariant } from "./ui/buttonClasses";

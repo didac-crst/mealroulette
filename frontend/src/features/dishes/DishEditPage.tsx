@@ -13,6 +13,8 @@ import {
 } from "../../api/catalog";
 import { ApiError } from "../../api/client";
 import { ButtonLink } from "../../components/ButtonLink";
+import { Button, DisclosureSection, FormSection, FormStickyActions, PageShell } from "../../components/ui";
+import { useFormSaveState } from "../../lib/useFormSaveState";
 import { useAuth } from "../auth/AuthContext";
 import {
   MEAL_COMPOSITION_OPTIONS,
@@ -185,6 +187,19 @@ export function DishEditPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(!isNew);
   const [submitting, setSubmitting] = useState(false);
+  const { status: saveStatus, setBaseline } = useFormSaveState(form, { saving: submitting, error });
+
+  useEffect(() => {
+    if (isNew) {
+      setBaseline(emptyForm);
+    }
+  }, [isNew, setBaseline]);
+
+  useEffect(() => {
+    if (dish) {
+      setBaseline(dishToForm(dish));
+    }
+  }, [dish, setBaseline]);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -270,23 +285,29 @@ export function DishEditPage() {
 
   if (loading) {
     return (
-      <section className="card">
-        <p className="muted">Loading dish…</p>
-      </section>
+      <div className="catalog-edit-page">
+        <PageShell title="Edit dish" loading loadingMessage="Loading dish…" />
+      </div>
     );
   }
 
   return (
-    <section className="card stack">
-      <div className="row-between">
-        <h2>{isNew ? "New dish" : "Edit dish"}</h2>
-        <ButtonLink to={isNew ? "/dishes" : `/dishes/${dishId}`} variant="secondary">
-          Cancel
-        </ButtonLink>
-      </div>
-      <form onSubmit={handleSubmit} className="stack">
-        <fieldset>
-          <legend>Basic info</legend>
+    <div className="catalog-edit-page">
+      <PageShell
+        title={isNew ? "New dish" : "Edit dish"}
+        breadcrumbLabels={
+          isNew
+            ? undefined
+            : { dishId: dish?.id ?? Number(dishId), dishName: dish?.name ?? form.name }
+        }
+        actions={
+          <ButtonLink to={isNew ? "/dishes" : `/dishes/${dishId}`} variant="secondary">
+            Cancel
+          </ButtonLink>
+        }
+      />
+      <form onSubmit={handleSubmit} className="catalog-form">
+        <FormSection title="Basic info">
           <div className="stack">
             <label>
               Name
@@ -376,150 +397,151 @@ export function DishEditPage() {
               Desserts are manual-only.
             </p>
           </div>
-        </fieldset>
+        </FormSection>
 
-        <fieldset>
-          <legend>Inferred from main recipe</legend>
-          <InferredTraitsSummary traits={dish?.computed_traits_json} />
-        </fieldset>
+        <div className="catalog-form-disclosure-stack">
+          <DisclosureSection title="Planning & style">
+            <div className="stack">
+              <FormSection
+                title="Curated style (optional)"
+                description="Only for styles the planner cannot infer from ingredients, such as soup."
+              >
+                <MultiSelectPills
+                  options={STYLE_OPTIONS}
+                  family="style"
+                  tags={tags}
+                  selectedIds={form.tag_ids ?? []}
+                  onChange={(tag_ids) => setForm({ ...form, tag_ids })}
+                />
+              </FormSection>
 
-        <fieldset>
-          <legend>Curated style (optional)</legend>
-          <p className="muted field-hint">
-            Only for styles the planner cannot infer from ingredients, such as soup.
-          </p>
-          <MultiSelectPills
-            options={STYLE_OPTIONS}
-            family="style"
-            tags={tags}
-            selectedIds={form.tag_ids ?? []}
-            onChange={(tag_ids) => setForm({ ...form, tag_ids })}
-          />
-        </fieldset>
+              <FormSection title="Planning profile">
+                <div className="stack">
+                  <div className="tag-grid">
+                    <label className="checkbox-pill">
+                      <input
+                        type="checkbox"
+                        checked={form.suitable_for_lunch === true}
+                        onChange={(event) =>
+                          setForm({ ...form, suitable_for_lunch: event.target.checked ? true : null })
+                        }
+                      />
+                      Suitable for lunch
+                    </label>
+                    <label className="checkbox-pill">
+                      <input
+                        type="checkbox"
+                        checked={form.suitable_for_dinner === true}
+                        onChange={(event) =>
+                          setForm({ ...form, suitable_for_dinner: event.target.checked ? true : null })
+                        }
+                      />
+                      Suitable for dinner
+                    </label>
+                    <label className="checkbox-pill">
+                      <input
+                        type="checkbox"
+                        checked={form.weekday_friendly === true}
+                        onChange={(event) =>
+                          setForm({ ...form, weekday_friendly: event.target.checked ? true : null })
+                        }
+                      />
+                      Weekday-friendly
+                    </label>
+                    <label className="checkbox-pill">
+                      <input
+                        type="checkbox"
+                        checked={form.leftovers_possible === true}
+                        onChange={(event) =>
+                          setForm({ ...form, leftovers_possible: event.target.checked ? true : null })
+                        }
+                      />
+                      Leftovers possible
+                    </label>
+                    <label className="checkbox-pill">
+                      <input
+                        type="checkbox"
+                        checked={form.kids_friendly === true}
+                        onChange={(event) =>
+                          setForm({ ...form, kids_friendly: event.target.checked ? true : null })
+                        }
+                      />
+                      Kids-friendly
+                    </label>
+                  </div>
+                  <label>
+                    Freezer-friendly
+                    <select
+                      value={form.freezer_friendly === null ? "" : form.freezer_friendly ? "yes" : "no"}
+                      onChange={(event) =>
+                        setForm({
+                          ...form,
+                          freezer_friendly:
+                            event.target.value === "" ? null : event.target.value === "yes",
+                        })
+                      }
+                    >
+                      <option value="">Unknown</option>
+                      <option value="yes">Yes</option>
+                      <option value="no">No</option>
+                    </select>
+                  </label>
+                </div>
+              </FormSection>
 
-        <fieldset>
-          <legend>Planning profile</legend>
-          <div className="stack">
-            <div className="tag-grid">
-              <label className="checkbox-pill">
-                <input
-                  type="checkbox"
-                  checked={form.suitable_for_lunch === true}
-                  onChange={(event) =>
-                    setForm({ ...form, suitable_for_lunch: event.target.checked ? true : null })
-                  }
-                />
-                Suitable for lunch
-              </label>
-              <label className="checkbox-pill">
-                <input
-                  type="checkbox"
-                  checked={form.suitable_for_dinner === true}
-                  onChange={(event) =>
-                    setForm({ ...form, suitable_for_dinner: event.target.checked ? true : null })
-                  }
-                />
-                Suitable for dinner
-              </label>
-              <label className="checkbox-pill">
-                <input
-                  type="checkbox"
-                  checked={form.weekday_friendly === true}
-                  onChange={(event) =>
-                    setForm({ ...form, weekday_friendly: event.target.checked ? true : null })
-                  }
-                />
-                Weekday-friendly
-              </label>
-              <label className="checkbox-pill">
-                <input
-                  type="checkbox"
-                  checked={form.leftovers_possible === true}
-                  onChange={(event) =>
-                    setForm({ ...form, leftovers_possible: event.target.checked ? true : null })
-                  }
-                />
-                Leftovers possible
-              </label>
-              <label className="checkbox-pill">
-                <input
-                  type="checkbox"
-                  checked={form.kids_friendly === true}
-                  onChange={(event) =>
-                    setForm({ ...form, kids_friendly: event.target.checked ? true : null })
-                  }
-                />
-                Kids-friendly
-              </label>
+              <FormSection title="Seasonality">
+                <div className="stack">
+                  <label>
+                    Mode
+                    <select
+                      value={form.seasonality?.seasonality_mode ?? "all_year"}
+                      onChange={(event) =>
+                        setForm({
+                          ...form,
+                          seasonality: {
+                            seasonality_mode: event.target.value,
+                            preferred_months:
+                              event.target.value === "seasonal"
+                                ? (form.seasonality?.preferred_months ?? [])
+                                : [],
+                          },
+                        })
+                      }
+                    >
+                      {SEASONALITY_MODE_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  {form.seasonality?.seasonality_mode === "seasonal" ? (
+                    <MonthPicker
+                      label="Preferred months"
+                      selected={form.seasonality?.preferred_months ?? []}
+                      onChange={(preferred_months) =>
+                        setForm({ ...form, seasonality: { seasonality_mode: "seasonal", preferred_months } })
+                      }
+                    />
+                  ) : null}
+                </div>
+              </FormSection>
             </div>
-            <label>
-              Freezer-friendly
-              <select
-                value={form.freezer_friendly === null ? "" : form.freezer_friendly ? "yes" : "no"}
-                onChange={(event) =>
-                  setForm({
-                    ...form,
-                    freezer_friendly:
-                      event.target.value === "" ? null : event.target.value === "yes",
-                  })
-                }
-              >
-                <option value="">Unknown</option>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-              </select>
-            </label>
-          </div>
-        </fieldset>
+          </DisclosureSection>
 
-        <fieldset>
-          <legend>Seasonality</legend>
-          <div className="stack">
-            <label>
-              Mode
-              <select
-                value={form.seasonality?.seasonality_mode ?? "all_year"}
-                onChange={(event) =>
-                  setForm({
-                    ...form,
-                    seasonality: {
-                      seasonality_mode: event.target.value,
-                      preferred_months:
-                        event.target.value === "seasonal"
-                          ? (form.seasonality?.preferred_months ?? [])
-                          : [],
-                    },
-                  })
-                }
-              >
-                {SEASONALITY_MODE_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {form.seasonality?.seasonality_mode === "seasonal" ? (
-              <MonthPicker
-                label="Preferred months"
-                selected={form.seasonality?.preferred_months ?? []}
-                onChange={(preferred_months) =>
-                  setForm({ ...form, seasonality: { seasonality_mode: "seasonal", preferred_months } })
-                }
-              />
-            ) : null}
-          </div>
-        </fieldset>
+          {!isNew ? (
+            <DisclosureSection title="Inferred from main recipe">
+              <InferredTraitsSummary traits={dish?.computed_traits_json} />
+            </DisclosureSection>
+          ) : null}
+        </div>
 
-        {error ? (
-          <p className="error" role="alert">
-            {error}
-          </p>
-        ) : null}
-        <button type="submit" className="button" disabled={submitting}>
-          {submitting ? "Saving…" : "Save dish"}
-        </button>
+        <FormStickyActions saveStatus={saveStatus} saveErrorMessage={error}>
+          <Button type="submit" loading={submitting}>
+            Save dish
+          </Button>
+        </FormStickyActions>
       </form>
-    </section>
+    </div>
   );
 }

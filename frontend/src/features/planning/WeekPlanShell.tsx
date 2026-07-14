@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
-import { addWeeks, formatPlanDate } from "./planFormat";
+import { PageShell } from "../../components/ui";
+import { WeekNavigator } from "./WeekNavigator";
 
 type Props = {
   weekStart: string | null;
@@ -12,6 +13,8 @@ type Props = {
   onNextWeek: () => void;
   error: string | null;
   children: ReactNode;
+  className?: string;
+  actions?: ReactNode;
 };
 
 export function WeekPlanShell({
@@ -24,70 +27,27 @@ export function WeekPlanShell({
   onNextWeek,
   error,
   children,
+  className,
+  actions,
 }: Props) {
   return (
-    <div className="stack plan-page">
-      <section className="card">
-        <div className="week-shell-header">
-          <div>
-            <h2>{title}</h2>
-            {weekStart ? (
-              <p className="muted">
-                {subtitle}
-                <br />
-                Week of {formatPlanDate(weekStart)}
-              </p>
-            ) : null}
-          </div>
-          <div className="week-nav" role="group" aria-label="Week navigation">
-            <button
-              type="button"
-              className="button button-secondary week-nav-button"
-              disabled={!weekStart || loading}
-              onClick={onPreviousWeek}
-              aria-label="Previous week"
-            >
-              <span aria-hidden="true">‹</span>
-              <span className="week-nav-label-long">Previous</span>
-            </button>
-            <button
-              type="button"
-              className="button button-secondary week-nav-button week-nav-today"
-              disabled={loading}
-              onClick={onThisWeek}
-            >
-              This week
-            </button>
-            <button
-              type="button"
-              className="button button-secondary week-nav-button"
-              disabled={!weekStart || loading}
-              onClick={onNextWeek}
-              aria-label="Next week"
-            >
-              <span className="week-nav-label-long">Next</span>
-              <span aria-hidden="true">›</span>
-            </button>
-          </div>
-        </div>
-        {error ? (
-          <p className="error" role="alert">
-            {error}
-          </p>
-        ) : null}
-      </section>
+    <div className={["stack", "plan-page", className].filter(Boolean).join(" ")}>
+      <PageShell title={title} subtitle={subtitle} actions={actions} />
+      <WeekNavigator
+        weekStart={weekStart}
+        loading={loading}
+        onPreviousWeek={onPreviousWeek}
+        onThisWeek={onThisWeek}
+        onNextWeek={onNextWeek}
+      />
+      {error ? (
+        <p className="error week-shell-error" role="alert">
+          {error}
+        </p>
+      ) : null}
       {children}
     </div>
   );
 }
 
-export function weekNavigationHandlers(
-  weekStart: string | null,
-  load: (targetWeekStart?: string) => Promise<void>,
-) {
-  return {
-    onPreviousWeek: () => weekStart && void load(addWeeks(weekStart, -1)),
-    onThisWeek: () => void load(),
-    onNextWeek: () => weekStart && void load(addWeeks(weekStart, 1)),
-  };
-}
+export { weekNavigationHandlers } from "./WeekNavigator";

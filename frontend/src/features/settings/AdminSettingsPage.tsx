@@ -1,60 +1,72 @@
+import type { ReactNode } from "react";
 import { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
+import { PageShell, PageLoadingState, SettingsTile } from "../../components/ui";
 import { useAuth } from "../auth/AuthContext";
 import { HouseholdClock } from "./HouseholdClock";
+import {
+  SettingsBackupIcon,
+  SettingsIngredientsIcon,
+  SettingsSchedulerIcon,
+  SettingsTargetsIcon,
+  SettingsTelegramIcon,
+} from "./settingsIcons";
 
-type SettingsLink = {
+type SettingsTileConfig = {
   to: string;
   title: string;
   description: string;
+  icon: ReactNode;
 };
 
-const PLANNING_LINKS: SettingsLink[] = [
+const PLANNING_TILES: SettingsTileConfig[] = [
   {
     to: "/settings/targets",
     title: "Weekly targets",
     description: "How many fish, meat, pasta, and rice meals per week.",
+    icon: <SettingsTargetsIcon />,
   },
   {
     to: "/settings/scheduler",
     title: "Auto roulette",
     description: "When to generate next week and Telegram “New roulette”.",
+    icon: <SettingsSchedulerIcon />,
   },
 ];
 
-const INTEGRATION_LINKS: SettingsLink[] = [
+const INTEGRATION_TILES: SettingsTileConfig[] = [
   {
     to: "/settings/telegram",
     title: "Telegram",
     description: "Daily reminders, bot commands, subscribers.",
+    icon: <SettingsTelegramIcon />,
   },
   {
     to: "/settings/backups",
     title: "Backups",
     description: "JSON export, schedule, retention, and manual runs.",
+    icon: <SettingsBackupIcon />,
   },
 ];
 
-const CATALOG_LINKS: SettingsLink[] = [
+const CATALOG_TILES: SettingsTileConfig[] = [
   {
     to: "/ingredients",
     title: "Ingredients",
     description: "Catalog, aliases, units, and conversions.",
+    icon: <SettingsIngredientsIcon />,
   },
 ];
 
-function SettingsGroup({ heading, links }: { heading: string; links: SettingsLink[] }) {
+function SettingsGroup({ heading, tiles }: { heading: string; tiles: SettingsTileConfig[] }) {
   return (
     <div className="settings-group">
-      <h3 className="settings-group-title">{heading}</h3>
-      <ul className="settings-link-list">
-        {links.map((link) => (
-          <li key={link.to}>
-            <Link to={link.to} className="settings-link-card">
-              <span className="settings-link-title">{link.title}</span>
-              <span className="settings-link-description">{link.description}</span>
-            </Link>
+      <h2 className="settings-group-title">{heading}</h2>
+      <ul className="settings-tile-list">
+        {tiles.map((tile) => (
+          <li key={tile.to}>
+            <SettingsTile to={tile.to} title={tile.title} description={tile.description} icon={tile.icon} />
           </li>
         ))}
       </ul>
@@ -74,9 +86,9 @@ export function AdminSettingsPage() {
 
   if (loading) {
     return (
-      <section className="card stack settings-page">
-        <p className="muted">Loading…</p>
-      </section>
+      <div className="admin-page">
+        <PageLoadingState message="Loading settings…" />
+      </div>
     );
   }
 
@@ -85,17 +97,16 @@ export function AdminSettingsPage() {
   }
 
   return (
-    <section className="card stack settings-page">
-      <div>
-        <h2>Settings</h2>
-        <p className="muted settings-page-subtitle">Household admin — meal rules, automation, and catalog.</p>
-      </div>
-
-      <HouseholdClock />
-
-      <SettingsGroup heading="Meal planning" links={PLANNING_LINKS} />
-      <SettingsGroup heading="Integrations" links={INTEGRATION_LINKS} />
-      <SettingsGroup heading="Catalog" links={CATALOG_LINKS} />
-    </section>
+    <div className="admin-page">
+      <PageShell
+        title="Settings"
+        subtitle="Household admin — meal rules, automation, and catalog."
+      >
+        <HouseholdClock />
+        <SettingsGroup heading="Meal planning" tiles={PLANNING_TILES} />
+        <SettingsGroup heading="Integrations" tiles={INTEGRATION_TILES} />
+        <SettingsGroup heading="Catalog" tiles={CATALOG_TILES} />
+      </PageShell>
+    </div>
   );
 }

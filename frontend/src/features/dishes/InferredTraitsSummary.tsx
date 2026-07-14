@@ -1,3 +1,6 @@
+import type { MetadataItem } from "../../components/ui";
+import { MetadataList } from "../../components/ui";
+import { buildDisplayFoodGroupLabels } from "../../lib/foodGroupComposition";
 import { formatTagName } from "./classification";
 
 type Props = {
@@ -19,49 +22,52 @@ function formatDominant(value: unknown): string | null {
   return formatTagName(value);
 }
 
-export function InferredTraitsSummary({
-  traits,
-  emptyMessage = "Add a main recipe with ingredients to infer fish, meat, pasta, and other weekly targets.",
-}: Props) {
+export function buildInferredTraitItems(traits: Record<string, unknown> | null | undefined): MetadataItem[] {
   if (!traits) {
-    return <p className="muted">{emptyMessage}</p>;
+    return [];
   }
 
-  const foodGroups = formatFoodGroups(traits.contains_food_groups);
+  const items: MetadataItem[] = [];
+  const weights =
+    traits.food_group_weights && typeof traits.food_group_weights === "object"
+      ? (traits.food_group_weights as Record<string, unknown>)
+      : null;
+  const displayFoodGroupLabels = weights
+    ? buildDisplayFoodGroupLabels(weights)
+    : formatFoodGroups(traits.contains_food_groups)?.split(", ") ?? [];
+  const displayFoodGroups = displayFoodGroupLabels.length > 0 ? displayFoodGroupLabels.join(", ") : null;
   const dominantProtein = formatDominant(traits.dominant_protein);
   const dominantCarb = formatDominant(traits.dominant_carb);
   const vegan = traits.vegan === true;
   const carbHeavy = traits.carb_heavy === true;
 
-  if (!foodGroups && !dominantProtein && !dominantCarb) {
+  if (displayFoodGroups) {
+    items.push({ label: "Food groups", value: displayFoodGroups });
+  }
+  if (dominantProtein) {
+    items.push({ label: "Dominant protein", value: dominantProtein });
+  }
+  if (dominantCarb) {
+    items.push({ label: "Dominant carb", value: dominantCarb });
+  }
+  if (displayFoodGroups || dominantProtein || dominantCarb) {
+    items.push({
+      label: "Diet",
+      value: `${vegan ? "Vegan" : "Not vegan"}${carbHeavy ? " · carb-heavy" : ""}`,
+    });
+  }
+
+  return items;
+}
+
+export function InferredTraitsSummary({
+  traits,
+  emptyMessage = "Add a main recipe with ingredients to infer fish, meat, pasta, and other weekly targets.",
+}: Props) {
+  const items = buildInferredTraitItems(traits);
+  if (items.length === 0) {
     return <p className="muted">{emptyMessage}</p>;
   }
 
-  return (
-    <div className="inferred-traits stack">
-      {foodGroups ? (
-        <p>
-          <span className="muted">Food groups: </span>
-          {foodGroups}
-        </p>
-      ) : null}
-      {dominantProtein ? (
-        <p>
-          <span className="muted">Dominant protein: </span>
-          {dominantProtein}
-        </p>
-      ) : null}
-      {dominantCarb ? (
-        <p>
-          <span className="muted">Dominant carb: </span>
-          {dominantCarb}
-        </p>
-      ) : null}
-      <p>
-        <span className="muted">Diet: </span>
-        {vegan ? "Vegan" : "Not vegan"}
-        {carbHeavy ? " · carb-heavy" : ""}
-      </p>
-    </div>
-  );
+  return <MetadataList items={items} />;
 }

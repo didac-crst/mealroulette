@@ -5,15 +5,14 @@ import { dishCardMeta, dishPlaceholderEmoji, truncateText } from "./dishVisual";
 
 type Props = {
   dish: Dish;
-  onPlan?: (dish: Dish) => void;
 };
 
-export function DishCard({ dish, onPlan }: Props) {
+export function DishCard({ dish }: Props) {
   const emoji = dishPlaceholderEmoji(dish);
 
   return (
-    <article className="dish-card-shell">
-      <Link to={`/dishes/${dish.id}`} className="dish-card">
+    <article className="dish-card">
+      <Link to={`/dishes/${dish.id}`} className="dish-card-link">
         <div className="dish-card-media" aria-hidden={!dish.image_url}>
           {dish.image_url ? (
             <img src={dish.image_url} alt="" className="dish-card-image" loading="lazy" />
@@ -22,16 +21,13 @@ export function DishCard({ dish, onPlan }: Props) {
           )}
         </div>
         <div className="dish-card-body">
-          <h3 className="dish-card-title">{dish.name}</h3>
-          {dish.description ? <p className="dish-card-description muted">{truncateText(dish.description, 100)}</p> : null}
+          <h2 className="dish-card-title">{dish.name}</h2>
+          {dish.description ? (
+            <p className="dish-card-description muted">{truncateText(dish.description, 100)}</p>
+          ) : null}
           <p className="dish-card-meta muted">{dishCardMeta(dish)}</p>
         </div>
       </Link>
-      {onPlan ? (
-        <button type="button" className="button button-secondary dish-card-plan" onClick={() => onPlan(dish)}>
-          Plan for…
-        </button>
-      ) : null}
     </article>
   );
 }

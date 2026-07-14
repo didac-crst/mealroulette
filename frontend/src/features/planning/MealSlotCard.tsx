@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import type { Dish, Recipe } from "../../api/catalog";
 import { fetchRecipes } from "../../api/catalog";
 import { ApiError } from "../../api/client";
+import { Button, DisclosureSection, ResponsiveActionGroup, ReviewOutcomeSelector, SearchSelect, StatusBadge } from "../../components/ui";
+import { dishPlaceholderEmoji } from "../dishes/dishVisual";
 import {
   fetchMealRating,
   lockMealPlanItem,
@@ -25,19 +27,18 @@ import {
   canSwapMeal,
   isFutureMealDate,
   leftoverSourceLabel,
-  reviewStatusClassName,
+  selectionReasonsList,
   showLeftoverSourcePicker,
   showLeftoverSourceSummary,
   showReviewExecutionActions,
   showReviewRating,
   showSkipSummary,
   showUndoStatus,
-  statusClassName,
   swappableMeals,
 } from "./planFormat";
+import { mealStatusBadgeVariant } from "./mealStatusBadge";
 import { canOpenCookMode } from "./todayMeals";
-import { SelectionReasons } from "./SelectionReasons";
-import { StarRating } from "./StarRating";
+import { StarRatingDisplay, StarRatingInput } from "./StarRating";
 import { SwapSlotDialog } from "./SwapSlotDialog";
 
 type Props = {
@@ -81,6 +82,9 @@ export function MealSlotCard({
   const [swapOpen, setSwapOpen] = useState(false);
   const [rating, setRating] = useState<number | null>(null);
   const [comment, setComment] = useState("");
+  const [savedRating, setSavedRating] = useState<number | null>(null);
+  const [savedComment, setSavedComment] = useState<string | null>(null);
+  const [reviewEditing, setReviewEditing] = useState(false);
   const [skipReason, setSkipReason] = useState(item.skip_reason ?? "");
   const [skipComment, setSkipComment] = useState(item.skip_comment ?? "");
   const [skipFormOpen, setSkipFormOpen] = useState(false);
@@ -95,8 +99,7 @@ export function MealSlotCard({
   const sourceItems = sourceLookupItems ?? leftoverSources;
   const isReviewed = (mode === "review" || mode === "today") && item.status !== "planned";
   const statusLabel = mode === "review" || mode === "today" ? formatReviewStatus(item) : formatStatus(item.status);
-  const statusClass =
-    mode === "review" || mode === "today" ? reviewStatusClassName(item) : statusClassName(item.status);
+  const statusBadgeVariant = mealStatusBadgeVariant(item, mode);
   const showUndo = (mode === "review" || mode === "today") && showUndoStatus(item);
   const showTodayReviewPanel = mode !== "today" || reviewExpanded;
   const showReviewPanel =
@@ -105,6 +108,21 @@ export function MealSlotCard({
   const swapTargets = swappableMeals(item, planItems);
   const showReroll = mode === "plan" && onReroll && canRerollMeal(item);
   const showSwap = mode === "plan" && onSwap && canSwapMeal(item);
+  const dish = item.dish_id ? dishes.find((entry) => entry.id === item.dish_id) : undefined;
+  const dishOptions = useMemo(
+    () => dishes.map((entry) => ({ value: String(entry.id), label: entry.name })),
+    [dishes],
+  );
+  const recipeOptions = useMemo(
+    () =>
+      recipes.map((recipe) => ({
+        value: String(recipe.id),
+        label: `${recipe.variant_name}${recipe.is_main ? " (main)" : ""}`,
+      })),
+    [recipes],
+  );
+  const selectionReasons = selectionReasonsList(item);
+  const showLock = mode === "plan";
 
   useEffect(() => {
     if (mode !== "plan" || !item.dish_id) {
@@ -145,19 +163,29 @@ export function MealSlotCard({
         if (cancelled) {
           return;
         }
-        setRating(existing?.rating ?? null);
-        setComment(existing?.comment ?? "");
+        const nextRating = existing?.rating ?? null;
+        const nextComment = existing?.comment ?? "";
+        setRating(nextRating);
+        setComment(nextComment);
+        setSavedRating(nextRating);
+        setSavedComment(existing?.comment ?? null);
       })
       .catch(() => {
         if (!cancelled) {
           setRating(null);
           setComment("");
+          setSavedRating(null);
+          setSavedComment(null);
         }
       });
     return () => {
       cancelled = true;
     };
   }, [accessToken, item.id, item.status]);
+
+  useEffect(() => {
+    setReviewEditing(item.review_saved_at == null);
+  }, [item.review_saved_at]);
 
   useEffect(() => {
     setLeftoverSourceId(item.leftover_source_item_id ? String(item.leftover_source_item_id) : "");
@@ -220,6 +248,7 @@ export function MealSlotCard({
 
   const cardClass = [
     "meal-slot-card",
+    mode === "today" ? "meal-hero-card" : "",
     isFuture && mode === "review" ? "meal-slot-card-future" : "",
     isReviewed ? "meal-slot-card-reviewed" : "",
   ]
@@ -228,113 +257,169 @@ export function MealSlotCard({
 
   return (
     <article className={cardClass}>
-      <div className="meal-slot-header">
-        <div>
-          <p className="meal-slot-label">{formatSlotLabel(item.meal_slot)}</p>
-          {item.dish_id ? (
-            <Link to={`/dishes/${item.dish_id}`} className="meal-slot-dish">
-              {item.dish_name}
-            </Link>
-          ) : (
-            <p className="muted meal-slot-empty">No dish assigned</p>
-          )}
-          {item.recipe_variant_name && !(mode === "plan" && item.dish_id && recipes.length > 0) ? (
-            <p className="muted meal-slot-recipe">{item.recipe_variant_name}</p>
-          ) : null}
+      {mode === "today" ? (
+        <div className="meal-hero-top">
+          <div className="meal-hero-media" aria-hidden={!dish?.image_url}>
+            {dish?.image_url ? (
+              <img src={dish.image_url} alt="" className="meal-hero-image" />
+            ) : (
+              <span className="meal-hero-emoji">{dish ? dishPlaceholderEmoji(dish) : "🍽️"}</span>
+            )}
+          </div>
+          <div className="meal-hero-content">
+            <div className="meal-hero-heading">
+              <p className="meal-slot-label">{formatSlotLabel(item.meal_slot)}</p>
+              <StatusBadge variant={statusBadgeVariant}>{statusLabel}</StatusBadge>
+            </div>
+            {item.dish_id ? (
+              <Link to={`/dishes/${item.dish_id}`} className="meal-hero-title">
+                {item.dish_name}
+              </Link>
+            ) : (
+              <p className="muted meal-slot-empty">No dish assigned</p>
+            )}
+            {item.recipe_variant_name ? (
+              <p className="muted meal-hero-recipe">{item.recipe_variant_name}</p>
+            ) : null}
+          </div>
         </div>
-        <div className="meal-slot-header-aside">
-          <span className={statusClass}>{statusLabel}</span>
-          {showUndo ? (
-            <button
-              type="button"
-              className="button button-undo"
-              disabled={busy}
-              onClick={() => void run(() => resetMealPlanItemStatus(accessToken, item.id))}
-            >
-              Undo status
-            </button>
-          ) : null}
+      ) : (
+        <div className="meal-slot-header">
+          <div>
+            <p className="meal-slot-label">{formatSlotLabel(item.meal_slot)}</p>
+            {item.dish_id ? (
+              <Link to={`/dishes/${item.dish_id}`} className="meal-slot-dish">
+                {item.dish_name}
+              </Link>
+            ) : (
+              <p className="muted meal-slot-empty">No dish assigned</p>
+            )}
+            {item.recipe_variant_name && !(mode === "plan" && item.dish_id && recipes.length > 0) ? (
+              <p className="muted meal-slot-recipe">{item.recipe_variant_name}</p>
+            ) : null}
+          </div>
+          <div className="meal-slot-header-aside">
+            <StatusBadge variant={statusBadgeVariant}>{statusLabel}</StatusBadge>
+            {showUndo ? (
+              <button
+                type="button"
+                className="button button-undo"
+                disabled={busy}
+                onClick={() => void run(() => resetMealPlanItemStatus(accessToken, item.id))}
+              >
+                Undo status
+              </button>
+            ) : null}
+          </div>
         </div>
-      </div>
+      )}
+
+      {mode === "today" && showUndo ? (
+        <div className="meal-hero-undo">
+          <button
+            type="button"
+            className="button button-undo"
+            disabled={busy}
+            onClick={() => void run(() => resetMealPlanItemStatus(accessToken, item.id))}
+          >
+            Undo status
+          </button>
+        </div>
+      ) : null}
 
       {mode === "plan" ? (
         <>
           <label className="meal-slot-assign">
             <span className="muted">Assign dish</span>
-            <select
-              value={item.dish_id ?? ""}
+            <SearchSelect
+              ariaLabel="Assign dish"
+              value={item.dish_id ? String(item.dish_id) : ""}
+              options={dishOptions}
               disabled={busy || item.is_locked}
-              onChange={(event) => void handleDishChange(event.target.value)}
-            >
-              <option value="">—</option>
-              {dishes.map((dish) => (
-                <option key={dish.id} value={dish.id}>
-                  {dish.name}
-                </option>
-              ))}
-            </select>
+              placeholder="Search dishes…"
+              allowEmptyOption
+              emptyLabel="Clear assignment"
+              onChange={(nextValue) => void handleDishChange(nextValue)}
+            />
           </label>
 
-          {item.dish_id && recipes.length > 0 ? (
+          {item.dish_id && recipesLoading ? (
+            <p className="muted meal-slot-recipe">Loading recipes…</p>
+          ) : item.dish_id && recipes.length === 0 ? (
+            <p className="muted meal-slot-recipe">No recipes for this dish yet.</p>
+          ) : item.dish_id && recipes.length === 1 ? (
+            <p className="muted meal-slot-recipe">
+              Recipe: <strong>{recipes[0]?.variant_name}</strong>
+              {recipes[0]?.is_main ? " (main)" : ""}
+            </p>
+          ) : item.dish_id && recipes.length > 1 ? (
             <label className="meal-slot-assign">
               <span className="muted">Recipe variant</span>
-              <select
-                value={item.recipe_id ?? ""}
+              <SearchSelect
+                ariaLabel="Recipe variant"
+                value={item.recipe_id ? String(item.recipe_id) : ""}
+                options={recipeOptions}
                 disabled={busy || item.is_locked}
-                onChange={(event) => void handleRecipeChange(event.target.value)}
-              >
-                <option value="">—</option>
-                {recipes.map((recipe) => (
-                  <option key={recipe.id} value={recipe.id}>
-                    {recipe.variant_name}
-                    {recipe.is_main ? " (main)" : ""}
-                  </option>
-                ))}
-              </select>
+                placeholder="Search recipes…"
+                allowEmptyOption
+                emptyLabel="Main recipe"
+                onChange={(nextValue) => void handleRecipeChange(nextValue)}
+              />
             </label>
-          ) : item.dish_id && recipes.length === 0 && recipesLoading ? (
-            <p className="muted meal-slot-recipe">Loading recipes…</p>
-          ) : item.dish_id && recipes.length === 0 && !busy ? (
-            <p className="muted meal-slot-recipe">No recipe for this dish yet.</p>
           ) : null}
 
-          <SelectionReasons item={item} />
+          {selectionReasons.length > 0 ? (
+            <DisclosureSection title="Why this meal">
+              <ul className="selection-reasons-list">
+                {selectionReasons.map((reason, index) => (
+                  <li key={`${index}-${reason}`}>{reason}</li>
+                ))}
+              </ul>
+            </DisclosureSection>
+          ) : null}
 
-          <div className="meal-slot-actions">
+          <div className="meal-slot-plan-actions">
             {showReroll ? (
-              <button
+              <Button
                 type="button"
-                className="button button-secondary"
+                variant="roulette"
+                size="sm"
                 disabled={actionBusy}
                 onClick={() => onReroll?.(item)}
               >
                 Reroll
-              </button>
+              </Button>
             ) : null}
             {showSwap ? (
-              <button
+              <Button
                 type="button"
-                className="button button-secondary"
+                variant="secondary"
+                size="sm"
+                className="meal-slot-secondary-action"
                 disabled={actionBusy}
                 onClick={() => setSwapOpen(true)}
               >
                 Swap
-              </button>
+              </Button>
             ) : null}
-            <button
-              type="button"
-              className="button button-secondary"
-              disabled={actionBusy || (!item.is_locked && !item.dish_id)}
-              onClick={() =>
-                void run(() =>
-                  item.is_locked
-                    ? unlockMealPlanItem(accessToken, item.id)
-                    : lockMealPlanItem(accessToken, item.id),
-                )
-              }
-            >
-              {item.is_locked ? "Unlock" : "Lock"}
-            </button>
+            {showLock ? (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="meal-slot-secondary-action"
+                disabled={actionBusy || (!item.is_locked && !item.dish_id)}
+                onClick={() =>
+                  void run(() =>
+                    item.is_locked
+                      ? unlockMealPlanItem(accessToken, item.id)
+                      : lockMealPlanItem(accessToken, item.id),
+                  )
+                }
+              >
+                {item.is_locked ? "Unlock" : "Lock"}
+              </Button>
+            ) : null}
           </div>
           {swapOpen && onSwap ? (
             <SwapSlotDialog
@@ -352,7 +437,7 @@ export function MealSlotCard({
       ) : null}
 
       {mode === "today" && (item.dish_id || showReviewExecutionActions(item)) ? (
-        <div className="meal-slot-actions meal-slot-actions-primary today-meal-primary-actions">
+        <ResponsiveActionGroup className="meal-hero-actions" stackOnMobile>
           {item.dish_id ? (
             canOpenCookMode(item) ? (
               cookRecipeId ? (
@@ -371,11 +456,11 @@ export function MealSlotCard({
             )
           ) : null}
           {showReviewExecutionActions(item) && onReviewToggle ? (
-            <button type="button" className="button button-secondary" onClick={onReviewToggle}>
+            <button type="button" className="button button-ghost" onClick={onReviewToggle}>
               {reviewExpanded ? "Hide review" : "Review"}
             </button>
           ) : null}
-        </div>
+        </ResponsiveActionGroup>
       ) : null}
 
       {mode === "review" && isFuture ? (
@@ -385,32 +470,35 @@ export function MealSlotCard({
       {showReviewPanel ? (
         <>
           {showReviewExecutionActions(item) && !skipFormOpen ? (
-            <div className="meal-slot-actions meal-slot-actions-primary">
-              <button
-                type="button"
-                className="button button-secondary"
-                disabled={busy || !item.dish_id}
-                onClick={() => void run(() => markMealPlanItemEaten(accessToken, item.id))}
-              >
-                Ate as planned
-              </button>
-              <button
-                type="button"
-                className="button button-secondary"
-                disabled={busy}
-                onClick={() => setSkipFormOpen(true)}
-              >
-                Skipped
-              </button>
-              <button
-                type="button"
-                className="button button-secondary"
-                disabled={busy}
-                onClick={() => void run(() => markMealPlanItemAteLeftovers(accessToken, item.id))}
-              >
-                Ate leftovers
-              </button>
-            </div>
+            <ReviewOutcomeSelector
+              ariaLabel="How did this meal go?"
+              options={[
+                {
+                  id: "ate",
+                  title: "Ate as planned",
+                  description: "Mark this meal as eaten.",
+                  icon: "✓",
+                  disabled: busy || !item.dish_id,
+                  onSelect: () => void run(() => markMealPlanItemEaten(accessToken, item.id)),
+                },
+                {
+                  id: "skipped",
+                  title: "Skipped",
+                  description: "Did not eat this meal.",
+                  icon: "—",
+                  disabled: busy,
+                  onSelect: () => setSkipFormOpen(true),
+                },
+                {
+                  id: "leftovers",
+                  title: "Ate leftovers",
+                  description: "Finished leftovers instead.",
+                  icon: "↺",
+                  disabled: busy,
+                  onSelect: () => void run(() => markMealPlanItemAteLeftovers(accessToken, item.id)),
+                },
+              ]}
+            />
           ) : null}
 
           {showReviewExecutionActions(item) && skipFormOpen ? (
@@ -509,35 +597,66 @@ export function MealSlotCard({
           {showReviewRating(item) && item.dish_id ? (
             <div className="meal-slot-review-panel stack">
               <p className="section-title">Rate this meal</p>
-              <StarRating value={rating} disabled={busy} onChange={setRating} />
-              <label>
-                Comment
-                <input value={comment} onChange={(event) => setComment(event.target.value)} />
-              </label>
-              <button
-                type="button"
-                className="button"
-                disabled={busy || rating === null}
-                onClick={() => {
-                  if (rating === null) {
-                    return;
-                  }
-                  setBusy(true);
-                  setRatingMessage(null);
-                  upsertMealRating(accessToken, item.id, { rating, comment: comment || null })
-                    .then((result) => {
-                      setRatingMessage("Rating saved");
-                      onChanged(result.item);
-                    })
-                    .catch((err) =>
-                      onError(err instanceof ApiError ? err.message : "Failed to save rating"),
-                    )
-                    .finally(() => setBusy(false));
-                }}
-              >
-                Save rating
-              </button>
-              {ratingMessage ? <p className="muted">{ratingMessage}</p> : null}
+              {item.review_saved_at && !reviewEditing && savedRating ? (
+                <div className="meal-review-readonly stack">
+                  <StarRatingDisplay value={savedRating} />
+                  {savedComment ? <p className="muted">“{savedComment}”</p> : null}
+                  <button type="button" className="button button-secondary" disabled={busy} onClick={() => setReviewEditing(true)}>
+                    Edit review
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <StarRatingInput value={rating} disabled={busy} onChange={setRating} />
+                  <label>
+                    Comment
+                    <input value={comment} onChange={(event) => setComment(event.target.value)} />
+                  </label>
+                  <div className="meal-slot-actions meal-slot-actions-primary">
+                    <button
+                      type="button"
+                      className="button"
+                      disabled={busy || rating === null}
+                      onClick={() => {
+                        if (rating === null) {
+                          return;
+                        }
+                        setBusy(true);
+                        setRatingMessage(null);
+                        upsertMealRating(accessToken, item.id, { rating, comment: comment || null })
+                          .then((result) => {
+                            setRatingMessage("Rating saved");
+                            setSavedRating(rating);
+                            setSavedComment(comment || null);
+                            setReviewEditing(false);
+                            onChanged(result.item);
+                          })
+                          .catch((err) =>
+                            onError(err instanceof ApiError ? err.message : "Failed to save rating"),
+                          )
+                          .finally(() => setBusy(false));
+                      }}
+                    >
+                      Save rating
+                    </button>
+                    {item.review_saved_at ? (
+                      <button
+                        type="button"
+                        className="button button-secondary"
+                        disabled={busy}
+                        onClick={() => {
+                          setRating(savedRating);
+                          setComment(savedComment ?? "");
+                          setReviewEditing(false);
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    ) : null}
+                  </div>
+                  {ratingMessage ? <p className="muted">{ratingMessage}</p> : null}
+                </>
+              )}
             </div>
           ) : null}
         </>

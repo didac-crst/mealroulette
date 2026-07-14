@@ -148,7 +148,8 @@ describe("RecipeCookingPage", () => {
   it("renders cooking mode for a recipe with steps", async () => {
     renderCookingPage();
 
-    expect(await screen.findByRole("heading", { name: "Standard" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Cook" })).toBeInTheDocument();
+    expect(screen.getByText("Tomato Pasta · Standard")).toBeInTheDocument();
     expect(screen.getByText("Step 1 of 2")).toBeInTheDocument();
     expect(screen.getByText("Boil water.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Exit" })).toHaveAttribute("href", "/dishes/10/recipes/42");
@@ -159,7 +160,7 @@ describe("RecipeCookingPage", () => {
 
     expect(await screen.findByText("Boil water.")).toBeInTheDocument();
     const previous = screen.getByRole("button", { name: "Previous" });
-    const next = screen.getByRole("button", { name: "Next" });
+    const next = screen.getByRole("button", { name: "Next step" });
 
     expect(previous).toBeDisabled();
     expect(next).toBeEnabled();
@@ -180,7 +181,7 @@ describe("RecipeCookingPage", () => {
 
     expect(await screen.findByText("No steps")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Previous" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "Next" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Next step" })).toBeDisabled();
   });
 
   it("shows start timer when step has timer metadata", async () => {
@@ -244,7 +245,7 @@ describe("RecipeCookingPage", () => {
       await act(async () => {
         await vi.advanceTimersByTimeAsync(3500);
       });
-      fireEvent.click(screen.getByRole("button", { name: "Next" }));
+      fireEvent.click(screen.getByRole("button", { name: "Next step" }));
 
       expect(await screen.findByText("Ready!")).toBeInTheDocument();
       fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
@@ -328,7 +329,7 @@ describe("RecipeCookingPage", () => {
       await act(async () => {
         await vi.advanceTimersByTimeAsync(2000);
       });
-      fireEvent.click(screen.getByRole("button", { name: "Next" }));
+      fireEvent.click(screen.getByRole("button", { name: "Next step" }));
 
       expect(screen.getByLabelText("Active cooking timers")).toBeInTheDocument();
       expect(screen.getByText("Running timers")).toBeInTheDocument();

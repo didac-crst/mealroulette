@@ -1,4 +1,5 @@
 import type { Dish, Tag } from "../../api/catalog";
+import { Card, MetadataList } from "../../components/ui";
 import {
   MEAL_COMPOSITION_OPTIONS,
   MONTH_OPTIONS,
@@ -9,12 +10,17 @@ import {
   selectedTagNames,
 } from "./classification";
 import { formatDifficulty } from "./constants";
-import { InferredTraitsSummary } from "./InferredTraitsSummary";
+import { buildInferredTraitItems } from "./InferredTraitsSummary";
+import { RecipeCompositionChart } from "./RecipeCompositionChart";
 
 type Props = {
   dish: Dish;
   tags: Tag[];
 };
+
+function inferredTraitItemsWithoutFoodGroups(traits: Dish["computed_traits_json"]) {
+  return buildInferredTraitItems(traits).filter((item) => item.label !== "Food groups");
+}
 
 function joinLabels(values: string[], options: ReadonlyArray<{ value: string; label: string }>): string {
   if (values.length === 0) {
@@ -23,132 +29,142 @@ function joinLabels(values: string[], options: ReadonlyArray<{ value: string; la
   return values.map((value) => formatOptionLabel(options, value)).join(", ");
 }
 
+function yesNo(value: boolean | null | undefined, unset = "Not set"): string {
+  if (value == null) {
+    return unset;
+  }
+  return value ? "Yes" : "No";
+}
+
 export function DishInheritedContext({ dish, tags }: Props) {
   const styles = selectedTagNames(tags, dish.tag_ids, "style");
   const mealSlots: string[] = [];
   if (dish.suitable_for_lunch) {
-    mealSlots.push("lunch");
+    mealSlots.push("Lunch");
   }
   if (dish.suitable_for_dinner) {
-    mealSlots.push("dinner");
+    mealSlots.push("Dinner");
   }
 
   return (
     <aside className="inherited-context stack">
-      <h3 className="section-title">Inherited from dish</h3>
-      <p>
-        <span className="muted">Meal composition: </span>
-        {formatOptionLabel(MEAL_COMPOSITION_OPTIONS, dish.meal_composition)}
-        {dish.meal_composition === "simple_dish" && dish.simple_dish_part
-          ? ` (${formatOptionLabel(SIMPLE_DISH_PART_OPTIONS, dish.simple_dish_part)})`
-          : ""}
-      </p>
-      <InferredTraitsSummary traits={dish.computed_traits_json} />
-      {styles.length > 0 ? (
-        <p>
-          <span className="muted">Curated style: </span>
-          {joinLabels(styles, STYLE_OPTIONS)}
-        </p>
-      ) : null}
-      <p>
-        <span className="muted">Suitable for: </span>
-        {mealSlots.length > 0 ? mealSlots.join(", ") : "Not set"}
-      </p>
-      <p>
-        <span className="muted">Default time: </span>
-        {dish.default_prep_time_minutes ?? "—"} / {dish.default_cook_time_minutes ?? "—"} min
-      </p>
-      <p>
-        <span className="muted">Default difficulty: </span>
-        {formatDifficulty(dish.default_difficulty)}
-      </p>
-      {dish.kids_friendly ? <p className="muted">Kids-friendly dish</p> : null}
+      <h3 className="classification-summary-heading">Inherited from dish</h3>
+      <MetadataList
+        items={[
+          {
+            label: "Meal composition",
+            value: (
+              <>
+                {formatOptionLabel(MEAL_COMPOSITION_OPTIONS, dish.meal_composition)}
+                {dish.meal_composition === "simple_dish" && dish.simple_dish_part
+                  ? ` (${formatOptionLabel(SIMPLE_DISH_PART_OPTIONS, dish.simple_dish_part)})`
+                  : ""}
+              </>
+            ),
+          },
+          ...(styles.length > 0
+            ? [{ label: "Curated style", value: joinLabels(styles, STYLE_OPTIONS) }]
+            : []),
+          { label: "Suitable for", value: mealSlots.length > 0 ? mealSlots.join(", ") : "Not set" },
+          {
+            label: "Default time",
+            value: `${dish.default_prep_time_minutes ?? "—"} / ${dish.default_cook_time_minutes ?? "—"} min`,
+          },
+          { label: "Default difficulty", value: formatDifficulty(dish.default_difficulty) },
+          ...(dish.kids_friendly ? [{ label: "Kids-friendly", value: "Yes" }] : []),
+          ...buildInferredTraitItems(dish.computed_traits_json),
+        ]}
+      />
     </aside>
   );
 }
 
 export function DishClassificationSummary({ dish, tags }: Props) {
   const styles = selectedTagNames(tags, dish.tag_ids, "style");
-
   const mealSlots: string[] = [];
   if (dish.suitable_for_lunch) {
-    mealSlots.push("lunch");
+    mealSlots.push("Lunch");
   }
   if (dish.suitable_for_dinner) {
-    mealSlots.push("dinner");
+    mealSlots.push("Dinner");
   }
 
   return (
-    <div className="classification-summary stack">
+    <Card density="comfortable" className="classification-summary stack">
       <div>
-        <h3 className="section-title">Classification</h3>
-        <p>
-          <span className="muted">Meal composition: </span>
-          {formatOptionLabel(MEAL_COMPOSITION_OPTIONS, dish.meal_composition)}
-          {dish.meal_composition === "simple_dish" && dish.simple_dish_part
-            ? ` (${formatOptionLabel(SIMPLE_DISH_PART_OPTIONS, dish.simple_dish_part)})`
-            : ""}
-        </p>
-        <InferredTraitsSummary traits={dish.computed_traits_json} />
-        {styles.length > 0 ? (
-          <p>
-            <span className="muted">Curated style: </span>
-            {joinLabels(styles, STYLE_OPTIONS)}
-          </p>
-        ) : null}
+        <h3 className="classification-summary-heading">Classification</h3>
+        <MetadataList
+          items={[
+            {
+              label: "Meal composition",
+              value: (
+                <>
+                  {formatOptionLabel(MEAL_COMPOSITION_OPTIONS, dish.meal_composition)}
+                  {dish.meal_composition === "simple_dish" && dish.simple_dish_part
+                    ? ` (${formatOptionLabel(SIMPLE_DISH_PART_OPTIONS, dish.simple_dish_part)})`
+                    : ""}
+                </>
+              ),
+            },
+            ...(styles.length > 0
+              ? [{ label: "Curated style", value: joinLabels(styles, STYLE_OPTIONS) }]
+              : []),
+            ...inferredTraitItemsWithoutFoodGroups(dish.computed_traits_json),
+          ]}
+        />
       </div>
+      <RecipeCompositionChart
+        traits={dish.computed_traits_json}
+        title="Food group composition (main recipe)"
+      />
       <div>
-        <h3 className="section-title">Planning profile</h3>
-        <p>
-          <span className="muted">Suitable for: </span>
-          {mealSlots.length > 0 ? mealSlots.join(", ") : "Not set"}
-        </p>
-        <p>
-          <span className="muted">Weekday-friendly: </span>
-          {dish.weekday_friendly == null ? "Not set" : dish.weekday_friendly ? "Yes" : "No"}
-        </p>
-        <p>
-          <span className="muted">Kids-friendly: </span>
-          {dish.kids_friendly == null ? "Not set" : dish.kids_friendly ? "Yes" : "No"}
-        </p>
-        <p>
-          <span className="muted">Leftovers: </span>
-          {dish.leftovers_possible == null ? "Not set" : dish.leftovers_possible ? "Possible" : "No"}
-        </p>
-        <p>
-          <span className="muted">Freezer-friendly: </span>
-          {dish.freezer_friendly == null ? "Unknown" : dish.freezer_friendly ? "Yes" : "No"}
-        </p>
-        <p>
-          <span className="muted">Thermomix possible: </span>
-          {dish.thermomix_possible == null ? "No recipes yet" : dish.thermomix_possible ? "Yes" : "No"}
-        </p>
-        <p>
-          <span className="muted">Difficulty (main recipe): </span>
-          {formatDifficulty(dish.default_difficulty)}
-        </p>
-        <p>
-          <span className="muted">Prep / cook (main recipe): </span>
-          {dish.default_prep_time_minutes ?? "—"} / {dish.default_cook_time_minutes ?? "—"} min
-        </p>
+        <h3 className="classification-summary-heading">Planning profile</h3>
+        <MetadataList
+          items={[
+            { label: "Suitable for", value: mealSlots.length > 0 ? mealSlots.join(", ") : "Not set" },
+            { label: "Weekday-friendly", value: yesNo(dish.weekday_friendly) },
+            { label: "Kids-friendly", value: yesNo(dish.kids_friendly) },
+            {
+              label: "Leftovers",
+              value: dish.leftovers_possible == null ? "Not set" : dish.leftovers_possible ? "Possible" : "No",
+            },
+            { label: "Freezer-friendly", value: yesNo(dish.freezer_friendly, "Unknown") },
+            {
+              label: "Thermomix possible",
+              value: dish.thermomix_possible == null ? "No recipes yet" : yesNo(dish.thermomix_possible),
+            },
+            { label: "Difficulty (main recipe)", value: formatDifficulty(dish.default_difficulty) },
+            {
+              label: "Prep / cook (main recipe)",
+              value: `${dish.default_prep_time_minutes ?? "—"} / ${dish.default_cook_time_minutes ?? "—"} min`,
+            },
+          ]}
+        />
       </div>
       {dish.seasonality ? (
         <div>
-          <h3 className="section-title">Seasonality</h3>
-          <p>
-            <span className="muted">Mode: </span>
-            {formatOptionLabel(SEASONALITY_MODE_OPTIONS, dish.seasonality.seasonality_mode)}
-          </p>
-          {dish.seasonality.seasonality_mode === "seasonal" && dish.seasonality.preferred_months.length > 0 ? (
-            <p>
-              <span className="muted">Preferred months: </span>
-              {dish.seasonality.preferred_months
-                .map((month) => MONTH_OPTIONS.find((option) => option.value === month)?.label ?? month)
-                .join(", ")}
-            </p>
-          ) : null}
+          <h3 className="classification-summary-heading">Seasonality</h3>
+          <MetadataList
+            items={[
+              {
+                label: "Mode",
+                value: formatOptionLabel(SEASONALITY_MODE_OPTIONS, dish.seasonality.seasonality_mode),
+              },
+              ...(dish.seasonality.seasonality_mode === "seasonal" &&
+              dish.seasonality.preferred_months.length > 0
+                ? [
+                    {
+                      label: "Preferred months",
+                      value: dish.seasonality.preferred_months
+                        .map((month) => MONTH_OPTIONS.find((option) => option.value === month)?.label ?? month)
+                        .join(", "),
+                    },
+                  ]
+                : []),
+            ]}
+          />
         </div>
       ) : null}
-    </div>
+    </Card>
   );
 }
