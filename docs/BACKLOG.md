@@ -89,7 +89,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.9** | UI/UX design system + live recipe traits — shared shell, visual QA, fresh trait reads | **Done** ([`v0.9.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.9.0), merge `9647509`, PR #12/#13) |
 | **v0.10** | Composable meals — multi-dish slots, simple dishes, do-not-plan, faster roulette | **Done** ([`v0.10.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.10.0), merge `a2e29de`, PR #14) |
 | **v0.11** | Pair compatibility and reroll memory — prevent bad simple-dish pairs and reroll cycles | **Done** ([`v0.11.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.11.0), merge `82f20de`, PR #15) |
-| **Future** | Household users and memberships — user creation, household scoping, Telegram linking | Architecture needed |
+| **Future** | Household users and memberships — user creation, household scoping, Telegram linking | Architecture accepted |
 | **Future** | LLM-assisted entry — draft enrichment, review before save | Not started |
 | **v1.0** | Stable home version — backups, auth hardening, scheduler reliability | Not started |
 
@@ -327,31 +327,36 @@ When `meal_composition = simple_dish`, **`simple_dish_part`** is required: `cent
 
 ### Future — Household Users and Memberships
 
-**Status:** Architecture needed before implementation.
+**Status:** Architecture accepted for first implementation — see [ADR 003](adr/003-household-tenancy-and-authorization.md).
 
 Use **household** or **workspace** as the product concept, not "entity".
 
 Recommended staged model:
 
+- [ ] Use UUID primary keys for users, households, memberships, invitations, Telegram links, and platform-role assignments.
+- [ ] Keep existing integer primary keys for catalog, planning, shopping, and scheduler content unless an external/public identifier is needed.
 - [ ] Single default household migration for current installations.
 - [ ] `households` table.
 - [ ] `household_memberships` table with household-level roles.
-- [ ] User creation/invite UI for household admins.
-- [ ] Join requests that require household-admin approval.
+- [ ] Atomic signup creates user, household, and first household-admin membership.
+- [ ] User creation/invitation UI for household admins; invitations join as normal members first.
 - [ ] Telegram subscriptions linked to `{user, household}`.
-- [ ] Household-scoped plans, dishes, recipes, settings, ratings, and notifications.
-- [ ] System-level canonical ingredients, food groups, units, and taxonomy restricted to `system_admin`.
+- [ ] Household-scoped plans, dishes, recipes, planning settings, ratings, and notifications.
+- [ ] Ratings support both user-level recipe preference and user-level meal-slot review context.
+- [ ] System-level canonical ingredients, food groups, units, and taxonomy restricted to `platform_admin`.
 - [ ] Household admins can manage household recipes/dishes but cannot mutate global canonical taxonomy.
+- [ ] Treat whole-database backup/restore as a platform operation; defer household-level portable export/import.
+- [ ] Defer public recipe sharing, localization tables, and cross-household copy/adopt workflows until after tenant isolation is stable.
 
 Initial role direction:
 
 | Scope | Role | Capability |
 | --- | --- | --- |
-| System | `system_admin` | Canonical ingredients, taxonomy, units, global maintenance |
-| Household | `admin` | Manage household members, recipes, dishes, planning settings |
-| Household | `user` | Plan, shop, cook, review, reroll |
+| Platform | `platform_admin` | Canonical ingredients, taxonomy, units, database backup/restore, global maintenance |
+| Household | `household_admin` | Manage household members, invitations, recipes, dishes, planning settings |
+| Household | `household_member` | Plan, shop, cook, review, reroll, collaborate on household recipes |
 
-Do not add public signup before household scoping and membership approval are specified.
+Initial UI may assume one active household per session even though the model supports multiple memberships. Do not add public discovery of households; joining an existing household requires an invitation.
 
 ### v1.0 — Stable Home Version
 
@@ -387,7 +392,7 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 12 | UI/UX design system and live traits | v0.9 | Done (PR #12/#13, `v0.9.0`) |
 | 13 | Composable meals and simple dishes | v0.10 | Done (PR #14, `v0.10.0`) |
 | 14 | Pair compatibility and reroll memory | v0.11 | Done (PR #15, `v0.11.0`) |
-| 15 | Household users and memberships | Future | Architecture needed |
+| 15 | Household users and memberships | Future | Architecture accepted (ADR 003) |
 | 16 | LLM-assisted entry & localization | Future | Not started |
 | 17 | v1 hardening | v1.0 | Not started |
 

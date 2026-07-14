@@ -932,21 +932,25 @@ Acceptance criteria:
 
 ### Phase 15 - Household Users and Memberships
 
-Architecture spec: not yet written. Shipment status: [BACKLOG.md](BACKLOG.md).
+Architecture spec: [ADR 003 — Household tenancy and authorization](adr/003-household-tenancy-and-authorization.md). Shipment status: [BACKLOG.md](BACKLOG.md).
 
 Deliverables:
 
 - Decide final product name: recommended `household` or `workspace`, not `entity`.
+- Use UUID primary keys for users, households, memberships, invitations, Telegram links, and platform-role assignments.
+- Keep existing integer IDs for content tables unless an external/public identifier is needed.
 - Single default household migration for existing installations.
 - Household membership model and per-household roles.
-- User creation/invite/join-request flow.
+- Atomic user+household signup and invitation-based join flow.
 - Household-scoped plan, dish, recipe, settings, rating, and Telegram subscription behavior.
-- System-level role for canonical ingredient/taxonomy maintenance.
+- Separate user-level recipe ratings from meal-slot reviews; both are user-contextual.
+- Platform-level role for canonical ingredient/taxonomy maintenance and whole-database backup/restore.
+- Defer public recipe sharing, localization tables, and household-level portable export/import.
 
 Acceptance criteria:
 
 - Existing installations migrate into one default household without losing access.
-- A household admin can invite or approve users for their household.
+- A household admin can invite users for their household.
 - Normal household users cannot mutate canonical ingredients, food groups, units, or global taxonomy.
 - Telegram subscriptions are linked to a user and household.
 - Public signup does not grant household access without approval.
