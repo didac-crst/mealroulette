@@ -13,6 +13,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from mealroulette.db.session import SessionLocal
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID
 from mealroulette.models.planning import MealPlan, MealPlanItem
 from mealroulette.services.household_time import household_local_today
 from mealroulette.services.planning import PlanningService
@@ -134,10 +135,10 @@ def main() -> None:
     rerolls_per_slot = args.rerolls
     db = SessionLocal()
     try:
-        reference_date = household_local_today(db)
+        reference_date = household_local_today(db, DEFAULT_HOUSEHOLD_ID)
         week_start = PlanningService.week_start_for(reference_date)
-        rules = PlanningRuleService(db).get_active_rules()
-        candidates = load_dish_candidates(db, rules=rules)
+        rules = PlanningRuleService(db, household_id=DEFAULT_HOUSEHOLD_ID).get_active_rules()
+        candidates = load_dish_candidates(db, rules=rules, household_id=DEFAULT_HOUSEHOLD_ID)
         names = {candidate.dish_id: candidate.dish_name for candidate in candidates}
 
         mains = sum(1 for candidate in candidates if is_main_candidate(candidate))
@@ -146,7 +147,10 @@ def main() -> None:
 
         plan = db.scalar(
             select(MealPlan)
-            .where(MealPlan.week_start_date == week_start)
+            .where(
+                MealPlan.week_start_date == week_start,
+                MealPlan.household_id == DEFAULT_HOUSEHOLD_ID,
+            )
             .options(selectinload(MealPlan.items).selectinload(MealPlanItem.lines))
         )
         if plan is None:
@@ -209,6 +213,7 @@ def main() -> None:
                 before_date=item.date + timedelta(days=1),
                 window_days=max(rules.history_window_days, rules.avoid_same_dish_within_days),
                 rules=rules,
+                household_id=DEFAULT_HOUSEHOLD_ID,
             )
 
             common = dict(

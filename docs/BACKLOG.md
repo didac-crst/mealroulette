@@ -25,7 +25,7 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Next focus — household users and memberships architecture.**
+**Current focus — finish Phase 15 household users and memberships.**
 
 `v0.9.0` shipped documentation harmonization, UI/UX design-system reconciliation, and live computed traits. See [releases/v0.9.0.md](releases/v0.9.0.md).
 
@@ -89,8 +89,9 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.9** | UI/UX design system + live recipe traits — shared shell, visual QA, fresh trait reads | **Done** ([`v0.9.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.9.0), merge `9647509`, PR #12/#13) |
 | **v0.10** | Composable meals — multi-dish slots, simple dishes, do-not-plan, faster roulette | **Done** ([`v0.10.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.10.0), merge `a2e29de`, PR #14) |
 | **v0.11** | Pair compatibility and reroll memory — prevent bad simple-dish pairs and reroll cycles | **Done** ([`v0.11.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.11.0), merge `82f20de`, PR #15) |
-| **Future** | Household users and memberships — user creation, household scoping, Telegram linking | Architecture accepted |
-| **Future** | LLM-assisted entry — draft enrichment, review before save | Not started |
+| **Future** | Household users and memberships — user creation, household scoping, Telegram linking | In progress (Phase 15) |
+| **Future** | Public dish catalog — publish private dishes, subscribe read-only, platform registry | Architecture accepted (ADR 004) |
+| **Future** | LLM-assisted entry and localization — draft enrichment, translations, review workflow | Architecture/design ready |
 | **v1.0** | Stable home version — backups, auth hardening, scheduler reliability | Not started |
 
 > **v0.6 shipped** as [`v0.6.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.6.0). Catalog keys, computed traits, taxonomy APIs, resolver, taxonomy navigator UI. Release notes: [docs/releases/v0.6.0.md](releases/v0.6.0.md).
@@ -325,9 +326,9 @@ When `meal_composition = simple_dish`, **`simple_dish_part`** is required: `cent
 - [x] Add explicit reroll exhaustion behavior.
 - [x] Add table-driven tests for the bad screenshot examples and good expected pairs.
 
-### Future — Household Users and Memberships
+### Phase 15 — Household Users and Memberships
 
-**Status:** Architecture accepted for first implementation — see [ADR 003](adr/003-household-tenancy-and-authorization.md).
+**Status:** In progress. Canonical architecture: [ADR 003](adr/003-household-tenancy-and-authorization.md), amended by [ADR 004](adr/004-platform-ops-public-dishes-and-tenancy-refinements.md).
 
 Use **household** or **workspace** as the product concept, not "entity".
 
@@ -335,18 +336,22 @@ Recommended staged model:
 
 - [ ] Use UUID primary keys for users, households, memberships, invitations, Telegram links, and platform-role assignments.
 - [ ] Keep existing integer primary keys for catalog, planning, shopping, and scheduler content unless an external/public identifier is needed.
-- [ ] Single default household migration for current installations.
+- [ ] Upgrade-only migration household for current installations; greenfield installs create no product default household.
 - [ ] `households` table.
 - [ ] `household_memberships` table with household-level roles.
 - [ ] Atomic signup creates user, household, and first household-admin membership.
 - [ ] User creation/invitation UI for household admins; invitations join as normal members first.
+- [ ] Platform admin bootstrap command creates a platform operator without household membership.
+- [ ] Enforce one active household membership per user for the initial product.
+- [ ] Split frontend navigation and backend APIs between platform-only and household-scoped workflows.
 - [ ] Telegram subscriptions linked to `{user, household}`.
-- [ ] Household-scoped plans, dishes, recipes, planning settings, ratings, and notifications.
-- [ ] Ratings support both user-level recipe preference and user-level meal-slot review context.
-- [ ] System-level canonical ingredients, food groups, units, and taxonomy restricted to `platform_admin`.
+- [ ] Household-scoped plans, dishes, recipes, planning settings, meal-slot reviews, and notifications.
+- [x] Meal-slot reviews (`meal_reviews`) are the Phase 15 feedback surface (user-contextual).
+- [ ] Follow-up: user-level recipe/dish preference API/UI (`recipe_ratings`) — deferred past Phase 15; table may already exist.
+- [ ] Platform-level canonical ingredients, food groups, units, and taxonomy restricted to `platform_admin`.
 - [ ] Household admins can manage household recipes/dishes but cannot mutate global canonical taxonomy.
 - [ ] Treat whole-database backup/restore as a platform operation; defer household-level portable export/import.
-- [ ] Defer public recipe sharing, localization tables, and cross-household copy/adopt workflows until after tenant isolation is stable.
+- [ ] Defer public dish publication, public subscriptions, localization tables, and cross-household copy/adopt workflows until after Phase 15 tenancy is stable.
 
 Initial role direction:
 
@@ -357,6 +362,35 @@ Initial role direction:
 | Household | `household_member` | Plan, shop, cook, review, reroll, collaborate on household recipes |
 
 Initial UI may assume one active household per session even though the model supports multiple memberships. Do not add public discovery of households; joining an existing household requires an invitation.
+
+### Future — Public Dish Catalog
+
+**Status:** Architecture accepted for future implementation — see [ADR 004](adr/004-platform-ops-public-dishes-and-tenancy-refinements.md).
+
+Planned model:
+
+- [ ] Dishes remain private by default.
+- [ ] `visibility` and `publication_status` live on the existing dish row; private and public are not separate entities.
+- [ ] `dishes.public_key` remains the stable external identifier.
+- [ ] Public catalog is browsable by authenticated household users.
+- [ ] Planning or roulette use of a foreign public dish requires an active household subscription.
+- [ ] Consumers are read-only on canonical owner rows.
+- [ ] Platform admins get a cross-household dish registry for moderation/ops, not meal planning.
+- [ ] Publication checks are deterministic and script-backed; owner can publish when checks pass, platform handles failures/moderation.
+- [ ] Unpublishing keeps historical meal-plan references readable but prevents new planning/roulette use.
+- [ ] Public dish forking/copy-to-household remains deferred.
+
+### Future — Public Dish Translations
+
+**Status:** Planned after public catalog foundation; aligns with [features/localization.md](features/localization.md) and [ADR 004](adr/004-platform-ops-public-dishes-and-tenancy-refinements.md).
+
+Initial rules:
+
+- [ ] Use translation overlays on canonical entities, not duplicated recipe rows.
+- [ ] Dish translation in locale `L` is required before approving recipe translation in locale `L`.
+- [ ] Owners and subscribing consumers may request translations.
+- [ ] Owner household approves translations; platform approves for system-owned dishes.
+- [ ] Full LLM-assisted localization jobs remain part of the localization phase.
 
 ### v1.0 — Stable Home Version
 
@@ -392,9 +426,10 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 12 | UI/UX design system and live traits | v0.9 | Done (PR #12/#13, `v0.9.0`) |
 | 13 | Composable meals and simple dishes | v0.10 | Done (PR #14, `v0.10.0`) |
 | 14 | Pair compatibility and reroll memory | v0.11 | Done (PR #15, `v0.11.0`) |
-| 15 | Household users and memberships | Future | Architecture accepted (ADR 003) |
-| 16 | LLM-assisted entry & localization | Future | Not started |
-| 17 | v1 hardening | v1.0 | Not started |
+| 15 | Household users and memberships | Future | In progress (ADR 003/004) |
+| 16 | Public dish catalog | Future | Architecture accepted (ADR 004) |
+| 17 | LLM-assisted entry & localization | Future | Design ready |
+| 18 | v1 hardening | v1.0 | Not started |
 
 ### Phase 0 — Project bootstrap ✅
 
@@ -502,7 +537,7 @@ Branch: `phase-6/shopping`.
 - [x] Ingredient seed import and conversion approval bootstrap
 - [x] Ingredient conversions CRUD API (unique triplet constraint, migration `018`)
 - [x] Ingredient admin UI — catalog list, edit aliases/conversions/unit behavior
-- [x] Localization design documented ([features/localization.md](features/localization.md)); implementation deferred to Phase 16
+- [x] Localization design documented ([features/localization.md](features/localization.md)); implementation deferred to Phase 17
 
 ### Phase 7 — Telegram reminders ✅
 

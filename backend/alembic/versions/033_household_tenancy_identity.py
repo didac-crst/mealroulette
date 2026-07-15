@@ -48,7 +48,7 @@ def upgrade() -> None:
     )
     op.execute(
         sa.text(
-            "INSERT INTO households (id, name) VALUES (:id, :name)"
+            "INSERT INTO households (id, name) VALUES (CAST(:id AS uuid), :name)"
         ).bindparams(id=DEFAULT_HOUSEHOLD_ID, name=DEFAULT_HOUSEHOLD_NAME)
     )
 

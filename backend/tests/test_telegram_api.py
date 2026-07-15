@@ -1,6 +1,9 @@
+from uuid import uuid4
+
 import pytest
 
-from mealroulette.services.telegram_subscribers import TelegramSubscriberService
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID, HouseholdNotificationSubscription
+from mealroulette.models.telegram import TelegramUserLink
 
 
 @pytest.mark.integration
@@ -10,7 +13,7 @@ def test_telegram_settings_admin_only(client, catalog_seed, user_headers):
 
 
 @pytest.mark.integration
-def test_telegram_settings_and_subscribers(client, catalog_seed, admin_headers, db_session):
+def test_telegram_settings_and_send_test(client, catalog_seed, admin_headers, admin_user, db_session):
     empty = client.get("/api/telegram/settings", headers=admin_headers)
     assert empty.status_code == 200
     assert empty.json()["enabled"] is False
@@ -34,12 +37,31 @@ def test_telegram_settings_and_subscribers(client, catalog_seed, admin_headers, 
     assert "bot_token" not in body
     assert "chat_id" not in body
 
-    TelegramSubscriberService(db_session).subscribe(chat_id="42", username="tester")
-
-    subs = client.get("/api/telegram/subscribers", headers=admin_headers)
-    assert subs.status_code == 200
-    assert len(subs.json()) == 1
-    assert subs.json()[0]["chat_id"] == "42"
+    db_session.add(
+        TelegramUserLink(
+            id=uuid4(),
+            user_id=admin_user.id,
+            chat_id="42",
+            username="tester",
+        )
+    )
+    existing = (
+        db_session.query(HouseholdNotificationSubscription)
+        .filter_by(user_id=admin_user.id, household_id=DEFAULT_HOUSEHOLD_ID)
+        .one_or_none()
+    )
+    if existing is None:
+        db_session.add(
+            HouseholdNotificationSubscription(
+                id=uuid4(),
+                user_id=admin_user.id,
+                household_id=DEFAULT_HOUSEHOLD_ID,
+                notify_daily_reminder=True,
+            )
+        )
+    else:
+        existing.notify_daily_reminder = True
+    db_session.commit()
 
     from unittest.mock import patch
 

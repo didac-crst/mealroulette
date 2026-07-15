@@ -1,6 +1,8 @@
 import pytest
 from uuid import UUID
 
+from sqlalchemy import select
+
 from mealroulette.models.household import (
     DEFAULT_HOUSEHOLD_ID,
     HouseholdRole,
@@ -41,10 +43,147 @@ def test_user_public_includes_tenancy_fields(admin_user, db_session):
 
     assert payload.platform_roles == [PlatformRole.platform_admin.value]
     assert payload.active_household_id == DEFAULT_HOUSEHOLD_ID
+    assert payload.active_household_name == "Default household"
     assert payload.household_role == HouseholdRole.household_admin.value
 
 
-def test_create_user_provisions_default_household_membership(admin_user, admin_token, client, db_session):
+def test_register_new_household_and_login(client, db_session):
+    response = client.post(
+        "/api/auth/register",
+        json={
+            "username": "owner",
+            "email": "owner@example.com",
+            "password": "ownerpass1",
+            "household_name": "Owner Home",
+        },
+    )
+    assert response.status_code == 201
+    body = response.json()
+    assert "access_token" in body
+
+    me = client.get("/api/auth/me", headers={"Authorization": f"Bearer {body['access_token']}"})
+    assert me.status_code == 200
+    profile = me.json()
+    assert profile["household_role"] == HouseholdRole.household_admin.value
+    assert profile["active_household_id"] is not None
+
+
+def test_household_invitation_flow(client, admin_user, admin_token, db_session):
+    created = client.post("/api/household/invitations", headers={"Authorization": f"Bearer {admin_token}"})
+    assert created.status_code == 201
+    invite_url = created.json()["invite_url"]
+    token = invite_url.split("token=")[1]
+
+    registered = client.post(
+        "/api/auth/register-with-invitation",
+        json={
+            "token": token,
+            "username": "invited",
+            "email": "invited@example.com",
+            "password": "invitedpass",
+        },
+    )
+    assert registered.status_code == 201
+    member_token = registered.json()["access_token"]
+
+    members = client.get("/api/household/members", headers={"Authorization": f"Bearer {admin_token}"})
+    assert members.status_code == 200
+    usernames = {row["username"] for row in members.json()}
+    assert "invited" in usernames
+
+
+def test_regular_user_cannot_create_invitation(client, user_token):
+    response = client.post("/api/household/invitations", headers={"Authorization": f"Bearer {user_token}"})
+    assert response.status_code == 403
+
+
+def test_household_admin_can_rename_household(client, admin_token, db_session, default_household):
+    response = client.patch(
+        "/api/household",
+        headers={"Authorization": f"Bearer {admin_token}"},
+        json={"name": "Casa Didac"},
+    )
+    assert response.status_code == 200
+    assert response.json()["name"] == "Casa Didac"
+
+    me = client.get("/api/auth/me", headers={"Authorization": f"Bearer {admin_token}"})
+    assert me.status_code == 200
+    assert me.json()["active_household_name"] == "Casa Didac"
+
+    db_session.refresh(default_household)
+    assert default_household.name == "Casa Didac"
+
+
+def test_regular_user_cannot_rename_household(client, user_token):
+    response = client.patch(
+        "/api/household",
+        headers={"Authorization": f"Bearer {user_token}"},
+        json={"name": "Nope"},
+    )
+    assert response.status_code == 403
+
+
+def test_bootstrap_platform_admin_has_no_household_membership(db_session, settings, monkeypatch):
+    from mealroulette.commands import bootstrap_platform_admin as bootstrap_mod
+    from mealroulette.models.user import User
+
+    monkeypatch.setattr(bootstrap_mod.settings, "database_url", settings.test_database_url)
+    bootstrap_mod.bootstrap_platform_admin("platform", "platform@example.com", "platformpass")
+    db_session.expire_all()
+
+    service = HouseholdService(db_session)
+    user = db_session.scalar(select(User).where(User.username == "platform"))
+    assert user is not None
+    assert PlatformRole.platform_admin in service.list_platform_roles(user.id)
+    assert service.active_household_membership(user.id) is None
+
+
+def test_user_cannot_join_second_household(client, admin_user, admin_token, db_session):
+    first = client.post("/api/auth/register", json={
+        "username": "solo",
+        "email": "solo@example.com",
+        "password": "solopass1",
+        "household_name": "Solo Home",
+    })
+    assert first.status_code == 201
+    solo_token = first.json()["access_token"]
+
+    created = client.post("/api/household/invitations", headers={"Authorization": f"Bearer {admin_token}"})
+    assert created.status_code == 201
+    token = created.json()["invite_url"].split("token=")[1]
+
+    conflict = client.post(
+        "/api/household/invitations/accept",
+        headers={"Authorization": f"Bearer {solo_token}"},
+        json={"token": token},
+    )
+    assert conflict.status_code == 409
+    assert "active household" in conflict.json()["error"]["message"].lower()
+
+
+def test_create_platform_admin_user_has_no_household_membership(admin_user, admin_token, client, db_session):
+    response = client.post(
+        "/api/users",
+        headers={"Authorization": f"Bearer {admin_token}"},
+        json={
+            "username": "operator",
+            "email": "operator@example.com",
+            "password": "operatorpass",
+            "role": "admin",
+        },
+    )
+
+    assert response.status_code == 201
+    body = response.json()
+    assert body["active_household_id"] is None
+    assert body["household_role"] is None
+    assert PlatformRole.platform_admin.value in body["platform_roles"]
+
+    membership = HouseholdService(db_session).active_household_membership(UUID(body["id"]))
+    assert membership is None
+
+
+def test_create_regular_user_has_no_household_membership(admin_user, admin_token, client, db_session):
     response = client.post(
         "/api/users",
         headers={"Authorization": f"Bearer {admin_token}"},
@@ -58,9 +197,8 @@ def test_create_user_provisions_default_household_membership(admin_user, admin_t
 
     assert response.status_code == 201
     body = response.json()
-    assert body["active_household_id"] == str(DEFAULT_HOUSEHOLD_ID)
-    assert body["household_role"] == HouseholdRole.household_member.value
+    assert body["active_household_id"] is None
+    assert body["household_role"] is None
 
     membership = HouseholdService(db_session).active_household_membership(UUID(body["id"]))
-    assert membership is not None
-    assert membership.role == HouseholdRole.household_member
+    assert membership is None

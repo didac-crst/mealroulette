@@ -32,7 +32,7 @@ export function DishDetailPage() {
   const id = Number(dishId);
   const hasValidId = dishId !== undefined && Number.isFinite(id) && id > 0;
   const navigate = useNavigate();
-  const { accessToken, isAdmin } = useAuth();
+  const { accessToken, isHouseholdAdmin } = useAuth();
   const [dish, setDish] = useState<Dish | null>(null);
   const [tags, setTags] = useState<Tag[]>([]);
   const [recipeSummaries, setRecipeSummaries] = useState<RecipeSummary[]>([]);
@@ -150,17 +150,17 @@ export function DishDetailPage() {
           <Button type="button" onClick={() => setPlanDialogOpen(true)}>
             Plan for…
           </Button>
-          {isAdmin ? (
+          {isHouseholdAdmin ? (
             <ButtonLink to={`/dishes/${dish.id}/recipes/new`} variant="secondary">
               Add recipe
             </ButtonLink>
           ) : null}
-          {isAdmin ? (
+          {isHouseholdAdmin ? (
             <ButtonLink to={`/dishes/${dish.id}/edit`} variant="ghost">
               Edit dish
             </ButtonLink>
           ) : null}
-          {isAdmin ? (
+          {isHouseholdAdmin ? (
             <button
               type="button"
               className="button button-danger-subtle"
@@ -204,7 +204,7 @@ export function DishDetailPage() {
             title="No recipe variants yet"
             description="Add a recipe variant to cook or plan this dish."
             action={
-              isAdmin ? (
+              isHouseholdAdmin ? (
                 <ButtonLink to={`/dishes/${dish.id}/recipes/new`}>Add recipe</ButtonLink>
               ) : undefined
             }
@@ -231,7 +231,7 @@ export function DishDetailPage() {
                       {incomplete ? `Incomplete recipe · ${meta}` : meta}
                     </p>
                   </Link>
-                  {isAdmin ? (
+                  {isHouseholdAdmin ? (
                     <ButtonLink to={`/dishes/${dish.id}/recipes/${recipe.id}/edit`} variant="secondary">
                       Edit recipe
                     </ButtonLink>

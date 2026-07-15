@@ -94,6 +94,9 @@ export function resolveBreadcrumbs(
   if (pathname === "/settings") {
     return [settings];
   }
+  if (pathname === "/settings/password") {
+    return [settings, { label: "Password" }];
+  }
   if (pathname === "/settings/targets") {
     return [settings, { label: "Weekly targets" }];
   }
@@ -103,24 +106,27 @@ export function resolveBreadcrumbs(
   if (pathname === "/settings/telegram") {
     return [settings, { label: "Telegram" }];
   }
+  if (pathname === "/settings/members") {
+    return [settings, { label: "Household settings" }];
+  }
   if (pathname === "/settings/backups") {
     return [settings, { label: "Backups" }];
   }
 
   if (pathname === "/ingredients") {
-    return [settings, ingredients];
+    return [ingredients];
   }
   if (pathname === "/ingredients/taxonomy") {
-    return [settings, ingredients, { label: "Taxonomy" }];
+    return [ingredients, { label: "Taxonomy" }];
   }
   if (pathname === "/ingredients/new") {
-    return [settings, ingredients, { label: "New ingredient" }];
+    return [ingredients, { label: "New ingredient" }];
   }
   if (pathname === `/ingredients/${params.ingredientId}/edit`) {
-    return [settings, ingredients, ingredientCrumb(labels, params.ingredientId), { label: "Edit" }];
+    return [ingredients, ingredientCrumb(labels, params.ingredientId), { label: "Edit" }];
   }
   if (pathname === `/ingredients/${params.ingredientId}`) {
-    return [settings, ingredients, { label: labels.ingredientName?.trim() || "Ingredient" }];
+    return [ingredients, { label: labels.ingredientName?.trim() || "Ingredient" }];
   }
 
   return [];

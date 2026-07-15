@@ -18,7 +18,16 @@ type AuthContextValue = {
   accessToken: string | null;
   loading: boolean;
   login: (username: string, password: string) => Promise<void>;
+  loginWithTelegramOtp: (username: string, code: string) => Promise<void>;
+  refreshUser: () => Promise<void>;
   logout: () => Promise<void>;
+  /** Platform operator (global catalog, backups). */
+  isPlatformAdmin: boolean;
+  /** Active household membership (required for meal planning routes). */
+  hasHousehold: boolean;
+  /** Household admin (not inferred from platform admin). */
+  isHouseholdAdmin: boolean;
+  /** @deprecated Use isPlatformAdmin */
   isAdmin: boolean;
 };
 
@@ -115,6 +124,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [applySession],
   );
 
+  const loginWithTelegramOtp = useCallback(
+    async (username: string, code: string) => {
+      const tokens = await authApi.verifyTelegramOtp(username, code);
+      saveTokens({
+        accessToken: tokens.access_token,
+        refreshToken: tokens.refresh_token,
+      });
+      const me = await fetchMeWithRetry(tokens.access_token);
+      applySession(tokens.access_token, me);
+    },
+    [applySession],
+  );
+
+  const refreshUser = useCallback(async () => {
+    const stored = loadTokens();
+    if (!stored) {
+      return;
+    }
+    const me = await fetchMeWithRetry(stored.accessToken);
+    applySession(stored.accessToken, me);
+  }, [applySession]);
+
   const logout = useCallback(async () => {
     const stored = loadTokens();
     if (stored) {
@@ -127,20 +158,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     clearSession();
   }, [clearSession]);
 
-  const value = useMemo(
-    () => ({
+  const value = useMemo(() => {
+    const isPlatformAdmin =
+      user?.role === "admin" ||
+      user?.role === "platform_admin" ||
+      user?.platform_roles.includes("platform_admin") === true;
+    const hasHousehold = user?.active_household_id != null;
+    const isHouseholdAdmin = user?.household_role === "household_admin";
+    return {
       user,
       accessToken,
       loading,
       login,
+      loginWithTelegramOtp,
+      refreshUser,
       logout,
-      isAdmin:
-        user?.role === "admin" ||
-        user?.role === "platform_admin" ||
-        user?.platform_roles.includes("platform_admin") === true,
-    }),
-    [user, accessToken, loading, login, logout],
-  );
+      isPlatformAdmin,
+      hasHousehold,
+      isHouseholdAdmin,
+      isAdmin: isPlatformAdmin,
+    };
+  }, [user, accessToken, loading, login, loginWithTelegramOtp, refreshUser, logout]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

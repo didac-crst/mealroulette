@@ -7,19 +7,19 @@ import { Card, ChoiceChip, EmptyState, PageShell } from "../../components/ui";
 import { useAuth } from "../auth/AuthContext";
 import { DishCard } from "./DishCard";
 import {
-  availableCourseFilters,
-  courseFilterLabel,
-  filterDishesByCourse,
-  type DishCourseFilter,
+  availableCatalogFilters,
+  catalogFilterLabel,
+  filterDishesByCatalog,
+  type DishCatalogFilter,
 } from "./dishCatalogFilters";
 import { filterDishesBySearch, normalizeDishSearchQuery } from "./dishSearch";
 
 export function DishListPage() {
-  const { accessToken, isAdmin } = useAuth();
+  const { accessToken, isHouseholdAdmin } = useAuth();
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [recipeNamesByDishId, setRecipeNamesByDishId] = useState<Record<number, string[]>>({});
   const [search, setSearch] = useState("");
-  const [courseFilter, setCourseFilter] = useState<DishCourseFilter>("all");
+  const [catalogFilter, setCatalogFilter] = useState<DishCatalogFilter>("all");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -76,17 +76,17 @@ export function DishListPage() {
     };
   }, [accessToken, dishes]);
 
-  const courseFilters = useMemo(() => availableCourseFilters(dishes), [dishes]);
+  const catalogFilters = useMemo(() => availableCatalogFilters(dishes), [dishes]);
   const dishesForFilters = useMemo(
-    () => filterDishesByCourse(dishes, courseFilter),
-    [courseFilter, dishes],
+    () => filterDishesByCatalog(dishes, catalogFilter),
+    [catalogFilter, dishes],
   );
   const filteredDishes = useMemo(
     () => filterDishesBySearch(dishesForFilters, search, recipeNamesByDishId),
     [dishesForFilters, recipeNamesByDishId, search],
   );
   const normalizedSearch = normalizeDishSearchQuery(search);
-  const showingFilteredResults = normalizedSearch.length > 0 || courseFilter !== "all";
+  const showingFilteredResults = normalizedSearch.length > 0 || catalogFilter !== "all";
   const subtitle = loading
     ? undefined
     : `${dishes.length} dish${dishes.length === 1 ? "" : "es"}`;
@@ -98,7 +98,7 @@ export function DishListPage() {
         subtitle={subtitle}
         loading={loading}
         loadingMessage="Loading dishes…"
-        actions={isAdmin ? <ButtonLink to="/dishes/new">Add dish</ButtonLink> : undefined}
+        actions={isHouseholdAdmin ? <ButtonLink to="/dishes/new">Add dish</ButtonLink> : undefined}
       >
         {error ? (
           <p className="error" role="alert">
@@ -118,18 +118,16 @@ export function DishListPage() {
                 autoComplete="off"
               />
             </label>
-            {courseFilters.length > 1 ? (
-              <div className="catalog-filter-bar" role="group" aria-label="Filter by course">
-                {courseFilters.map((filter) => (
-                  <ChoiceChip
-                    key={filter}
-                    label={courseFilterLabel(filter)}
-                    selected={courseFilter === filter}
-                    onClick={() => setCourseFilter(filter)}
-                  />
-                ))}
-              </div>
-            ) : null}
+            <div className="catalog-filter-bar" role="group" aria-label="Filter by dish type">
+              {catalogFilters.map((filter) => (
+                <ChoiceChip
+                  key={filter}
+                  label={catalogFilterLabel(filter)}
+                  selected={catalogFilter === filter}
+                  onClick={() => setCatalogFilter(filter)}
+                />
+              ))}
+            </div>
             <p className="muted catalog-search-meta">
               {showingFilteredResults
                 ? `Showing ${filteredDishes.length} of ${dishes.length} dishes`
@@ -142,18 +140,14 @@ export function DishListPage() {
           <EmptyState
             title="No dishes yet"
             description="Add your first dish to start building your library."
-            action={isAdmin ? <ButtonLink to="/dishes/new">Add dish</ButtonLink> : undefined}
+            action={isHouseholdAdmin ? <ButtonLink to="/dishes/new">Add dish</ButtonLink> : undefined}
           />
         ) : null}
 
         {!loading && !error && dishes.length > 0 && filteredDishes.length === 0 ? (
           <EmptyState
             title="No matches"
-            description={
-              <>
-                No dishes match your filters. Try a different search or course filter.
-              </>
-            }
+            description="No dishes match your filters. Try a different search or dish type."
           />
         ) : null}
 

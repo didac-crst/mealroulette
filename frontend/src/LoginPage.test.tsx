@@ -28,5 +28,7 @@ describe("LoginPage", () => {
     expect(screen.getByLabelText("Username")).toBeInTheDocument();
     expect(screen.getByLabelText("Password")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Sign in" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "One Time Password" })).toBeInTheDocument();
+    expect(screen.getByText("New here?")).toBeInTheDocument();
   });
 });

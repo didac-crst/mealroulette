@@ -55,6 +55,7 @@ Implementation detail for taxonomy YAML and validation workflows: [taxonomy/READ
 | [adr/001-ingredient-taxonomy-contract.md](adr/001-ingredient-taxonomy-contract.md) | Ingredient taxonomy contract |
 | [adr/002-canonical-taxonomy-before-backup.md](adr/002-canonical-taxonomy-before-backup.md) | Taxonomy hardening before backup contract |
 | [adr/003-household-tenancy-and-authorization.md](adr/003-household-tenancy-and-authorization.md) | Household tenancy and authorization |
+| [adr/004-platform-ops-public-dishes-and-tenancy-refinements.md](adr/004-platform-ops-public-dishes-and-tenancy-refinements.md) | Platform ops, public dishes, and tenancy refinements |
 
 ## Operations (runbooks)
 

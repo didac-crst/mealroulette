@@ -7,10 +7,13 @@ from decimal import Decimal
 from pathlib import Path
 
 import yaml
+from uuid import UUID
+
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from mealroulette.models.catalog import Dish, Ingredient, IngredientAlias, Tag, Unit
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID
 from mealroulette.models.enums import (
     DifficultyLevel,
     DishCourse,
@@ -147,11 +150,16 @@ def _resolve_fixture_ingredient_id(
     return ingredient.id
 
 
-def import_dish_fixtures(db: Session, path: Path | str = DEFAULT_FIXTURE_PATH) -> ImportResult:
+def import_dish_fixtures(
+    db: Session,
+    path: Path | str = DEFAULT_FIXTURE_PATH,
+    *,
+    household_id: UUID = DEFAULT_HOUSEHOLD_ID,
+) -> ImportResult:
     """Import dishes from a YAML fixture. Skips dishes that already exist by name."""
     data = load_fixture(path)
     import_ingredient_seed(db, DEFAULT_INGREDIENT_SEED_PATH)
-    service = CatalogService(db)
+    service = CatalogService(db, household_id=household_id)
     unit_lookup, tag_lookup, ingredient_lookup = _build_lookup_maps(db)
 
     dishes_added = 0
@@ -163,7 +171,12 @@ def import_dish_fixtures(db: Session, path: Path | str = DEFAULT_FIXTURE_PATH) -
 
     for dish_data in data["dishes"]:
         dish_name = dish_data["name"]
-        if db.scalar(select(Dish).where(func.lower(Dish.name) == dish_name.strip().lower())):
+        if db.scalar(
+            select(Dish).where(
+                func.lower(Dish.name) == dish_name.strip().lower(),
+                Dish.household_id == household_id,
+            )
+        ):
             dishes_skipped += 1
             continue
 

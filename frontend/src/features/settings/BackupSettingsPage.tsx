@@ -20,7 +20,7 @@ function timeInputValue(value: string): string {
 }
 
 export function BackupSettingsPage() {
-  const { accessToken, isAdmin } = useAuth();
+  const { accessToken, isPlatformAdmin } = useAuth();
   const [settings, setSettings] = useState<BackupSettings | null>(null);
   const [runs, setRuns] = useState<BackupRun[]>([]);
   const [form, setForm] = useState<BackupSettingsInput>({
@@ -39,7 +39,7 @@ export function BackupSettingsPage() {
   const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!accessToken || !isAdmin) {
+    if (!accessToken || !isPlatformAdmin) {
       return;
     }
     let cancelled = false;
@@ -73,7 +73,7 @@ export function BackupSettingsPage() {
     return () => {
       cancelled = true;
     };
-  }, [accessToken, isAdmin]);
+  }, [accessToken, isPlatformAdmin]);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();

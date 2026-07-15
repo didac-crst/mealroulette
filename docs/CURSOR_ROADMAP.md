@@ -162,8 +162,9 @@ Phases 0–14 shipped through **`v0.11.0`**. Later phases continue from the pair
 | 13 | Composable meals and simple dishes | v0.10 |
 | 14 | Pair compatibility and reroll memory | v0.11 |
 | 15 | Household users and memberships | Future |
-| 16 | LLM-assisted entry & localization | Future |
-| 17 | v1 hardening | v1.0 |
+| 16 | Public dish catalog | Future |
+| 17 | LLM-assisted entry & localization | Future |
+| 18 | v1 hardening | v1.0 |
 
 ### Phase 0 - Project Bootstrap
 
@@ -379,7 +380,7 @@ Acceptance criteria:
 - Shopping items show which planned meals require them.
 - Admins can review and approve conversion suggestions from the ingredient dashboard.
 
-**Deferred to Phase 16:** multilingual content translations — design in [features/localization.md](features/localization.md).
+**Deferred to Phase 17:** multilingual content translations — design in [features/localization.md](features/localization.md).
 
 Implementation notes (v0.3):
 
@@ -388,7 +389,7 @@ Implementation notes (v0.3):
 - `services/quantities`: strategy-aware aggregation; approved conversions only for cross-dimension merge.
 - Ingredient seed: `import_ingredient_seed` + `mealroulette_ingredients_seed.yaml`.
 - Frontend: `/shopping` (List tab), `/ingredients` admin catalog and edit.
-- Localization design documented; implementation deferred to Phase 16.
+- Localization design documented; implementation deferred to Phase 17.
 
 ### Later — Leftover inventory (after shopping lists)
 
@@ -932,30 +933,58 @@ Acceptance criteria:
 
 ### Phase 15 - Household Users and Memberships
 
-Architecture spec: [ADR 003 — Household tenancy and authorization](adr/003-household-tenancy-and-authorization.md). Shipment status: [BACKLOG.md](BACKLOG.md).
+Architecture spec: [ADR 003 — Household tenancy and authorization](adr/003-household-tenancy-and-authorization.md), amended by [ADR 004 — Platform ops, public dishes, and tenancy refinements](adr/004-platform-ops-public-dishes-and-tenancy-refinements.md). Shipment status: [BACKLOG.md](BACKLOG.md).
 
 Deliverables:
 
 - Decide final product name: recommended `household` or `workspace`, not `entity`.
 - Use UUID primary keys for users, households, memberships, invitations, Telegram links, and platform-role assignments.
 - Keep existing integer IDs for content tables unless an external/public identifier is needed.
-- Single default household migration for existing installations.
+- Upgrade-only migration household for existing installations; no greenfield product default household.
 - Household membership model and per-household roles.
 - Atomic user+household signup and invitation-based join flow.
-- Household-scoped plan, dish, recipe, settings, rating, and Telegram subscription behavior.
-- Separate user-level recipe ratings from meal-slot reviews; both are user-contextual.
+- Platform admin bootstrap command with no implicit household membership.
+- One active household membership per user for the initial product.
+- Nav and route gating for platform-only vs household-required workflows.
+- Household-scoped plan, dish, recipe, settings, meal-slot reviews, and Telegram subscription behavior.
+- Meal-slot reviews shipped as the user-contextual feedback surface; recipe/dish preference (`recipe_ratings` API/UI) deferred to a later slice.
 - Platform-level role for canonical ingredient/taxonomy maintenance and whole-database backup/restore.
-- Defer public recipe sharing, localization tables, and household-level portable export/import.
+- Defer public dish publication, localization tables, and household-level portable export/import.
 
 Acceptance criteria:
 
-- Existing installations migrate into one default household without losing access.
+- Existing installations migrate into one migration household without losing access.
+- Greenfield installs require signup or explicit import to create the first household.
+- Platform admin users can exist without household membership and cannot access household workflows unless they join/create a household.
 - A household admin can invite users for their household.
 - Normal household users cannot mutate canonical ingredients, food groups, units, or global taxonomy.
 - Telegram subscriptions are linked to a user and household.
 - Public signup does not grant household access without approval.
 
-### Phase 16 - LLM-Assisted Entry & Localization
+### Phase 16 - Public Dish Catalog
+
+Architecture spec: [ADR 004 — Platform ops, public dishes, and tenancy refinements](adr/004-platform-ops-public-dishes-and-tenancy-refinements.md). Shipment status: [BACKLOG.md](BACKLOG.md).
+
+Deliverables:
+
+- Dish visibility/publication columns on existing dish rows.
+- Public catalog read API for authenticated household members.
+- Platform dish registry for cross-household moderation/ops.
+- Deterministic publication/revalidation checks.
+- Owner publish flow when checks pass; platform handling for failures and moderation.
+- Household dish subscriptions for planning/roulette use of foreign public dishes.
+- Historical read behavior for unpublished dishes already used in meal plans.
+
+Acceptance criteria:
+
+- Private dishes stay visible only to their owner household.
+- Public dishes are browsable read-only by other household users.
+- Foreign public dishes cannot be planned or selected by roulette without an active subscription.
+- Consumers cannot edit canonical owner rows.
+- Unpublishing blocks new planning/roulette use but does not break historical meal-plan reads.
+- Publication checks produce structured failure reasons.
+
+### Phase 17 - LLM-Assisted Entry & Localization
 
 Design spec: [features/localization.md](features/localization.md). Shipment status: [BACKLOG.md](BACKLOG.md).
 
@@ -974,6 +1003,8 @@ Deliverables:
 - **Bulk translate:** field-aware batched `POST /api/admin/localization/jobs` → draft translations → admin approve
 - **Locale-aware reads:** `?locale=fr` with fallback chain; UI chrome via frontend i18n (separate from content)
 - Optional: LLM-suggested ingredient **aliases** per target locale (not a substitute for display translations)
+- Public dish translation requests: owner/subscriber request, owner approval, platform approval for system-owned dishes.
+- Enforce dish translation before recipe translation in the same locale for public content.
 
 Acceptance criteria:
 
@@ -986,7 +1017,7 @@ Acceptance criteria:
 - Recipe step translation preserves quantities, times, temperatures, units, and appliance terms.
 - Ingredient display translations remain separate from search aliases.
 
-### Phase 17 - v1 Hardening
+### Phase 18 - v1 Hardening
 
 Deliverables:
 

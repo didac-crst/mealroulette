@@ -35,7 +35,6 @@ describe("resolveBreadcrumbs", () => {
     expect(
       resolveBreadcrumbs("/ingredients/12/edit", { ingredientId: "12" }, { ingredientId: 12, ingredientName: "Tomato" }),
     ).toEqual([
-      { label: "Settings", to: "/settings" },
       { label: "Ingredients", to: "/ingredients" },
       { label: "Tomato", to: "/ingredients/12" },
       { label: "Edit" },

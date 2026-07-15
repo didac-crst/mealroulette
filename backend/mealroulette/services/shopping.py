@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date, timedelta
 from decimal import Decimal
+from uuid import UUID
 
 from fastapi import HTTPException, status
 from sqlalchemy import select
@@ -10,7 +11,8 @@ from sqlalchemy.orm import Session, selectinload
 
 from mealroulette.models.catalog import Ingredient, IngredientUnitConversion, Recipe, RecipeIngredient, Unit
 from mealroulette.models.enums import AggregationStrategy, MealPlanningState, MealPlanItemStatus, ShoppingListStatus
-from mealroulette.models.planning import MealPlanItem, MealPlanItemDish
+from mealroulette.models.planning import MealPlan, MealPlanItem, MealPlanItemDish
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID
 from mealroulette.models.shopping import ShoppingList, ShoppingListItem
 from mealroulette.schemas.shopping import (
     ShoppingListCreateRequest,
@@ -66,8 +68,9 @@ class _GeneratedItem:
 
 
 class ShoppingListService:
-    def __init__(self, db: Session) -> None:
+    def __init__(self, db: Session, household_id: UUID = DEFAULT_HOUSEHOLD_ID) -> None:
         self.db = db
+        self.household_id = household_id
 
     @staticmethod
     def _window_end(from_date: date, days: int) -> date:
@@ -118,7 +121,9 @@ class ShoppingListService:
         items = list(
             self.db.scalars(
                 select(MealPlanItem)
+                .join(MealPlan, MealPlanItem.meal_plan_id == MealPlan.id)
                 .where(
+                    MealPlan.household_id == self.household_id,
                     MealPlanItem.date >= from_date,
                     MealPlanItem.date <= to_date,
                     MealPlanItem.status == MealPlanItemStatus.planned,
@@ -520,6 +525,7 @@ class ShoppingListService:
         generated = self._build_generated_items(meal_items, payload.exclude_pantry)
 
         shopping_list = ShoppingList(
+            household_id=self.household_id,
             from_date=payload.from_date,
             to_date=to_date,
             status=ShoppingListStatus.active,
@@ -564,7 +570,7 @@ class ShoppingListService:
     def get_list(self, shopping_list_id: int) -> ShoppingListPublic:
         shopping_list = self.db.scalar(
             select(ShoppingList)
-            .where(ShoppingList.id == shopping_list_id)
+            .where(ShoppingList.id == shopping_list_id, ShoppingList.household_id == self.household_id)
             .options(
                 selectinload(ShoppingList.items).selectinload(ShoppingListItem.unit),
                 selectinload(ShoppingList.items).selectinload(ShoppingListItem.ingredient),
@@ -626,7 +632,11 @@ class ShoppingListService:
     def update_item(self, item_id: int, payload: ShoppingListItemUpdateRequest) -> ShoppingListItemPublic:
         row = self.db.scalar(
             select(ShoppingListItem)
-            .where(ShoppingListItem.id == item_id)
+            .join(ShoppingList, ShoppingListItem.shopping_list_id == ShoppingList.id)
+            .where(
+                ShoppingListItem.id == item_id,
+                ShoppingList.household_id == self.household_id,
+            )
             .options(
                 selectinload(ShoppingListItem.unit),
                 selectinload(ShoppingListItem.ingredient),

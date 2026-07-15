@@ -25,8 +25,8 @@ _session_factory = sessionmaker(bind=_engine)
 def run_scheduled_reminder() -> None:
     with _session_factory() as db:
         try:
-            result = TelegramReminderService(db).run_scheduled_reminder()
-            if result is not None:
+            results = TelegramReminderService(db).run_scheduled_reminder()
+            for result in results:
                 logger.info("Scheduled Telegram reminder sent to %s subscriber(s)", result.recipient_count)
         except Exception:
             logger.exception("Scheduled Telegram reminder failed")
@@ -47,8 +47,8 @@ def poll_telegram_updates(stop_event: threading.Event) -> None:
 def run_scheduled_roulette() -> None:
     with _session_factory() as db:
         try:
-            result = ScheduledRouletteService(db).run_scheduled()
-            if result is not None:
+            results = ScheduledRouletteService(db).run_scheduled()
+            for result in results:
                 logger.info(
                     "Scheduled meal roulette generated %s assignments for week %s",
                     result.assignments_count,
@@ -82,7 +82,7 @@ def main() -> None:
     stop_event = threading.Event()
     if get_settings().telegram_bot_token:
         threading.Thread(target=poll_telegram_updates, args=(stop_event,), daemon=True).start()
-        logger.info("Telegram /subscribe polling enabled")
+        logger.info("Telegram update polling enabled")
     else:
         logger.warning("TELEGRAM_BOT_TOKEN not set — bot commands disabled")
 

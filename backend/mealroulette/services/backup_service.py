@@ -73,7 +73,7 @@ TABLE_SPECS: list[tuple[str, type]] = [
     ("recipe_ingredients", RecipeIngredient),
     ("meal_plans", MealPlan),
     ("meal_plan_items", MealPlanItem),
-    ("meal_ratings", MealRating),
+    ("meal_reviews", MealRating),
     ("shopping_lists", ShoppingList),
     ("shopping_list_items", ShoppingListItem),
     ("telegram_settings", TelegramSettings),
@@ -106,7 +106,7 @@ FK_CHECKS: dict[str, list[tuple[str, str, str]]] = {
         ("recipe_id", "recipes", "id"),
         ("leftover_source_item_id", "meal_plan_items", "id"),
     ],
-    "meal_ratings": [("meal_plan_item_id", "meal_plan_items", "id"), ("dish_id", "dishes", "id")],
+    "meal_reviews": [("meal_plan_item_id", "meal_plan_items", "id"), ("dish_id", "dishes", "id")],
     "shopping_list_items": [("shopping_list_id", "shopping_lists", "id"), ("ingredient_id", "ingredients", "id")],
     "cooking_timer_alerts": [
         ("user_id", "users", "id"),
@@ -224,18 +224,18 @@ class BackupService:
 
     def validate_import_payload(self, payload: dict[str, Any]) -> FullExportPayload:
         if payload.get("format") != EXPORT_FORMAT:
-            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unsupported export format")
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Unsupported export format")
         if payload.get("format_version") != EXPORT_FORMAT_VERSION:
-            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unsupported format version")
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Unsupported format version")
         if payload.get("schema_revision") != CURRENT_SCHEMA_REVISION:
             raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail=f"Incompatible schema revision: {payload.get('schema_revision')}",
             )
         try:
             export = FullExportPayload.model_validate(payload)
         except Exception as exc:
-            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(exc)) from exc
         self._validate_table_shapes(export)
         self._validate_foreign_keys(export)
         self._validate_admin_user(export)
@@ -406,12 +406,12 @@ class BackupService:
             rows = export.tables.get(table_name)
             if rows is None:
                 raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                     detail=f"Missing table array: {table_name}",
                 )
             if not isinstance(rows, list):
                 raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                     detail=f"Table {table_name} must be an array",
                 )
         for table_name, rows in export.tables.items():

@@ -6,7 +6,7 @@ from uuid import UUID
 
 import jwt
 
-from mealroulette.core.config import settings
+from mealroulette.core.config import get_settings
 
 
 DUMMY_PASSWORD_HASH = bcrypt.hashpw(b"dummy-timing-mitigation", bcrypt.gensalt()).decode("utf-8")
@@ -21,6 +21,7 @@ def verify_password(plain_password: str, password_hash: str) -> bool:
 
 
 def create_access_token(*, user_id: UUID, role: str) -> str:
+    settings = get_settings()
     expires_at = datetime.now(UTC) + timedelta(minutes=settings.access_token_expire_minutes)
     payload = {
         "sub": str(user_id),
@@ -32,6 +33,7 @@ def create_access_token(*, user_id: UUID, role: str) -> str:
 
 
 def create_refresh_token(*, user_id: UUID) -> tuple[str, str, datetime]:
+    settings = get_settings()
     jti = uuid4().hex
     expires_at = datetime.now(UTC) + timedelta(days=settings.refresh_token_expire_days)
     payload = {
@@ -45,4 +47,5 @@ def create_refresh_token(*, user_id: UUID) -> tuple[str, str, datetime]:
 
 
 def decode_token(token: str) -> dict:
+    settings = get_settings()
     return jwt.decode(token, settings.secret_key, algorithms=[settings.jwt_algorithm])

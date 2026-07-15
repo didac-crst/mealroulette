@@ -180,7 +180,7 @@ export function DishEditPage() {
   const { dishId } = useParams();
   const isNew = !dishId;
   const navigate = useNavigate();
-  const { accessToken, isAdmin } = useAuth();
+  const { accessToken, isHouseholdAdmin } = useAuth();
   const [form, setForm] = useState<DishInput>(emptyForm);
   const [dish, setDish] = useState<Dish | null>(null);
   const [tags, setTags] = useState<Tag[]>([]);
@@ -202,10 +202,10 @@ export function DishEditPage() {
   }, [dish, setBaseline]);
 
   useEffect(() => {
-    if (!isAdmin) {
+    if (!isHouseholdAdmin) {
       navigate("/dishes", { replace: true });
     }
-  }, [isAdmin, navigate]);
+  }, [isHouseholdAdmin, navigate]);
 
   useEffect(() => {
     if (!accessToken) {

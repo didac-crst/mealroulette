@@ -14,28 +14,28 @@ from mealroulette.models.cooking import CookingTimerAlert, CookingTimerAlertStat
 from mealroulette.models.user import User
 from mealroulette.schemas.cooking import CookingTimerAlertCreateRequest, CookingTimerAlertPublic
 from mealroulette.services.telegram_client import TelegramApiError, TelegramClient
-from mealroulette.services.telegram_subscribers import TelegramSubscriberService
+from mealroulette.services.telegram_link import TelegramLinkService
 
 
 class CookingTimerAlertService:
     def __init__(self, db: Session, client: TelegramClient | None = None) -> None:
         self.db = db
         self.client = client or TelegramClient()
-        self.subscribers = TelegramSubscriberService(db)
+        self.links = TelegramLinkService(db)
 
     @staticmethod
     def telegram_delivery_available() -> bool:
         token = (get_settings().telegram_bot_token or "").strip()
         return bool(token)
 
-    def _delivery_targets(self) -> tuple[str, list[str]] | None:
+    def _delivery_target_for_user(self, user_id: UUID) -> tuple[str, str] | None:
         token = (get_settings().telegram_bot_token or "").strip()
         if not token:
             return None
-        chat_ids = self.subscribers.list_chat_ids()
-        if not chat_ids:
+        link = self.links.get_link_for_user(user_id)
+        if link is None:
             return None
-        return token, chat_ids
+        return token, link.chat_id
 
     def _load_recipe_context(self, recipe_id: int, recipe_step_id: int) -> tuple[Dish, Recipe, RecipeStep]:
         step = self.db.get(RecipeStep, recipe_step_id)
@@ -121,21 +121,15 @@ class CookingTimerAlertService:
         )
 
     def _send_alert(self, row: CookingTimerAlert) -> None:
-        targets = self._delivery_targets()
-        if targets is None:
-            raise RuntimeError("Telegram is not configured or has no subscribers")
-        token, chat_ids = targets
+        target = self._delivery_target_for_user(row.user_id)
+        if target is None:
+            raise RuntimeError("Telegram is not configured or this user has not linked Telegram")
+        token, chat_id = target
         message = self._format_message(row)
-        failures: list[str] = []
-        sent_count = 0
-        for chat_id in chat_ids:
-            try:
-                self.client.send_message(token, chat_id, message)
-                sent_count += 1
-            except TelegramApiError as exc:
-                failures.append(f"{chat_id}: {exc}")
-        if sent_count == 0:
-            raise RuntimeError("; ".join(failures) if failures else "No messages sent")
+        try:
+            self.client.send_message(token, chat_id, message)
+        except TelegramApiError as exc:
+            raise RuntimeError(f"{chat_id}: {exc}") from exc
 
     def process_due(self, now: datetime | None = None) -> int:
         current = now or datetime.now(UTC)
@@ -164,7 +158,7 @@ class CookingTimerAlertService:
         return processed
 
     def _to_public(self, row: CookingTimerAlert) -> CookingTimerAlertPublic:
-        delivery = self._delivery_targets()
+        delivery = self._delivery_target_for_user(row.user_id)
         return CookingTimerAlertPublic(
             id=row.id,
             recipe_id=row.recipe_id,

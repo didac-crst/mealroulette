@@ -41,7 +41,7 @@ from mealroulette.models.planning import MealPlan, MealPlanItem, MealPlanItemDis
 from mealroulette.models.scheduler import PlanningRule, SchedulerSettings
 from mealroulette.models.shopping import ShoppingList, ShoppingListItem
 from mealroulette.models.taxonomy import FoodGroup, IngredientFamily
-from mealroulette.models.telegram import TelegramSettings, TelegramSubscriber
+from mealroulette.models.telegram import TelegramSettings, TelegramSubscriber, TelegramUserLink, TelegramLinkToken, TelegramLoginOtp
 from mealroulette.models.user import RefreshToken, User, UserRole
 
 __all__ = [

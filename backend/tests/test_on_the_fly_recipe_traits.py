@@ -13,6 +13,7 @@ from mealroulette.services.public_keys import (
 from mealroulette.services.recipe_traits import compute_recipe_traits_now
 from mealroulette.services.scheduler.catalog import load_dish_candidates
 from mealroulette.data.default_planning_rules import DEFAULT_PLANNING_RULES_JSON
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID
 from mealroulette.models.scheduler import PlanningRule, SchedulerSettings, DEFAULT_PLANNING_RULE_ID, SCHEDULER_SETTINGS_ID
 from mealroulette.schemas.scheduler import PlanningRulesConfig
 
@@ -150,6 +151,7 @@ def test_recipe_public_key_lookup(client, catalog_seed, admin_headers):
 @pytest.mark.integration
 def test_scheduler_uses_fresh_traits(db_session, catalog_seed, scheduler_seed):
     dish = Dish(
+        household_id=DEFAULT_HOUSEHOLD_ID,
         public_key=generate_dish_public_key("Scheduler Fresh Traits"),
         name="Scheduler Fresh Traits",
         course=DishCourse.main,
@@ -179,13 +181,25 @@ def test_scheduler_uses_fresh_traits(db_session, catalog_seed, scheduler_seed):
 
     if db_session.get(PlanningRule, DEFAULT_PLANNING_RULE_ID) is None:
         db_session.add(
-            PlanningRule(id=DEFAULT_PLANNING_RULE_ID, name="Default", rules=DEFAULT_PLANNING_RULES_JSON, active=True)
+            PlanningRule(
+                id=DEFAULT_PLANNING_RULE_ID,
+                household_id=DEFAULT_HOUSEHOLD_ID,
+                name="Default",
+                rules_json=DEFAULT_PLANNING_RULES_JSON,
+                active=True,
+            )
         )
     if db_session.get(SchedulerSettings, SCHEDULER_SETTINGS_ID) is None:
-        db_session.add(SchedulerSettings(id=SCHEDULER_SETTINGS_ID, enabled=False))
+        db_session.add(
+            SchedulerSettings(id=SCHEDULER_SETTINGS_ID, household_id=DEFAULT_HOUSEHOLD_ID, enabled=False)
+        )
     db_session.commit()
 
-    candidates = load_dish_candidates(db_session, rules=PlanningRulesConfig.model_validate(DEFAULT_PLANNING_RULES_JSON))
+    candidates = load_dish_candidates(
+        db_session,
+        rules=PlanningRulesConfig.model_validate(DEFAULT_PLANNING_RULES_JSON),
+        household_id=DEFAULT_HOUSEHOLD_ID,
+    )
     match = next(item for item in candidates if item.dish_id == dish.id)
     assert match.computed_traits_json is not None
     assert match.computed_traits_json["contains_meat"] is True

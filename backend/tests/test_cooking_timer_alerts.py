@@ -53,9 +53,19 @@ def test_schedule_and_cancel_cooking_timer_alert(client, catalog_seed, admin_hea
 
 def test_process_due_sends_telegram(db_session, catalog_seed, client, admin_headers, admin_user):
     _, recipe, step = _create_dish_with_timed_step(client, admin_headers)
-    from mealroulette.models.telegram import TelegramSubscriber
+    from uuid import uuid4
 
-    db_session.add(TelegramSubscriber(chat_id="12345", telegram_user_id="99"))
+    from mealroulette.models.telegram import TelegramUserLink
+
+    db_session.add(
+        TelegramUserLink(
+            id=uuid4(),
+            user_id=admin_user.id,
+            chat_id="12345",
+            telegram_user_id="99",
+            username="chef",
+        )
+    )
     db_session.commit()
 
     mock_client = MagicMock()
@@ -77,4 +87,5 @@ def test_process_due_sends_telegram(db_session, catalog_seed, client, admin_head
     processed = service.process_due()
     assert processed == 1
     mock_client.send_message.assert_called_once()
+    assert mock_client.send_message.call_args.args[1] == "12345"
     assert row.status == CookingTimerAlertStatus.sent.value

@@ -21,7 +21,7 @@ import { Button, Card, FormSection, FormStickyActions, PageShell } from "../../c
 import { useAuth } from "../auth/AuthContext";
 
 export function IngredientTaxonomyPage() {
-  const { accessToken } = useAuth();
+  const { accessToken, isAdmin } = useAuth();
   const [overview, setOverview] = useState<IngredientTaxonomyOverview | null>(null);
   const [foodGroups, setFoodGroups] = useState<FoodGroup[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
@@ -208,7 +208,9 @@ export function IngredientTaxonomyPage() {
             <ul className="taxonomy-ingredient-list">
               {ingredients.map((ingredient) => (
                 <li key={ingredient.id} className="taxonomy-ingredient-item">
-                  <Link to={`/ingredients/${ingredient.id}/edit`}>{ingredient.display_name}</Link>
+                  <Link to={isAdmin ? `/ingredients/${ingredient.id}/edit` : `/ingredients/${ingredient.id}`}>
+                    {ingredient.display_name}
+                  </Link>
                   <span className="muted">
                     {" "}
                     · {ingredient.food_group ?? "—"} · aliases {ingredient.alias_count}

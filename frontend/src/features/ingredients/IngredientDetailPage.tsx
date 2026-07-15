@@ -6,6 +6,7 @@ import { ApiError } from "../../api/client";
 import { ButtonLink } from "../../components/ButtonLink";
 import { Card, EmptyState, PageShell } from "../../components/ui";
 import { useAuth } from "../auth/AuthContext";
+import { formatAggregationStrategy, formatCatalogLabel } from "./aggregationStrategy";
 
 export function IngredientDetailPage() {
   const { ingredientId } = useParams();
@@ -75,6 +76,13 @@ export function IngredientDetailPage() {
     );
   }
 
+  const metaRows = [
+    { label: "Category", value: formatCatalogLabel(detail.category) },
+    { label: "Food group", value: formatCatalogLabel(detail.food_group) },
+    { label: "Family", value: formatCatalogLabel(detail.family) },
+    { label: "Strategy", value: formatAggregationStrategy(detail.aggregation_strategy) },
+  ];
+
   return (
     <div className="admin-page">
       <PageShell
@@ -86,10 +94,14 @@ export function IngredientDetailPage() {
       {detail.notes ? <p>{detail.notes}</p> : null}
 
       <Card density="comfortable">
-        <p>
-          Category: {detail.category ?? "—"} · Food group: {detail.food_group ?? "—"} · Family:{" "}
-          {detail.family ?? "—"} · Strategy: {detail.aggregation_strategy ?? "—"}
-        </p>
+        <dl className="ingredient-detail-meta">
+          {metaRows.map((row) => (
+            <div key={row.label} className="ingredient-detail-meta-row">
+              <dt>{row.label}</dt>
+              <dd>{row.value}</dd>
+            </div>
+          ))}
+        </dl>
       </Card>
 
       <Card density="comfortable">

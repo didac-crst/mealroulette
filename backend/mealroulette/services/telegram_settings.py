@@ -1,26 +1,39 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime, time
+from datetime import UTC, datetime
+from uuid import UUID
 from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException, status
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from mealroulette.core.config import get_settings
-from mealroulette.models.telegram import TELEGRAM_SETTINGS_ID, TelegramSettings
+from mealroulette.models.telegram import TelegramSettings
 from mealroulette.schemas.telegram import TelegramSettingsPublic, TelegramSettingsUpdateRequest
-from mealroulette.services.telegram_subscribers import TelegramSubscriberService
+from mealroulette.services.telegram_link import TelegramLinkService
 
 
 class TelegramSettingsService:
     def __init__(self, db: Session) -> None:
         self.db = db
-        self.subscribers = TelegramSubscriberService(db)
+        self.links = TelegramLinkService(db)
 
-    def get_row(self) -> TelegramSettings:
-        row = self.db.get(TelegramSettings, TELEGRAM_SETTINGS_ID)
+    def _subscriber_count(self, household_id: UUID) -> int:
+        return len(self.links.list_subscribed_chat_ids(household_id))
+
+    def _chat_ids_for_household(self, household_id: UUID) -> list[str]:
+        return self.links.list_subscribed_chat_ids(household_id)
+
+    def list_all_rows(self) -> list[TelegramSettings]:
+        return list(self.db.scalars(select(TelegramSettings).order_by(TelegramSettings.id)))
+
+    def get_row(self, household_id: UUID) -> TelegramSettings:
+        row = self.db.scalar(
+            select(TelegramSettings).where(TelegramSettings.household_id == household_id)
+        )
         if row is None:
-            row = TelegramSettings(id=TELEGRAM_SETTINGS_ID)
+            row = TelegramSettings(household_id=household_id)
             self.db.add(row)
             self.db.commit()
             self.db.refresh(row)
@@ -35,7 +48,7 @@ class TelegramSettingsService:
         return TelegramSettingsPublic(
             enabled=row.enabled,
             has_bot_token=self.bot_token_configured(),
-            subscriber_count=len(self.subscribers.list_subscribers()),
+            subscriber_count=self._subscriber_count(row.household_id),
             daily_reminder_time=row.daily_reminder_time,
             shopping_window_days=row.shopping_window_days,
             include_today=row.include_today,
@@ -46,19 +59,24 @@ class TelegramSettingsService:
             last_error=row.last_error,
         )
 
-    def get_public(self) -> TelegramSettingsPublic:
-        return self.to_public(self.get_row())
+    def get_public(self, household_id: UUID) -> TelegramSettingsPublic:
+        return self.to_public(self.get_row(household_id))
 
-    def update(self, payload: TelegramSettingsUpdateRequest) -> TelegramSettingsPublic:
-        row = self.get_row()
+    def update(self, household_id: UUID, payload: TelegramSettingsUpdateRequest) -> TelegramSettingsPublic:
+        row = self.get_row(household_id)
         for field, value in payload.model_dump(exclude_unset=True).items():
             setattr(row, field, value)
         self.db.commit()
         self.db.refresh(row)
         return self.to_public(row)
 
-    def require_send_config(self, row: TelegramSettings | None = None) -> tuple[TelegramSettings, str, list[str]]:
-        settings_row = row or self.get_row()
+    def require_send_config(
+        self,
+        row: TelegramSettings | None = None,
+        *,
+        household_id: UUID | None = None,
+    ) -> tuple[TelegramSettings, str, list[str]]:
+        settings_row = row or self.get_row(household_id)  # type: ignore[arg-type]
         if not settings_row.enabled:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Telegram reminders are disabled")
         token = (get_settings().telegram_bot_token or "").strip()
@@ -67,11 +85,11 @@ class TelegramSettingsService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="TELEGRAM_BOT_TOKEN is not configured",
             )
-        chat_ids = self.subscribers.list_chat_ids()
+        chat_ids = self._chat_ids_for_household(settings_row.household_id)
         if not chat_ids:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="No Telegram subscribers yet. Send /subscribe to the bot.",
+                detail="No linked Telegram users with daily reminders enabled. Link Telegram in Settings.",
             )
         return settings_row, token, chat_ids
 

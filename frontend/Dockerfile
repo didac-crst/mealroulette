@@ -9,4 +9,5 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]
+# Named volume `frontend-node-modules` can lag behind package.json; sync on start.
+CMD ["sh", "-c", "npm install && npm run dev -- --host 0.0.0.0 --port 3000"]

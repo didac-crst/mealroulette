@@ -34,11 +34,16 @@ def recipe_deep_link(bot_username: str, recipe_id: int) -> str:
     return f"https://t.me/{username}?start=recipe_{recipe_id}"
 
 
-def load_recipe_detail(db: Session, recipe_id: int) -> TelegramRecipeDetail | None:
-    recipe = db.scalar(
+def load_recipe_detail(db: Session, recipe_id: int, *, household_id=None) -> TelegramRecipeDetail | None:
+    query = (
         select(Recipe)
+        .join(Dish, Recipe.dish_id == Dish.id)
         .where(Recipe.id == recipe_id)
-        .options(
+    )
+    if household_id is not None:
+        query = query.where(Dish.household_id == household_id)
+    recipe = db.scalar(
+        query.options(
             selectinload(Recipe.dish),
             selectinload(Recipe.ingredients).selectinload(RecipeIngredient.ingredient),
             selectinload(Recipe.ingredients).selectinload(RecipeIngredient.unit),

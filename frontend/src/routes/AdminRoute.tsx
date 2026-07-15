@@ -3,7 +3,7 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../features/auth/AuthContext";
 
 export function AdminRoute() {
-  const { user, loading, isAdmin } = useAuth();
+  const { user, loading, isPlatformAdmin } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -18,7 +18,7 @@ export function AdminRoute() {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  if (!isAdmin) {
+  if (!isPlatformAdmin) {
     return <Navigate to="/today" replace />;
   }
 

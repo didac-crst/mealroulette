@@ -1,139 +1,112 @@
-from unittest.mock import MagicMock
+from uuid import uuid4
 
 import pytest
+from unittest.mock import MagicMock
 
-from mealroulette.services.telegram_subscribers import TelegramSubscriberService
+from mealroulette.models.telegram import TelegramUserLink
 from mealroulette.services.telegram_updates import TelegramUpdateService
 
+pytestmark = pytest.mark.integration
 
-@pytest.mark.integration
-def test_subscribe_and_unsubscribe_commands(db_session):
-    subscriber_service = TelegramSubscriberService(db_session)
+
+def test_help_lists_commands_without_deprecated_mentions(db_session):
     client = MagicMock()
-    update_service = TelegramUpdateService(db_session, client=client)
-
-    handled = update_service._handle_update(
-        "fake-token",
+    service = TelegramUpdateService(db_session, client=client)
+    service._handle_update(
+        "token",
         {
-            "update_id": 1,
+            "message": {
+                "text": "/help",
+                "chat": {"id": 4242},
+                "from": {"id": 7, "username": "didac"},
+            }
+        },
+    )
+    reply = client.send_message.call_args.args[2]
+    assert "/planning" in reply
+    assert "/reminder" in reply
+    assert "/shopping" in reply
+    assert "subscribe" not in reply.lower()
+    assert "unsubscribe" not in reply.lower()
+    assert "deprecated" not in reply.lower()
+    assert client.send_message.call_args.kwargs.get("parse_mode") == "HTML"
+
+
+def test_subscribe_and_unsubscribe_are_deprecated(db_session):
+    client = MagicMock()
+    service = TelegramUpdateService(db_session, client=client)
+
+    service._handle_update(
+        "token",
+        {
             "message": {
                 "text": "/subscribe",
                 "chat": {"id": 4242},
-                "from": {"id": 99, "username": "didac", "first_name": "Didac"},
-            },
+                "from": {"id": 7, "username": "didac", "first_name": "Didac"},
+            }
         },
     )
-    assert handled is True
-    subscribers = subscriber_service.list_subscribers()
-    assert len(subscribers) == 1
-    assert subscribers[0].chat_id == "4242"
-    assert subscribers[0].username == "didac"
-    first_reply = client.send_message.call_args[0][2]
-    assert "now subscribed" in first_reply.lower()
-    assert "daily shopping reminders" in first_reply.lower()
+    first_reply = client.send_message.call_args.args[2]
+    assert "no longer uses /subscribe" in first_reply.lower()
+    assert db_session.query(TelegramUserLink).count() == 0
 
-    handled = update_service._handle_update(
-        "fake-token",
+    service._handle_update(
+        "token",
         {
-            "update_id": 2,
-            "message": {
-                "text": "/subscribe",
-                "chat": {"id": 4242},
-                "from": {"id": 99},
-            },
-        },
-    )
-    assert handled is True
-    assert len(subscriber_service.list_subscribers()) == 1
-    second_reply = client.send_message.call_args[0][2]
-    assert "already subscribed" in second_reply.lower()
-
-    handled = update_service._handle_update(
-        "fake-token",
-        {
-            "update_id": 3,
             "message": {
                 "text": "/unsubscribe",
                 "chat": {"id": 4242},
-                "from": {"id": 99},
-            },
+                "from": {"id": 7, "username": "didac"},
+            }
         },
     )
-    assert handled is True
-    assert subscriber_service.list_subscribers() == []
-    third_reply = client.send_message.call_args[0][2]
-    assert "unsubscribed" in third_reply.lower()
+    second_reply = client.send_message.call_args.args[2]
+    assert "no longer uses /unsubscribe" in second_reply.lower()
 
 
-@pytest.mark.integration
-def test_planning_and_reminder_commands_send_html(db_session, catalog_seed, monkeypatch):
-    monkeypatch.setenv("TELEGRAM_BOT_USERNAME", "mealroulette_bot")
+def test_start_without_payload_points_to_app_link(db_session):
     client = MagicMock()
-    update_service = TelegramUpdateService(db_session, client=client)
-
-    handled = update_service._handle_update(
-        "fake-token",
+    service = TelegramUpdateService(db_session, client=client)
+    service._handle_update(
+        "token",
         {
-            "update_id": 10,
             "message": {
-                "text": "/planning 3",
-                "chat": {"id": 9001},
-                "from": {"id": 1},
-            },
+                "text": "/start",
+                "chat": {"id": 99},
+                "from": {"id": 1, "username": "chef"},
+            }
         },
     )
-    assert handled is True
-    planning_call = client.send_message.call_args
-    assert planning_call.kwargs.get("parse_mode") == "HTML"
-    planning_message = planning_call.args[2]
-    assert "Planning" in planning_message
-    assert "MealRoulette" not in planning_message
+    reply = client.send_message.call_args.args[2]
+    assert "settings → telegram" in reply.lower()
 
-    handled = update_service._handle_update(
-        "fake-token",
+
+def test_start_with_link_token_links_user(db_session, admin_user, default_household):
+    from mealroulette.services.telegram_link import TelegramLinkService
+
+    link_service = TelegramLinkService(db_session)
+    _row, raw = link_service.create_link_token(admin_user.id)
+
+    client = MagicMock()
+    service = TelegramUpdateService(db_session, client=client)
+    service._handle_update(
+        "token",
         {
-            "update_id": 11,
             "message": {
-                "text": "/reminder",
-                "chat": {"id": 9001},
-                "from": {"id": 1},
-            },
+                "text": f"/start link_{raw}",
+                "chat": {"id": 555},
+                "from": {"id": 12, "username": "chef", "first_name": "Chef"},
+            }
         },
     )
-    assert handled is True
-    reminder_call = client.send_message.call_args
-    assert reminder_call.kwargs.get("parse_mode") == "HTML"
-    reminder_message = reminder_call.args[2]
-    assert "Reminder" in reminder_message
-
-    handled = update_service._handle_update(
-        "fake-token",
-        {
-            "update_id": 12,
-            "message": {
-                "text": "/planning 0",
-                "chat": {"id": 9001},
-                "from": {"id": 1},
-            },
-        },
-    )
-    assert handled is True
-    invalid_reply = client.send_message.call_args.args[2]
-    assert "between 1 and" in invalid_reply
-
-    handled = update_service._handle_update(
-        "fake-token",
-        {
-            "update_id": 13,
-            "message": {
-                "text": "/shopping",
-                "chat": {"id": 9001},
-                "from": {"id": 1},
-            },
-        },
-    )
-    assert handled is True
-    shopping_call = client.send_message.call_args
-    assert shopping_call.kwargs.get("parse_mode") == "HTML"
-    shopping_message = shopping_call.args[2]
-    assert "Shopping" in shopping_message
+    reply = client.send_message.call_args.args[2]
+    assert "Welcome to MealRoulette" in reply
+    assert "You're linked." in reply
+    assert admin_user.username in reply
+    assert default_household.name in reply
+    assert str(admin_user.id) not in reply
+    assert str(default_household.id) not in reply
+    assert client.send_message.call_args.kwargs.get("parse_mode") == "HTML"
+    linked = link_service.get_link_for_user(admin_user.id)
+    assert linked is not None
+    assert linked.chat_id == "555"

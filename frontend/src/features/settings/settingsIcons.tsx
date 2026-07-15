@@ -52,6 +52,26 @@ export function SettingsBackupIcon() {
   );
 }
 
+export function SettingsPasswordIcon() {
+  return (
+    <svg {...iconProps}>
+      <rect x="5" y="11" width="14" height="10" rx="2" />
+      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+      <circle cx="12" cy="16" r="1.25" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function SettingsHouseholdIcon() {
+  return (
+    <svg {...iconProps}>
+      <path d="M4 11.5 12 4l8 7.5" />
+      <path d="M6.5 10.5V20h11V10.5" />
+      <path d="M10 20v-5h4v5" />
+    </svg>
+  );
+}
+
 export function SettingsIngredientsIcon() {
   return (
     <svg {...iconProps}>

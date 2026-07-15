@@ -14,11 +14,18 @@ vi.mock("../api/auth", () => ({
     username: "chef",
     email: "chef@example.com",
     role: "user",
+    active_household_id: "00000000-0000-4000-8000-000000000001",
+    active_household_name: "Default household",
+    household_role: "household_member",
+    platform_roles: [],
   }),
 }));
 
 vi.mock("../features/auth/authStorage", () => ({
-  loadTokens: vi.fn(() => null),
+  loadTokens: vi.fn(() => ({
+    accessToken: "test-access-token",
+    refreshToken: "test-refresh-token",
+  })),
   saveTokens: vi.fn(),
   clearTokens: vi.fn(),
 }));
@@ -75,5 +82,14 @@ describe("AppShell", () => {
     expect(screen.queryByRole("link", { name: "Skip to main content" })).not.toBeInTheDocument();
     expect(screen.queryByRole("complementary", { name: "Application navigation" })).not.toBeInTheDocument();
     expect(screen.queryByRole("navigation", { name: "Primary navigation" })).not.toBeInTheDocument();
+  });
+
+  it("does not show Ingredients for household members", async () => {
+    renderShell();
+
+    expect(await screen.findByText("Today content")).toBeInTheDocument();
+    const sidebar = screen.getByRole("complementary", { name: "Application navigation" });
+    expect(sidebar).toHaveTextContent("Dishes");
+    expect(sidebar).not.toHaveTextContent("Ingredients");
   });
 });

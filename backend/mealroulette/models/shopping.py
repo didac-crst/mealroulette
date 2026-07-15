@@ -1,9 +1,11 @@
 from datetime import date, datetime
 from decimal import Decimal
+from uuid import UUID
 
 from sqlalchemy import Boolean, Date, DateTime, Enum, ForeignKey, Numeric, String, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.types import Uuid
 
 from mealroulette.db.base import Base
 from mealroulette.models.catalog import Ingredient, Unit
@@ -14,6 +16,11 @@ class ShoppingList(Base):
     __tablename__ = "shopping_lists"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    household_id: Mapped[UUID] = mapped_column(
+        Uuid,
+        ForeignKey("households.id", ondelete="CASCADE"),
+        index=True,
+    )
     from_date: Mapped[date] = mapped_column(Date, index=True)
     to_date: Mapped[date] = mapped_column(Date)
     status: Mapped[ShoppingListStatus] = mapped_column(

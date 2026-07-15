@@ -72,7 +72,7 @@ export function RecipeEditPage() {
   const dishIdNum = Number(dishId);
   const recipeIdNum = recipeId ? Number(recipeId) : null;
   const navigate = useNavigate();
-  const { accessToken, isAdmin } = useAuth();
+  const { accessToken, isHouseholdAdmin } = useAuth();
   const [dish, setDish] = useState<Dish | null>(null);
   const [tags, setTags] = useState<Tag[]>([]);
   const [form, setForm] = useState<RecipeForm>(emptyRecipeForm);
@@ -137,10 +137,10 @@ export function RecipeEditPage() {
   }, [accessToken, recipeIdNum, setBaseline]);
 
   useEffect(() => {
-    if (!isAdmin) {
+    if (!isHouseholdAdmin) {
       navigate(`/dishes/${dishId}`, { replace: true });
     }
-  }, [dishId, isAdmin, navigate]);
+  }, [dishId, isHouseholdAdmin, navigate]);
 
   useEffect(() => {
     if (!accessToken || !dishIdNum) {

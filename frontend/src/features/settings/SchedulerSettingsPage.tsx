@@ -30,7 +30,7 @@ function timeInputValue(value: string): string {
 }
 
 export function SchedulerSettingsPage() {
-  const { accessToken, isAdmin } = useAuth();
+  const { accessToken, isHouseholdAdmin } = useAuth();
   const navigate = useNavigate();
   const [settings, setSettings] = useState<SchedulerSettings | null>(null);
   const [form, setForm] = useState<SchedulerSettingsInput>({
@@ -49,10 +49,10 @@ export function SchedulerSettingsPage() {
   const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isAdmin) {
+    if (!isHouseholdAdmin) {
       navigate("/review");
     }
-  }, [isAdmin, navigate]);
+  }, [isHouseholdAdmin, navigate]);
 
   const reload = async () => {
     if (!accessToken) {

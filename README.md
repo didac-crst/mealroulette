@@ -28,10 +28,10 @@ make test        # backend + frontend tests
 
 The API container runs `alembic upgrade head` on startup. Migration files live in `backend/alembic/versions/` (current head: check with `alembic heads`).
 
-Bootstrap the first admin user:
+Bootstrap the first platform operator (no household — use signup or invites for households):
 
 ```bash
-docker exec -it mealroulette-api python -m mealroulette.commands.bootstrap_admin \
+docker exec -it mealroulette-api python -m mealroulette.commands.bootstrap_platform_admin \
   --username admin --email admin@example.com
 ```
 

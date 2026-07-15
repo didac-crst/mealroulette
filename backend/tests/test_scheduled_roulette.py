@@ -5,6 +5,7 @@ import pytest
 from fastapi import HTTPException
 
 from mealroulette.data.import_dishes import DEFAULT_FIXTURE_PATH, import_dish_fixtures
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID
 from mealroulette.models.scheduler import SCHEDULER_SETTINGS_ID, SchedulerSettings
 from mealroulette.services.planning import PlanningService
 from mealroulette.services.scheduled_roulette import ScheduledRouletteService
@@ -25,18 +26,18 @@ def test_target_week_start_offsets_from_reference_monday():
 
 def test_run_scheduled_skips_when_disabled(db_session, catalog_seed, scheduler_seed):
     service = ScheduledRouletteService(db_session)
-    row = service.settings_service.get_row()
+    row = service.settings_service.get_row(DEFAULT_HOUSEHOLD_ID)
     row.enabled = False
     db_session.commit()
 
     friday_1800 = datetime(2026, 7, 3, 18, 0, tzinfo=UTC)
-    assert service.run_scheduled(now=friday_1800) is None
+    assert service.run_scheduled(now=friday_1800) == []
 
 
 def test_run_now_generates_next_week(db_session, catalog_seed, scheduler_seed):
     _seed(db_session)
     service = ScheduledRouletteService(db_session)
-    row = service.settings_service.get_row()
+    row = service.settings_service.get_row(DEFAULT_HOUSEHOLD_ID)
     row.enabled = True
     row.target_week_offset = 1
     db_session.commit()
@@ -47,7 +48,7 @@ def test_run_now_generates_next_week(db_session, catalog_seed, scheduler_seed):
             "mealroulette.services.scheduled_roulette.local_today",
             lambda _settings: reference_today,
         )
-        result = service.run_now()
+        result = service.run_now(DEFAULT_HOUSEHOLD_ID)
 
     assert result.assignments_count == 14
     assert result.week_start_date == date(2026, 7, 6)
@@ -67,26 +68,55 @@ def test_run_now_records_failure_when_no_dishes(db_session, catalog_seed, schedu
             lambda _settings: reference_today,
         )
         with pytest.raises(HTTPException):
-            service.run_now()
+            service.run_now(DEFAULT_HOUSEHOLD_ID)
 
     refreshed = db_session.get(SchedulerSettings, SCHEDULER_SETTINGS_ID)
     assert refreshed is not None
     assert refreshed.last_error is not None
 
 
-def test_notify_telegram_sends_new_roulette_heading(db_session, catalog_seed, scheduler_seed, monkeypatch):
+def test_notify_telegram_sends_new_roulette_heading(
+    db_session, catalog_seed, scheduler_seed, admin_user, monkeypatch
+):
+    from uuid import uuid4
+
+    from mealroulette.models.household import HouseholdNotificationSubscription
+    from mealroulette.models.telegram import TelegramSettings, TelegramUserLink
+
     _seed(db_session)
     mock_client = MagicMock()
     service = ScheduledRouletteService(db_session, client=mock_client)
-    row = service.settings_service.get_row()
+    row = service.settings_service.get_row(DEFAULT_HOUSEHOLD_ID)
     row.notify_telegram = True
     row.notify_planning_days = 7
     db_session.commit()
 
-    from mealroulette.models.telegram import TelegramSubscriber
-    from mealroulette.services.telegram_settings import TelegramSettingsService
-
-    db_session.add(TelegramSubscriber(chat_id="12345", telegram_user_id="99", username="tester"))
+    existing = (
+        db_session.query(HouseholdNotificationSubscription)
+        .filter_by(user_id=admin_user.id, household_id=DEFAULT_HOUSEHOLD_ID)
+        .one_or_none()
+    )
+    if existing is None:
+        db_session.add(
+            HouseholdNotificationSubscription(
+                id=uuid4(),
+                user_id=admin_user.id,
+                household_id=DEFAULT_HOUSEHOLD_ID,
+                notify_roulette=True,
+            )
+        )
+    else:
+        existing.notify_roulette = True
+    db_session.add(
+        TelegramUserLink(
+            id=uuid4(),
+            user_id=admin_user.id,
+            chat_id="12345",
+            telegram_user_id="99",
+            username="tester",
+        )
+    )
+    db_session.add(TelegramSettings(household_id=DEFAULT_HOUSEHOLD_ID, enabled=True))
     db_session.commit()
 
     reference_today = date(2026, 7, 1)
@@ -104,7 +134,7 @@ def test_notify_telegram_sends_new_roulette_heading(db_session, catalog_seed, sc
         lambda: type("S", (), {"telegram_bot_token": "123456:TEST-BOT-TOKEN"})(),
     )
 
-    result = service.run_now()
+    result = service.run_now(DEFAULT_HOUSEHOLD_ID)
     assert result.telegram is not None
     assert result.telegram.sent is True
     assert mock_client.send_message.called

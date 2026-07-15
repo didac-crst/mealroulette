@@ -7,6 +7,8 @@
 - **Status:** Accepted — implement in staged slices.
 - **Update when:** A later ADR supersedes identity, tenancy, role, rating, Telegram, or backup ownership decisions.
 
+**Amended by:** [ADR 004 — Platform ops, public dishes, and tenancy refinements](004-platform-ops-public-dishes-and-tenancy-refinements.md).
+
 **Status:** Accepted (July 2026)  
 **Context:** MealRoulette currently has global `admin` / `user` roles, global dishes/recipes/plans/settings, singleton scheduler/Telegram/backup settings, and user-linked cooking timer alerts. The next product step is household collaboration without corrupting global ingredient taxonomy or leaking data across households.
 
@@ -19,7 +21,7 @@ MealRoulette will use a household tenancy model with separate platform and house
 3. **Memberships connect users to households and carry household roles.**
 4. **Platform roles are separate from household roles.**
 5. **Ingredients, units, food groups, ingredient families, aliases, and conversions are global platform-governed reference data.**
-6. **Dishes, recipes, meal plans, planning rules, shopping lists, ratings, reviews, household notification defaults, and household integrations are household-owned.**
+6. **Dishes, recipes, meal plans, planning rules, shopping lists, ratings, reviews, and household integrations are household-owned. Telegram notification preferences and reminder schedule are user-level (per membership).**
 
 The word `admin` must not be used alone in new authorization APIs or domain models.
 
@@ -34,7 +36,7 @@ Initial household roles:
 - `household_admin`: may manage household members, invitations, household settings, and household-owned meal-planning content.
 - `household_member`: may use household planning, shopping, cooking, review, reroll, and collaborative recipe workflows.
 
-Platform administration does not imply invisible household membership or unrestricted private household access. Any future support/impersonation flow must be explicitly designed and audited.
+Platform administration does not imply invisible household membership or unrestricted private household access. A platform admin is not automatically a household member. Any future support/impersonation flow must be explicitly designed and audited.
 
 ## Identity Keys
 
@@ -70,7 +72,7 @@ Add `household_id` to root household aggregates first:
 - `planning_rules`
 - `shopping_lists`
 - household scheduler settings or equivalent household scheduling configuration
-- household Telegram/notification defaults
+- household Telegram bot polling / send status rows (`telegram_settings`) for integrations infra
 
 Recipes inherit ownership through `dishes`. Recipe steps and ingredients inherit through `recipes`. Meal-plan items and lines inherit through `meal_plans`.
 
@@ -89,6 +91,8 @@ Initial supported flows:
 4. Promotion to `household_admin` happens after joining.
 
 Households must always retain at least one active household admin. Demoting, removing, or leaving as the last admin must fail.
+
+Initial product constraint: one active household membership per user. The schema may later support multiple memberships, but Phase 15 services and UI should reject signup or invitation acceptance when the user already has an active membership.
 
 Do not add public household discovery. Joining an existing household requires a deliberate invitation.
 
@@ -120,6 +124,8 @@ recipe_ratings
 
 When rating a dish without a specific recipe, use a separate dish-rating row or a nullable recipe strategy with a constraint that prevents ambiguous duplicates.
 
+**Phase 15 shipment:** the `recipe_ratings` table may exist after tenancy migrations, but Phase 15 **does not ship** preference API or UI. Recipe/dish preference is deferred to a later slice. Meal-slot reviews (`meal_reviews`) are the only feedback surface shipped in Phase 15.
+
 ### Meal-Slot Review
 
 A meal-slot review answers:
@@ -135,7 +141,7 @@ meal_reviews
 - id UUID or integer PK
 - household_id
 - meal_plan_item_id
-- user_id
+- user_id  -- NULL only for pre-tenancy / migrated history
 - rating NULL
 - outcome/status context
 - comment NULL
@@ -143,6 +149,13 @@ meal_reviews
 - updated_at
 - UNIQUE (meal_plan_item_id, user_id)
 ```
+
+**Legacy `user_id` NULL rows** (pre-tenancy migration):
+
+- are **read-only historical** records;
+- are **never** returned as the current user’s review (`get_meal_rating` / reset paths filter `user_id == actor`);
+- are **never** updated or claimed by current upsert APIs (new writes always set `user_id`);
+- **are included** in household dish averages used by the scheduler (`load_average_ratings`).
 
 Current `meal_ratings` should evolve toward this model rather than being replaced by dish-only unique ratings.
 
@@ -168,9 +181,14 @@ Telegram links to a specific MealRoulette user, not directly to a household.
 
 Initial model:
 
-- user-level Telegram account/link established through a single-use bot deep-link token;
-- household notification defaults define what the household normally sends;
-- per-user subscriptions define whether a user receives a given household event through Telegram.
+- user-level Telegram account/link established through a single-use bot deep-link token in Settings → Telegram;
+- each MealRoulette user has at most one Telegram link;
+- the same Telegram chat may be linked to many MealRoulette users (no max);
+- Telegram reminder schedule (time, timezone, shopping window) and notification toggles are **user-level** on `household_notification_subscriptions` (Settings → Telegram);
+- outbound household broadcasts (e.g. shopping, roulette) resolve linked users who opted into that event;
+- outbound sends resolve only linked users (no legacy `/subscribe` subscriber table fallback);
+- `/subscribe` and `/unsubscribe` are deprecated; the bot tells users to link from the app;
+- cooking timers notify the linked Telegram chat of the user who started the timer.
 
 Cooking timers are owned by the user who starts them and should notify that user by default. Household-wide timer broadcasts are out of scope.
 
@@ -202,14 +220,15 @@ The following are intentionally out of scope for the first household implementat
 
 1. Add UUID-backed `households` and `household_memberships`.
 2. Migrate or recreate `users` as UUID-backed identities while preserving the existing single test/admin user.
-3. Create one default household.
-4. Convert current users into members of that household.
-5. Map trusted current admin/operator to `platform_admin` and `household_admin`.
+3. For existing upgraded data only, create one migration household and backfill legacy household-owned rows to it.
+4. Greenfield installs do not create a product default household; first household appears through signup or explicit import.
+5. Convert legacy non-platform users into members of the migration household as needed.
+6. Create trusted platform operators through operator tooling as `platform_admin` without implicit household membership.
 
 ### Slice 2 — Household Ownership
 
 1. Add `household_id` to household root aggregates.
-2. Backfill existing rows to the default household.
+2. Backfill existing rows to the migration household.
 3. Add non-null and foreign-key constraints after validation.
 4. Scope read/write services by active household.
 5. Add two-household tenant isolation tests.
@@ -230,10 +249,11 @@ The following are intentionally out of scope for the first household implementat
 
 ### Slice 5 — Ratings, Telegram, And Notifications
 
-1. Split recipe preference from meal-slot review.
-2. Link Telegram accounts to users through one-time bot deep links.
-3. Add household notification defaults plus user subscriptions.
-4. Deliver scheduled notifications by resolving current active memberships/subscriptions at send time.
+1. **Deferred:** ship recipe preference (`recipe_ratings`) API/UI in a later slice; Phase 15 keeps the table optional/unused by product APIs.
+2. Meal-slot reviews remain the shipped feedback path (`meal_reviews`); legacy NULL `user_id` rows are read-only historical (see Meal-Slot Review above).
+3. Link Telegram accounts to users through one-time bot deep links.
+4. Add user-level Telegram notification subscriptions (toggles + reminder schedule).
+5. Deliver scheduled notifications by resolving current active memberships/subscriptions at send time.
 
 ## Consequences
 

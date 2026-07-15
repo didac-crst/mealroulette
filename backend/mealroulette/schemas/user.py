@@ -27,6 +27,11 @@ class LogoutRequest(BaseModel):
     refresh_token: str
 
 
+class ChangePasswordRequest(BaseModel):
+    current_password: str = Field(min_length=8, max_length=128)
+    new_password: str = Field(min_length=8, max_length=128)
+
+
 class UserPublic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -36,10 +41,20 @@ class UserPublic(BaseModel):
     role: UserRole
     platform_roles: list[str] = Field(default_factory=list)
     active_household_id: UUID | None = None
+    active_household_name: str | None = None
     household_role: str | None = None
     active: bool
     created_at: datetime
     updated_at: datetime
+
+
+class TelegramOtpRequest(BaseModel):
+    username: str = Field(min_length=1, max_length=64)
+
+
+class TelegramOtpVerifyRequest(BaseModel):
+    username: str = Field(min_length=1, max_length=64)
+    code: str = Field(min_length=6, max_length=8)
 
 
 class UserCreateRequest(BaseModel):

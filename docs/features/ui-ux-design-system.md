@@ -83,7 +83,7 @@ On ordinary screens: ~75–85% neutral surfaces, ~10–15% teal accents, ~3–6%
 | **App icon** | Favicon, PWA, small contexts |
 | **Monochrome** | Masks, print, accessibility fallbacks |
 
-Do not scale the full detailed logo below ~40 px. Current repo assets (`/logo-header.png`, `/logo-header.webp`) are compact/header marks only; login should use a larger full logo when available.
+Do not scale the full detailed logo below ~40 px. Repo assets (`/logo-header.png`, `/logo-header.webp`) are 512×512 source marks for crisp display at login and sidebar sizes.
 
 ### Minimum sizes
 
@@ -91,7 +91,7 @@ Do not scale the full detailed logo below ~40 px. Current repo assets (`/logo-he
 | --- | ---: |
 | Login mobile | 144–176 px |
 | Login desktop | 176–220 px |
-| Sidebar compact mark | 28–40 px |
+| Sidebar compact mark | 56–64 px |
 | Header compact mark | 40–64 px |
 
 ### Backgrounds

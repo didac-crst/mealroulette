@@ -15,7 +15,7 @@ from mealroulette.auth.security import (
     hash_password,
     verify_password,
 )
-from mealroulette.models.household import HouseholdRole, PlatformRole, UserPlatformRole
+from mealroulette.models.household import Household, PlatformRole, UserPlatformRole
 from mealroulette.models.user import RefreshToken, User, UserRole
 from mealroulette.schemas.user import UserCreateRequest, UserPublic, UserUpdateRequest
 from mealroulette.services.household import HouseholdService
@@ -109,6 +109,23 @@ class AuthService:
             self.db.delete(stored_token)
             self.db.commit()
 
+    def change_password(self, user: User, *, current_password: str, new_password: str) -> None:
+        if not verify_password(current_password, user.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Current password is incorrect",
+            )
+        if current_password == new_password:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="New password must be different from the current password",
+            )
+        user.password_hash = hash_password(new_password)
+        user.updated_at = datetime.now(UTC)
+        # Invalidate existing refresh tokens so other sessions must sign in again.
+        self.db.execute(delete(RefreshToken).where(RefreshToken.user_id == user.id))
+        self.db.commit()
+
 
 class UserService:
     def __init__(self, db: Session):
@@ -150,7 +167,8 @@ class UserService:
         )
         self.db.add(user)
         self.db.flush()
-        self.household_service.provision_user_tenancy(user, legacy_role=payload.role)
+        if payload.role == UserRole.admin:
+            self.household_service.provision_platform_admin(user)
         self.db.commit()
         self.db.refresh(user)
         return user
@@ -190,15 +208,8 @@ class UserService:
         self.db.commit()
 
     def _sync_tenancy_roles(self, user: User) -> None:
-        membership = self.household_service.active_household_membership(user.id)
-        if membership is not None:
-            membership.role = (
-                HouseholdRole.household_admin
-                if user.role == UserRole.admin
-                else HouseholdRole.household_member
-            )
         if user.role == UserRole.admin:
-            self.household_service._ensure_platform_admin(user.id)
+            self.household_service.provision_platform_admin(user)
         else:
             self.db.execute(
                 delete(UserPlatformRole).where(
@@ -212,6 +223,10 @@ class UserService:
         if user.role == UserRole.admin and PlatformRole.platform_admin.value not in platform_roles:
             platform_roles.append(PlatformRole.platform_admin.value)
         membership = self.household_service.active_household_membership(user.id)
+        household_name = None
+        if membership is not None:
+            household = self.db.get(Household, membership.household_id)
+            household_name = household.name if household is not None else None
         return UserPublic(
             id=user.id,
             username=user.username,
@@ -219,6 +234,7 @@ class UserService:
             role=user.role,
             platform_roles=platform_roles,
             active_household_id=membership.household_id if membership is not None else None,
+            active_household_name=household_name,
             household_role=membership.role.value if membership is not None else None,
             active=user.active,
             created_at=user.created_at,
