@@ -36,7 +36,7 @@ def settings() -> Settings:
     return Settings(
         database_url=test_url,
         test_database_url=test_url,
-        secret_key="test-secret-key-that-is-long-enough-for-hs256",
+        secret_key="test-secret-key-for-hs256-at-least-32-bytes",
     )
 
 
@@ -82,6 +82,13 @@ def client(db_session: Session) -> Generator[TestClient, None, None]:
         yield test_client
 
     app.dependency_overrides.clear()
+
+
+@pytest.fixture(autouse=True)
+def ensure_default_household(db_session: Session) -> None:
+    if db_session.get(Household, DEFAULT_HOUSEHOLD_ID) is None:
+        db_session.add(Household(id=DEFAULT_HOUSEHOLD_ID, name=DEFAULT_HOUSEHOLD_NAME))
+        db_session.flush()
 
 
 @pytest.fixture
@@ -158,7 +165,7 @@ def catalog_seed(db_session: Session):
 
 
 @pytest.fixture
-def scheduler_seed(db_session: Session):
+def scheduler_seed(db_session: Session, default_household: Household):
     from mealroulette.data.default_planning_rules import DEFAULT_PLANNING_RULES_JSON, DEFAULT_PLANNING_RULE_NAME
     from mealroulette.models.scheduler import (
         DEFAULT_PLANNING_RULE_ID,
@@ -171,13 +178,14 @@ def scheduler_seed(db_session: Session):
         db_session.add(
             PlanningRule(
                 id=DEFAULT_PLANNING_RULE_ID,
+                household_id=DEFAULT_HOUSEHOLD_ID,
                 name=DEFAULT_PLANNING_RULE_NAME,
                 active=True,
                 rules_json=DEFAULT_PLANNING_RULES_JSON,
             )
         )
     if db_session.get(SchedulerSettings, SCHEDULER_SETTINGS_ID) is None:
-        db_session.add(SchedulerSettings(id=SCHEDULER_SETTINGS_ID))
+        db_session.add(SchedulerSettings(id=SCHEDULER_SETTINGS_ID, household_id=DEFAULT_HOUSEHOLD_ID))
     db_session.commit()
     return db_session
 
@@ -194,7 +202,7 @@ def user_headers(user_token: str) -> dict[str, str]:
 
 @pytest.fixture(autouse=True)
 def clear_settings_cache(monkeypatch):
-    monkeypatch.setenv("SECRET_KEY", "test-secret-key-that-is-long-enough-for-hs256")
+    monkeypatch.setenv("SECRET_KEY", "test-secret-key-for-hs256-at-least-32-bytes")
     monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "123456:TEST-BOT-TOKEN")
     get_settings.cache_clear()
     yield

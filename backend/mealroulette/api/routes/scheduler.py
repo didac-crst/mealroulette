@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from mealroulette.auth.dependencies import get_current_admin
+from mealroulette.auth.dependencies import get_current_household_admin, get_current_household_scope, HouseholdScope
 from mealroulette.db.session import get_db
 from mealroulette.models.user import User
 from mealroulette.schemas.scheduler import (
@@ -20,44 +20,49 @@ router = APIRouter(tags=["scheduler"])
 
 @router.get("/planning-rules/active", response_model=PlanningRulePublic)
 def get_active_planning_rules(
-    _admin: User = Depends(get_current_admin),
+    _admin: User = Depends(get_current_household_admin),
+    scope: HouseholdScope = Depends(get_current_household_scope),
     db: Session = Depends(get_db),
 ) -> PlanningRulePublic:
-    return PlanningRuleService(db).get_active_public()
+    return PlanningRuleService(db, household_id=scope.household_id).get_active_public()
 
 
 @router.put("/planning-rules/active", response_model=PlanningRulePublic)
 def update_active_planning_rules(
     payload: PlanningRuleUpdateRequest,
-    _admin: User = Depends(get_current_admin),
+    _admin: User = Depends(get_current_household_admin),
+    scope: HouseholdScope = Depends(get_current_household_scope),
     db: Session = Depends(get_db),
 ) -> PlanningRulePublic:
-    return PlanningRuleService(db).update_active(payload)
+    return PlanningRuleService(db, household_id=scope.household_id).update_active(payload)
 
 
 @router.get("/scheduler/settings", response_model=SchedulerSettingsPublic)
 def get_scheduler_settings(
-    _admin: User = Depends(get_current_admin),
+    _admin: User = Depends(get_current_household_admin),
+    scope: HouseholdScope = Depends(get_current_household_scope),
     db: Session = Depends(get_db),
 ) -> SchedulerSettingsPublic:
-    return SchedulerSettingsService(db).get_public()
+    return SchedulerSettingsService(db).get_public(scope.household_id)
 
 
 @router.put("/scheduler/settings", response_model=SchedulerSettingsPublic)
 def update_scheduler_settings(
     payload: SchedulerSettingsUpdateRequest,
-    _admin: User = Depends(get_current_admin),
+    _admin: User = Depends(get_current_household_admin),
+    scope: HouseholdScope = Depends(get_current_household_scope),
     db: Session = Depends(get_db),
 ) -> SchedulerSettingsPublic:
-    return SchedulerSettingsService(db).update(payload)
+    return SchedulerSettingsService(db).update(scope.household_id, payload)
 
 
 @router.post("/scheduler/run-roulette", response_model=SchedulerRouletteRunResult)
 def run_scheduler_roulette_now(
-    _admin: User = Depends(get_current_admin),
+    _admin: User = Depends(get_current_household_admin),
+    scope: HouseholdScope = Depends(get_current_household_scope),
     db: Session = Depends(get_db),
 ) -> SchedulerRouletteRunResult:
-    result = ScheduledRouletteService(db).run_now()
+    result = ScheduledRouletteService(db).run_now(scope.household_id)
     telegram = result.telegram
     detail = f"Generated {result.assignments_count} meals for week {result.week_start_date.isoformat()}"
     if telegram is not None:

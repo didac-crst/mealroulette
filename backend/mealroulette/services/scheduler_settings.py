@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime, time
+from uuid import UUID
 from zoneinfo import ZoneInfo
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from mealroulette.models.scheduler import SCHEDULER_SETTINGS_ID, SchedulerSettings
+from mealroulette.models.scheduler import SchedulerSettings
 from mealroulette.schemas.scheduler import SchedulerSettingsPublic, SchedulerSettingsUpdateRequest
 
 
@@ -13,10 +15,15 @@ class SchedulerSettingsService:
     def __init__(self, db: Session) -> None:
         self.db = db
 
-    def get_row(self) -> SchedulerSettings:
-        row = self.db.get(SchedulerSettings, SCHEDULER_SETTINGS_ID)
+    def list_all_rows(self) -> list[SchedulerSettings]:
+        return list(self.db.scalars(select(SchedulerSettings).order_by(SchedulerSettings.id)))
+
+    def get_row(self, household_id: UUID) -> SchedulerSettings:
+        row = self.db.scalar(
+            select(SchedulerSettings).where(SchedulerSettings.household_id == household_id)
+        )
         if row is None:
-            row = SchedulerSettings(id=SCHEDULER_SETTINGS_ID)
+            row = SchedulerSettings(household_id=household_id)
             self.db.add(row)
             self.db.commit()
             self.db.refresh(row)
@@ -36,26 +43,24 @@ class SchedulerSettingsService:
             last_error=row.last_error,
         )
 
-    def get_public(self) -> SchedulerSettingsPublic:
-        return self.to_public(self.get_row())
+    def get_public(self, household_id: UUID) -> SchedulerSettingsPublic:
+        return self.to_public(self.get_row(household_id))
 
-    def update(self, payload: SchedulerSettingsUpdateRequest) -> SchedulerSettingsPublic:
-        row = self.get_row()
+    def update(self, household_id: UUID, payload: SchedulerSettingsUpdateRequest) -> SchedulerSettingsPublic:
+        row = self.get_row(household_id)
         for field, value in payload.model_dump(exclude_unset=True).items():
             setattr(row, field, value)
         self.db.commit()
         self.db.refresh(row)
         return self.to_public(row)
 
-    def record_roulette_success(self, row: SchedulerSettings | None = None) -> None:
-        settings_row = row or self.get_row()
-        settings_row.last_roulette_at = datetime.now(UTC)
-        settings_row.last_error = None
+    def record_roulette_success(self, row: SchedulerSettings) -> None:
+        row.last_roulette_at = datetime.now(UTC)
+        row.last_error = None
         self.db.commit()
 
-    def record_roulette_failure(self, error: str, row: SchedulerSettings | None = None) -> None:
-        settings_row = row or self.get_row()
-        settings_row.last_error = error[:2000]
+    def record_roulette_failure(self, error: str, row: SchedulerSettings) -> None:
+        row.last_error = error[:2000]
         self.db.commit()
 
     @staticmethod
