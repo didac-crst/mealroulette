@@ -69,6 +69,26 @@ def upgrade() -> None:
 def downgrade() -> None:
     op.rename_table("meal_reviews", "meal_ratings")
     op.drop_constraint("uq_meal_ratings_item_user", "meal_ratings", type_="unique")
+
+    bind = op.get_bind()
+    duplicate_count = bind.execute(
+        sa.text(
+            """
+            SELECT COUNT(*) FROM (
+                SELECT meal_plan_item_id
+                FROM meal_ratings
+                GROUP BY meal_plan_item_id
+                HAVING COUNT(*) > 1
+            ) duplicates
+            """
+        )
+    ).scalar_one()
+    if duplicate_count:
+        raise RuntimeError(
+            "Cannot downgrade meal reviews: multiple reviews exist for the same meal_plan_item_id. "
+            "Resolve duplicate reviews before recreating uq_meal_ratings_meal_plan_item."
+        )
+
     op.create_unique_constraint("uq_meal_ratings_meal_plan_item", "meal_ratings", ["meal_plan_item_id"])
     op.drop_index(op.f("ix_meal_ratings_user_id"), table_name="meal_ratings")
     op.drop_index(op.f("ix_meal_ratings_household_id"), table_name="meal_ratings")

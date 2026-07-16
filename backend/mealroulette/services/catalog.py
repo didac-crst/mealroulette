@@ -118,12 +118,9 @@ class CatalogService:
     def _generate_unique_dish_public_key(self, name: str) -> str:
         for _ in range(20):
             public_key = generate_dish_public_key(name)
-            if self.db.scalar(
-                select(Dish.id).where(
-                    Dish.public_key == public_key,
-                    Dish.household_id == self.household_id,
-                )
-            ) is None:
+            # Dish public keys remain globally unique: recipe keys are derived from them
+            # and recipes keep a global unique index.
+            if self.db.scalar(select(Dish.id).where(Dish.public_key == public_key)) is None:
                 return public_key
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -940,6 +937,7 @@ class CatalogService:
         step = self.db.get(RecipeStep, step_id)
         if step is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recipe step not found")
+        self.get_recipe(step.recipe_id)
         for field, value in payload.model_dump(exclude_unset=True).items():
             setattr(step, field, value)
         self.db.commit()
@@ -950,6 +948,7 @@ class CatalogService:
         step = self.db.get(RecipeStep, step_id)
         if step is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recipe step not found")
+        self.get_recipe(step.recipe_id)
         self.db.delete(step)
         self.db.commit()
 

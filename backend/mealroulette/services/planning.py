@@ -334,6 +334,9 @@ class PlanningService:
         return self.to_plan_public(self._load_plan(plan.id))
 
     def _resolve_recipe_for_dish(self, dish_id: int, recipe_id: int | None) -> int | None:
+        dish = self.db.get(Dish, dish_id)
+        if dish is None or dish.household_id != self.household_id:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dish not found")
         if recipe_id is not None:
             recipe = self.db.get(Recipe, recipe_id)
             if recipe is None or recipe.dish_id != dish_id:
@@ -385,7 +388,7 @@ class PlanningService:
         position: int | None = None,
     ) -> MealPlanItemDish:
         dish = self.db.get(Dish, dish_id)
-        if dish is None:
+        if dish is None or dish.household_id != self.household_id:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dish not found")
         resolved_recipe_id = self._resolve_recipe_for_dish(dish_id, recipe_id)
         resolved_position = self._resolve_line_position(item, position)
@@ -550,7 +553,11 @@ class PlanningService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="A meal cannot be its own leftover source",
             )
-        source = self.db.get(MealPlanItem, source_id)
+        source = self.db.scalar(
+            select(MealPlanItem)
+            .join(MealPlan, MealPlanItem.meal_plan_id == MealPlan.id)
+            .where(MealPlanItem.id == source_id, MealPlan.household_id == self.household_id)
+        )
         if source is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Leftover source meal not found")
         if not is_leftover_source_candidate(
@@ -984,7 +991,9 @@ class PlanningService:
     def _load_line(self, line_id: int) -> MealPlanItemDish:
         line = self.db.scalar(
             select(MealPlanItemDish)
-            .where(MealPlanItemDish.id == line_id)
+            .join(MealPlanItem, MealPlanItemDish.meal_plan_item_id == MealPlanItem.id)
+            .join(MealPlan, MealPlanItem.meal_plan_id == MealPlan.id)
+            .where(MealPlanItemDish.id == line_id, MealPlan.household_id == self.household_id)
             .options(
                 selectinload(MealPlanItemDish.meal_plan_item).options(*self._meal_plan_item_trait_options()),
                 selectinload(MealPlanItemDish.dish),

@@ -45,9 +45,9 @@ def _add_household_id(table: str) -> None:
 def upgrade() -> None:
     _add_household_id("dishes")
     op.drop_index(op.f("ix_dishes_name"), table_name="dishes")
-    op.drop_constraint("uq_dishes_public_key", "dishes", type_="unique")
+    # Dish names are household-scoped; public keys remain globally unique because recipe
+    # public keys are derived from dish public keys and recipes keep a global unique index.
     op.create_unique_constraint("uq_dishes_household_name", "dishes", ["household_id", "name"])
-    op.create_unique_constraint("uq_dishes_household_public_key", "dishes", ["household_id", "public_key"])
 
     _add_household_id("meal_plans")
     op.drop_constraint("uq_meal_plans_week_start", "meal_plans", type_="unique")
@@ -83,36 +83,7 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.drop_constraint("uq_telegram_settings_household_id", "telegram_settings", type_="unique")
-    op.drop_index(op.f("ix_telegram_settings_household_id"), table_name="telegram_settings")
-    op.drop_constraint("fk_telegram_settings_household_id_households", "telegram_settings", type_="foreignkey")
-    op.drop_column("telegram_settings", "household_id")
-
-    op.drop_constraint("uq_scheduler_settings_household_id", "scheduler_settings", type_="unique")
-    op.drop_index(op.f("ix_scheduler_settings_household_id"), table_name="scheduler_settings")
-    op.drop_constraint("fk_scheduler_settings_household_id_households", "scheduler_settings", type_="foreignkey")
-    op.drop_column("scheduler_settings", "household_id")
-
-    op.drop_index(op.f("ix_shopping_lists_household_id"), table_name="shopping_lists")
-    op.drop_constraint("fk_shopping_lists_household_id_households", "shopping_lists", type_="foreignkey")
-    op.drop_column("shopping_lists", "household_id")
-
-    op.drop_constraint("uq_planning_rules_household_name", "planning_rules", type_="unique")
-    op.drop_index(op.f("ix_planning_rules_household_id"), table_name="planning_rules")
-    op.drop_constraint("fk_planning_rules_household_id_households", "planning_rules", type_="foreignkey")
-    op.drop_column("planning_rules", "household_id")
-    op.create_unique_constraint("uq_planning_rules_name", "planning_rules", ["name"])
-
-    op.drop_constraint("uq_meal_plans_household_week", "meal_plans", type_="unique")
-    op.drop_index(op.f("ix_meal_plans_household_id"), table_name="meal_plans")
-    op.drop_constraint("fk_meal_plans_household_id_households", "meal_plans", type_="foreignkey")
-    op.drop_column("meal_plans", "household_id")
-    op.create_unique_constraint("uq_meal_plans_week_start", "meal_plans", ["week_start_date"])
-
-    op.drop_constraint("uq_dishes_household_public_key", "dishes", type_="unique")
-    op.drop_constraint("uq_dishes_household_name", "dishes", type_="unique")
-    op.drop_index(op.f("ix_dishes_household_id"), table_name="dishes")
-    op.drop_constraint("fk_dishes_household_id_households", "dishes", type_="foreignkey")
-    op.drop_column("dishes", "household_id")
-    op.create_unique_constraint("uq_dishes_public_key", "dishes", ["public_key"])
-    op.create_index(op.f("ix_dishes_name"), "dishes", ["name"], unique=True)
+    raise NotImplementedError(
+        "Downgrade is not supported for household ownership migration; "
+        "dropping household_id and restoring global uniqueness is not data-safe."
+    )

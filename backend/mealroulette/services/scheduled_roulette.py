@@ -5,10 +5,12 @@ from datetime import date, datetime, timedelta
 from uuid import UUID
 
 from fastapi import HTTPException
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from mealroulette.core.config import get_settings
 from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID
+from mealroulette.models.planning import MealPlan, MealPlanItem
 from mealroulette.schemas.telegram import TelegramSendResult
 from mealroulette.services.planning import PlanningService
 from mealroulette.services.scheduler_settings import SchedulerSettingsService
@@ -94,6 +96,8 @@ class ScheduledRouletteService:
         if not TelegramSettingsService.bot_token_configured():
             return None
 
+        # TelegramSubscriber remains installation-global in this Phase 15B slice.
+        # Household-scoped recipients land in a later Telegram tenancy slice.
         chat_ids = self.telegram_settings_service.subscribers.list_chat_ids()
         if not chat_ids:
             return None
@@ -102,9 +106,22 @@ class ScheduledRouletteService:
         days = settings_row.notify_planning_days
         from_date = week_start
         to_date = week_start + timedelta(days=days - 1)
-        items = self.on_demand_service.list_planning_items(from_date, to_date)
+        items = list(
+            self.db.scalars(
+                select(MealPlanItem)
+                .join(MealPlan, MealPlanItem.meal_plan_id == MealPlan.id)
+                .where(
+                    MealPlan.household_id == self.household_id,
+                    MealPlanItem.date >= from_date,
+                    MealPlanItem.date <= to_date,
+                )
+                .options(*PlanningService._meal_plan_item_trait_options())
+                .order_by(MealPlanItem.date, MealPlanItem.meal_slot)
+            )
+        )
+        public_items = [self.planning_service.to_item_public(item) for item in items]
         message = format_planning_message_html(
-            items,
+            public_items,
             from_date=from_date,
             to_date=to_date,
             days=days,

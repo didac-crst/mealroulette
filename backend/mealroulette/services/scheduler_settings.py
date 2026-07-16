@@ -5,6 +5,7 @@ from uuid import UUID
 from zoneinfo import ZoneInfo
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from mealroulette.models.scheduler import SchedulerSettings
@@ -25,8 +26,17 @@ class SchedulerSettingsService:
         if row is None:
             row = SchedulerSettings(household_id=household_id)
             self.db.add(row)
-            self.db.commit()
-            self.db.refresh(row)
+            try:
+                self.db.commit()
+            except IntegrityError:
+                self.db.rollback()
+                row = self.db.scalar(
+                    select(SchedulerSettings).where(SchedulerSettings.household_id == household_id)
+                )
+                if row is None:
+                    raise
+            else:
+                self.db.refresh(row)
         return row
 
     @staticmethod

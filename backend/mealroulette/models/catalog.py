@@ -170,7 +170,7 @@ class Dish(Base):
     __tablename__ = "dishes"
     __table_args__ = (
         UniqueConstraint("household_id", "name", name="uq_dishes_household_name"),
-        UniqueConstraint("household_id", "public_key", name="uq_dishes_household_public_key"),
+        UniqueConstraint("public_key", name="uq_dishes_public_key"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
