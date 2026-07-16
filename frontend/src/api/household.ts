@@ -88,3 +88,88 @@ export async function acceptHouseholdInvitation(invitationToken: string, accessT
     body: JSON.stringify({ token: invitationToken }),
   });
 }
+
+export type TelegramLinkToken = {
+  token: string;
+  expires_at: string;
+  deep_link_url: string | null;
+};
+
+export type TelegramLinkStatus = {
+  linked: boolean;
+  username?: string | null;
+  display_name?: string | null;
+  linked_at?: string | null;
+};
+
+export async function createTelegramLinkToken(token: string): Promise<TelegramLinkToken> {
+  return apiRequest<TelegramLinkToken>("/api/household/telegram/link-token", {
+    method: "POST",
+    token,
+  });
+}
+
+export async function fetchTelegramLink(token: string): Promise<TelegramLinkStatus> {
+  return apiRequest<TelegramLinkStatus>("/api/household/telegram/link", { token });
+}
+
+export async function unlinkTelegram(token: string): Promise<void> {
+  await apiRequest<void>("/api/household/telegram/link", {
+    method: "DELETE",
+    token,
+  });
+}
+
+export type NotificationSubscription = {
+  notify_daily_reminder: boolean;
+  notify_shopping: boolean;
+  notify_roulette: boolean;
+  daily_reminder_time: string;
+  shopping_window_days: number;
+  timezone: string;
+  last_reminder_sent_at: string | null;
+};
+
+export type NotificationSubscriptionInput = Partial<{
+  notify_daily_reminder: boolean;
+  notify_shopping: boolean;
+  notify_roulette: boolean;
+  daily_reminder_time: string;
+  shopping_window_days: number;
+  timezone: string;
+}>;
+
+export async function fetchNotificationSubscription(token: string): Promise<NotificationSubscription> {
+  return apiRequest<NotificationSubscription>("/api/household/notification-subscription", { token });
+}
+
+export async function updateNotificationSubscription(
+  token: string,
+  payload: NotificationSubscriptionInput,
+): Promise<NotificationSubscription> {
+  return apiRequest<NotificationSubscription>("/api/household/notification-subscription", {
+    method: "PUT",
+    token,
+    body: JSON.stringify(payload),
+  });
+}
+
+export type TelegramSendResult = {
+  sent: boolean;
+  detail: string;
+  recipient_count: number;
+};
+
+export async function sendPersonalTelegramTest(token: string): Promise<TelegramSendResult> {
+  return apiRequest<TelegramSendResult>("/api/household/telegram/test", {
+    method: "POST",
+    token,
+  });
+}
+
+export async function sendPersonalDailyReminder(token: string): Promise<TelegramSendResult> {
+  return apiRequest<TelegramSendResult>("/api/household/telegram/send-daily-reminder", {
+    method: "POST",
+    token,
+  });
+}

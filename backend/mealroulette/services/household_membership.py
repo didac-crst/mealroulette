@@ -7,10 +7,18 @@ from uuid import UUID, uuid4
 
 from fastapi import HTTPException, status
 from sqlalchemy import func, select, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from mealroulette.auth.security import hash_password
-from mealroulette.models.household import Household, HouseholdInvitation, HouseholdMembership, HouseholdRole
+from mealroulette.models.household import (
+    Household,
+    HouseholdInvitation,
+    HouseholdMembership,
+    HouseholdNotificationSubscription,
+    HouseholdRole,
+)
+from mealroulette.models.telegram import TelegramSettings
 from mealroulette.models.user import User, UserRole
 from mealroulette.services.household import HouseholdService
 
@@ -25,6 +33,49 @@ class HouseholdMembershipService:
     def __init__(self, db: Session) -> None:
         self.db = db
         self.household_service = HouseholdService(db)
+
+    def ensure_notification_subscription(
+        self, user_id: UUID, household_id: UUID
+    ) -> HouseholdNotificationSubscription:
+        """Create a pending subscription row if missing; does not commit."""
+        row = self.db.scalar(
+            select(HouseholdNotificationSubscription).where(
+                HouseholdNotificationSubscription.user_id == user_id,
+                HouseholdNotificationSubscription.household_id == household_id,
+            )
+        )
+        if row is not None:
+            return row
+
+        settings = self.db.scalar(
+            select(TelegramSettings).where(TelegramSettings.household_id == household_id)
+        )
+        kwargs: dict = {}
+        if settings is not None:
+            kwargs = {
+                "daily_reminder_time": settings.daily_reminder_time,
+                "shopping_window_days": settings.shopping_window_days,
+                "timezone": settings.timezone,
+            }
+        row = HouseholdNotificationSubscription(
+            user_id=user_id,
+            household_id=household_id,
+            **kwargs,
+        )
+        self.db.add(row)
+        try:
+            with self.db.begin_nested():
+                self.db.flush()
+        except IntegrityError:
+            row = self.db.scalar(
+                select(HouseholdNotificationSubscription).where(
+                    HouseholdNotificationSubscription.user_id == user_id,
+                    HouseholdNotificationSubscription.household_id == household_id,
+                )
+            )
+            if row is None:
+                raise
+        return row
 
     def count_active_admins(self, household_id: UUID) -> int:
         return int(
@@ -220,6 +271,7 @@ class HouseholdMembershipService:
             )
             self.db.add(membership)
         invitation.accepted_by_user_id = user.id
+        self.ensure_notification_subscription(membership.user_id, membership.household_id)
         self.db.commit()
         self.db.refresh(membership)
         return membership
@@ -252,6 +304,7 @@ class HouseholdMembershipService:
             )
         )
         invitation.accepted_by_user_id = user.id
+        self.ensure_notification_subscription(user.id, invitation.household_id)
         self.db.commit()
         self.db.refresh(user)
         return user
@@ -284,6 +337,7 @@ class HouseholdMembershipService:
                 active=True,
             )
         )
+        self.ensure_notification_subscription(user.id, household.id)
         self.db.commit()
         self.db.refresh(user)
         return user

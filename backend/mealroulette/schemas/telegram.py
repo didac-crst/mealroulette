@@ -1,4 +1,5 @@
 from datetime import datetime, time
+from uuid import UUID
 from zoneinfo import ZoneInfo
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -7,7 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field
 class TelegramSubscriberPublic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
+    id: UUID
     chat_id: str
     telegram_user_id: str | None = None
     username: str | None = None

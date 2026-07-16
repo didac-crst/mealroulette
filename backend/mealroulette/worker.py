@@ -25,9 +25,9 @@ _session_factory = sessionmaker(bind=_engine)
 def run_scheduled_reminder() -> None:
     with _session_factory() as db:
         try:
-            result = TelegramReminderService(db).run_scheduled_reminder()
-            if result is not None:
-                logger.info("Scheduled Telegram reminder sent to %s subscriber(s)", result.recipient_count)
+            results = TelegramReminderService(db).run_scheduled_reminder()
+            for result in results:
+                logger.info("Scheduled Telegram reminder sent to %s recipient(s)", result.recipient_count)
         except Exception:
             logger.exception("Scheduled Telegram reminder failed")
 
@@ -46,16 +46,23 @@ def poll_telegram_updates(stop_event: threading.Event) -> None:
 
 def run_scheduled_roulette() -> None:
     with _session_factory() as db:
-        try:
-            result = ScheduledRouletteService(db).run_scheduled()
-            if result is not None:
-                logger.info(
-                    "Scheduled meal roulette generated %s assignments for week %s",
-                    result.assignments_count,
-                    result.week_start_date,
+        from mealroulette.services.scheduler_settings import SchedulerSettingsService
+
+        for settings_row in SchedulerSettingsService(db).list_all_rows():
+            try:
+                result = ScheduledRouletteService(db, household_id=settings_row.household_id).run_scheduled()
+                if result is not None:
+                    logger.info(
+                        "Scheduled meal roulette generated %s assignments for household %s week %s",
+                        result.assignments_count,
+                        settings_row.household_id,
+                        result.week_start_date,
+                    )
+            except Exception:
+                logger.exception(
+                    "Scheduled meal roulette failed for household %s",
+                    settings_row.household_id,
                 )
-        except Exception:
-            logger.exception("Scheduled meal roulette failed")
 
 
 def run_cooking_timer_alerts() -> None:

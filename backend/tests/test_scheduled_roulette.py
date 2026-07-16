@@ -75,7 +75,23 @@ def test_run_now_records_failure_when_no_dishes(db_session, catalog_seed, schedu
     assert refreshed.last_error is not None
 
 
-def test_notify_telegram_sends_new_roulette_heading(db_session, catalog_seed, scheduler_seed, monkeypatch):
+def test_notify_telegram_sends_new_roulette_heading(
+    db_session, catalog_seed, scheduler_seed, monkeypatch, admin_user, regular_user
+):
+    from uuid import uuid4
+
+    from mealroulette.auth.security import hash_password
+    from mealroulette.models.household import (
+        Household,
+        HouseholdMembership,
+        HouseholdNotificationSubscription,
+        HouseholdRole,
+    )
+    from mealroulette.models.telegram import TelegramUserLink
+    from mealroulette.models.user import User, UserRole
+    from mealroulette.services.household_membership import HouseholdMembershipService
+    from sqlalchemy import select
+
     _seed(db_session)
     mock_client = MagicMock()
     service = ScheduledRouletteService(db_session, client=mock_client)
@@ -84,10 +100,68 @@ def test_notify_telegram_sends_new_roulette_heading(db_session, catalog_seed, sc
     row.notify_planning_days = 7
     db_session.commit()
 
-    from mealroulette.models.telegram import TelegramSubscriber
-    from mealroulette.services.telegram_settings import TelegramSettingsService
+    other = Household(id=uuid4(), name="Other")
+    outsider = User(
+        username="outsider-tg",
+        email="outsider-tg@example.com",
+        password_hash=hash_password("password123"),
+        role=UserRole.user,
+        active=True,
+    )
+    db_session.add(other)
+    db_session.add(outsider)
+    db_session.flush()
+    db_session.add(
+        HouseholdMembership(
+            household_id=other.id,
+            user_id=outsider.id,
+            role=HouseholdRole.household_member,
+            active=True,
+        )
+    )
+    HouseholdMembershipService(db_session).ensure_notification_subscription(outsider.id, other.id)
+    HouseholdMembershipService(db_session).ensure_notification_subscription(
+        admin_user.id, DEFAULT_HOUSEHOLD_ID
+    )
+    HouseholdMembershipService(db_session).ensure_notification_subscription(
+        regular_user.id, DEFAULT_HOUSEHOLD_ID
+    )
 
-    db_session.add(TelegramSubscriber(chat_id="12345", telegram_user_id="99", username="tester"))
+    db_session.add(
+        TelegramUserLink(
+            id=uuid4(),
+            user_id=admin_user.id,
+            chat_id="12345",
+            telegram_user_id="99",
+            username="tester",
+        )
+    )
+    db_session.add(
+        TelegramUserLink(
+            id=uuid4(),
+            user_id=regular_user.id,
+            chat_id="99999",
+            telegram_user_id="88",
+            username="muted",
+        )
+    )
+    db_session.add(
+        TelegramUserLink(
+            id=uuid4(),
+            user_id=outsider.id,
+            chat_id="55555",
+            telegram_user_id="77",
+            username="other",
+        )
+    )
+    muted = db_session.scalar(
+        select(HouseholdNotificationSubscription).where(
+            HouseholdNotificationSubscription.user_id == regular_user.id,
+            HouseholdNotificationSubscription.household_id == DEFAULT_HOUSEHOLD_ID,
+        )
+    )
+    assert muted is not None
+    muted.notify_roulette = False
     db_session.commit()
 
     reference_today = date(2026, 7, 1)
@@ -108,7 +182,8 @@ def test_notify_telegram_sends_new_roulette_heading(db_session, catalog_seed, sc
     result = service.run_now()
     assert result.telegram is not None
     assert result.telegram.sent is True
-    assert mock_client.send_message.called
+    assert mock_client.send_message.call_count == 1
+    assert mock_client.send_message.call_args[0][1] == "12345"
     message = mock_client.send_message.call_args[0][2]
     assert "<b>New roulette</b>" in message
 
