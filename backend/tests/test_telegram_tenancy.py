@@ -293,14 +293,21 @@ def test_concurrent_ensure_notification_subscription_creates_one_row(db_engine):
     def race() -> str:
         barrier.wait(timeout=5)
         with SessionLocal() as session:
-            row = HouseholdMembershipService(session).ensure_notification_subscription(user_id, household_id)
-            session.commit()
-            return str(row.id)
+            try:
+                row = HouseholdMembershipService(session).ensure_notification_subscription(
+                    user_id, household_id
+                )
+                session.commit()
+                return str(row.id)
+            except Exception as exc:  # noqa: BLE001 - surface race failures in assertion
+                session.rollback()
+                return f"error:{type(exc).__name__}:{exc}"
 
     with ThreadPoolExecutor(max_workers=2) as pool:
         ids = list(pool.map(lambda _: race(), range(2)))
 
-    assert ids[0] == ids[1]
+    assert all(not item.startswith("error:") for item in ids), ids
+    assert ids[0] == ids[1], ids
     with SessionLocal() as session:
         rows = list(
             session.scalars(
@@ -311,4 +318,5 @@ def test_concurrent_ensure_notification_subscription_creates_one_row(db_engine):
             )
         )
         assert len(rows) == 1
+        assert str(rows[0].id) == ids[0]
 

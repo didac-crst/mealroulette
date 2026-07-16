@@ -119,7 +119,7 @@ describe("AdminSettingsPage access boundary", () => {
     expect(screen.getByRole("heading", { name: "Catalog" })).toBeInTheDocument();
   });
 
-  it("shows loading state while auth is unresolved", async () => {
+  it("redirects after auth loading resolves to unauthenticated", async () => {
     useAuthMock.mockReturnValue({
       user: null,
       isPlatformAdmin: false,
@@ -127,11 +127,29 @@ describe("AdminSettingsPage access boundary", () => {
       loading: true,
     });
 
-    renderSettings();
+    const view = renderSettings();
 
     expect(screen.getByText(/Loading settings/i)).toBeInTheDocument();
+    expect(screen.queryByText("Today redirected")).not.toBeInTheDocument();
+
+    useAuthMock.mockReturnValue({
+      user: null,
+      isPlatformAdmin: false,
+      isHouseholdAdmin: false,
+      loading: false,
+    });
+    view.rerender(
+      <MemoryRouter initialEntries={["/settings"]}>
+        <Routes>
+          <Route path="/settings" element={<AdminSettingsPage />} />
+          <Route path="/today" element={<p>Today redirected</p>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText("Today redirected")).toBeInTheDocument();
     await waitFor(() => {
-      expect(screen.queryByText("Today redirected")).not.toBeInTheDocument();
+      expect(screen.queryByText(/Loading settings/i)).not.toBeInTheDocument();
     });
   });
 });

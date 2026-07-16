@@ -4,11 +4,11 @@
 
 - **Purpose:** Durable decisions for users, households, authorization boundaries, ratings, Telegram linking, and backup scope.
 - **Authority:** Canonical ADR for Phase 15 tenancy and authorization; feature delivery status in [BACKLOG.md](../BACKLOG.md).
-- **Status:** Accepted — implement in staged slices.
+- **Status:** Implemented — Phase 15A–E on `main` (PRs #17–#21); closeout in 15F.
 - **Update when:** A later ADR supersedes identity, tenancy, role, rating, Telegram, or backup ownership decisions.
 
-**Status:** Accepted (July 2026)  
-**Context:** MealRoulette currently has global `admin` / `user` roles, global dishes/recipes/plans/settings, singleton scheduler/Telegram/backup settings, and user-linked cooking timer alerts. The next product step is household collaboration without corrupting global ingredient taxonomy or leaking data across households.
+**Status:** Implemented (July 2026) via Phase 15A–E  
+**Context:** MealRoulette previously had global `admin` / `user` roles, global dishes/recipes/plans/settings, singleton scheduler/Telegram/backup settings, and user-linked cooking timer alerts. Phase 15 introduced household collaboration without corrupting global ingredient taxonomy or leaking data across households.
 
 ## Decision
 
@@ -184,7 +184,7 @@ Existing JSON backup/export may remain as an operational tool, but multi-househo
 
 ## Deferred Scope
 
-The following are intentionally out of scope for the first household implementation:
+The following are intentionally out of scope for Phase 15 (remain future work):
 
 - public recipe publication and moderation;
 - localization tables for dishes, recipes, and steps;
@@ -192,13 +192,38 @@ The following are intentionally out of scope for the first household implementat
 - granular custom permissions beyond the three initial roles;
 - platform support impersonation;
 - Telegram group-chat support;
+- Telegram OTP / passwordless bot login;
+- password / account settings UI;
+- ingredient proposal workflow;
+- user-level recipe preference API/UI (`recipe_ratings`);
+- multi-household membership;
 - passkeys;
 - PostgreSQL row-level security;
 - household-level portable export/import.
 
 ## Migration Strategy
 
-### Slice 1 — Identity And Tenancy
+Implemented as stacked PRs (not the umbrella branch):
+
+| ADR slice | Shipped as | PR |
+| --- | --- | --- |
+| Slice 1 — Identity And Tenancy | Phase 15A | [#17](https://github.com/didac-crst/mealroulette/pull/17) |
+| Slice 2 — Household Ownership | Phase 15B | [#18](https://github.com/didac-crst/mealroulette/pull/18) |
+| Slice 3 — Authorization Split | Phase 15B–D (platform vs household dependencies + UI gates) | [#18](https://github.com/didac-crst/mealroulette/pull/18)–[#20](https://github.com/didac-crst/mealroulette/pull/20) |
+| Slice 4 — Invitations | Phase 15C–D | [#19](https://github.com/didac-crst/mealroulette/pull/19)–[#20](https://github.com/didac-crst/mealroulette/pull/20) |
+| Slice 5 — Ratings, Telegram, And Notifications | Phase 15B meal reviews + Phase 15E Telegram | [#18](https://github.com/didac-crst/mealroulette/pull/18), [#21](https://github.com/didac-crst/mealroulette/pull/21) |
+
+### Implementation notes vs original draft
+
+- Greenfield installs create households via signup; a migration default household remains only for upgrading legacy single-tenant data.
+- Users may hold **at most one active household membership** in the initial product.
+- Meal-slot reviews shipped by evolving `meal_ratings` → `meal_reviews` (user + household scoped). Separate user-level `recipe_ratings` preference remains deferred.
+- Ingredient proposal architecture remains deferred; household users still cannot create missing global ingredients.
+- Telegram OTP / passwordless bot login and password settings UI remain deferred.
+
+### Original staged outline (historical)
+
+#### Slice 1 — Identity And Tenancy
 
 1. Add UUID-backed `households` and `household_memberships`.
 2. Migrate or recreate `users` as UUID-backed identities while preserving the existing single test/admin user.
@@ -206,7 +231,7 @@ The following are intentionally out of scope for the first household implementat
 4. Convert current users into members of that household.
 5. Map trusted current admin/operator to `platform_admin` and `household_admin`.
 
-### Slice 2 — Household Ownership
+#### Slice 2 — Household Ownership
 
 1. Add `household_id` to household root aggregates.
 2. Backfill existing rows to the default household.
@@ -214,21 +239,21 @@ The following are intentionally out of scope for the first household implementat
 4. Scope read/write services by active household.
 5. Add two-household tenant isolation tests.
 
-### Slice 3 — Authorization Split
+#### Slice 3 — Authorization Split
 
 1. Replace `get_current_admin` usage with explicit platform/household policy dependencies.
 2. Move global catalogue mutation behind platform-admin authorization.
 3. Keep global catalogue reads available to household members.
 4. Add ingredient proposal architecture before allowing household users to request missing catalogue entries.
 
-### Slice 4 — Invitations
+#### Slice 4 — Invitations
 
 1. Add invitation tokens stored only as hashes.
 2. Support single-use invitation acceptance.
 3. Add household membership management UI.
 4. Enforce last-admin protection.
 
-### Slice 5 — Ratings, Telegram, And Notifications
+#### Slice 5 — Ratings, Telegram, And Notifications
 
 1. Split recipe preference from meal-slot review.
 2. Link Telegram accounts to users through one-time bot deep links.
