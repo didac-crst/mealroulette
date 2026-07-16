@@ -25,9 +25,11 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Current focus — Phase 16 deferred umbrella slices; tag `v0.12.0` only after user testing.**
+**Current focus — Phase 16 deferred umbrella slices; do not tag `v0.12.0` yet.**
 
-Phase 15 is complete on `main` (PRs #17–#22). Draft release notes remain pending: [releases/v0.12.0.md](releases/v0.12.0.md).
+Phase 15 is complete on `main` (PRs #17–#22). Draft release notes: [releases/v0.12.0.md](releases/v0.12.0.md).
+
+**`v0.12.0` tagging gate (authoritative):** tag only after (1) green `main`, and (2) human user testing of the full product passes. Phase 16 umbrella slices may land before or after the tag decision; they are not automatic blockers unless user testing finds gaps.
 
 Phase 16 remaining umbrella scope (split for reviewability):
 

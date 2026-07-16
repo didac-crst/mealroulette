@@ -52,3 +52,47 @@ def test_change_password_revokes_refresh_tokens(client, admin_user):
 
     refreshed = client.post("/api/auth/refresh", json={"refresh_token": refresh_token})
     assert refreshed.status_code == 401
+
+
+def test_change_password_enforces_bcrypt_byte_limit(client, admin_token):
+    exactly_72 = "a" * 72
+    too_long = "a" * 73
+    # Two-byte UTF-8 characters: 36 * 2 = 72 bytes.
+    multibyte_ok = "é" * 36
+    multibyte_too_long = "é" * 37
+
+    ok = client.post(
+        "/api/auth/change-password",
+        headers={"Authorization": f"Bearer {admin_token}"},
+        json={"current_password": "adminpassword", "new_password": exactly_72},
+    )
+    assert ok.status_code == 204
+
+    login = client.post("/api/auth/login", json={"username": "admin", "password": exactly_72})
+    assert login.status_code == 200
+    access_token = login.json()["access_token"]
+
+    rejected = client.post(
+        "/api/auth/change-password",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={"current_password": exactly_72, "new_password": too_long},
+    )
+    assert rejected.status_code == 422
+
+    multibyte = client.post(
+        "/api/auth/change-password",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={"current_password": exactly_72, "new_password": multibyte_ok},
+    )
+    assert multibyte.status_code == 204
+
+    login = client.post("/api/auth/login", json={"username": "admin", "password": multibyte_ok})
+    assert login.status_code == 200
+    access_token = login.json()["access_token"]
+
+    multibyte_rejected = client.post(
+        "/api/auth/change-password",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={"current_password": multibyte_ok, "new_password": multibyte_too_long},
+    )
+    assert multibyte_rejected.status_code == 422

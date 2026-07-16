@@ -4,6 +4,7 @@ from uuid import UUID
 from pydantic import BaseModel, EmailStr, Field, model_validator
 
 from mealroulette.models.household import HouseholdRole
+from mealroulette.schemas.user import PasswordStr
 
 
 class AcceptInvitationRequest(BaseModel):
@@ -13,7 +14,7 @@ class AcceptInvitationRequest(BaseModel):
 class RegisterRequest(BaseModel):
     username: str = Field(min_length=3, max_length=64)
     email: EmailStr
-    password: str = Field(min_length=8, max_length=128)
+    password: PasswordStr
     household_name: str = Field(default="My household", min_length=1, max_length=128)
 
 
@@ -21,7 +22,7 @@ class RegisterWithInvitationRequest(BaseModel):
     token: str = Field(min_length=1)
     username: str = Field(min_length=3, max_length=64)
     email: EmailStr
-    password: str = Field(min_length=8, max_length=128)
+    password: PasswordStr
 
 
 class HouseholdPublic(BaseModel):
