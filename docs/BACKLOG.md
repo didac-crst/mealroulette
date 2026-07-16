@@ -376,7 +376,7 @@ When `meal_composition = simple_dish`, **`simple_dish_part`** is required: `cent
 - [ ] Ingredient proposal workflow for missing catalogue entries
 - [ ] Public dish catalog / publication / subscriptions
 - [ ] Telegram OTP / passwordless bot login
-- [x] Password / account settings page (Phase 16A)
+- [ ] Password / account settings page (Phase 16A — in PR #23)
 - [ ] Household-level portable export/import
 - [ ] Localization tables and cross-household copy/adopt
 - [ ] Multi-household membership (users may hold at most one active membership today)
