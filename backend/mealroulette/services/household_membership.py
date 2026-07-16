@@ -67,6 +67,7 @@ class HouseholdMembershipService:
             with self.db.begin_nested():
                 self.db.flush()
         except IntegrityError:
+            self.db.expunge(row)
             row = self.db.scalar(
                 select(HouseholdNotificationSubscription).where(
                     HouseholdNotificationSubscription.user_id == user_id,
