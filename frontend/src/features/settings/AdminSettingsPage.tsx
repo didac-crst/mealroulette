@@ -7,6 +7,7 @@ import { useAuth } from "../auth/AuthContext";
 import { HouseholdClock } from "./HouseholdClock";
 import {
   SettingsBackupIcon,
+  SettingsHouseholdIcon,
   SettingsIngredientsIcon,
   SettingsSchedulerIcon,
   SettingsTargetsIcon,
@@ -32,6 +33,15 @@ const PLANNING_TILES: SettingsTileConfig[] = [
     title: "Auto roulette",
     description: "When to generate next week and Telegram “New roulette”.",
     icon: <SettingsSchedulerIcon />,
+  },
+];
+
+const HOUSEHOLD_TILES: SettingsTileConfig[] = [
+  {
+    to: "/settings/members",
+    title: "Household",
+    description: "Name, invite links, members, and roles.",
+    icon: <SettingsHouseholdIcon />,
   },
 ];
 
@@ -103,6 +113,7 @@ export function AdminSettingsPage() {
         subtitle="Household admin — meal rules, automation, and catalog."
       >
         <HouseholdClock />
+        <SettingsGroup heading="Household" tiles={HOUSEHOLD_TILES} />
         <SettingsGroup heading="Meal planning" tiles={PLANNING_TILES} />
         <SettingsGroup heading="Integrations" tiles={INTEGRATION_TILES} />
         <SettingsGroup heading="Catalog" tiles={CATALOG_TILES} />

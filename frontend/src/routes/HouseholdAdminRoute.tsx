@@ -2,14 +2,14 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 import { useAuth } from "../features/auth/AuthContext";
 
-export function AdminRoute() {
-  const { user, loading, isPlatformAdmin } = useAuth();
+export function HouseholdAdminRoute() {
+  const { user, loading, isHouseholdAdmin } = useAuth();
   const location = useLocation();
 
   if (loading) {
     return (
       <main className="app-shell">
-        <p className="muted">Loading session…</p>
+        <p className="muted">Loading session...</p>
       </main>
     );
   }
@@ -18,7 +18,7 @@ export function AdminRoute() {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  if (!isPlatformAdmin) {
+  if (!isHouseholdAdmin) {
     return <Navigate to="/today" replace />;
   }
 

@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Link, Navigate, useLocation, useSearchParams } from "react-router-dom";
 
 import { ApiError } from "../../api/client";
 import { BrandLogo } from "../../components/BrandLogo";
@@ -9,13 +9,15 @@ import { useAuth } from "./AuthContext";
 export function LoginPage() {
   const { login, user, loading } = useAuth();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   if (!loading && user) {
-    const redirect = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? "/review";
+    const stateRedirect = (location.state as { from?: { pathname: string } } | null)?.from?.pathname;
+    const redirect = searchParams.get("next") ?? stateRedirect ?? "/today";
     return <Navigate to={redirect} replace />;
   }
 
@@ -66,10 +68,13 @@ export function LoginPage() {
               {error}
             </p>
           ) : null}
-          <Button type="submit" size="lg" loading={submitting} disabled={loading} className="login-submit">
-            {submitting ? "Signing in…" : "Sign in"}
-          </Button>
+        <Button type="submit" size="lg" loading={submitting} disabled={loading} className="login-submit">
+          {submitting ? "Signing in…" : "Sign in"}
+        </Button>
         </form>
+        <p className="muted">
+          New household? <Link to="/signup">Create one</Link>
+        </p>
       </section>
     </main>
   );
