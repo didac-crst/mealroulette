@@ -36,7 +36,7 @@ export function RecipeDetailPage() {
   const { dishId, recipeId } = useParams();
   const dishIdNum = Number(dishId);
   const recipeIdNum = Number(recipeId);
-  const { accessToken, isAdmin } = useAuth();
+  const { accessToken, isHouseholdAdmin } = useAuth();
   const [dish, setDish] = useState<Dish | null>(null);
   const [tags, setTags] = useState<Tag[]>([]);
   const [recipe, setRecipe] = useState<Recipe | null>(null);
@@ -133,7 +133,7 @@ export function RecipeDetailPage() {
         actions={
           <div className="catalog-detail-actions">
             <ButtonLink to={`/recipes/${recipe.id}/cook`}>Cook</ButtonLink>
-            {isAdmin ? (
+            {isHouseholdAdmin ? (
               <ButtonLink to={`/dishes/${dish.id}/recipes/${recipe.id}/edit`}>Edit recipe</ButtonLink>
             ) : null}
           </div>

@@ -85,14 +85,15 @@ function SettingsGroup({ heading, tiles }: { heading: string; tiles: SettingsTil
 }
 
 export function AdminSettingsPage() {
-  const { isAdmin, loading } = useAuth();
+  const { isPlatformAdmin, isHouseholdAdmin, loading } = useAuth();
   const navigate = useNavigate();
+  const canAccessSettings = isPlatformAdmin || isHouseholdAdmin;
 
   useEffect(() => {
-    if (!loading && !isAdmin) {
-      navigate("/review");
+    if (!loading && !canAccessSettings) {
+      navigate("/today");
     }
-  }, [isAdmin, loading, navigate]);
+  }, [canAccessSettings, loading, navigate]);
 
   if (loading) {
     return (
@@ -102,7 +103,7 @@ export function AdminSettingsPage() {
     );
   }
 
-  if (!isAdmin) {
+  if (!canAccessSettings) {
     return null;
   }
 
@@ -110,13 +111,17 @@ export function AdminSettingsPage() {
     <div className="admin-page">
       <PageShell
         title="Settings"
-        subtitle="Household admin — meal rules, automation, and catalog."
+        subtitle={
+          isHouseholdAdmin
+            ? "Household admin — members, meal rules, and automation."
+            : "Platform admin — installation catalog and integrations."
+        }
       >
         <HouseholdClock />
-        <SettingsGroup heading="Household" tiles={HOUSEHOLD_TILES} />
-        <SettingsGroup heading="Meal planning" tiles={PLANNING_TILES} />
-        <SettingsGroup heading="Integrations" tiles={INTEGRATION_TILES} />
-        <SettingsGroup heading="Catalog" tiles={CATALOG_TILES} />
+        {isHouseholdAdmin ? <SettingsGroup heading="Household" tiles={HOUSEHOLD_TILES} /> : null}
+        {isHouseholdAdmin ? <SettingsGroup heading="Meal planning" tiles={PLANNING_TILES} /> : null}
+        {isPlatformAdmin ? <SettingsGroup heading="Integrations" tiles={INTEGRATION_TILES} /> : null}
+        {isPlatformAdmin ? <SettingsGroup heading="Catalog" tiles={CATALOG_TILES} /> : null}
       </PageShell>
     </div>
   );

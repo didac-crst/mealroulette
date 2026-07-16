@@ -24,13 +24,18 @@ export function SignupPage() {
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setError(null);
+    const trimmedHouseholdName = householdName.trim();
+    if (!trimmedHouseholdName) {
+      setError("Enter a household name.");
+      return;
+    }
     setSubmitting(true);
     try {
       const tokens = await authApi.register({
         username,
         email,
         password,
-        household_name: householdName.trim() || "My household",
+        household_name: trimmedHouseholdName,
       });
       saveTokens({
         accessToken: tokens.access_token,

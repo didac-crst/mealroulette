@@ -17,7 +17,9 @@ export function LoginPage() {
 
   if (!loading && user) {
     const stateRedirect = (location.state as { from?: { pathname: string } } | null)?.from?.pathname;
-    const redirect = searchParams.get("next") ?? stateRedirect ?? "/today";
+    const nextParam = searchParams.get("next")?.trim() ?? "";
+    const safeNext = nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : null;
+    const redirect = safeNext ?? stateRedirect ?? "/today";
     return <Navigate to={redirect} replace />;
   }
 

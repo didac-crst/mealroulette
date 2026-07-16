@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import * as householdApi from "../../api/household";
@@ -27,7 +27,11 @@ function readStoredInviteUrls(): Record<string, string> {
 }
 
 function writeStoredInviteUrls(urls: Record<string, string>) {
-  sessionStorage.setItem(INVITE_URL_STORAGE_KEY, JSON.stringify(urls));
+  try {
+    sessionStorage.setItem(INVITE_URL_STORAGE_KEY, JSON.stringify(urls));
+  } catch {
+    // Keep in-memory invite URLs when sessionStorage is unavailable.
+  }
 }
 
 function formatDateTime(value: string): string {
@@ -94,6 +98,9 @@ export function HouseholdMembersPage() {
   const [savingName, setSavingName] = useState(false);
   const [busyMembershipId, setBusyMembershipId] = useState<string | null>(null);
   const [busyInvitationId, setBusyInvitationId] = useState<string | null>(null);
+  const loadGenerationRef = useRef(0);
+
+  const mutationsBusy = busy || savingName || busyMembershipId !== null || busyInvitationId !== null;
 
   const currentUserId = user?.id ?? null;
 
@@ -113,6 +120,7 @@ export function HouseholdMembersPage() {
     if (!accessToken) {
       return;
     }
+    const generation = ++loadGenerationRef.current;
     setLoading(true);
     setError(null);
     try {
@@ -121,6 +129,9 @@ export function HouseholdMembersPage() {
         householdApi.listHouseholdInvitations(accessToken),
         householdApi.fetchHousehold(accessToken),
       ]);
+      if (generation !== loadGenerationRef.current) {
+        return;
+      }
       setMembers(memberRows);
       setInvitations(invitationRows);
       setHouseholdName(household.name);
@@ -132,9 +143,14 @@ export function HouseholdMembersPage() {
         return next;
       });
     } catch (err) {
+      if (generation !== loadGenerationRef.current) {
+        return;
+      }
       setError(err instanceof ApiError ? err.message : "Could not load household members.");
     } finally {
-      setLoading(false);
+      if (generation === loadGenerationRef.current) {
+        setLoading(false);
+      }
     }
   }, [accessToken]);
 
@@ -164,8 +180,12 @@ export function HouseholdMembersPage() {
       const updated = await householdApi.updateHousehold(accessToken, nextName);
       setHouseholdName(updated.name);
       setHouseholdNameDraft(updated.name);
-      await refreshUser();
       setNotice("Household name updated.");
+      try {
+        await refreshUser();
+      } catch {
+        // Rename already persisted; session refresh can retry later.
+      }
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Could not rename household.");
     } finally {
@@ -284,12 +304,12 @@ export function HouseholdMembersPage() {
                 onChange={(event) => setHouseholdNameDraft(event.target.value)}
                 required
                 maxLength={128}
-                disabled={savingName || busy}
+                disabled={mutationsBusy}
               />
             </label>
             <Button
               type="submit"
-              disabled={savingName || busy || householdNameDraft.trim() === householdName || !householdNameDraft.trim()}
+              disabled={mutationsBusy || householdNameDraft.trim() === householdName || !householdNameDraft.trim()}
               loading={savingName}
             >
               Save name
@@ -308,7 +328,6 @@ export function HouseholdMembersPage() {
             </div>
             {sortedMembers.map((member) => {
               const isSelf = currentUserId !== null && member.user_id === currentUserId;
-              const rowBusy = busyMembershipId === member.membership_id;
               return (
                 <div
                   key={member.membership_id}
@@ -328,7 +347,7 @@ export function HouseholdMembersPage() {
                     <span className="admin-mobile-label">Role</span>
                     <select
                       value={member.role}
-                      disabled={busy || isSelf || rowBusy}
+                      disabled={mutationsBusy || isSelf}
                       aria-label={`Role for ${member.username}`}
                       onChange={(event) => void handleRoleChange(member.membership_id, event.target.value as HouseholdRole)}
                     >
@@ -342,7 +361,7 @@ export function HouseholdMembersPage() {
                       type="button"
                       variant="ghost"
                       size="sm"
-                      disabled={busy || isSelf || rowBusy}
+                      disabled={mutationsBusy || isSelf}
                       title={isSelf ? "You cannot remove yourself here" : `Remove ${member.username}`}
                       onClick={() => void handleRemove(member.membership_id)}
                     >
@@ -360,7 +379,7 @@ export function HouseholdMembersPage() {
             title="Invitations"
             description="Pending invite links. Copy a link to share it; revoke to invalidate it."
             trailing={
-              <Button type="button" disabled={busy} onClick={() => void handleCreateInvitation()}>
+              <Button type="button" disabled={mutationsBusy} onClick={() => void handleCreateInvitation()}>
                 Create invite link
               </Button>
             }
@@ -377,7 +396,6 @@ export function HouseholdMembersPage() {
               </div>
               {invitations.map((invitation) => {
                 const expired = isInvitationExpired(invitation);
-                const rowBusy = busyInvitationId === invitation.id;
                 return (
                   <div
                     key={invitation.id}
@@ -405,7 +423,7 @@ export function HouseholdMembersPage() {
                         type="button"
                         variant="ghost"
                         size="sm"
-                        disabled={busy || rowBusy}
+                        disabled={mutationsBusy}
                         onClick={() => void handleRevoke(invitation.id)}
                       >
                         Revoke

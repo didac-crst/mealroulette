@@ -124,9 +124,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!stored) {
       return;
     }
-    const me = await fetchMeWithRetry(stored.accessToken);
-    applySession(stored.accessToken, me);
-  }, [applySession]);
+    try {
+      const me = await fetchMeWithRetry(stored.accessToken);
+      applySession(stored.accessToken, me);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        try {
+          const tokens = await authApi.refresh(stored.refreshToken);
+          saveTokens({
+            accessToken: tokens.access_token,
+            refreshToken: tokens.refresh_token,
+          });
+          const me = await fetchMeWithRetry(tokens.access_token);
+          applySession(tokens.access_token, me);
+          return;
+        } catch {
+          clearSession();
+        }
+      }
+      throw error;
+    }
+  }, [applySession, clearSession]);
 
   const logout = useCallback(async () => {
     const stored = loadTokens();
