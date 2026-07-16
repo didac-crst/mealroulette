@@ -258,3 +258,112 @@ def test_migration_033_remaps_legacy_users_and_tenancy():
     finally:
         get_settings.cache_clear()
         engine.dispose()
+
+
+def test_migration_035_scopes_and_renames_legacy_meal_ratings():
+    database_url = _migration_database_url()
+    _ensure_migration_database(database_url)
+    _configure_migration_settings(database_url)
+    engine = create_engine(database_url, pool_pre_ping=True)
+
+    try:
+        _reset_database(engine)
+        alembic_config = _alembic_config(database_url)
+        command.upgrade(alembic_config, "034_household_ownership")
+
+        with engine.begin() as connection:
+            connection.execute(
+                text(
+                    """
+                    INSERT INTO dishes (id, household_id, public_key, name, active, meal_composition, status)
+                    VALUES (
+                        :dish_id,
+                        CAST(:household_id AS uuid),
+                        'migrate035dish',
+                        'Migration 035 Dish',
+                        true,
+                        'main_dish',
+                        'active'
+                    )
+                    """
+                ),
+                {"dish_id": STUB_DISH_ID, "household_id": DEFAULT_HOUSEHOLD_ID},
+            )
+            connection.execute(
+                text(
+                    """
+                    INSERT INTO recipes (
+                        id, dish_id, public_key, sequence_number, variant_name, recipe_type, is_main, is_thermomix
+                    )
+                    VALUES (
+                        :recipe_id, :dish_id, 'migrate035recipe', 1, 'default', 'standard', false, false
+                    )
+                    """
+                ),
+                {"recipe_id": STUB_RECIPE_ID, "dish_id": STUB_DISH_ID},
+            )
+            connection.execute(
+                text(
+                    """
+                    INSERT INTO meal_plans (id, household_id, week_start_date, status)
+                    VALUES (9901, CAST(:household_id AS uuid), '2026-07-13', 'active')
+                    """
+                ),
+                {"household_id": DEFAULT_HOUSEHOLD_ID},
+            )
+            connection.execute(
+                text(
+                    """
+                    INSERT INTO meal_plan_items (
+                        id, meal_plan_id, date, meal_slot, status, dish_id, recipe_id
+                    )
+                    VALUES (9901, 9901, '2026-07-13', 'lunch', 'eaten', :dish_id, :recipe_id)
+                    """
+                ),
+                {"dish_id": STUB_DISH_ID, "recipe_id": STUB_RECIPE_ID},
+            )
+            connection.execute(
+                text(
+                    """
+                    INSERT INTO meal_ratings (
+                        id, meal_plan_item_id, dish_id, recipe_id, rating, comment
+                    )
+                    VALUES (9901, 9901, :dish_id, :recipe_id, 4, 'legacy rating')
+                    """
+                ),
+                {"dish_id": STUB_DISH_ID, "recipe_id": STUB_RECIPE_ID},
+            )
+
+        command.upgrade(alembic_config, "035_meal_reviews_household_user")
+
+        with engine.connect() as connection:
+            old_table_exists = connection.execute(
+                text(
+                    """
+                    SELECT EXISTS (
+                        SELECT 1
+                        FROM information_schema.tables
+                        WHERE table_schema = 'public' AND table_name = 'meal_ratings'
+                    )
+                    """
+                )
+            ).scalar_one()
+            assert old_table_exists is False
+
+            review = connection.execute(
+                text(
+                    """
+                    SELECT household_id, meal_plan_item_id, user_id, rating, comment
+                    FROM meal_reviews
+                    WHERE id = 9901
+                    """
+                )
+            ).one()
+            assert review.household_id == DEFAULT_HOUSEHOLD_ID
+            assert review.meal_plan_item_id == 9901
+            assert review.user_id is None
+            assert review.rating == 4
+            assert review.comment == "legacy rating"
+    finally:
+        get_settings.cache_clear()
+        engine.dispose()
