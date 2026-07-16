@@ -4,12 +4,10 @@ import logging
 from collections.abc import Callable
 from uuid import UUID
 
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from mealroulette.core.config import get_settings
 from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID, Household
-from mealroulette.models.telegram import TelegramUserLink
 from mealroulette.services.household import HouseholdService
 from mealroulette.services.telegram_client import TelegramApiError, TelegramClient
 from mealroulette.services.telegram_html_utils import esc
@@ -163,7 +161,7 @@ class TelegramUpdateService:
             self.client.send_message(token, chat_id, MIGRATE_SUBSCRIBE_MESSAGE)
             return True
 
-        household_id = self._household_id_for_chat(chat_id)
+        household_id = self._household_id_for_sender(chat_id, telegram_user_id)
 
         if command in PLANNING_COMMANDS:
             return self._handle_days_command(
@@ -208,18 +206,14 @@ class TelegramUpdateService:
 
         return False
 
-    def _household_id_for_chat(self, chat_id: str) -> UUID | None:
-        links = list(
-            self.db.scalars(select(TelegramUserLink).where(TelegramUserLink.chat_id == chat_id))
-        )
-        if not links:
+    def _household_id_for_sender(self, chat_id: str, telegram_user_id: str | None) -> UUID | None:
+        link = self.link_service.resolve_link_for_sender(chat_id, telegram_user_id)
+        if link is None:
             return None
-        # Prefer the active membership of the first linked user that still has one.
-        for link in links:
-            membership = HouseholdService(self.db).active_household_membership(link.user_id)
-            if membership is not None:
-                return membership.household_id
-        return None
+        membership = HouseholdService(self.db).active_household_membership(link.user_id)
+        if membership is None:
+            return None
+        return membership.household_id
 
     def _handle_link_token(
         self,
@@ -255,6 +249,7 @@ class TelegramUpdateService:
             HouseholdMembershipService(self.db).ensure_notification_subscription(
                 link.user_id, membership.household_id
             )
+            self.db.commit()
             household = self.db.get(Household, membership.household_id)
             household_name = household.name if household is not None else "your household"
             lines.append(f"Household <b>{esc(household_name)}</b>")

@@ -13,12 +13,13 @@ function isCookingModePath(pathname: string): boolean {
 }
 
 export function AppShell() {
-  const { user, logout, isPlatformAdmin, isHouseholdAdmin, hasHousehold, accessToken } = useAuth();
+  const { user, logout, isPlatformAdmin, isHouseholdAdmin, accessToken } = useAuth();
   const location = useLocation();
   const username = user?.username ?? "";
   const reviewAttention = useReviewAttentionCount(accessToken);
   const cookingMode = isCookingModePath(location.pathname);
-  const canAccessSettings = isPlatformAdmin || isHouseholdAdmin || hasHousehold;
+  const isAdmin = isPlatformAdmin || isHouseholdAdmin;
+  const showSettings = Boolean(user);
 
   return (
     <>
@@ -27,7 +28,8 @@ export function AppShell() {
       {!cookingMode ? (
         <DesktopSidebar
           username={username}
-          isAdmin={canAccessSettings}
+          isAdmin={isAdmin}
+          showSettings={showSettings}
           reviewAttention={reviewAttention}
           onSignOut={() => void logout()}
         />
@@ -38,10 +40,10 @@ export function AppShell() {
           <header className="mobile-shell-bar" aria-label="Account">
             <p className="mobile-shell-user muted">
               {username}
-              {canAccessSettings ? " · admin" : ""}
+              {isAdmin ? " · admin" : ""}
             </p>
             <div className="mobile-shell-actions">
-              {canAccessSettings ? (
+              {showSettings ? (
                 <ButtonLink to="/settings" variant="ghost" className="mobile-shell-settings">
                   Settings
                 </ButtonLink>

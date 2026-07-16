@@ -82,3 +82,93 @@ def test_send_daily_reminder_disabled_raises_http_exception(db_session, catalog_
 
     assert exc_info.value.status_code == 400
     client.send_message.assert_not_called()
+
+
+from datetime import UTC, datetime, time
+
+from mealroulette.models.household import HouseholdNotificationSubscription
+from mealroulette.services.telegram_client import TelegramApiError
+from sqlalchemy import select
+
+
+def _subscription(db_session, user):
+    return db_session.scalar(
+        select(HouseholdNotificationSubscription).where(
+            HouseholdNotificationSubscription.user_id == user.id,
+            HouseholdNotificationSubscription.household_id == DEFAULT_HOUSEHOLD_ID,
+        )
+    )
+
+
+@pytest.mark.integration
+def test_should_send_personal_scheduled_minute_and_suppression(db_session, admin_user):
+    _enable_and_link(db_session, admin_user)
+    sub = _subscription(db_session, admin_user)
+    assert sub is not None
+    sub.daily_reminder_time = time(8, 0)
+    sub.timezone = "UTC"
+    sub.notify_daily_reminder = True
+    sub.last_reminder_sent_at = None
+    db_session.commit()
+
+    now = datetime(2026, 7, 16, 8, 0, tzinfo=UTC)
+    assert TelegramReminderService.should_send_personal_scheduled(sub, now=now) is True
+    assert TelegramReminderService.should_send_personal_scheduled(sub, now=datetime(2026, 7, 16, 8, 1, tzinfo=UTC)) is False
+
+    sub.notify_daily_reminder = False
+    db_session.commit()
+    assert TelegramReminderService.should_send_personal_scheduled(sub, now=now) is False
+
+    sub.notify_daily_reminder = True
+    sub.last_reminder_sent_at = datetime(2026, 7, 16, 8, 0, tzinfo=UTC)
+    db_session.commit()
+    assert TelegramReminderService.should_send_personal_scheduled(sub, now=now) is False
+
+    sub.timezone = "Not/AZone"
+    sub.last_reminder_sent_at = None
+    db_session.commit()
+    # Invalid timezone falls back to UTC; still matches 08:00 UTC.
+    assert TelegramReminderService.should_send_personal_scheduled(sub, now=now) is True
+
+
+@pytest.mark.integration
+def test_run_scheduled_reminder_skips_missing_link_and_disabled_household(db_session, admin_user):
+    row = TelegramSettingsService(db_session).get_row(DEFAULT_HOUSEHOLD_ID)
+    row.enabled = True
+    HouseholdMembershipService(db_session).ensure_notification_subscription(admin_user.id, DEFAULT_HOUSEHOLD_ID)
+    sub = _subscription(db_session, admin_user)
+    assert sub is not None
+    sub.daily_reminder_time = time(8, 0)
+    sub.timezone = "UTC"
+    db_session.commit()
+
+    client = MagicMock(spec=TelegramClient)
+    service = TelegramReminderService(db_session, client=client)
+    now = datetime(2026, 7, 16, 8, 0, tzinfo=UTC)
+    assert service.run_scheduled_reminder(now=now) == []
+    client.send_message.assert_not_called()
+
+    _enable_and_link(db_session, admin_user)
+    row = TelegramSettingsService(db_session).get_row(DEFAULT_HOUSEHOLD_ID)
+    row.enabled = False
+    db_session.commit()
+    assert service.run_scheduled_reminder(now=now) == []
+
+
+@pytest.mark.integration
+def test_run_scheduled_reminder_releases_claim_on_send_failure(db_session, admin_user):
+    _enable_and_link(db_session, admin_user)
+    sub = _subscription(db_session, admin_user)
+    assert sub is not None
+    sub.daily_reminder_time = time(8, 0)
+    sub.timezone = "UTC"
+    sub.last_reminder_sent_at = None
+    db_session.commit()
+
+    client = MagicMock(spec=TelegramClient)
+    client.send_message.side_effect = TelegramApiError("boom")
+    service = TelegramReminderService(db_session, client=client)
+    now = datetime(2026, 7, 16, 8, 0, tzinfo=UTC)
+    assert service.run_scheduled_reminder(now=now) == []
+    db_session.refresh(sub)
+    assert sub.last_reminder_sent_at is None

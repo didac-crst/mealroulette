@@ -98,11 +98,18 @@ export function PersonalTelegramSettingsPage() {
       width: 240,
       margin: 2,
       errorCorrectionLevel: "M",
-    }).then((url) => {
-      if (!cancelled) {
-        setQrDataUrl(url);
-      }
-    });
+    })
+      .then((url) => {
+        if (!cancelled) {
+          setQrDataUrl(url);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setQrDataUrl(null);
+          setError("Could not generate QR code. Use the deep link below instead.");
+        }
+      });
     return () => {
       cancelled = true;
     };
@@ -223,7 +230,11 @@ export function PersonalTelegramSettingsPage() {
 
   return (
     <SettingsPageShell title="Telegram" subtitle="Link your account and choose which notifications you receive.">
-      {error ? <p className="form-error">{error}</p> : null}
+      {error ? (
+        <p className="form-error" role="alert">
+          {error}
+        </p>
+      ) : null}
       {notice ? <p className="success">{notice}</p> : null}
 
       {linked ? (

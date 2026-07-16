@@ -97,6 +97,7 @@ def test_planning_and_reminder_commands_send_html(db_session, catalog_seed, admi
             id=uuid4(),
             user_id=admin_user.id,
             chat_id="9001",
+            telegram_user_id="1",
             username="admin_tg",
         )
     )
@@ -137,5 +138,36 @@ def test_planning_and_reminder_commands_send_html(db_session, catalog_seed, admi
         },
     )
     assert handled is True
-    reminder_message = client.send_message.call_args.args[2]
+    reminder_call = client.send_message.call_args
+    assert reminder_call.kwargs.get("parse_mode") == "HTML"
+    reminder_message = reminder_call.args[2]
     assert "Reminder" in reminder_message
+
+
+@pytest.mark.integration
+def test_on_demand_fails_closed_without_matching_telegram_identity(db_session, catalog_seed, admin_user):
+    db_session.add(
+        TelegramUserLink(
+            id=uuid4(),
+            user_id=admin_user.id,
+            chat_id="9001",
+            telegram_user_id="99",
+            username="admin_tg",
+        )
+    )
+    db_session.commit()
+    client = MagicMock()
+    update_service = TelegramUpdateService(db_session, client=client)
+    handled = update_service._handle_update(
+        "fake-token",
+        {
+            "update_id": 12,
+            "message": {
+                "text": "/planning 3",
+                "chat": {"id": 9001},
+                "from": {"id": 1},
+            },
+        },
+    )
+    assert handled is True
+    assert "link your mealroulette account" in client.send_message.call_args[0][2].lower()

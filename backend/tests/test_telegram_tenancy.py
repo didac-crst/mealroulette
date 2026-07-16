@@ -140,3 +140,99 @@ def test_household_settings_rows_are_isolated(db_session, default_household):
 
     assert service.get_row(default_household.id).enabled is True
     assert service.get_row(other.id).enabled is False
+
+
+def test_inactive_membership_excluded_from_recipients(db_session, admin_user):
+    _link(db_session, admin_user, "chat-1")
+    HouseholdMembershipService(db_session).ensure_notification_subscription(
+        admin_user.id, DEFAULT_HOUSEHOLD_ID
+    )
+    membership = db_session.scalar(
+        select(HouseholdMembership).where(
+            HouseholdMembership.user_id == admin_user.id,
+            HouseholdMembership.household_id == DEFAULT_HOUSEHOLD_ID,
+        )
+    )
+    assert membership is not None
+    membership.active = False
+    db_session.commit()
+
+    links = TelegramLinkService(db_session)
+    assert links.list_subscribed_chat_ids(DEFAULT_HOUSEHOLD_ID) == []
+    assert links.list_shopping_chat_ids(DEFAULT_HOUSEHOLD_ID) == []
+    assert links.list_roulette_chat_ids(DEFAULT_HOUSEHOLD_ID) == []
+    assert links.list_linked_recipients(DEFAULT_HOUSEHOLD_ID) == []
+
+
+def test_telegram_identity_reassigned_on_relink(db_session, admin_user, regular_user):
+    service = TelegramLinkService(db_session)
+    _, token_a = service.create_link_token(admin_user.id)
+    _, token_b = service.create_link_token(regular_user.id)
+    service.link_chat(token_a, chat_id="c1", telegram_user_id="tg-42", username="a", display_name="A")
+    service.link_chat(token_b, chat_id="c2", telegram_user_id="tg-42", username="b", display_name="B")
+
+    assert service.get_link_for_user(admin_user.id) is None
+    link_b = service.get_link_for_user(regular_user.id)
+    assert link_b is not None
+    assert link_b.telegram_user_id == "tg-42"
+
+
+def test_concurrent_link_token_consumption_claims_once(db_engine):
+    from concurrent.futures import ThreadPoolExecutor
+    from sqlalchemy.orm import sessionmaker
+
+    from mealroulette.auth.security import hash_password
+    from mealroulette.models.household import Household, HouseholdMembership, HouseholdRole
+    from mealroulette.models.user import User, UserRole
+    from mealroulette.services.telegram_link import TelegramLinkService
+
+    SessionLocal = sessionmaker(bind=db_engine, autoflush=False, autocommit=False)
+    household_id = uuid4()
+    with SessionLocal() as setup:
+        household = Household(id=household_id, name="Link race household")
+        user = User(
+            username=f"link-race-{household_id.hex[:8]}",
+            email=f"link-race-{household_id.hex[:8]}@example.com",
+            password_hash=hash_password("password123"),
+            role=UserRole.user,
+            active=True,
+        )
+        setup.add(household)
+        setup.add(user)
+        setup.flush()
+        setup.add(
+            HouseholdMembership(
+                household_id=household_id,
+                user_id=user.id,
+                role=HouseholdRole.household_member,
+                active=True,
+            )
+        )
+        setup.commit()
+        _, token = TelegramLinkService(setup).create_link_token(user.id)
+        user_id = user.id
+
+    barrier = __import__("threading").Barrier(2)
+
+    def race(chat_suffix: int) -> str:
+        barrier.wait(timeout=5)
+        with SessionLocal() as session:
+            try:
+                TelegramLinkService(session).link_chat(
+                    token,
+                    chat_id=f"chat-{chat_suffix}",
+                    telegram_user_id=str(chat_suffix),
+                    username="racer",
+                    display_name="Racer",
+                )
+                return "ok"
+            except ValueError:
+                return "conflict"
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(pool.map(race, (1, 2)))
+
+    assert sorted(results) == ["conflict", "ok"]
+    with SessionLocal() as session:
+        link = TelegramLinkService(session).get_link_for_user(user_id)
+        assert link is not None

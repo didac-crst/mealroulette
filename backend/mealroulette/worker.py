@@ -46,10 +46,10 @@ def poll_telegram_updates(stop_event: threading.Event) -> None:
 
 def run_scheduled_roulette() -> None:
     with _session_factory() as db:
-        try:
-            from mealroulette.services.scheduler_settings import SchedulerSettingsService
+        from mealroulette.services.scheduler_settings import SchedulerSettingsService
 
-            for settings_row in SchedulerSettingsService(db).list_all_rows():
+        for settings_row in SchedulerSettingsService(db).list_all_rows():
+            try:
                 result = ScheduledRouletteService(db, household_id=settings_row.household_id).run_scheduled()
                 if result is not None:
                     logger.info(
@@ -58,8 +58,11 @@ def run_scheduled_roulette() -> None:
                         settings_row.household_id,
                         result.week_start_date,
                     )
-        except Exception:
-            logger.exception("Scheduled meal roulette failed")
+            except Exception:
+                logger.exception(
+                    "Scheduled meal roulette failed for household %s",
+                    settings_row.household_id,
+                )
 
 
 def run_cooking_timer_alerts() -> None:

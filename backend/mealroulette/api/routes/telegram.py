@@ -39,7 +39,7 @@ def list_telegram_subscribers(
     links = TelegramLinkService(db).list_linked_recipients(scope.household_id)
     return [
         TelegramSubscriberPublic(
-            id=0,
+            id=link.id,
             chat_id=link.chat_id,
             telegram_user_id=link.telegram_user_id,
             username=link.username,

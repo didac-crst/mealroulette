@@ -8,6 +8,7 @@ import { ADMIN_NAV, PRIMARY_NAV } from "./navigation";
 type DesktopSidebarProps = {
   username: string;
   isAdmin: boolean;
+  showSettings?: boolean;
   reviewAttention?: boolean;
   onSignOut: () => void;
 };
@@ -32,7 +33,14 @@ function SignOutIcon() {
   );
 }
 
-export function DesktopSidebar({ username, isAdmin, reviewAttention = false, onSignOut }: DesktopSidebarProps) {
+export function DesktopSidebar({
+  username,
+  isAdmin,
+  showSettings,
+  reviewAttention = false,
+  onSignOut,
+}: DesktopSidebarProps) {
+  const settingsVisible = showSettings ?? isAdmin;
   return (
     <aside className="desktop-sidebar" aria-label="Application navigation">
       <div className="desktop-sidebar-brand">
@@ -72,7 +80,7 @@ export function DesktopSidebar({ username, isAdmin, reviewAttention = false, onS
         ))}
       </nav>
 
-      {isAdmin ? (
+      {settingsVisible ? (
         <>
           <div className="desktop-sidebar-separator" role="presentation" />
           <nav className="desktop-sidebar-nav" aria-label="Administration">

@@ -197,6 +197,8 @@ def get_notification_subscription(
     db: Session = Depends(get_db),
 ) -> NotificationSubscriptionPublic:
     row = HouseholdMembershipService(db).ensure_notification_subscription(current_user.id, scope.household_id)
+    db.commit()
+    db.refresh(row)
     return _subscription_public(row)
 
 

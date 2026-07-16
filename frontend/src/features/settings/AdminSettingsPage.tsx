@@ -94,9 +94,9 @@ function SettingsGroup({ heading, tiles }: { heading: string; tiles: SettingsTil
 }
 
 export function AdminSettingsPage() {
-  const { isPlatformAdmin, isHouseholdAdmin, hasHousehold, loading } = useAuth();
+  const { user, isPlatformAdmin, isHouseholdAdmin, loading } = useAuth();
   const navigate = useNavigate();
-  const canAccessSettings = isPlatformAdmin || isHouseholdAdmin || hasHousehold;
+  const canAccessSettings = Boolean(user);
 
   useEffect(() => {
     if (!loading && !canAccessSettings) {
@@ -129,7 +129,7 @@ export function AdminSettingsPage() {
     <div className="admin-page">
       <PageShell title="Settings" subtitle={subtitle}>
         <HouseholdClock />
-        {hasHousehold ? <SettingsGroup heading="Personal" tiles={PERSONAL_TILES} /> : null}
+        <SettingsGroup heading="Personal" tiles={PERSONAL_TILES} />
         {isHouseholdAdmin ? <SettingsGroup heading="Household" tiles={HOUSEHOLD_TILES} /> : null}
         {isHouseholdAdmin ? <SettingsGroup heading="Meal planning" tiles={PLANNING_TILES} /> : null}
         {isPlatformAdmin ? <SettingsGroup heading="Integrations" tiles={INTEGRATION_TILES} /> : null}

@@ -5,11 +5,11 @@ import secrets
 from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from mealroulette.core.config import get_settings
-from mealroulette.models.household import HouseholdNotificationSubscription
+from mealroulette.models.household import HouseholdMembership, HouseholdNotificationSubscription
 from mealroulette.models.telegram import TelegramLinkToken, TelegramUserLink
 from mealroulette.services.telegram_bot_info import resolve_bot_username
 
@@ -58,14 +58,38 @@ class TelegramLinkService:
         display_name: str | None,
     ) -> TelegramUserLink:
         token_hash = _hash_token(token)
-        row = self.db.scalar(select(TelegramLinkToken).where(TelegramLinkToken.token_hash == token_hash))
-        if row is None or row.used_at is not None or row.expires_at < datetime.now(UTC):
+        now = datetime.now(UTC)
+        # Atomically claim the token (same pattern as household invitation claim).
+        row = self.db.scalars(
+            update(TelegramLinkToken)
+            .where(
+                TelegramLinkToken.token_hash == token_hash,
+                TelegramLinkToken.used_at.is_(None),
+                TelegramLinkToken.expires_at >= now,
+            )
+            .values(used_at=now)
+            .returning(TelegramLinkToken)
+        ).first()
+        if row is None:
             raise ValueError("Invalid or expired link token")
+
         # One MealRoulette user → one Telegram link. Same Telegram chat may link many users.
         existing_user = self.db.scalar(select(TelegramUserLink).where(TelegramUserLink.user_id == row.user_id))
         if existing_user is not None:
             self.db.delete(existing_user)
             self.db.flush()
+
+        # One Telegram identity must not map to multiple MealRoulette users.
+        if telegram_user_id:
+            for stale in self.db.scalars(
+                select(TelegramUserLink).where(
+                    TelegramUserLink.telegram_user_id == telegram_user_id,
+                    TelegramUserLink.user_id != row.user_id,
+                )
+            ):
+                self.db.delete(stale)
+            self.db.flush()
+
         link = TelegramUserLink(
             id=uuid4(),
             user_id=row.user_id,
@@ -74,7 +98,6 @@ class TelegramLinkService:
             username=username,
             display_name=display_name,
         )
-        row.used_at = datetime.now(UTC)
         self.db.add(link)
         self.db.commit()
         self.db.refresh(link)
@@ -82,6 +105,22 @@ class TelegramLinkService:
 
     def get_link_for_user(self, user_id: UUID) -> TelegramUserLink | None:
         return self.db.scalar(select(TelegramUserLink).where(TelegramUserLink.user_id == user_id))
+
+    def resolve_link_for_sender(self, chat_id: str, telegram_user_id: str | None) -> TelegramUserLink | None:
+        """Fail closed unless exactly one link matches chat + Telegram identity."""
+        if not telegram_user_id:
+            return None
+        links = list(
+            self.db.scalars(
+                select(TelegramUserLink).where(
+                    TelegramUserLink.chat_id == chat_id,
+                    TelegramUserLink.telegram_user_id == telegram_user_id,
+                )
+            )
+        )
+        if len(links) != 1:
+            return None
+        return links[0]
 
     def unlink_user(self, user_id: UUID) -> bool:
         link = self.get_link_for_user(user_id)
@@ -98,8 +137,14 @@ class TelegramLinkService:
                 HouseholdNotificationSubscription,
                 HouseholdNotificationSubscription.user_id == TelegramUserLink.user_id,
             )
+            .join(
+                HouseholdMembership,
+                (HouseholdMembership.user_id == TelegramUserLink.user_id)
+                & (HouseholdMembership.household_id == HouseholdNotificationSubscription.household_id),
+            )
             .where(
                 HouseholdNotificationSubscription.household_id == household_id,
+                HouseholdMembership.active.is_(True),
                 notify_column.is_(True),
             )
         )
@@ -130,7 +175,15 @@ class TelegramLinkService:
                 HouseholdNotificationSubscription,
                 HouseholdNotificationSubscription.user_id == TelegramUserLink.user_id,
             )
-            .where(HouseholdNotificationSubscription.household_id == household_id)
+            .join(
+                HouseholdMembership,
+                (HouseholdMembership.user_id == TelegramUserLink.user_id)
+                & (HouseholdMembership.household_id == HouseholdNotificationSubscription.household_id),
+            )
+            .where(
+                HouseholdNotificationSubscription.household_id == household_id,
+                HouseholdMembership.active.is_(True),
+            )
             .order_by(TelegramUserLink.linked_at)
         )
         seen: set[UUID] = set()

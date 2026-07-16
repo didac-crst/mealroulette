@@ -1,7 +1,7 @@
 from datetime import datetime, time
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, model_validator
 
 from mealroulette.models.household import HouseholdRole
 
@@ -92,3 +92,12 @@ class NotificationSubscriptionUpdateRequest(BaseModel):
     daily_reminder_time: time | None = None
     shopping_window_days: int | None = Field(default=None, ge=1, le=14)
     timezone: str | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def reject_explicit_nulls(cls, data: object) -> object:
+        if isinstance(data, dict):
+            for key, value in data.items():
+                if value is None:
+                    raise ValueError(f"{key} cannot be null")
+        return data

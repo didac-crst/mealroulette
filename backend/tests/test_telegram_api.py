@@ -115,3 +115,13 @@ def test_personal_telegram_link_token_and_subscription(client, catalog_seed, use
     unlink = client.delete("/api/household/telegram/link", headers=user_headers)
     assert unlink.status_code == 204
     assert client.get("/api/household/telegram/link", headers=user_headers).json()["linked"] is False
+
+
+@pytest.mark.integration
+def test_notification_subscription_rejects_explicit_null(client, catalog_seed, user_headers):
+    response = client.put(
+        "/api/household/notification-subscription",
+        headers=user_headers,
+        json={"notify_roulette": None},
+    )
+    assert response.status_code == 422

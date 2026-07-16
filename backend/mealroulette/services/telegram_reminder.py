@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from datetime import UTC, datetime
 from uuid import UUID
 from zoneinfo import ZoneInfo
@@ -18,6 +19,8 @@ from mealroulette.services.telegram_format import format_shopping_list_message
 from mealroulette.services.telegram_link import TelegramLinkService
 from mealroulette.services.telegram_on_demand import TelegramOnDemandService
 from mealroulette.services.telegram_settings import TelegramSettingsService
+
+logger = logging.getLogger(__name__)
 
 
 class TelegramReminderService:
@@ -157,25 +160,81 @@ class TelegramReminderService:
                 return False
         return True
 
+    def _try_claim_personal_scheduled(
+        self,
+        subscription_id: UUID,
+        *,
+        now: datetime,
+    ) -> tuple[HouseholdNotificationSubscription, datetime | None] | None:
+        """Atomically claim a due subscription. Returns (row, previous_sent_at) or None."""
+        row = self.db.scalar(
+            select(HouseholdNotificationSubscription)
+            .where(HouseholdNotificationSubscription.id == subscription_id)
+            .with_for_update()
+        )
+        if row is None or not self.should_send_personal_scheduled(row, now=now):
+            return None
+        link = self.links.get_link_for_user(row.user_id)
+        if link is None:
+            return None
+        household_settings = self.settings_service.get_row(row.household_id)
+        if not household_settings.enabled:
+            return None
+        previous = row.last_reminder_sent_at
+        row.last_reminder_sent_at = now
+        self.db.commit()
+        self.db.refresh(row)
+        return row, previous
+
+    def _deliver_claimed_personal_reminder(
+        self,
+        subscription: HouseholdNotificationSubscription,
+    ) -> TelegramSendResult:
+        link = self.links.get_link_for_user(subscription.user_id)
+        if link is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Link Telegram in Settings before sending a reminder.",
+            )
+        token = self._bot_token()
+        message = self._on_demand(subscription.household_id).build_reminder_message(
+            subscription.shopping_window_days
+        )
+        self._send_one(token, link.chat_id, message, parse_mode="HTML")
+        return TelegramSendResult(sent=True, detail="Reminder sent to your linked Telegram.", recipient_count=1)
+
+    def _release_claim(
+        self,
+        subscription_id: UUID,
+        previous_sent_at: datetime | None,
+    ) -> None:
+        row = self.db.get(HouseholdNotificationSubscription, subscription_id)
+        if row is None:
+            return
+        row.last_reminder_sent_at = previous_sent_at
+        self.db.commit()
+
     def run_scheduled_reminder(self, now: datetime | None = None) -> list[TelegramSendResult]:
         results: list[TelegramSendResult] = []
         if not (get_settings().telegram_bot_token or "").strip():
             return results
 
-        subscriptions = list(self.db.scalars(select(HouseholdNotificationSubscription)))
-        for subscription in subscriptions:
-            if not self.should_send_personal_scheduled(subscription, now=now):
+        current = now or datetime.now(UTC)
+        subscription_ids = list(
+            self.db.scalars(select(HouseholdNotificationSubscription.id))
+        )
+        for subscription_id in subscription_ids:
+            claimed = self._try_claim_personal_scheduled(subscription_id, now=current)
+            if claimed is None:
                 continue
-            link = self.links.get_link_for_user(subscription.user_id)
-            if link is None:
-                continue
-            household_settings = self.settings_service.get_row(subscription.household_id)
-            if not household_settings.enabled:
-                continue
+            subscription, previous_sent_at = claimed
             try:
-                results.append(
-                    self.send_personal_daily_reminder(subscription.user_id, subscription.household_id)
+                results.append(self._deliver_claimed_personal_reminder(subscription))
+            except Exception:
+                logger.exception(
+                    "Scheduled personal Telegram reminder failed user_id=%s household_id=%s",
+                    subscription.user_id,
+                    subscription.household_id,
                 )
-            except HTTPException:
-                continue
+                self._release_claim(subscription.id, previous_sent_at)
         return results

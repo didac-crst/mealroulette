@@ -17,6 +17,7 @@ from mealroulette.models.household import (
     HouseholdNotificationSubscription,
     HouseholdRole,
 )
+from mealroulette.models.telegram import TelegramSettings
 from mealroulette.models.user import User, UserRole
 from mealroulette.services.household import HouseholdService
 
@@ -35,6 +36,7 @@ class HouseholdMembershipService:
     def ensure_notification_subscription(
         self, user_id: UUID, household_id: UUID
     ) -> HouseholdNotificationSubscription:
+        """Create a pending subscription row if missing; does not commit."""
         row = self.db.scalar(
             select(HouseholdNotificationSubscription).where(
                 HouseholdNotificationSubscription.user_id == user_id,
@@ -42,10 +44,23 @@ class HouseholdMembershipService:
             )
         )
         if row is None:
-            row = HouseholdNotificationSubscription(user_id=user_id, household_id=household_id)
+            settings = self.db.scalar(
+                select(TelegramSettings).where(TelegramSettings.household_id == household_id)
+            )
+            kwargs: dict = {}
+            if settings is not None:
+                kwargs = {
+                    "daily_reminder_time": settings.daily_reminder_time,
+                    "shopping_window_days": settings.shopping_window_days,
+                    "timezone": settings.timezone,
+                }
+            row = HouseholdNotificationSubscription(
+                user_id=user_id,
+                household_id=household_id,
+                **kwargs,
+            )
             self.db.add(row)
-            self.db.commit()
-            self.db.refresh(row)
+            self.db.flush()
         return row
 
     def count_active_admins(self, household_id: UUID) -> int:
@@ -242,9 +257,9 @@ class HouseholdMembershipService:
             )
             self.db.add(membership)
         invitation.accepted_by_user_id = user.id
+        self.ensure_notification_subscription(membership.user_id, membership.household_id)
         self.db.commit()
         self.db.refresh(membership)
-        self.ensure_notification_subscription(membership.user_id, membership.household_id)
         return membership
 
     def register_with_invitation(
@@ -275,9 +290,9 @@ class HouseholdMembershipService:
             )
         )
         invitation.accepted_by_user_id = user.id
+        self.ensure_notification_subscription(user.id, invitation.household_id)
         self.db.commit()
         self.db.refresh(user)
-        self.ensure_notification_subscription(user.id, invitation.household_id)
         return user
 
     def register_new_household(
@@ -308,9 +323,9 @@ class HouseholdMembershipService:
                 active=True,
             )
         )
+        self.ensure_notification_subscription(user.id, household.id)
         self.db.commit()
         self.db.refresh(user)
-        self.ensure_notification_subscription(user.id, household.id)
         return user
 
     def list_invitations(self, household_id: UUID) -> list[HouseholdInvitation]:

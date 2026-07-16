@@ -1,7 +1,7 @@
 import { apiRequest } from "./client";
 
 export type TelegramSubscriber = {
-  id: number;
+  id: string;
   chat_id: string;
   telegram_user_id: string | null;
   username: string | null;
