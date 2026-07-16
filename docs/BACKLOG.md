@@ -36,7 +36,7 @@ Phase 15 shipped as stacked PRs:
 | **15C** | Household membership API | [#19](https://github.com/didac-crst/mealroulette/pull/19) |
 | **15D** | Household UX and frontend tenancy wiring | [#20](https://github.com/didac-crst/mealroulette/pull/20) |
 | **15E** | Telegram tenancy and notification subscriptions | [#21](https://github.com/didac-crst/mealroulette/pull/21) |
-| **15F** | Final hardening, docs, release prep | this PR |
+| **15F** | Final hardening, docs, release prep | [#22](https://github.com/didac-crst/mealroulette/pull/22) |
 
 Architecture: [ADR 003](adr/003-household-tenancy-and-authorization.md). Draft release notes: [releases/v0.12.0.md](releases/v0.12.0.md) (tag only after merge + green `main`).
 
@@ -364,7 +364,7 @@ When `meal_composition = simple_dish`, **`simple_dish_part`** is required: `cent
 - [x] Invitation create/accept/revoke; join as `household_member`; last-admin protection
 - [x] Household-scoped plans, dishes, recipes, planning settings, shopping, scheduler, meal reviews
 - [x] Global taxonomy mutation restricted to `platform_admin`; household admins manage household content
-- [x] User-level Telegram link + household notification defaults + per-user subscriptions
+- [x] User-level Telegram link + household notification defaults + per-membership notification subscriptions
 - [x] Cooking timer alerts go to the starter’s linked Telegram user
 - [x] One active household membership per user (initial product constraint)
 

@@ -62,12 +62,11 @@ class HouseholdMembershipService:
             household_id=household_id,
             **kwargs,
         )
-        self.db.add(row)
         try:
             with self.db.begin_nested():
+                self.db.add(row)
                 self.db.flush()
         except IntegrityError:
-            self.db.expunge(row)
             row = self.db.scalar(
                 select(HouseholdNotificationSubscription).where(
                     HouseholdNotificationSubscription.user_id == user_id,

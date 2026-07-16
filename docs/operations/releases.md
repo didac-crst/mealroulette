@@ -64,11 +64,16 @@ git push origin v0.1.0
 
 ## Check out a release
 
+Until `v0.12.0` is tagged, use `main` (or an earlier tag such as `v0.11.0`):
+
 ```bash
-git checkout v0.12.0   # latest tagged release (after v0.12.0 is published)
-# or, until tagged:
-# git checkout main
+git checkout main
 docker compose up --build
 ```
 
-Until `v0.12.0` is tagged, use `main` or an earlier tag such as `v0.11.0`.
+After `v0.12.0` is published:
+
+```bash
+git checkout v0.12.0
+docker compose up --build
+```
