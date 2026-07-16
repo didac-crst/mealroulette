@@ -103,6 +103,9 @@ export function resolveBreadcrumbs(
   if (pathname === "/settings/telegram") {
     return [settings, { label: "Telegram" }];
   }
+  if (pathname === "/settings/password") {
+    return [settings, { label: "Password" }];
+  }
   if (pathname === "/settings/backups") {
     return [settings, { label: "Backups" }];
   }

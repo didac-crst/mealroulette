@@ -109,6 +109,23 @@ class AuthService:
             self.db.delete(stored_token)
             self.db.commit()
 
+    def change_password(self, user: User, *, current_password: str, new_password: str) -> None:
+        if not verify_password(current_password, user.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Current password is incorrect",
+            )
+        if current_password == new_password:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="New password must be different from the current password",
+            )
+        user.password_hash = hash_password(new_password)
+        user.updated_at = datetime.now(UTC)
+        # Invalidate existing refresh tokens so other sessions must sign in again.
+        self.db.execute(delete(RefreshToken).where(RefreshToken.user_id == user.id))
+        self.db.commit()
+
 
 class UserService:
     def __init__(self, db: Session):

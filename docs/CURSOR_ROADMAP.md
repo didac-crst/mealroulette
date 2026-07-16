@@ -958,15 +958,29 @@ Acceptance criteria (met):
 - Public dish catalog / publication / subscriptions
 - Ingredient proposal workflow
 - Telegram OTP / bot login
-- Password / account settings page
-- User-level recipe preference API/UI (`recipe_ratings`)
+- Password / account settings page → **Phase 16A**
+- User-level recipe preference API/UI (`recipe_ratings`) → **Phase 16B**
 - Multi-household membership
 - Household-level portable export/import
 - Localization tables and cross-household copy/adopt
 
-### Phase 16 - LLM-Assisted Entry & Localization
+### Phase 16 - Deferred umbrella slices, then LLM & Localization
 
-Design spec: [features/localization.md](features/localization.md). Shipment status: [BACKLOG.md](BACKLOG.md).
+Shipment status: [BACKLOG.md](BACKLOG.md).
+
+Phase 16 starts by landing deferred umbrella items as reviewable slices before LLM/localization:
+
+| Slice | Theme |
+| --- | --- |
+| **16A** | Password / account settings |
+| **16B** | Recipe ratings UI |
+| **16C** | Ingredient proposals |
+| **16D** | Public catalog / public dishes |
+| **16E** | Telegram OTP/login (if still desired) |
+
+Then continue with LLM-assisted entry and localization foundation:
+
+Design spec: [features/localization.md](features/localization.md).
 
 Deliverables:
 

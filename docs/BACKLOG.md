@@ -25,22 +25,21 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Phase 15 complete on `main` — prepare `v0.12.0` release after this cleanup PR merges and CI is green.**
+**Current focus — Phase 16 deferred umbrella slices; tag `v0.12.0` only after user testing.**
 
-Phase 15 shipped as stacked PRs:
+Phase 15 is complete on `main` (PRs #17–#22). Draft release notes remain pending: [releases/v0.12.0.md](releases/v0.12.0.md).
 
-| Slice | Theme | PR |
+Phase 16 remaining umbrella scope (split for reviewability):
+
+| Slice | Theme | Status |
 | --- | --- | --- |
-| **15A** | Identity and tenancy foundation | [#17](https://github.com/didac-crst/mealroulette/pull/17) |
-| **15B** | Household domain scoping | [#18](https://github.com/didac-crst/mealroulette/pull/18) |
-| **15C** | Household membership API | [#19](https://github.com/didac-crst/mealroulette/pull/19) |
-| **15D** | Household UX and frontend tenancy wiring | [#20](https://github.com/didac-crst/mealroulette/pull/20) |
-| **15E** | Telegram tenancy and notification subscriptions | [#21](https://github.com/didac-crst/mealroulette/pull/21) |
-| **15F** | Final hardening, docs, release prep | [#22](https://github.com/didac-crst/mealroulette/pull/22) |
+| **16A** | Password / account settings | In progress (`phase-16a-account-settings`) |
+| **16B** | Recipe ratings UI | Planned |
+| **16C** | Ingredient proposals | Planned |
+| **16D** | Public catalog / public dishes | Planned |
+| **16E** | Telegram OTP/login | Planned if still desired |
 
-Architecture: [ADR 003](adr/003-household-tenancy-and-authorization.md). Draft release notes: [releases/v0.12.0.md](releases/v0.12.0.md) (tag only after merge + green `main`).
-
-`v0.11.0` and earlier remain the prior product line. See [releases/](releases/).
+Do not merge the umbrella branch `phase-15/household-users-and-memberships`; use it as reference only.
 
 ---
 
@@ -83,8 +82,9 @@ Use one branch per milestone, then merge via pull request:
 - `phase-15c-household-membership-api` — signup, invitations, membership APIs (merged in PR #19)
 - `phase-15d-household-ux-and-tenancy-wiring` — signup/join/members UI + role-gated settings (merged in PR #20)
 - `phase-15e-telegram-tenancy` — user Telegram links, subscriptions, household-scoped delivery (merged in PR #21)
-- `phase-15f-final-hardening-docs-release` — Phase 15 closeout: tests, docs, release notes
-- `phase-15/household-users-and-memberships` — **umbrella only**; do not merge. Used to inventory deferred extras (OTP, password settings, ingredient proposals, public catalog).
+- `phase-15f-final-hardening-docs-release` — Phase 15 closeout: tests, docs, release notes (merged in PR #22)
+- `phase-16a-account-settings` — password/account settings (in progress)
+- `phase-15/household-users-and-memberships` — **umbrella only**; do not merge. Reference for deferred extras (OTP, proposals, public catalog).
 
 ---
 
@@ -106,7 +106,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.10** | Composable meals — multi-dish slots, simple dishes, do-not-plan, faster roulette | **Done** ([`v0.10.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.10.0), merge `a2e29de`, PR #14) |
 | **v0.11** | Pair compatibility and reroll memory — prevent bad simple-dish pairs and reroll cycles | **Done** ([`v0.11.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.11.0), merge `82f20de`, PR #15) |
 | **v0.12** | Household users and memberships — tenancy, invitations, household UX, Telegram linking | **Done on `main`** (PRs #17–#21, merge `1d959c5`); tag `v0.12.0` after 15F |
-| **Future** | Public catalog, ingredient proposals, Telegram OTP login, password settings | Not started (deferred past Phase 15) |
+| **Future** | Public catalog, ingredient proposals, Telegram OTP login | Not started (Phase 16B–E) |
 | **Future** | LLM-assisted entry — draft enrichment, review before save | Not started |
 | **v1.0** | Stable home version — backups, auth hardening, scheduler reliability | Not started |
 
@@ -374,7 +374,7 @@ When `meal_composition = simple_dish`, **`simple_dish_part`** is required: `cent
 - [ ] Ingredient proposal workflow for missing catalogue entries
 - [ ] Public dish catalog / publication / subscriptions
 - [ ] Telegram OTP / passwordless bot login
-- [ ] Password / account settings page
+- [x] Password / account settings page (Phase 16A)
 - [ ] Household-level portable export/import
 - [ ] Localization tables and cross-household copy/adopt
 - [ ] Multi-household membership (users may hold at most one active membership today)
@@ -421,8 +421,8 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 12 | UI/UX design system and live traits | v0.9 | Done (PR #12/#13, `v0.9.0`) |
 | 13 | Composable meals and simple dishes | v0.10 | Done (PR #14, `v0.10.0`) |
 | 14 | Pair compatibility and reroll memory | v0.11 | Done (PR #15, `v0.11.0`) |
-| 15 | Household users and memberships | v0.12 | Done (PRs #17–#21, `1d959c5`; 15F closeout) |
-| 16 | LLM-assisted entry & localization | Future | Not started (also absorbs public-catalog / OTP / proposals later) |
+| 15 | Household users and memberships | v0.12 | Done (PRs #17–#22) |
+| 16 | Deferred umbrella + LLM/localization | Future | 16A account settings in progress; LLM later |
 | 17 | v1 hardening | v1.0 | Not started |
 
 ### Phase 0 — Project bootstrap ✅
@@ -641,7 +641,7 @@ Shipped as stacked PRs on `main` (tip of feature work: `1d959c5`). Closeout docs
 | 15E | `phase-15e-telegram-tenancy` | [#21](https://github.com/didac-crst/mealroulette/pull/21) | Telegram user links + notification subscriptions |
 | 15F | `phase-15f-final-hardening-docs-release` | this PR | Docs/status reconciliation + release prep |
 
-Umbrella branch `phase-15/household-users-and-memberships` is **not** mergeable source of truth. Deferred extras found there (Telegram OTP, password settings UI, ingredient proposals, public catalog drafts) stay Phase 16 / future work.
+Umbrella branch `phase-15/household-users-and-memberships` is **not** mergeable source of truth. Remaining deferred extras (Telegram OTP, ingredient proposals, public catalog drafts) continue as Phase 16B–E.
 
 ---
 

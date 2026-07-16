@@ -47,6 +47,17 @@ export async function fetchMe(token: string): Promise<UserPublic> {
   return apiRequest<UserPublic>("/api/auth/me", { token });
 }
 
+export async function changePassword(
+  token: string,
+  payload: { current_password: string; new_password: string },
+): Promise<void> {
+  await apiRequest<void>("/api/auth/change-password", {
+    method: "POST",
+    token,
+    body: JSON.stringify(payload),
+  });
+}
+
 export async function register(payload: {
   username: string;
   email: string;
