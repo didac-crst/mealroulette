@@ -107,7 +107,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.9** | UI/UX design system + live recipe traits — shared shell, visual QA, fresh trait reads | **Done** ([`v0.9.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.9.0), merge `9647509`, PR #12/#13) |
 | **v0.10** | Composable meals — multi-dish slots, simple dishes, do-not-plan, faster roulette | **Done** ([`v0.10.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.10.0), merge `a2e29de`, PR #14) |
 | **v0.11** | Pair compatibility and reroll memory — prevent bad simple-dish pairs and reroll cycles | **Done** ([`v0.11.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.11.0), merge `82f20de`, PR #15) |
-| **v0.12** | Household users and memberships — tenancy, invitations, household UX, Telegram linking | **Done on `main`** (PRs #17–#21, merge `1d959c5`); tag `v0.12.0` after 15F |
+| **v0.12** | Household users and memberships — tenancy, invitations, household UX, Telegram linking | **Done on `main`** (PRs #17–#22); tag `v0.12.0` only after green `main` + human user testing |
 | **Future** | Public catalog, ingredient proposals, Telegram OTP login | Not started (Phase 16B–E) |
 | **Future** | LLM-assisted entry — draft enrichment, review before save | Not started |
 | **v1.0** | Stable home version — backups, auth hardening, scheduler reliability | Not started |
@@ -346,7 +346,7 @@ When `meal_composition = simple_dish`, **`simple_dish_part`** is required: `cent
 
 ### v0.12 — Household Users and Memberships
 
-**Status:** Done on `main` via Phase 15A–E (PRs [#17](https://github.com/didac-crst/mealroulette/pull/17)–[#21](https://github.com/didac-crst/mealroulette/pull/21), tip `1d959c5`). Architecture: [ADR 003](adr/003-household-tenancy-and-authorization.md). Release notes: [releases/v0.12.0.md](releases/v0.12.0.md) (tag after 15F).
+**Status:** Done on `main` via Phase 15A–F (PRs [#17](https://github.com/didac-crst/mealroulette/pull/17)–[#22](https://github.com/didac-crst/mealroulette/pull/22)). Architecture: [ADR 003](adr/003-household-tenancy-and-authorization.md). Draft release notes: [releases/v0.12.0.md](releases/v0.12.0.md) — tag only after green `main` + human user testing.
 
 | Slice | Delivered |
 | --- | --- |
