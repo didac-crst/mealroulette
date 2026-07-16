@@ -53,7 +53,7 @@ export function PlanningTargetsPage() {
 
   useEffect(() => {
     if (!authLoading && !isHouseholdAdmin) {
-      navigate("/today");
+      navigate("/today", { replace: true });
     }
   }, [isHouseholdAdmin, authLoading, navigate]);
 

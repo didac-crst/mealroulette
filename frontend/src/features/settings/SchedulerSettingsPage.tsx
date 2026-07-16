@@ -50,7 +50,7 @@ export function SchedulerSettingsPage() {
 
   useEffect(() => {
     if (!isHouseholdAdmin) {
-      navigate("/today");
+      navigate("/today", { replace: true });
     }
   }, [isHouseholdAdmin, navigate]);
 

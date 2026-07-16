@@ -91,7 +91,7 @@ export function AdminSettingsPage() {
 
   useEffect(() => {
     if (!loading && !canAccessSettings) {
-      navigate("/today");
+      navigate("/today", { replace: true });
     }
   }, [canAccessSettings, loading, navigate]);
 
@@ -107,16 +107,16 @@ export function AdminSettingsPage() {
     return null;
   }
 
+  const subtitle =
+    isPlatformAdmin && isHouseholdAdmin
+      ? "Household and platform admin — members, meal rules, catalog, and integrations."
+      : isHouseholdAdmin
+        ? "Household admin — members, meal rules, and automation."
+        : "Platform admin — installation catalog and integrations.";
+
   return (
     <div className="admin-page">
-      <PageShell
-        title="Settings"
-        subtitle={
-          isHouseholdAdmin
-            ? "Household admin — members, meal rules, and automation."
-            : "Platform admin — installation catalog and integrations."
-        }
-      >
+      <PageShell title="Settings" subtitle={subtitle}>
         <HouseholdClock />
         {isHouseholdAdmin ? <SettingsGroup heading="Household" tiles={HOUSEHOLD_TILES} /> : null}
         {isHouseholdAdmin ? <SettingsGroup heading="Meal planning" tiles={PLANNING_TILES} /> : null}
