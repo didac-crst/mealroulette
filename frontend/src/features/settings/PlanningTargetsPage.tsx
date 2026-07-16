@@ -40,7 +40,7 @@ function rowsToTargets(rows: TargetRow[]): Record<string, WeeklyTargetSpec> {
 }
 
 export function PlanningTargetsPage() {
-  const { accessToken, isAdmin, loading: authLoading } = useAuth();
+  const { accessToken, isHouseholdAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [baseRules, setBaseRules] = useState<PlanningRulesConfig | null>(null);
   const [rows, setRows] = useState<TargetRow[]>([]);
@@ -52,10 +52,10 @@ export function PlanningTargetsPage() {
   const [newPreset, setNewPreset] = useState<string>(TARGET_PRESETS[0]);
 
   useEffect(() => {
-    if (!authLoading && !isAdmin) {
-      navigate("/review");
+    if (!authLoading && !isHouseholdAdmin) {
+      navigate("/today", { replace: true });
     }
-  }, [isAdmin, authLoading, navigate]);
+  }, [isHouseholdAdmin, authLoading, navigate]);
 
   useEffect(() => {
     if (!accessToken) {
@@ -166,7 +166,7 @@ export function PlanningTargetsPage() {
     );
   }
 
-  if (!isAdmin) {
+  if (!isHouseholdAdmin) {
     return null;
   }
 

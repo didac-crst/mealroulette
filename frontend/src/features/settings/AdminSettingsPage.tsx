@@ -7,6 +7,7 @@ import { useAuth } from "../auth/AuthContext";
 import { HouseholdClock } from "./HouseholdClock";
 import {
   SettingsBackupIcon,
+  SettingsHouseholdIcon,
   SettingsIngredientsIcon,
   SettingsSchedulerIcon,
   SettingsTargetsIcon,
@@ -32,6 +33,15 @@ const PLANNING_TILES: SettingsTileConfig[] = [
     title: "Auto roulette",
     description: "When to generate next week and Telegram “New roulette”.",
     icon: <SettingsSchedulerIcon />,
+  },
+];
+
+const HOUSEHOLD_TILES: SettingsTileConfig[] = [
+  {
+    to: "/settings/members",
+    title: "Household",
+    description: "Name, invite links, members, and roles.",
+    icon: <SettingsHouseholdIcon />,
   },
 ];
 
@@ -75,14 +85,15 @@ function SettingsGroup({ heading, tiles }: { heading: string; tiles: SettingsTil
 }
 
 export function AdminSettingsPage() {
-  const { isAdmin, loading } = useAuth();
+  const { isPlatformAdmin, isHouseholdAdmin, loading } = useAuth();
   const navigate = useNavigate();
+  const canAccessSettings = isPlatformAdmin || isHouseholdAdmin;
 
   useEffect(() => {
-    if (!loading && !isAdmin) {
-      navigate("/review");
+    if (!loading && !canAccessSettings) {
+      navigate("/today", { replace: true });
     }
-  }, [isAdmin, loading, navigate]);
+  }, [canAccessSettings, loading, navigate]);
 
   if (loading) {
     return (
@@ -92,20 +103,25 @@ export function AdminSettingsPage() {
     );
   }
 
-  if (!isAdmin) {
+  if (!canAccessSettings) {
     return null;
   }
 
+  const subtitle =
+    isPlatformAdmin && isHouseholdAdmin
+      ? "Household and platform admin — members, meal rules, catalog, and integrations."
+      : isHouseholdAdmin
+        ? "Household admin — members, meal rules, and automation."
+        : "Platform admin — installation catalog and integrations.";
+
   return (
     <div className="admin-page">
-      <PageShell
-        title="Settings"
-        subtitle="Household admin — meal rules, automation, and catalog."
-      >
+      <PageShell title="Settings" subtitle={subtitle}>
         <HouseholdClock />
-        <SettingsGroup heading="Meal planning" tiles={PLANNING_TILES} />
-        <SettingsGroup heading="Integrations" tiles={INTEGRATION_TILES} />
-        <SettingsGroup heading="Catalog" tiles={CATALOG_TILES} />
+        {isHouseholdAdmin ? <SettingsGroup heading="Household" tiles={HOUSEHOLD_TILES} /> : null}
+        {isHouseholdAdmin ? <SettingsGroup heading="Meal planning" tiles={PLANNING_TILES} /> : null}
+        {isPlatformAdmin ? <SettingsGroup heading="Integrations" tiles={INTEGRATION_TILES} /> : null}
+        {isPlatformAdmin ? <SettingsGroup heading="Catalog" tiles={CATALOG_TILES} /> : null}
       </PageShell>
     </div>
   );

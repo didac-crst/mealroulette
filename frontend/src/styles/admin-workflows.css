@@ -420,14 +420,106 @@
   display: none;
 }
 
+.household-admin-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.household-members-grid,
+.household-invitations-grid {
+  display: grid;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.household-members-grid {
+  grid-template-columns: minmax(8rem, 1.1fr) minmax(12rem, 1.4fr) minmax(9rem, 0.9fr) auto;
+}
+
+.household-invitations-grid {
+  grid-template-columns: minmax(8rem, 0.9fr) minmax(8rem, 0.9fr) minmax(12rem, 1.8fr) auto;
+}
+
+.household-admin-table-header {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  padding: 0 var(--space-2);
+}
+
+.household-admin-table-row {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-soft);
+}
+
+.household-admin-table-row-self {
+  opacity: 0.72;
+  background: var(--surface-muted);
+}
+
+.household-admin-table-row-muted {
+  opacity: 0.75;
+}
+
+.household-admin-table-secondary {
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.household-admin-table-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.household-invite-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.household-invite-link-code {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.household-invite-link-unavailable {
+  font-size: var(--font-size-sm);
+}
+
+.settings-form {
+  max-width: 24rem;
+}
+
 @media (max-width: 767px) {
-  .ingredient-catalog-header {
+  .ingredient-catalog-header,
+  .household-admin-table-header {
     display: none;
   }
 
   .ingredient-catalog-row {
     grid-template-columns: 1fr;
     gap: var(--space-2);
+  }
+
+  .household-members-grid,
+  .household-invitations-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+
+  .household-admin-table-actions {
+    justify-content: flex-start;
   }
 
   .admin-mobile-label {

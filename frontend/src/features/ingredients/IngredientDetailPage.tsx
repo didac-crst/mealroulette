@@ -10,14 +10,14 @@ import { useAuth } from "../auth/AuthContext";
 export function IngredientDetailPage() {
   const { ingredientId } = useParams();
   const navigate = useNavigate();
-  const { accessToken, isAdmin } = useAuth();
+  const { accessToken, isPlatformAdmin } = useAuth();
   const [detail, setDetail] = useState<IngredientDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!accessToken || !ingredientId || isAdmin) {
-      if (isAdmin) {
+    if (!accessToken || !ingredientId || isPlatformAdmin) {
+      if (isPlatformAdmin) {
         setLoading(false);
       }
       return;
@@ -43,13 +43,13 @@ export function IngredientDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [accessToken, ingredientId, isAdmin]);
+  }, [accessToken, ingredientId, isPlatformAdmin]);
 
   useEffect(() => {
-    if (isAdmin && ingredientId) {
+    if (isPlatformAdmin && ingredientId) {
       navigate(`/ingredients/${ingredientId}/edit`, { replace: true });
     }
-  }, [isAdmin, ingredientId, navigate]);
+  }, [isPlatformAdmin, ingredientId, navigate]);
 
   if (loading) {
     return (

@@ -64,3 +64,14 @@ export function SettingsIngredientsIcon() {
     </svg>
   );
 }
+
+export function SettingsHouseholdIcon() {
+  return (
+    <svg {...iconProps}>
+      <path d="M4 20V10l8-6 8 6v10" />
+      <path d="M9 20v-6h6v6" />
+      <path d="M8 11.5h.01" />
+      <path d="M16 11.5h.01" />
+    </svg>
+  );
+}

@@ -18,7 +18,11 @@ type AuthContextValue = {
   accessToken: string | null;
   loading: boolean;
   login: (username: string, password: string) => Promise<void>;
+  refreshUser: () => Promise<void>;
   logout: () => Promise<void>;
+  isPlatformAdmin: boolean;
+  hasHousehold: boolean;
+  isHouseholdAdmin: boolean;
   isAdmin: boolean;
 };
 
@@ -115,6 +119,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [applySession],
   );
 
+  const refreshUser = useCallback(async () => {
+    const stored = loadTokens();
+    if (!stored) {
+      return;
+    }
+    try {
+      const me = await fetchMeWithRetry(stored.accessToken);
+      applySession(stored.accessToken, me);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        try {
+          const tokens = await authApi.refresh(stored.refreshToken);
+          saveTokens({
+            accessToken: tokens.access_token,
+            refreshToken: tokens.refresh_token,
+          });
+          const me = await fetchMeWithRetry(tokens.access_token);
+          applySession(tokens.access_token, me);
+          return;
+        } catch {
+          clearSession();
+        }
+      }
+      throw error;
+    }
+  }, [applySession, clearSession]);
+
   const logout = useCallback(async () => {
     const stored = loadTokens();
     if (stored) {
@@ -127,20 +158,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     clearSession();
   }, [clearSession]);
 
-  const value = useMemo(
-    () => ({
+  const value = useMemo(() => {
+    const isPlatformAdmin =
+      user?.role === "admin" ||
+      user?.role === "platform_admin" ||
+      user?.platform_roles.includes("platform_admin") === true;
+    const hasHousehold = user?.active_household_id != null;
+    const isHouseholdAdmin = user?.household_role === "household_admin";
+    return {
       user,
       accessToken,
       loading,
       login,
+      refreshUser,
       logout,
-      isAdmin:
-        user?.role === "admin" ||
-        user?.role === "platform_admin" ||
-        user?.platform_roles.includes("platform_admin") === true,
-    }),
-    [user, accessToken, loading, login, logout],
-  );
+      isPlatformAdmin,
+      hasHousehold,
+      isHouseholdAdmin,
+      isAdmin: isPlatformAdmin,
+    };
+  }, [user, accessToken, loading, login, refreshUser, logout]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

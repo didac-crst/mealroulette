@@ -8,7 +8,7 @@ import { Button, Card, EmptyState, PageShell } from "../../components/ui";
 import { useAuth } from "../auth/AuthContext";
 
 export function IngredientListPage() {
-  const { accessToken, isAdmin } = useAuth();
+  const { accessToken, isPlatformAdmin } = useAuth();
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
   const [search, setSearch] = useState("");
@@ -63,7 +63,7 @@ export function IngredientListPage() {
         loading={loading}
         loadingMessage="Loading ingredients…"
         actions={
-          isAdmin ? (
+          isPlatformAdmin ? (
             <div className="catalog-detail-actions">
               <ButtonLink to="/ingredients/taxonomy" variant="secondary">
                 Taxonomy
@@ -105,8 +105,8 @@ export function IngredientListPage() {
       {!loading && !error && ingredients.length === 0 ? (
         <EmptyState
           title="No ingredients found"
-          description={isAdmin ? "Add your first ingredient to build the catalog." : "Try a different search."}
-          action={isAdmin ? <ButtonLink to="/ingredients/new">Add ingredient</ButtonLink> : undefined}
+          description={isPlatformAdmin ? "Add your first ingredient to build the catalog." : "Try a different search."}
+          action={isPlatformAdmin ? <ButtonLink to="/ingredients/new">Add ingredient</ButtonLink> : undefined}
         />
       ) : null}
 
@@ -121,7 +121,7 @@ export function IngredientListPage() {
           {ingredients.map((ingredient) => (
             <Link
               key={ingredient.id}
-              to={isAdmin ? `/ingredients/${ingredient.id}/edit` : `/ingredients/${ingredient.id}`}
+              to={isPlatformAdmin ? `/ingredients/${ingredient.id}/edit` : `/ingredients/${ingredient.id}`}
               className="ingredient-catalog-row"
             >
               <span>

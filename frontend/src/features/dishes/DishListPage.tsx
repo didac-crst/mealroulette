@@ -15,7 +15,7 @@ import {
 import { filterDishesBySearch, normalizeDishSearchQuery } from "./dishSearch";
 
 export function DishListPage() {
-  const { accessToken, isAdmin } = useAuth();
+  const { accessToken, isHouseholdAdmin } = useAuth();
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [recipeNamesByDishId, setRecipeNamesByDishId] = useState<Record<number, string[]>>({});
   const [search, setSearch] = useState("");
@@ -98,7 +98,7 @@ export function DishListPage() {
         subtitle={subtitle}
         loading={loading}
         loadingMessage="Loading dishes…"
-        actions={isAdmin ? <ButtonLink to="/dishes/new">Add dish</ButtonLink> : undefined}
+        actions={isHouseholdAdmin ? <ButtonLink to="/dishes/new">Add dish</ButtonLink> : undefined}
       >
         {error ? (
           <p className="error" role="alert">
@@ -142,7 +142,7 @@ export function DishListPage() {
           <EmptyState
             title="No dishes yet"
             description="Add your first dish to start building your library."
-            action={isAdmin ? <ButtonLink to="/dishes/new">Add dish</ButtonLink> : undefined}
+            action={isHouseholdAdmin ? <ButtonLink to="/dishes/new">Add dish</ButtonLink> : undefined}
           />
         ) : null}
 
