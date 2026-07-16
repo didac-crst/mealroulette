@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
 
 from fastapi import HTTPException, status
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session
 
 from mealroulette.auth.security import hash_password
@@ -40,10 +40,27 @@ class HouseholdMembershipService:
             or 0
         )
 
+    def _lock_active_admins(self, household_id: UUID) -> list[HouseholdMembership]:
+        return list(
+            self.db.scalars(
+                select(HouseholdMembership)
+                .where(
+                    HouseholdMembership.household_id == household_id,
+                    HouseholdMembership.active.is_(True),
+                    HouseholdMembership.role == HouseholdRole.household_admin,
+                )
+                .order_by(HouseholdMembership.id)
+                .with_for_update()
+            )
+        )
+
     def _ensure_not_last_admin(self, membership: HouseholdMembership) -> None:
         if membership.role != HouseholdRole.household_admin or not membership.active:
             return
-        if self.count_active_admins(membership.household_id) <= 1:
+        admins = self._lock_active_admins(membership.household_id)
+        if not any(admin.id == membership.id for admin in admins):
+            return
+        if len(admins) <= 1:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Household must retain at least one active admin",
@@ -61,19 +78,26 @@ class HouseholdMembershipService:
             )
         )
 
-    def get_membership(self, membership_id: UUID, household_id: UUID) -> HouseholdMembership:
-        membership = self.db.scalar(
-            select(HouseholdMembership).where(
-                HouseholdMembership.id == membership_id,
-                HouseholdMembership.household_id == household_id,
-            )
+    def get_membership(
+        self,
+        membership_id: UUID,
+        household_id: UUID,
+        *,
+        for_update: bool = False,
+    ) -> HouseholdMembership:
+        stmt = select(HouseholdMembership).where(
+            HouseholdMembership.id == membership_id,
+            HouseholdMembership.household_id == household_id,
         )
+        if for_update:
+            stmt = stmt.with_for_update()
+        membership = self.db.scalar(stmt)
         if membership is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Membership not found")
         return membership
 
     def update_member_role(self, membership_id: UUID, household_id: UUID, role: HouseholdRole) -> HouseholdMembership:
-        membership = self.get_membership(membership_id, household_id)
+        membership = self.get_membership(membership_id, household_id, for_update=True)
         if membership.role == HouseholdRole.household_admin and role != HouseholdRole.household_admin:
             self._ensure_not_last_admin(membership)
         membership.role = role
@@ -82,7 +106,7 @@ class HouseholdMembershipService:
         return membership
 
     def remove_member(self, membership_id: UUID, household_id: UUID) -> None:
-        membership = self.get_membership(membership_id, household_id)
+        membership = self.get_membership(membership_id, household_id, for_update=True)
         self._ensure_not_last_admin(membership)
         membership.active = False
         self.db.commit()
@@ -101,7 +125,7 @@ class HouseholdMembershipService:
         self.db.refresh(invitation)
         return invitation, token
 
-    def _load_valid_invitation(self, token: str) -> HouseholdInvitation:
+    def _reject_unclaimable_invitation(self, token: str, *, now: datetime) -> None:
         invitation = self.db.scalar(
             select(HouseholdInvitation).where(HouseholdInvitation.token_hash == _hash_token(token))
         )
@@ -111,12 +135,31 @@ class HouseholdMembershipService:
             raise HTTPException(status_code=status.HTTP_410_GONE, detail="Invitation revoked")
         if invitation.accepted_at is not None:
             raise HTTPException(status_code=status.HTTP_410_GONE, detail="Invitation already used")
-        if invitation.expires_at < datetime.now(UTC):
+        if invitation.expires_at < now:
             raise HTTPException(status_code=status.HTTP_410_GONE, detail="Invitation expired")
-        return invitation
+        raise HTTPException(status_code=status.HTTP_410_GONE, detail="Invitation already used")
+
+    def _claim_invitation(self, token: str) -> HouseholdInvitation:
+        """Atomically claim a valid invitation before membership/user side effects."""
+        now = datetime.now(UTC)
+        claimed = self.db.scalars(
+            update(HouseholdInvitation)
+            .where(
+                HouseholdInvitation.token_hash == _hash_token(token),
+                HouseholdInvitation.accepted_at.is_(None),
+                HouseholdInvitation.revoked_at.is_(None),
+                HouseholdInvitation.expires_at >= now,
+            )
+            .values(accepted_at=now)
+            .returning(HouseholdInvitation)
+        ).first()
+        if claimed is None:
+            self._reject_unclaimable_invitation(token, now=now)
+            raise AssertionError("unreachable")  # pragma: no cover
+        return claimed
 
     def accept_invitation_for_user(self, token: str, user: User) -> HouseholdMembership:
-        invitation = self._load_valid_invitation(token)
+        invitation = self._claim_invitation(token)
         self.household_service.ensure_single_active_membership(
             user.id,
             exclude_household_id=invitation.household_id,
@@ -141,7 +184,6 @@ class HouseholdMembershipService:
                 active=True,
             )
             self.db.add(membership)
-        invitation.accepted_at = datetime.now(UTC)
         invitation.accepted_by_user_id = user.id
         self.db.commit()
         self.db.refresh(membership)
@@ -155,7 +197,7 @@ class HouseholdMembershipService:
         email: str,
         password: str,
     ) -> User:
-        invitation = self._load_valid_invitation(token)
+        invitation = self._claim_invitation(token)
         self._assert_unique_identity(username, email)
         user = User(
             username=username,
@@ -174,7 +216,6 @@ class HouseholdMembershipService:
                 active=True,
             )
         )
-        invitation.accepted_at = datetime.now(UTC)
         invitation.accepted_by_user_id = user.id
         self.db.commit()
         self.db.refresh(user)
