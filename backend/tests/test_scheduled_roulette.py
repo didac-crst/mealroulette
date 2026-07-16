@@ -5,6 +5,7 @@ import pytest
 from fastapi import HTTPException
 
 from mealroulette.data.import_dishes import DEFAULT_FIXTURE_PATH, import_dish_fixtures
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID
 from mealroulette.models.scheduler import SCHEDULER_SETTINGS_ID, SchedulerSettings
 from mealroulette.services.planning import PlanningService
 from mealroulette.services.scheduled_roulette import ScheduledRouletteService
@@ -25,7 +26,7 @@ def test_target_week_start_offsets_from_reference_monday():
 
 def test_run_scheduled_skips_when_disabled(db_session, catalog_seed, scheduler_seed):
     service = ScheduledRouletteService(db_session)
-    row = service.settings_service.get_row()
+    row = service.settings_service.get_row(DEFAULT_HOUSEHOLD_ID)
     row.enabled = False
     db_session.commit()
 
@@ -36,7 +37,7 @@ def test_run_scheduled_skips_when_disabled(db_session, catalog_seed, scheduler_s
 def test_run_now_generates_next_week(db_session, catalog_seed, scheduler_seed):
     _seed(db_session)
     service = ScheduledRouletteService(db_session)
-    row = service.settings_service.get_row()
+    row = service.settings_service.get_row(DEFAULT_HOUSEHOLD_ID)
     row.enabled = True
     row.target_week_offset = 1
     db_session.commit()
@@ -78,7 +79,7 @@ def test_notify_telegram_sends_new_roulette_heading(db_session, catalog_seed, sc
     _seed(db_session)
     mock_client = MagicMock()
     service = ScheduledRouletteService(db_session, client=mock_client)
-    row = service.settings_service.get_row()
+    row = service.settings_service.get_row(DEFAULT_HOUSEHOLD_ID)
     row.notify_telegram = True
     row.notify_planning_days = 7
     db_session.commit()

@@ -2,11 +2,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
+from uuid import UUID
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from mealroulette.core.config import get_settings
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID
 from mealroulette.schemas.telegram import TelegramSendResult
 from mealroulette.services.planning import PlanningService
 from mealroulette.services.scheduler_settings import SchedulerSettingsService
@@ -27,23 +29,32 @@ class ScheduledRouletteResult:
 
 
 class ScheduledRouletteService:
-    def __init__(self, db: Session, client: TelegramClient | None = None) -> None:
+    def __init__(
+        self,
+        db: Session,
+        client: TelegramClient | None = None,
+        household_id: UUID = DEFAULT_HOUSEHOLD_ID,
+    ) -> None:
         self.db = db
+        self.household_id = household_id
         self.settings_service = SchedulerSettingsService(db)
-        self.planning_service = PlanningService(db)
-        self.scheduler_service = SchedulerService(db)
+        self.planning_service = PlanningService(db, household_id=household_id)
+        self.scheduler_service = SchedulerService(db, household_id=household_id)
         self.client = client or TelegramClient()
         self.on_demand_service = TelegramOnDemandService(db, self.client)
         self.telegram_settings_service = TelegramSettingsService(db)
 
     def run_scheduled(self, now: datetime | None = None) -> ScheduledRouletteResult | None:
-        settings_row = self.settings_service.get_row()
+        settings_row = self.settings_service.get_row(self.household_id)
         if not self.settings_service.should_run_scheduled(settings_row, now=now):
             return None
         return self._execute(settings_row)
 
-    def run_now(self) -> ScheduledRouletteResult:
-        return self._execute(self.settings_service.get_row())
+    def run_now(self, household_id: UUID | None = None) -> ScheduledRouletteResult:
+        if household_id is not None and household_id != self.household_id:
+            scoped = ScheduledRouletteService(self.db, client=self.client, household_id=household_id)
+            return scoped.run_now()
+        return self._execute(self.settings_service.get_row(self.household_id))
 
     def _execute(self, settings_row) -> ScheduledRouletteResult:
         telegram_settings = self.telegram_settings_service.get_row()
