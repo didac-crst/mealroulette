@@ -110,11 +110,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(
     async (username: string, password: string) => {
       const tokens = await authApi.login(username, password);
+      const me = await fetchMeWithRetry(tokens.access_token);
       saveTokens({
         accessToken: tokens.access_token,
         refreshToken: tokens.refresh_token,
       });
-      const me = await fetchMeWithRetry(tokens.access_token);
       applySession(tokens.access_token, me);
     },
     [applySession],
@@ -123,11 +123,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loginWithTelegramOtp = useCallback(
     async (username: string, code: string) => {
       const tokens = await authApi.verifyTelegramOtp(username, code);
+      const me = await fetchMeWithRetry(tokens.access_token);
       saveTokens({
         accessToken: tokens.access_token,
         refreshToken: tokens.refresh_token,
       });
-      const me = await fetchMeWithRetry(tokens.access_token);
       applySession(tokens.access_token, me);
     },
     [applySession],

@@ -34,6 +34,23 @@ describe("dishCatalogFilters", () => {
     expect(filterDishesByCatalog(dishes, "dessert").map((item) => item.id)).toEqual([4]);
   });
 
+  it("matches dessert via course when meal_composition is not dessert", () => {
+    const courseOnly = dish({ id: 10, meal_composition: "main_dish", course: "dessert" });
+    expect(filterDishesByCatalog([courseOnly], "dessert").map((item) => item.id)).toEqual([10]);
+  });
+
+  it("does not treat main_dish as dessert without dessert course", () => {
+    const main = dish({ id: 11, meal_composition: "main_dish", course: "main" });
+    expect(filterDishesByCatalog([main], "dessert")).toHaveLength(0);
+    expect(filterDishesByCatalog([main], "main_dish").map((item) => item.id)).toEqual([11]);
+  });
+
+  it("does not match sidedish filter for non-sidedish parts", () => {
+    const centerpiece = dish({ id: 12, meal_composition: "simple_dish", simple_dish_part: "centerpiece" });
+    const main = dish({ id: 13, meal_composition: "main_dish" });
+    expect(filterDishesByCatalog([centerpiece, main], "sidedish")).toHaveLength(0);
+  });
+
   it("always exposes All plus composition role chips", () => {
     expect(availableCatalogFilters(dishes)).toEqual([
       "all",

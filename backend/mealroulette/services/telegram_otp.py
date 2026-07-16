@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import hmac
 import secrets
 from datetime import UTC, datetime, timedelta
 from uuid import uuid4
@@ -17,7 +18,8 @@ from mealroulette.services.telegram_link import TelegramLinkService
 
 
 def _hash_code(code: str) -> str:
-    return hashlib.sha256(code.encode("utf-8")).hexdigest()
+    secret = get_settings().secret_key.encode("utf-8")
+    return hmac.new(secret, code.encode("utf-8"), hashlib.sha256).hexdigest()
 
 
 class TelegramOtpService:
@@ -25,6 +27,7 @@ class TelegramOtpService:
 
     OTP_TTL_MINUTES = 5
     OTP_DIGITS = 6
+    REQUEST_COOLDOWN_SECONDS = 60
     GENERIC_DETAIL = (
         "If that account exists and has Telegram linked, a login code was sent. "
         "It expires in a few minutes."
@@ -44,20 +47,38 @@ class TelegramOtpService:
         if link is None or not token:
             return
 
-        code = f"{secrets.randbelow(10**self.OTP_DIGITS):0{self.OTP_DIGITS}d}"
-        existing = self.db.scalar(select(TelegramLoginOtp).where(TelegramLoginOtp.user_id == user.id))
-        if existing is not None:
-            self.db.delete(existing)
-            self.db.flush()
-
-        self.db.add(
-            TelegramLoginOtp(
-                id=uuid4(),
-                user_id=user.id,
-                code_hash=_hash_code(code),
-                expires_at=datetime.now(UTC) + timedelta(minutes=self.OTP_TTL_MINUTES),
-            )
+        now = datetime.now(UTC)
+        existing = self.db.scalar(
+            select(TelegramLoginOtp).where(TelegramLoginOtp.user_id == user.id).with_for_update()
         )
+        if (
+            existing is not None
+            and existing.used_at is None
+            and existing.expires_at >= now
+            and (now - existing.created_at).total_seconds() < self.REQUEST_COOLDOWN_SECONDS
+        ):
+            # Keep the existing unused code; do not resend or invalidate.
+            self.db.commit()
+            return
+
+        code = f"{secrets.randbelow(10**self.OTP_DIGITS):0{self.OTP_DIGITS}d}"
+        code_hash = _hash_code(code)
+        expires_at = now + timedelta(minutes=self.OTP_TTL_MINUTES)
+        if existing is not None:
+            existing.code_hash = code_hash
+            existing.expires_at = expires_at
+            existing.used_at = None
+            existing.created_at = now
+        else:
+            self.db.add(
+                TelegramLoginOtp(
+                    id=uuid4(),
+                    user_id=user.id,
+                    code_hash=code_hash,
+                    expires_at=expires_at,
+                    created_at=now,
+                )
+            )
         self.db.commit()
 
         message = (
@@ -80,17 +101,20 @@ class TelegramOtpService:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid username or code",
             )
-        row = self.db.scalar(select(TelegramLoginOtp).where(TelegramLoginOtp.user_id == user.id))
+        now = datetime.now(UTC)
+        row = self.db.scalar(
+            select(TelegramLoginOtp).where(TelegramLoginOtp.user_id == user.id).with_for_update()
+        )
         if (
             row is None
             or row.used_at is not None
-            or row.expires_at < datetime.now(UTC)
-            or row.code_hash != _hash_code(code.strip())
+            or row.expires_at < now
+            or not hmac.compare_digest(row.code_hash, _hash_code(code.strip()))
         ):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid username or code",
             )
-        row.used_at = datetime.now(UTC)
+        row.used_at = now
         self.db.commit()
         return user

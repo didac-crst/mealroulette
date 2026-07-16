@@ -41,6 +41,21 @@ export function householdPrimaryNav(includeIngredients: boolean): AppNavItem[] {
   return [...PRIMARY_NAV, INGREDIENTS_NAV_ITEM];
 }
 
+export function resolvePrimaryNav({
+  hasHousehold,
+  isPlatformAdmin,
+  isHouseholdAdmin,
+}: {
+  hasHousehold: boolean;
+  isPlatformAdmin: boolean;
+  isHouseholdAdmin: boolean;
+}): AppNavItem[] {
+  if (!hasHousehold) {
+    return isPlatformAdmin ? PLATFORM_NAV : [];
+  }
+  return householdPrimaryNav(isPlatformAdmin || isHouseholdAdmin);
+}
+
 export const PLATFORM_ADMIN_NAV: AppNavItem[] = [
   { to: "/settings", label: "Settings", icon: "settings", end: false },
 ];

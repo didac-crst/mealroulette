@@ -7,20 +7,20 @@ import { useAuth } from "../features/auth/AuthContext";
 import { useReviewAttentionCount } from "../features/planning/useReviewAttentionCount";
 import { DesktopSidebar } from "./DesktopSidebar";
 import { MobileBottomNav } from "./MobileBottomNav";
-import { PLATFORM_NAV, householdPrimaryNav } from "./navigation";
+import { resolvePrimaryNav } from "./navigation";
 
 function isCookingModePath(pathname: string): boolean {
   return /^\/recipes\/\d+\/cook\/?$/.test(pathname);
 }
 
 export function AppShell() {
-  const { user, logout, hasHousehold, isHouseholdAdmin, accessToken } = useAuth();
+  const { user, logout, hasHousehold, isHouseholdAdmin, isPlatformAdmin, accessToken } = useAuth();
   const location = useLocation();
   const username = user?.username ?? "";
   const householdName = user?.active_household_name ?? null;
   const reviewAttention = useReviewAttentionCount(hasHousehold ? accessToken : null);
   const cookingMode = isCookingModePath(location.pathname);
-  const primaryNav = hasHousehold ? householdPrimaryNav(isHouseholdAdmin) : PLATFORM_NAV;
+  const primaryNav = resolvePrimaryNav({ hasHousehold, isPlatformAdmin, isHouseholdAdmin });
 
   return (
     <>

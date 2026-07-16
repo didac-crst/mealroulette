@@ -3,7 +3,9 @@ from uuid import uuid4
 
 import pytest
 
-from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID
+from sqlalchemy import select
+
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID, HouseholdNotificationSubscription
 from mealroulette.models.telegram import TelegramSubscriber, TelegramUserLink
 from mealroulette.services.household_membership import HouseholdMembershipService
 from mealroulette.services.telegram_link import TelegramLinkService
@@ -132,6 +134,37 @@ def test_start_with_link_token_links_user(db_session, admin_user, default_househ
     assert link is not None
     assert link.chat_id == "555"
     assert db_session.query(TelegramSubscriber).count() == 0
+
+    subscription = db_session.scalar(
+        select(HouseholdNotificationSubscription).where(
+            HouseholdNotificationSubscription.user_id == admin_user.id,
+            HouseholdNotificationSubscription.household_id == DEFAULT_HOUSEHOLD_ID,
+        )
+    )
+    assert subscription is not None
+
+
+@pytest.mark.integration
+def test_start_with_invalid_link_token_does_not_persist(db_session, admin_user):
+    client = MagicMock()
+    update_service = TelegramUpdateService(db_session, client=client)
+
+    handled = update_service._handle_update(
+        "fake-token",
+        {
+            "update_id": 6,
+            "message": {
+                "text": "/start link_not-a-real-token",
+                "chat": {"id": 556},
+                "from": {"id": 9, "username": "admin_tg", "first_name": "Admin"},
+            },
+        },
+    )
+    assert handled is True
+    reply = client.send_message.call_args.args[2]
+    assert "invalid or expired" in reply.lower()
+    assert TelegramLinkService(db_session).get_link_for_user(admin_user.id) is None
+    assert db_session.query(TelegramUserLink).count() == 0
 
 
 @pytest.mark.integration

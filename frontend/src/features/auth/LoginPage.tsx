@@ -19,6 +19,7 @@ export function LoginPage() {
   const [password, setPassword] = useState("");
   const [otpCode, setOtpCode] = useState("");
   const [otpSent, setOtpSent] = useState(false);
+  const [otpUsername, setOtpUsername] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -54,7 +55,9 @@ export function LoginPage() {
     setNotice(null);
     setSubmitting(true);
     try {
-      const result = await authApi.requestTelegramOtp(username);
+      const requestedUsername = username.trim();
+      const result = await authApi.requestTelegramOtp(requestedUsername);
+      setOtpUsername(requestedUsername);
       setOtpSent(true);
       setNotice(result.detail);
     } catch (err) {
@@ -70,7 +73,7 @@ export function LoginPage() {
     setNotice(null);
     setSubmitting(true);
     try {
-      await loginWithTelegramOtp(username, otpCode);
+      await loginWithTelegramOtp(otpUsername ?? username, otpCode);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Invalid code");
     } finally {
@@ -78,11 +81,20 @@ export function LoginPage() {
     }
   }
 
+  function resetOtpUsername() {
+    setOtpSent(false);
+    setOtpUsername(null);
+    setOtpCode("");
+    setNotice(null);
+    setError(null);
+  }
+
   function switchMode(next: LoginMode) {
     setMode(next);
     setError(null);
     setNotice(null);
     setOtpSent(false);
+    setOtpUsername(null);
     setOtpCode("");
     setPassword("");
   }
@@ -157,6 +169,8 @@ export function LoginPage() {
                   value={username}
                   onChange={(event) => setUsername(event.target.value)}
                   required
+                  readOnly={otpSent}
+                  disabled={otpSent}
                 />
               </label>
               {otpSent ? (
@@ -186,17 +200,7 @@ export function LoginPage() {
                 {otpSent ? (submitting ? "Signing in…" : "Sign in with code") : submitting ? "Sending…" : "Send code"}
               </Button>
               {otpSent ? (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  disabled={submitting}
-                  onClick={() => {
-                    setOtpSent(false);
-                    setOtpCode("");
-                    setNotice(null);
-                    setError(null);
-                  }}
-                >
+                <Button type="button" variant="ghost" disabled={submitting} onClick={resetOtpUsername}>
                   Use a different username
                 </Button>
               ) : null}
