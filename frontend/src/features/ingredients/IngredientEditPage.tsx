@@ -29,16 +29,7 @@ import {
 } from "../../components/ui";
 import { useFormSaveState } from "../../lib/useFormSaveState";
 import { useAuth } from "../auth/AuthContext";
-
-const AGGREGATION_STRATEGIES = [
-  { value: "", label: "Default" },
-  { value: "strict_same_dimension", label: "Strict same dimension" },
-  { value: "prefer_mass", label: "Prefer mass" },
-  { value: "prefer_volume", label: "Prefer volume" },
-  { value: "prefer_count", label: "Prefer count" },
-  { value: "allow_approximate_conversion", label: "Allow approximate conversion" },
-  { value: "never_convert_count", label: "Never convert count" },
-] as const;
+import { AGGREGATION_STRATEGIES } from "./aggregationStrategy";
 
 const CONFIDENCE_OPTIONS = ["exact", "high", "medium", "low", "not_recommended", "approximate", "measured"] as const;
 
@@ -107,7 +98,7 @@ export function IngredientEditPage() {
   const { ingredientId } = useParams();
   const isNew = !ingredientId;
   const navigate = useNavigate();
-  const { accessToken, isAdmin } = useAuth();
+  const { accessToken, isPlatformAdmin } = useAuth();
 
   const [form, setForm] = useState<IngredientInput>(emptyForm);
   const [detail, setDetail] = useState<IngredientDetail | null>(null);
@@ -135,10 +126,10 @@ export function IngredientEditPage() {
   });
 
   useEffect(() => {
-    if (!isAdmin) {
+    if (!isPlatformAdmin) {
       navigate("/ingredients");
     }
-  }, [isAdmin, navigate]);
+  }, [isPlatformAdmin, navigate]);
 
   useEffect(() => {
     if (!accessToken) {

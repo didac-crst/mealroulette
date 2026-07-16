@@ -10,6 +10,8 @@ vi.mock("./api/auth", () => ({
   refresh: vi.fn(),
   logout: vi.fn(),
   fetchMe: vi.fn(),
+  requestTelegramOtp: vi.fn(),
+  verifyTelegramOtp: vi.fn(),
 }));
 
 describe("LoginPage", () => {
@@ -28,5 +30,6 @@ describe("LoginPage", () => {
     expect(screen.getByLabelText("Username")).toBeInTheDocument();
     expect(screen.getByLabelText("Password")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Sign in" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "One Time Password" })).toBeInTheDocument();
   });
 });

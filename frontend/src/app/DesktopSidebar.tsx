@@ -3,12 +3,14 @@ import { NavLink } from "react-router-dom";
 import { NavigationAction } from "../components/ui";
 import { BrandLogo } from "../components/BrandLogo";
 import { NavIcon } from "./NavIcon";
-import { ADMIN_NAV, PRIMARY_NAV } from "./navigation";
+import { SETTINGS_NAV, type AppNavItem } from "./navigation";
 
 type DesktopSidebarProps = {
   username: string;
-  isAdmin: boolean;
-  showSettings?: boolean;
+  householdName?: string | null;
+  showSettings: boolean;
+  primaryNav: AppNavItem[];
+  platformAdminNav?: AppNavItem[];
   reviewAttention?: boolean;
   onSignOut: () => void;
 };
@@ -35,27 +37,26 @@ function SignOutIcon() {
 
 export function DesktopSidebar({
   username,
-  isAdmin,
+  householdName,
   showSettings,
+  primaryNav,
+  platformAdminNav = [],
   reviewAttention = false,
   onSignOut,
 }: DesktopSidebarProps) {
-  const settingsVisible = showSettings ?? isAdmin;
   return (
     <aside className="desktop-sidebar" aria-label="Application navigation">
       <div className="desktop-sidebar-brand">
         <BrandLogo variant="compact" />
         <div className="desktop-sidebar-brand-text">
           <span className="desktop-sidebar-product">MealRoulette</span>
-          <span className="desktop-sidebar-user muted">
-            {username}
-            {isAdmin ? " · admin" : ""}
-          </span>
+          {householdName ? <span className="desktop-sidebar-household muted">{householdName}</span> : null}
+          <span className="desktop-sidebar-user muted">{username}</span>
         </div>
       </div>
 
       <nav className="desktop-sidebar-nav" aria-label="Primary">
-        {PRIMARY_NAV.map(({ to, label, icon, end }) => (
+        {primaryNav.map(({ to, label, icon, end }) => (
           <NavLink
             key={to}
             to={to}
@@ -80,11 +81,32 @@ export function DesktopSidebar({
         ))}
       </nav>
 
-      {settingsVisible ? (
+      {platformAdminNav.length > 0 ? (
         <>
           <div className="desktop-sidebar-separator" role="presentation" />
-          <nav className="desktop-sidebar-nav" aria-label="Administration">
-            {ADMIN_NAV.map(({ to, label, icon, end }) => (
+          <nav className="desktop-sidebar-nav" aria-label="Platform">
+            {platformAdminNav.map(({ to, label, icon, end }) => (
+              <NavLink
+                key={to}
+                to={to}
+                end={end}
+                className={({ isActive }) =>
+                  `desktop-sidebar-link${isActive ? " desktop-sidebar-link-active" : ""}`
+                }
+              >
+                <NavIcon name={icon} />
+                <span>{label}</span>
+              </NavLink>
+            ))}
+          </nav>
+        </>
+      ) : null}
+
+      {showSettings ? (
+        <>
+          <div className="desktop-sidebar-separator" role="presentation" />
+          <nav className="desktop-sidebar-nav" aria-label="Settings">
+            {SETTINGS_NAV.map(({ to, label, icon, end }) => (
               <NavLink
                 key={to}
                 to={to}

@@ -18,6 +18,7 @@ type AuthContextValue = {
   accessToken: string | null;
   loading: boolean;
   login: (username: string, password: string) => Promise<void>;
+  loginWithTelegramOtp: (username: string, code: string) => Promise<void>;
   refreshUser: () => Promise<void>;
   logout: () => Promise<void>;
   isPlatformAdmin: boolean;
@@ -119,6 +120,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [applySession],
   );
 
+  const loginWithTelegramOtp = useCallback(
+    async (username: string, code: string) => {
+      const tokens = await authApi.verifyTelegramOtp(username, code);
+      saveTokens({
+        accessToken: tokens.access_token,
+        refreshToken: tokens.refresh_token,
+      });
+      const me = await fetchMeWithRetry(tokens.access_token);
+      applySession(tokens.access_token, me);
+    },
+    [applySession],
+  );
+
   const refreshUser = useCallback(async () => {
     const stored = loadTokens();
     if (!stored) {
@@ -170,6 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       accessToken,
       loading,
       login,
+      loginWithTelegramOtp,
       refreshUser,
       logout,
       isPlatformAdmin,
@@ -177,7 +192,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isHouseholdAdmin,
       isAdmin: isPlatformAdmin,
     };
-  }, [user, accessToken, loading, login, refreshUser, logout]);
+  }, [user, accessToken, loading, login, loginWithTelegramOtp, refreshUser, logout]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

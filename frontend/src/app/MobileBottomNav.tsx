@@ -1,16 +1,17 @@
 import { NavLink } from "react-router-dom";
 
 import { NavIcon } from "./NavIcon";
-import { PRIMARY_NAV } from "./navigation";
+import { PRIMARY_NAV, type AppNavItem } from "./navigation";
 
 type MobileBottomNavProps = {
+  navItems?: AppNavItem[];
   reviewAttention?: boolean;
 };
 
-export function MobileBottomNav({ reviewAttention = false }: MobileBottomNavProps) {
+export function MobileBottomNav({ navItems = PRIMARY_NAV, reviewAttention = false }: MobileBottomNavProps) {
   return (
     <nav className="mobile-bottom-nav" aria-label="Primary navigation">
-      {PRIMARY_NAV.map(({ to, label, icon, end }) => (
+      {navItems.map(({ to, label, icon, end }) => (
         <NavLink
           key={to}
           to={to}

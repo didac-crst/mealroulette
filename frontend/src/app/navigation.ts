@@ -1,4 +1,11 @@
-export type NavIconName = "today" | "plan" | "review" | "shopping" | "dishes" | "settings";
+export type NavIconName =
+  | "today"
+  | "plan"
+  | "review"
+  | "shopping"
+  | "dishes"
+  | "ingredients"
+  | "settings";
 
 export type AppNavItem = {
   to: string;
@@ -16,9 +23,34 @@ export const PRIMARY_NAV: AppNavItem[] = [
   { to: "/dishes", label: "Dishes", icon: "dishes", end: false },
 ];
 
-export const ADMIN_NAV: AppNavItem[] = [
+/** Household admins may browse the global ingredient catalog (read-only). */
+export const INGREDIENTS_NAV_ITEM: AppNavItem = {
+  to: "/ingredients",
+  label: "Ingredients",
+  icon: "ingredients",
+  end: false,
+};
+
+/** Platform operator without household membership — global catalog only. */
+export const PLATFORM_NAV: AppNavItem[] = [INGREDIENTS_NAV_ITEM];
+
+export function householdPrimaryNav(includeIngredients: boolean): AppNavItem[] {
+  if (!includeIngredients) {
+    return PRIMARY_NAV;
+  }
+  return [...PRIMARY_NAV, INGREDIENTS_NAV_ITEM];
+}
+
+export const PLATFORM_ADMIN_NAV: AppNavItem[] = [
   { to: "/settings", label: "Settings", icon: "settings", end: false },
 ];
+
+export const SETTINGS_NAV: AppNavItem[] = [
+  { to: "/settings", label: "Settings", icon: "settings", end: false },
+];
+
+/** @deprecated Use SETTINGS_NAV — settings is available to all users. */
+export const ADMIN_NAV: AppNavItem[] = SETTINGS_NAV;
 
 export function isNavActive(pathname: string, to: string, end = false): boolean {
   if (end) {

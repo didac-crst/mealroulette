@@ -53,10 +53,22 @@ export function NavIcon({ name }: NavIconProps) {
     case "dishes":
       return (
         <svg {...common}>
-          <path d="M5 10c0-3 2-5 7-5s7 2 7 5" />
-          <path d="M4 10h16v2a6 6 0 0 1-6 6H10a6 6 0 0 1-6-6v-2Z" />
-          <path d="M9 6c0-2 1.5-3 3-3s3 1 3 3" />
-          <path d="M8 4c.5-1 1.5-1.5 4-1.5s3.5.5 4 1.5" />
+          <path d="M4 17h16" />
+          <path d="M6 17a6 6 0 0 1 12 0" />
+          <path d="M12 8v-2" />
+          <path d="M9.75 6h4.5" />
+          <path d="M7.5 20h9" />
+        </svg>
+      );
+    case "ingredients":
+      return (
+        <svg {...common}>
+          <path d="M4 11.5C4 7.4 7.4 4 12 4s8 3.4 8 7.5c0 1.1-.9 2-2 2h-3.2l1.2 6.5H8l1.2-6.5H6c-1.1 0-2-.9-2-2Z" />
+          <path d="M9.2 13.5h5.6" />
+          <path d="M10.2 17h3.6" />
+          <path d="M7.5 9.5h.01" />
+          <path d="M12 7.8h.01" />
+          <path d="M16.5 9.5h.01" />
         </svg>
       );
     case "settings":

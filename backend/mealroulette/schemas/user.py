@@ -49,6 +49,15 @@ class ChangePasswordRequest(BaseModel):
     new_password: PasswordStr
 
 
+class TelegramOtpRequest(BaseModel):
+    username: str = Field(min_length=1, max_length=64)
+
+
+class TelegramOtpVerifyRequest(BaseModel):
+    username: str = Field(min_length=1, max_length=64)
+    code: str = Field(min_length=6, max_length=8)
+
+
 class UserPublic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

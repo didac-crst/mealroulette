@@ -4,8 +4,8 @@ type BrandLogoProps = {
 };
 
 const SIZES = {
-  compact: { width: 40, height: 40, className: "brand-logo-compact" },
-  login: { width: 160, height: 160, className: "brand-logo-login" },
+  compact: { width: 64, height: 64, className: "brand-logo-compact" },
+  login: { width: 200, height: 200, className: "brand-logo-login" },
 } as const;
 
 export function BrandLogo({ variant = "compact", className }: BrandLogoProps) {
@@ -20,6 +20,7 @@ export function BrandLogo({ variant = "compact", className }: BrandLogoProps) {
         alt=""
         width={size.width}
         height={size.height}
+        decoding="async"
         className="brand-logo-image"
       />
     </picture>

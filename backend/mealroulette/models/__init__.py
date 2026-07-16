@@ -43,7 +43,13 @@ from mealroulette.models.planning import MealPlan, MealPlanItem, MealPlanItemDis
 from mealroulette.models.scheduler import PlanningRule, SchedulerSettings
 from mealroulette.models.shopping import ShoppingList, ShoppingListItem
 from mealroulette.models.taxonomy import FoodGroup, IngredientFamily
-from mealroulette.models.telegram import TelegramLinkToken, TelegramSettings, TelegramSubscriber, TelegramUserLink
+from mealroulette.models.telegram import (
+    TelegramLinkToken,
+    TelegramLoginOtp,
+    TelegramSettings,
+    TelegramSubscriber,
+    TelegramUserLink,
+)
 from mealroulette.models.user import RefreshToken, User, UserRole
 
 __all__ = [
@@ -94,6 +100,7 @@ __all__ = [
     "ShoppingListStatus",
     "Tag",
     "TelegramLinkToken",
+    "TelegramLoginOtp",
     "TelegramSettings",
     "TelegramSubscriber",
     "TelegramUserLink",
