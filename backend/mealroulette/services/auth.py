@@ -232,6 +232,7 @@ class UserService:
             role=user.role,
             platform_roles=platform_roles,
             active_household_id=membership.household_id if membership is not None else None,
+            active_household_name=membership.household.name if membership is not None else None,
             household_role=membership.role if membership is not None else None,
             active=user.active,
             created_at=user.created_at,

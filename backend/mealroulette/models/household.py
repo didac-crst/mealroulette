@@ -65,6 +65,31 @@ class HouseholdMembership(Base):
     user: Mapped["User"] = relationship(back_populates="household_memberships")
 
 
+class HouseholdInvitation(Base):
+    __tablename__ = "household_invitations"
+    __table_args__ = (UniqueConstraint("token_hash", name="uq_household_invitations_token_hash"),)
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    household_id: Mapped[UUID] = mapped_column(
+        ForeignKey("households.id", ondelete="CASCADE"),
+        index=True,
+    )
+    token_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    created_by_user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    accepted_by_user_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    household: Mapped[Household] = relationship()
+    created_by: Mapped["User"] = relationship(foreign_keys=[created_by_user_id])
+    accepted_by: Mapped["User | None"] = relationship(foreign_keys=[accepted_by_user_id])
+
+
 class UserPlatformRole(Base):
     __tablename__ = "user_platform_roles"
     __table_args__ = (UniqueConstraint("user_id", "role", name="uq_user_platform_roles_user_role"),)
