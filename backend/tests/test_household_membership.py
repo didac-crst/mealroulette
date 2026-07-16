@@ -214,33 +214,48 @@ def test_invitation_token_rejected_after_first_use_accept(client, admin_token):
     assert created.status_code == 201
     token = created.json()["invite_url"].split("token=")[1]
 
-    invitee = client.post(
-        "/api/auth/register-with-invitation",
+    created_user = client.post(
+        "/api/users",
+        headers={"Authorization": f"Bearer {admin_token}"},
         json={
-            "token": token,
             "username": "accepteer",
             "email": "accepteer@example.com",
             "password": "acceptpass2",
+            "role": "user",
         },
     )
-    assert invitee.status_code == 201
+    assert created_user.status_code == 201
+    user_id = created_user.json()["id"]
 
-    other = client.post(
-        "/api/auth/register",
-        json={
-            "username": "accepttwo",
-            "email": "accepttwo@example.com",
-            "password": "acceptpass3",
-            "household_name": "Temp Two",
-        },
+    members = client.get("/api/household/members", headers={"Authorization": f"Bearer {admin_token}"})
+    assert members.status_code == 200
+    membership_id = next(row["membership_id"] for row in members.json() if row["user_id"] == user_id)
+    removed = client.delete(
+        f"/api/household/members/{membership_id}",
+        headers={"Authorization": f"Bearer {admin_token}"},
     )
-    assert other.status_code == 201
-    reuse = client.post(
+    assert removed.status_code == 204
+
+    login = client.post(
+        "/api/auth/login",
+        json={"username": "accepteer", "password": "acceptpass2"},
+    )
+    assert login.status_code == 200
+    invitee_headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+
+    first = client.post(
         "/api/household/invitations/accept",
-        headers={"Authorization": f"Bearer {other.json()['access_token']}"},
+        headers=invitee_headers,
         json={"token": token},
     )
-    assert reuse.status_code == 410
+    assert first.status_code == 204
+
+    second = client.post(
+        "/api/household/invitations/accept",
+        headers=invitee_headers,
+        json={"token": token},
+    )
+    assert second.status_code == 410
 
 
 def test_concurrent_register_with_invitation_claims_token_once(db_engine):
@@ -370,6 +385,94 @@ def test_concurrent_accept_invitation_claims_token_once(db_engine):
         results = [future.result() for future in as_completed(futures)]
 
     assert sorted(results) == [201, 410]
+
+
+def test_concurrent_same_user_two_invitation_tokens_keeps_one_membership(db_engine):
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    from uuid import uuid4
+
+    from fastapi import HTTPException
+    from sqlalchemy import func, select
+    from sqlalchemy.orm import sessionmaker
+
+    from mealroulette.auth.security import hash_password
+    from mealroulette.models.household import Household, HouseholdMembership, HouseholdRole
+    from mealroulette.models.user import User, UserRole
+    from mealroulette.services.household_membership import HouseholdMembershipService
+
+    SessionLocal = sessionmaker(bind=db_engine, autoflush=False, autocommit=False)
+    with SessionLocal() as setup:
+        invitee_suffix = uuid4().hex[:8]
+        invitee = User(
+            username=f"two-token-user-{invitee_suffix}",
+            email=f"two-token-user-{invitee_suffix}@example.com",
+            password_hash=hash_password("userpassword"),
+            role=UserRole.user,
+            active=True,
+        )
+        households = []
+        admins = []
+        tokens = []
+        for index in (1, 2):
+            household_id = uuid4()
+            household = Household(id=household_id, name=f"Two Token Home {index}")
+            admin = User(
+                username=f"two-token-admin-{index}-{household_id.hex[:8]}",
+                email=f"two-token-admin-{index}-{household_id.hex[:8]}@example.com",
+                password_hash=hash_password("adminpassword"),
+                role=UserRole.user,
+                active=True,
+            )
+            households.append(household)
+            admins.append(admin)
+        setup.add(invitee)
+        setup.add_all(households)
+        setup.add_all(admins)
+        setup.flush()
+        for household, admin in zip(households, admins, strict=True):
+            setup.add(
+                HouseholdMembership(
+                    household_id=household.id,
+                    user_id=admin.id,
+                    role=HouseholdRole.household_admin,
+                    active=True,
+                )
+            )
+        setup.commit()
+        for household, admin in zip(households, admins, strict=True):
+            _invitation, token = HouseholdMembershipService(setup).create_invitation(household.id, admin.id)
+            tokens.append(token)
+        invitee_id = invitee.id
+
+    barrier = __import__("threading").Barrier(2)
+
+    def race(token: str) -> int:
+        barrier.wait(timeout=5)
+        with SessionLocal() as session:
+            user = session.get(User, invitee_id)
+            assert user is not None
+            try:
+                HouseholdMembershipService(session).accept_invitation_for_user(token, user)
+                return 201
+            except HTTPException as exc:
+                return exc.status_code
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        futures = [pool.submit(race, token) for token in tokens]
+        results = [future.result() for future in as_completed(futures)]
+
+    assert sorted(results) == [201, 409]
+
+    with SessionLocal() as verify:
+        active_count = verify.scalar(
+            select(func.count())
+            .select_from(HouseholdMembership)
+            .where(
+                HouseholdMembership.user_id == invitee_id,
+                HouseholdMembership.active.is_(True),
+            )
+        )
+        assert active_count == 1
 
 
 def test_concurrent_last_admin_removal_keeps_one_admin(db_engine):
