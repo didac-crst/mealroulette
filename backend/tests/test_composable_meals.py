@@ -6,10 +6,10 @@ from mealroulette.data.import_dishes import DEFAULT_FIXTURE_PATH, import_dish_fi
 from mealroulette.services.planning import PlanningService
 
 
-def _today_or_future_item(plan: dict, *, client=None, user_headers=None) -> dict:
+def _future_item(plan: dict, *, client=None, user_headers=None) -> dict:
     today = date.today()
     for item in plan["items"]:
-        if date.fromisoformat(item["date"]) >= today:
+        if date.fromisoformat(item["date"]) > today:
             return item
     if client is not None and user_headers is not None:
         week_start = date.fromisoformat(plan["week_start_date"])
@@ -20,9 +20,9 @@ def _today_or_future_item(plan: dict, *, client=None, user_headers=None) -> dict
         if response.status_code == 200:
             next_plan = response.json()
             for item in next_plan["items"]:
-                if date.fromisoformat(item["date"]) >= today:
+                if date.fromisoformat(item["date"]) > today:
                     return item
-    raise AssertionError("expected at least one today-or-future meal slot")
+    raise AssertionError("expected at least one future meal slot")
 
 
 def _create_dish(client, admin_headers, name: str) -> dict:
@@ -45,7 +45,7 @@ def test_meal_slot_supports_multiple_manual_lines(client, catalog_seed, admin_he
     second = _create_dish(client, admin_headers, "Composable Side")
 
     plan = client.get("/api/meal-plans/current", headers=user_headers).json()
-    item = _today_or_future_item(plan, client=client, user_headers=user_headers)
+    item = _future_item(plan, client=client, user_headers=user_headers)
 
     assigned = client.post(
         "/api/meal-plan-items/assign",
@@ -86,7 +86,7 @@ def test_meal_slot_supports_multiple_manual_lines(client, catalog_seed, admin_he
 def test_do_not_plan_clears_lines_and_blocks_add(client, catalog_seed, admin_headers, user_headers):
     dish = _create_dish(client, admin_headers, "Do Not Plan Dish")
     plan = client.get("/api/meal-plans/current", headers=user_headers).json()
-    item = _today_or_future_item(plan, client=client, user_headers=user_headers)
+    item = _future_item(plan, client=client, user_headers=user_headers)
 
     client.post(
         "/api/meal-plan-items/assign",
@@ -126,7 +126,7 @@ def test_assign_add_mode_appends_line(client, catalog_seed, admin_headers, user_
     first = _create_dish(client, admin_headers, "Add Mode Main")
     second = _create_dish(client, admin_headers, "Add Mode Extra")
     plan = client.get("/api/meal-plans/current", headers=user_headers).json()
-    item = _today_or_future_item(plan, client=client, user_headers=user_headers)
+    item = _future_item(plan, client=client, user_headers=user_headers)
 
     client.post(
         "/api/meal-plan-items/assign",
@@ -155,7 +155,7 @@ def test_assign_add_mode_appends_line(client, catalog_seed, admin_headers, user_
 def test_do_not_plan_rejects_locked_slot(client, catalog_seed, admin_headers, user_headers):
     dish = _create_dish(client, admin_headers, "Locked Do Not Plan Dish")
     plan = client.get("/api/meal-plans/current", headers=user_headers).json()
-    item = _today_or_future_item(plan, client=client, user_headers=user_headers)
+    item = _future_item(plan, client=client, user_headers=user_headers)
 
     client.post(
         "/api/meal-plan-items/assign",
@@ -182,7 +182,7 @@ def test_add_line_rejects_duplicate_position(client, catalog_seed, admin_headers
     first = _create_dish(client, admin_headers, "Position Main")
     second = _create_dish(client, admin_headers, "Position Extra")
     plan = client.get("/api/meal-plans/current", headers=user_headers).json()
-    item = _today_or_future_item(plan, client=client, user_headers=user_headers)
+    item = _future_item(plan, client=client, user_headers=user_headers)
 
     client.post(
         "/api/meal-plan-items/assign",
@@ -211,7 +211,7 @@ def test_update_line_resolves_default_recipe_when_dish_changes(client, catalog_s
         json={"variant_name": "Alt", "is_main": False},
     ).json()
     plan = client.get("/api/meal-plans/current", headers=user_headers).json()
-    item = _today_or_future_item(plan, client=client, user_headers=user_headers)
+    item = _future_item(plan, client=client, user_headers=user_headers)
 
     assigned = client.post(
         "/api/meal-plan-items/assign",
@@ -242,7 +242,7 @@ def test_delete_line_reindexes_remaining_positions(client, catalog_seed, admin_h
     first = _create_dish(client, admin_headers, "Delete Line First")
     second = _create_dish(client, admin_headers, "Delete Line Second")
     plan = client.get("/api/meal-plans/current", headers=user_headers).json()
-    item = _today_or_future_item(plan, client=client, user_headers=user_headers)
+    item = _future_item(plan, client=client, user_headers=user_headers)
 
     client.post(
         "/api/meal-plan-items/assign",
@@ -279,7 +279,7 @@ def test_meal_traits_aggregate_across_fixture_dishes(client, catalog_seed, admin
     puttanesca = next(d for d in dishes if d["name"] == "Spaghetti Puttanesca")
 
     plan = client.get("/api/meal-plans/current", headers=user_headers).json()
-    item = _today_or_future_item(plan, client=client, user_headers=user_headers)
+    item = _future_item(plan, client=client, user_headers=user_headers)
 
     assigned = client.post(
         "/api/meal-plan-items/assign",

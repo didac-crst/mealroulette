@@ -2,6 +2,8 @@ from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 import bcrypt
+from uuid import UUID
+
 import jwt
 
 from mealroulette.core.config import settings
@@ -18,7 +20,7 @@ def verify_password(plain_password: str, password_hash: str) -> bool:
     return bcrypt.checkpw(plain_password.encode("utf-8"), password_hash.encode("utf-8"))
 
 
-def create_access_token(*, user_id: int, role: str) -> str:
+def create_access_token(*, user_id: UUID, role: str) -> str:
     expires_at = datetime.now(UTC) + timedelta(minutes=settings.access_token_expire_minutes)
     payload = {
         "sub": str(user_id),
@@ -29,7 +31,7 @@ def create_access_token(*, user_id: int, role: str) -> str:
     return jwt.encode(payload, settings.secret_key, algorithm=settings.jwt_algorithm)
 
 
-def create_refresh_token(*, user_id: int) -> tuple[str, str, datetime]:
+def create_refresh_token(*, user_id: UUID) -> tuple[str, str, datetime]:
     jti = uuid4().hex
     expires_at = datetime.now(UTC) + timedelta(days=settings.refresh_token_expire_days)
     payload = {

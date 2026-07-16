@@ -1,7 +1,9 @@
 from datetime import datetime
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
+from mealroulette.models.household import HouseholdRole, PlatformRole
 from mealroulette.models.user import UserRole
 
 
@@ -29,10 +31,13 @@ class LogoutRequest(BaseModel):
 class UserPublic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
+    id: UUID
     username: str
     email: EmailStr
     role: UserRole
+    platform_roles: list[PlatformRole] = Field(default_factory=list)
+    active_household_id: UUID | None = None
+    household_role: HouseholdRole | None = None
     active: bool
     created_at: datetime
     updated_at: datetime

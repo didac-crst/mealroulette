@@ -7,7 +7,9 @@ from sqlalchemy.orm import Session
 
 from mealroulette.auth.security import hash_password
 from mealroulette.core.config import settings
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID, DEFAULT_HOUSEHOLD_NAME, Household
 from mealroulette.models.user import User, UserRole
+from mealroulette.services.household import HouseholdService
 
 
 def bootstrap_admin(username: str, email: str, password: str) -> None:
@@ -19,6 +21,10 @@ def bootstrap_admin(username: str, email: str, password: str) -> None:
             print(f"Admin user '{username}' already exists.", file=sys.stderr)
             sys.exit(1)
 
+        if db.get(Household, DEFAULT_HOUSEHOLD_ID) is None:
+            db.add(Household(id=DEFAULT_HOUSEHOLD_ID, name=DEFAULT_HOUSEHOLD_NAME))
+            db.flush()
+
         user = User(
             username=username,
             email=email,
@@ -27,6 +33,8 @@ def bootstrap_admin(username: str, email: str, password: str) -> None:
             active=True,
         )
         db.add(user)
+        db.flush()
+        HouseholdService(db).provision_user_tenancy(user, legacy_role=UserRole.admin)
         db.commit()
         print(f"Created admin user '{username}'.")
 

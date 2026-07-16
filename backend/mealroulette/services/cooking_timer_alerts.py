@@ -3,6 +3,8 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, status
+from uuid import UUID
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -47,7 +49,7 @@ class CookingTimerAlertService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dish not found")
         return dish, recipe, step
 
-    def _cancel_pending_for_step(self, user_id: int, recipe_step_id: int) -> None:
+    def _cancel_pending_for_step(self, user_id: UUID, recipe_step_id: int) -> None:
         rows = self.db.scalars(
             select(CookingTimerAlert).where(
                 CookingTimerAlert.user_id == user_id,

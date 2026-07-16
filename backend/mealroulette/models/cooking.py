@@ -1,8 +1,10 @@
 import enum
 from datetime import datetime
+from uuid import UUID
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.types import Uuid
 
 from mealroulette.db.base import Base
 
@@ -18,7 +20,7 @@ class CookingTimerAlert(Base):
     __tablename__ = "cooking_timer_alerts"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    user_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     recipe_id: Mapped[int] = mapped_column(ForeignKey("recipes.id", ondelete="CASCADE"), nullable=False)
     recipe_step_id: Mapped[int] = mapped_column(ForeignKey("recipe_steps.id", ondelete="CASCADE"), nullable=False)
     step_number: Mapped[int] = mapped_column(Integer, nullable=False)

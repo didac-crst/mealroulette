@@ -1,12 +1,15 @@
 import { apiRequest } from "./client";
 
-export type UserRole = "admin" | "user";
+export type UserRole = "admin" | "user" | "platform_admin";
 
 export type UserPublic = {
-  id: number;
+  id: string;
   username: string;
   email: string;
   role: UserRole;
+  platform_roles: string[];
+  active_household_id: string | null;
+  household_role: string | null;
   active: boolean;
   created_at: string;
   updated_at: string;

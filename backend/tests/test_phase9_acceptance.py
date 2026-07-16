@@ -14,13 +14,23 @@ from mealroulette.models.scheduler import PlanningRule, SchedulerSettings, DEFAU
 from mealroulette.schemas.scheduler import PlanningRulesConfig
 
 
-def _future_lunch_item(plan: dict) -> dict:
-    from datetime import date
+def _future_lunch_item(plan: dict, *, client=None, user_headers=None) -> dict:
+    from datetime import date, timedelta
 
     today = date.today()
     for item in plan["items"]:
-        if item["meal_slot"] == "lunch" and item["date"] >= today.isoformat():
+        if item["meal_slot"] == "lunch" and item["date"] > today.isoformat():
             return item
+    if client is not None and user_headers is not None:
+        week_start = date.fromisoformat(plan["week_start_date"])
+        response = client.get(
+            f"/api/meal-plans/{(week_start + timedelta(days=7)).isoformat()}",
+            headers=user_headers,
+        )
+        if response.status_code == 200:
+            for item in response.json()["items"]:
+                if item["meal_slot"] == "lunch" and item["date"] > today.isoformat():
+                    return item
     pytest.fail("expected a future lunch slot")
 
 
@@ -108,7 +118,7 @@ def test_meal_plan_item_effective_traits(client, catalog_seed, admin_headers, us
     ).json()
 
     plan = client.get("/api/meal-plans/current", headers=user_headers).json()
-    item = _future_lunch_item(plan)
+    item = _future_lunch_item(plan, client=client, user_headers=user_headers)
     assign = client.post(
         "/api/meal-plan-items/assign",
         headers=user_headers,

@@ -1,10 +1,12 @@
 from datetime import UTC, datetime
+from uuid import UUID
 
 from fastapi import HTTPException, status
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from mealroulette.auth.dependencies import parse_token_user_id, utcnow
+from mealroulette.auth.roles import access_token_role, user_is_platform_admin
 from mealroulette.auth.security import (
     DUMMY_PASSWORD_HASH,
     create_access_token,
@@ -13,8 +15,10 @@ from mealroulette.auth.security import (
     hash_password,
     verify_password,
 )
+from mealroulette.models.household import HouseholdRole, PlatformRole, UserPlatformRole
 from mealroulette.models.user import RefreshToken, User, UserRole
 from mealroulette.schemas.user import UserCreateRequest, UserPublic, UserUpdateRequest
+from mealroulette.services.household import HouseholdService
 
 
 class AuthService:
@@ -42,7 +46,7 @@ class AuthService:
         return user
 
     def issue_tokens(self, user: User) -> tuple[str, str]:
-        access_token = create_access_token(user_id=user.id, role=user.role.value)
+        access_token = create_access_token(user_id=user.id, role=access_token_role(self.db, user))
         refresh_token, jti, expires_at = create_refresh_token(user_id=user.id)
         self.db.add(RefreshToken(user_id=user.id, token_jti=jti, expires_at=expires_at))
         self.db.commit()
@@ -109,25 +113,36 @@ class AuthService:
 class UserService:
     def __init__(self, db: Session):
         self.db = db
+        self.household_service = HouseholdService(db)
 
-    def _active_admin_count(self) -> int:
-        return self.db.scalar(
-            select(func.count())
-            .select_from(User)
-            .where(User.role == UserRole.admin, User.active.is_(True))
-        ) or 0
+    def _active_platform_admin_count(self) -> int:
+        stmt = (
+            select(func.count(User.id))
+            .where(
+                User.active.is_(True),
+                (User.role == UserRole.admin)
+                | (
+                    User.id.in_(
+                        select(UserPlatformRole.user_id).where(
+                            UserPlatformRole.role == PlatformRole.platform_admin
+                        )
+                    )
+                ),
+            )
+        )
+        return self.db.scalar(stmt) or 0
 
     def _ensure_not_last_active_admin(self, user: User) -> None:
-        if user.role == UserRole.admin and user.active and self._active_admin_count() <= 1:
+        if user.active and user_is_platform_admin(self.db, user) and self._active_platform_admin_count() <= 1:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Cannot remove or demote the last active admin",
             )
 
     def list_users(self) -> list[User]:
-        return list(self.db.scalars(select(User).order_by(User.id)))
+        return list(self.db.scalars(select(User).order_by(User.created_at)))
 
-    def get_user(self, user_id: int) -> User:
+    def get_user(self, user_id: UUID) -> User:
         user = self.db.get(User, user_id)
         if user is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
@@ -147,14 +162,16 @@ class UserService:
             active=payload.active,
         )
         self.db.add(user)
+        self.db.flush()
+        self.household_service.provision_user_tenancy(user, legacy_role=payload.role)
         self.db.commit()
         self.db.refresh(user)
         return user
 
-    def update_user(self, user_id: int, payload: UserUpdateRequest) -> User:
+    def update_user(self, user_id: UUID, payload: UserUpdateRequest) -> User:
         user = self.get_user(user_id)
 
-        demoting_admin = user.role == UserRole.admin and user.active and (
+        demoting_admin = user.active and user_is_platform_admin(self.db, user) and (
             (payload.role is not None and payload.role != UserRole.admin)
             or (payload.active is not None and not payload.active)
         )
@@ -170,6 +187,7 @@ class UserService:
             user.password_hash = hash_password(payload.password)
         if payload.role is not None:
             user.role = payload.role
+            self._sync_tenancy_roles(user)
         if payload.active is not None:
             user.active = payload.active
 
@@ -178,12 +196,44 @@ class UserService:
         self.db.refresh(user)
         return user
 
-    def delete_user(self, user_id: int) -> None:
+    def delete_user(self, user_id: UUID) -> None:
         user = self.get_user(user_id)
         self._ensure_not_last_active_admin(user)
         self.db.delete(user)
         self.db.commit()
 
-    @staticmethod
-    def to_public(user: User) -> UserPublic:
-        return UserPublic.model_validate(user)
+    def _sync_tenancy_roles(self, user: User) -> None:
+        membership = self.household_service.active_household_membership(user.id)
+        if membership is not None:
+            membership.role = (
+                HouseholdRole.household_admin
+                if user.role == UserRole.admin
+                else HouseholdRole.household_member
+            )
+        if user.role == UserRole.admin:
+            self.household_service._ensure_platform_admin(user.id)
+        else:
+            self.db.execute(
+                delete(UserPlatformRole).where(
+                    UserPlatformRole.user_id == user.id,
+                    UserPlatformRole.role == PlatformRole.platform_admin,
+                )
+            )
+
+    def to_public(self, user: User) -> UserPublic:
+        platform_roles = self.household_service.list_platform_roles(user.id)
+        if user.role == UserRole.admin and PlatformRole.platform_admin not in platform_roles:
+            platform_roles = [*platform_roles, PlatformRole.platform_admin]
+        membership = self.household_service.active_household_membership(user.id)
+        return UserPublic(
+            id=user.id,
+            username=user.username,
+            email=user.email,
+            role=user.role,
+            platform_roles=platform_roles,
+            active_household_id=membership.household_id if membership is not None else None,
+            household_role=membership.role if membership is not None else None,
+            active=user.active,
+            created_at=user.created_at,
+            updated_at=user.updated_at,
+        )
