@@ -59,12 +59,6 @@ const HOUSEHOLD_TILES: SettingsTileConfig[] = [
     description: "Name, invite links, members, and roles.",
     icon: <SettingsHouseholdIcon />,
   },
-  {
-    to: "/settings/telegram/household",
-    title: "Household Telegram",
-    description: "Enable notifications and shopping-list format for the household.",
-    icon: <SettingsTelegramIcon />,
-  },
 ];
 
 const INTEGRATION_TILES: SettingsTileConfig[] = [

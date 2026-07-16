@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from mealroulette.core.config import get_settings
 from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID, Household
+from mealroulette.models.user import User
 from mealroulette.services.household import HouseholdService
 from mealroulette.services.telegram_client import TelegramApiError, TelegramClient
 from mealroulette.services.telegram_html_utils import esc
@@ -24,11 +25,22 @@ logger = logging.getLogger(__name__)
 
 MIGRATE_SUBSCRIBE_MESSAGE = (
     "MealRoulette no longer uses /subscribe.\n"
-    "Link your account from Settings → Telegram in the app."
+    "Open Settings → Telegram in the app and scan the QR code (or open the link) to connect your account."
 )
 MIGRATE_UNSUBSCRIBE_MESSAGE = (
     "MealRoulette no longer uses /unsubscribe.\n"
-    "Unlink Telegram or turn off notifications in Settings → Telegram."
+    "Unlink Telegram from Settings → Telegram in the app to stop account notifications."
+)
+
+HELP_MESSAGE_HTML = (
+    "<b>MealRoulette</b>\n\n"
+    "Link from Settings → Telegram in the app, then:\n"
+    "• /planning [days] — planned meals\n"
+    "• /reminder [days] — planning + ingredients\n"
+    "• /shopping [days] — shopping totals\n"
+    "• Tap a dish in planning for the full recipe\n"
+    "• /help — this message\n\n"
+    "<i>Days default to 3.</i>"
 )
 
 HELP_COMMANDS = {"/help"}
@@ -129,14 +141,8 @@ class TelegramUpdateService:
             self.client.send_message(
                 token,
                 chat_id,
-                "MealRoulette bot\n\n"
-                "Commands:\n"
-                "• Link your account from Settings → Telegram in the app\n"
-                "• /planning [days] — planned meals (default: 3 days)\n"
-                "• /reminder [days] — planning + ingredients (default: 3 days)\n"
-                "• /shopping [days] — shopping totals only (default: 3 days)\n"
-                "• Tap a dish name in planning to open its full recipe\n"
-                "• /help — this message",
+                HELP_MESSAGE_HTML,
+                parse_mode="HTML",
             )
             return True
 
@@ -237,12 +243,11 @@ class TelegramUpdateService:
             self.client.send_message(
                 token,
                 chat_id,
-                "That link is invalid or expired. Create a new one in Settings → Telegram.",
+                "This link token is invalid or expired. Generate a new one from MealRoulette settings.",
             )
             return True
 
         membership = HouseholdService(self.db).active_household_membership(link.user_id)
-        lines = ["Telegram linked to your MealRoulette account."]
         if membership is not None:
             from mealroulette.services.household_membership import HouseholdMembershipService
 
@@ -250,9 +255,25 @@ class TelegramUpdateService:
                 link.user_id, membership.household_id
             )
             self.db.commit()
+
+        user = self.db.get(User, link.user_id)
+        username_html = esc(user.username if user is not None else "unknown")
+        lines = [
+            "<b>Welcome to MealRoulette</b>",
+            "",
+            "You're linked.",
+            f"Signed in as <b>{username_html}</b>",
+        ]
+        if membership is not None:
             household = self.db.get(Household, membership.household_id)
             household_name = household.name if household is not None else "your household"
             lines.append(f"Household <b>{esc(household_name)}</b>")
+        lines.extend(
+            [
+                "",
+                "Notifications follow Settings → Telegram.",
+            ]
+        )
         self.client.send_message(token, chat_id, "\n".join(lines), parse_mode="HTML")
         return True
 
