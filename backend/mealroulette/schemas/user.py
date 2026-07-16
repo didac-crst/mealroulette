@@ -37,6 +37,7 @@ class UserPublic(BaseModel):
     role: UserRole
     platform_roles: list[PlatformRole] = Field(default_factory=list)
     active_household_id: UUID | None = None
+    active_household_name: str | None = None
     household_role: HouseholdRole | None = None
     active: bool
     created_at: datetime

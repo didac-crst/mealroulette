@@ -367,3 +367,34 @@ def test_migration_035_scopes_and_renames_legacy_meal_ratings():
     finally:
         get_settings.cache_clear()
         engine.dispose()
+
+
+def test_migration_036_creates_household_invitations_table():
+    database_url = _migration_database_url()
+    _ensure_migration_database(database_url)
+    _configure_migration_settings(database_url)
+    engine = create_engine(database_url, pool_pre_ping=True)
+
+    try:
+        _reset_database(engine)
+        alembic_config = _alembic_config(database_url)
+        command.upgrade(alembic_config, "035_meal_reviews_household_user")
+
+        command.upgrade(alembic_config, "036_household_invitations")
+
+        with engine.connect() as connection:
+            invitations_exists = connection.execute(
+                text(
+                    """
+                    SELECT EXISTS (
+                        SELECT 1
+                        FROM information_schema.tables
+                        WHERE table_schema = 'public' AND table_name = 'household_invitations'
+                    )
+                    """
+                )
+            ).scalar_one()
+            assert invitations_exists is True
+    finally:
+        get_settings.cache_clear()
+        engine.dispose()

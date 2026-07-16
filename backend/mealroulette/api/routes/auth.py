@@ -12,7 +12,9 @@ from mealroulette.schemas.user import (
     TokenResponse,
     UserPublic,
 )
+from mealroulette.schemas.household import RegisterRequest, RegisterWithInvitationRequest
 from mealroulette.services.auth import AuthService, UserService
+from mealroulette.services.household_membership import HouseholdMembershipService
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -49,6 +51,30 @@ def refresh(payload: RefreshRequest, db: Session = Depends(get_db)) -> TokenResp
 @router.post("/logout", status_code=204)
 def logout(payload: LogoutRequest, db: Session = Depends(get_db)) -> None:
     AuthService(db).logout(payload.refresh_token)
+
+
+@router.post("/register", response_model=TokenResponse, status_code=201)
+def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> TokenResponse:
+    user = HouseholdMembershipService(db).register_new_household(
+        username=payload.username,
+        email=payload.email,
+        password=payload.password,
+        household_name=payload.household_name,
+    )
+    access_token, refresh_token = AuthService(db).issue_tokens(user)
+    return TokenResponse(access_token=access_token, refresh_token=refresh_token)
+
+
+@router.post("/register-with-invitation", response_model=TokenResponse, status_code=201)
+def register_with_invitation(payload: RegisterWithInvitationRequest, db: Session = Depends(get_db)) -> TokenResponse:
+    user = HouseholdMembershipService(db).register_with_invitation(
+        token=payload.token,
+        username=payload.username,
+        email=payload.email,
+        password=payload.password,
+    )
+    access_token, refresh_token = AuthService(db).issue_tokens(user)
+    return TokenResponse(access_token=access_token, refresh_token=refresh_token)
 
 
 @router.get("/me", response_model=UserPublic)
