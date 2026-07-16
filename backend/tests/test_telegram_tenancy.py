@@ -236,3 +236,79 @@ def test_concurrent_link_token_consumption_claims_once(db_engine):
     with SessionLocal() as session:
         link = TelegramLinkService(session).get_link_for_user(user_id)
         assert link is not None
+
+def test_ensure_notification_subscription_is_idempotent(db_session, admin_user):
+    service = HouseholdMembershipService(db_session)
+    first = service.ensure_notification_subscription(admin_user.id, DEFAULT_HOUSEHOLD_ID)
+    second = service.ensure_notification_subscription(admin_user.id, DEFAULT_HOUSEHOLD_ID)
+    assert first.id == second.id
+    db_session.commit()
+    rows = list(
+        db_session.scalars(
+            select(HouseholdNotificationSubscription).where(
+                HouseholdNotificationSubscription.user_id == admin_user.id,
+                HouseholdNotificationSubscription.household_id == DEFAULT_HOUSEHOLD_ID,
+            )
+        )
+    )
+    assert len(rows) == 1
+
+
+def test_concurrent_ensure_notification_subscription_creates_one_row(db_engine):
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+
+    from sqlalchemy.orm import sessionmaker
+
+    from mealroulette.auth.security import hash_password
+    from mealroulette.models.user import User, UserRole
+
+    SessionLocal = sessionmaker(bind=db_engine, autoflush=False, autocommit=False)
+    household_id = uuid4()
+    with SessionLocal() as setup:
+        household = Household(id=household_id, name="Subscription race household")
+        user = User(
+            username=f"sub-race-{household_id.hex[:8]}",
+            email=f"sub-race-{household_id.hex[:8]}@example.com",
+            password_hash=hash_password("password123"),
+            role=UserRole.user,
+            active=True,
+        )
+        setup.add(household)
+        setup.add(user)
+        setup.flush()
+        setup.add(
+            HouseholdMembership(
+                household_id=household_id,
+                user_id=user.id,
+                role=HouseholdRole.household_member,
+                active=True,
+            )
+        )
+        setup.commit()
+        user_id = user.id
+
+    barrier = Barrier(2)
+
+    def race() -> str:
+        barrier.wait(timeout=5)
+        with SessionLocal() as session:
+            row = HouseholdMembershipService(session).ensure_notification_subscription(user_id, household_id)
+            session.commit()
+            return str(row.id)
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        ids = list(pool.map(lambda _: race(), range(2)))
+
+    assert ids[0] == ids[1]
+    with SessionLocal() as session:
+        rows = list(
+            session.scalars(
+                select(HouseholdNotificationSubscription).where(
+                    HouseholdNotificationSubscription.user_id == user_id,
+                    HouseholdNotificationSubscription.household_id == household_id,
+                )
+            )
+        )
+        assert len(rows) == 1
+

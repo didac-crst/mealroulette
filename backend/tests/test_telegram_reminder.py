@@ -1,13 +1,15 @@
+from datetime import UTC, datetime, time
 from unittest.mock import MagicMock
 from uuid import uuid4
 
 import pytest
 from fastapi import HTTPException
+from sqlalchemy import select
 
-from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID, HouseholdNotificationSubscription
 from mealroulette.models.telegram import TelegramUserLink
 from mealroulette.services.household_membership import HouseholdMembershipService
-from mealroulette.services.telegram_client import TelegramClient
+from mealroulette.services.telegram_client import TelegramApiError, TelegramClient
 from mealroulette.services.telegram_reminder import TelegramReminderService
 from mealroulette.services.telegram_settings import TelegramSettingsService
 
@@ -25,6 +27,15 @@ def _enable_and_link(db_session, user, chat_id: str = "12345") -> None:
     )
     HouseholdMembershipService(db_session).ensure_notification_subscription(user.id, DEFAULT_HOUSEHOLD_ID)
     db_session.commit()
+
+
+def _subscription(db_session, user):
+    return db_session.scalar(
+        select(HouseholdNotificationSubscription).where(
+            HouseholdNotificationSubscription.user_id == user.id,
+            HouseholdNotificationSubscription.household_id == DEFAULT_HOUSEHOLD_ID,
+        )
+    )
 
 
 @pytest.mark.integration
@@ -82,22 +93,6 @@ def test_send_daily_reminder_disabled_raises_http_exception(db_session, catalog_
 
     assert exc_info.value.status_code == 400
     client.send_message.assert_not_called()
-
-
-from datetime import UTC, datetime, time
-
-from mealroulette.models.household import HouseholdNotificationSubscription
-from mealroulette.services.telegram_client import TelegramApiError
-from sqlalchemy import select
-
-
-def _subscription(db_session, user):
-    return db_session.scalar(
-        select(HouseholdNotificationSubscription).where(
-            HouseholdNotificationSubscription.user_id == user.id,
-            HouseholdNotificationSubscription.household_id == DEFAULT_HOUSEHOLD_ID,
-        )
-    )
 
 
 @pytest.mark.integration
@@ -170,5 +165,6 @@ def test_run_scheduled_reminder_releases_claim_on_send_failure(db_session, admin
     service = TelegramReminderService(db_session, client=client)
     now = datetime(2026, 7, 16, 8, 0, tzinfo=UTC)
     assert service.run_scheduled_reminder(now=now) == []
+    client.send_message.assert_called_once()
     db_session.refresh(sub)
     assert sub.last_reminder_sent_at is None

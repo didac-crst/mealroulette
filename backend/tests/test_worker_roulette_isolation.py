@@ -11,6 +11,7 @@ def test_run_scheduled_roulette_continues_after_household_failure():
     first = MagicMock(household_id=uuid4())
     second = MagicMock(household_id=uuid4())
     ok_result = MagicMock(assignments_count=2, week_start_date="2026-07-06")
+    services: dict = {}
 
     with (
         patch("mealroulette.worker._session_factory") as session_factory,
@@ -22,6 +23,7 @@ def test_run_scheduled_roulette_continues_after_household_failure():
 
         def factory(_db, household_id=None, **_kwargs):
             service = MagicMock()
+            services[household_id] = service
             if household_id == first.household_id:
                 service.run_scheduled.side_effect = RuntimeError("boom")
             else:
@@ -32,3 +34,5 @@ def test_run_scheduled_roulette_continues_after_household_failure():
         run_scheduled_roulette()
 
     assert roulette_cls.call_count == 2
+    services[first.household_id].run_scheduled.assert_called_once_with()
+    services[second.household_id].run_scheduled.assert_called_once_with()
