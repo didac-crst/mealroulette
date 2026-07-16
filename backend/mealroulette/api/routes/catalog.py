@@ -1,7 +1,12 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from mealroulette.auth.dependencies import get_current_admin, get_current_user
+from mealroulette.auth.dependencies import (
+    get_catalog_service,
+    get_current_household_admin,
+    get_current_platform_admin,
+    get_current_user,
+)
 from mealroulette.db.session import get_db
 from mealroulette.models.user import User
 from mealroulette.schemas.catalog import (
@@ -65,7 +70,7 @@ def list_tags(
 @router.post("/tags", response_model=TagPublic, status_code=201)
 def create_tag(
     payload: TagCreateRequest,
-    _admin: User = Depends(get_current_admin),
+    _admin: User = Depends(get_current_platform_admin),
     db: Session = Depends(get_db),
 ) -> TagPublic:
     return TagPublic.model_validate(CatalogService(db).create_tag(payload))
@@ -84,7 +89,7 @@ def get_tag(
 def update_tag(
     tag_id: int,
     payload: TagUpdateRequest,
-    _admin: User = Depends(get_current_admin),
+    _admin: User = Depends(get_current_platform_admin),
     db: Session = Depends(get_db),
 ) -> TagPublic:
     return TagPublic.model_validate(CatalogService(db).update_tag(tag_id, payload))
@@ -93,7 +98,7 @@ def update_tag(
 @router.delete("/tags/{tag_id}", status_code=204)
 def delete_tag(
     tag_id: int,
-    _admin: User = Depends(get_current_admin),
+    _admin: User = Depends(get_current_platform_admin),
     db: Session = Depends(get_db),
 ) -> None:
     CatalogService(db).delete_tag(tag_id)
@@ -121,7 +126,7 @@ def resolve_ingredient(
 @router.post("/ingredients/confirm", response_model=IngredientPublic, status_code=201)
 def confirm_ingredient(
     payload: IngredientConfirmRequest,
-    _admin: User = Depends(get_current_admin),
+    _admin: User = Depends(get_current_platform_admin),
     db: Session = Depends(get_db),
 ) -> IngredientPublic:
     service = CatalogService(db)
@@ -140,7 +145,7 @@ def confirm_ingredient(
 @router.post("/ingredients", response_model=IngredientPublic, status_code=201)
 def create_ingredient(
     payload: IngredientCreateRequest,
-    _admin: User = Depends(get_current_admin),
+    _admin: User = Depends(get_current_platform_admin),
     db: Session = Depends(get_db),
 ) -> IngredientPublic:
     service = CatalogService(db)
@@ -161,7 +166,7 @@ def get_ingredient(
 def update_ingredient(
     ingredient_id: int,
     payload: IngredientUpdateRequest,
-    _admin: User = Depends(get_current_admin),
+    _admin: User = Depends(get_current_platform_admin),
     db: Session = Depends(get_db),
 ) -> IngredientPublic:
     service = CatalogService(db)
@@ -171,7 +176,7 @@ def update_ingredient(
 @router.delete("/ingredients/{ingredient_id}", status_code=204)
 def delete_ingredient(
     ingredient_id: int,
-    _admin: User = Depends(get_current_admin),
+    _admin: User = Depends(get_current_platform_admin),
     db: Session = Depends(get_db),
 ) -> None:
     CatalogService(db).delete_ingredient(ingredient_id)
@@ -193,7 +198,7 @@ def list_ingredient_aliases(
 def create_ingredient_alias(
     ingredient_id: int,
     payload: IngredientAliasCreateRequest,
-    _admin: User = Depends(get_current_admin),
+    _admin: User = Depends(get_current_platform_admin),
     db: Session = Depends(get_db),
 ) -> IngredientAliasPublic:
     return IngredientAliasPublic.model_validate(
@@ -204,7 +209,7 @@ def create_ingredient_alias(
 @router.delete("/ingredient-aliases/{alias_id}", status_code=204)
 def delete_ingredient_alias(
     alias_id: int,
-    _admin: User = Depends(get_current_admin),
+    _admin: User = Depends(get_current_platform_admin),
     db: Session = Depends(get_db),
 ) -> None:
     CatalogService(db).delete_alias(alias_id)
@@ -231,7 +236,7 @@ def list_ingredient_conversions(
 def create_ingredient_conversion(
     ingredient_id: int,
     payload: IngredientUnitConversionCreateRequest,
-    _admin: User = Depends(get_current_admin),
+    _admin: User = Depends(get_current_platform_admin),
     db: Session = Depends(get_db),
 ) -> IngredientUnitConversionPublic:
     service = CatalogService(db)
@@ -245,7 +250,7 @@ def create_ingredient_conversion(
 def update_ingredient_conversion(
     conversion_id: int,
     payload: IngredientUnitConversionUpdateRequest,
-    _admin: User = Depends(get_current_admin),
+    _admin: User = Depends(get_current_platform_admin),
     db: Session = Depends(get_db),
 ) -> IngredientUnitConversionPublic:
     service = CatalogService(db)
@@ -255,7 +260,7 @@ def update_ingredient_conversion(
 @router.delete("/ingredient-conversions/{conversion_id}", status_code=204)
 def delete_ingredient_conversion(
     conversion_id: int,
-    _admin: User = Depends(get_current_admin),
+    _admin: User = Depends(get_current_platform_admin),
     db: Session = Depends(get_db),
 ) -> None:
     CatalogService(db).delete_conversion(conversion_id)
@@ -265,56 +270,54 @@ def delete_ingredient_conversion(
 def list_dishes(
     active_only: bool = False,
     _user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    service: CatalogService = Depends(get_catalog_service),
 ) -> list[DishPublic]:
-    service = CatalogService(db)
     return service.list_dishes_public(active_only)
 
 
 @router.post("/dishes", response_model=DishPublic, status_code=201)
 def create_dish(
     payload: DishCreateRequest,
-    _admin: User = Depends(get_current_admin),
-    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_household_admin),
+    service: CatalogService = Depends(get_catalog_service),
 ) -> DishPublic:
-    return CatalogService(db).to_dish_public(CatalogService(db).create_dish(payload))
+    return service.to_dish_public(service.create_dish(payload))
 
 
 @router.get("/dishes/{dish_id}", response_model=DishPublic)
 def get_dish(
     dish_id: int,
     _user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    service: CatalogService = Depends(get_catalog_service),
 ) -> DishPublic:
-    return CatalogService(db).to_dish_public(CatalogService(db).get_dish(dish_id))
+    return service.to_dish_public(service.get_dish(dish_id))
 
 
 @router.put("/dishes/{dish_id}", response_model=DishPublic)
 def update_dish(
     dish_id: int,
     payload: DishUpdateRequest,
-    _admin: User = Depends(get_current_admin),
-    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_household_admin),
+    service: CatalogService = Depends(get_catalog_service),
 ) -> DishPublic:
-    return CatalogService(db).to_dish_public(CatalogService(db).update_dish(dish_id, payload))
+    return service.to_dish_public(service.update_dish(dish_id, payload))
 
 
 @router.delete("/dishes/{dish_id}", status_code=204)
 def delete_dish(
     dish_id: int,
-    _admin: User = Depends(get_current_admin),
-    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_household_admin),
+    service: CatalogService = Depends(get_catalog_service),
 ) -> None:
-    CatalogService(db).delete_dish(dish_id)
+    service.delete_dish(dish_id)
 
 
 @router.get("/dishes/{dish_id}/recipes", response_model=list[RecipePublic])
 def list_recipes(
     dish_id: int,
     _user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    service: CatalogService = Depends(get_catalog_service),
 ) -> list[RecipePublic]:
-    service = CatalogService(db)
     return service.list_recipes_public(dish_id)
 
 
@@ -322,10 +325,9 @@ def list_recipes(
 def create_recipe(
     dish_id: int,
     payload: RecipeCreateRequest,
-    _admin: User = Depends(get_current_admin),
-    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_household_admin),
+    service: CatalogService = Depends(get_catalog_service),
 ) -> RecipePublic:
-    service = CatalogService(db)
     return service.to_recipe_public(service.create_recipe(dish_id, payload))
 
 
@@ -333,9 +335,8 @@ def create_recipe(
 def get_recipe_by_public_key(
     public_key: str,
     _user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    service: CatalogService = Depends(get_catalog_service),
 ) -> RecipePublic:
-    service = CatalogService(db)
     return service.to_recipe_public(service.get_recipe_by_public_key(public_key))
 
 
@@ -343,9 +344,8 @@ def get_recipe_by_public_key(
 def get_recipe(
     recipe_id: int,
     _user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    service: CatalogService = Depends(get_catalog_service),
 ) -> RecipePublic:
-    service = CatalogService(db)
     return service.to_recipe_public(service.get_recipe(recipe_id))
 
 
@@ -353,69 +353,68 @@ def get_recipe(
 def update_recipe(
     recipe_id: int,
     payload: RecipeUpdateRequest,
-    _admin: User = Depends(get_current_admin),
-    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_household_admin),
+    service: CatalogService = Depends(get_catalog_service),
 ) -> RecipePublic:
-    service = CatalogService(db)
     return service.to_recipe_public(service.update_recipe(recipe_id, payload))
 
 
 @router.delete("/recipes/{recipe_id}", status_code=204)
 def delete_recipe(
     recipe_id: int,
-    _admin: User = Depends(get_current_admin),
-    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_household_admin),
+    service: CatalogService = Depends(get_catalog_service),
 ) -> None:
-    CatalogService(db).delete_recipe(recipe_id)
+    service.delete_recipe(recipe_id)
 
 
 @router.get("/recipes/{recipe_id}/steps", response_model=list[RecipeStepPublic])
 def list_recipe_steps(
     recipe_id: int,
     _user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    service: CatalogService = Depends(get_catalog_service),
 ) -> list[RecipeStepPublic]:
-    return [RecipeStepPublic.model_validate(step) for step in CatalogService(db).list_steps(recipe_id)]
+    return [RecipeStepPublic.model_validate(step) for step in service.list_steps(recipe_id)]
 
 
 @router.post("/recipes/{recipe_id}/steps", response_model=RecipeStepPublic, status_code=201)
 def create_recipe_step(
     recipe_id: int,
     payload: RecipeStepCreateRequest,
-    _admin: User = Depends(get_current_admin),
-    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_household_admin),
+    service: CatalogService = Depends(get_catalog_service),
 ) -> RecipeStepPublic:
-    return RecipeStepPublic.model_validate(CatalogService(db).create_step(recipe_id, payload))
+    return RecipeStepPublic.model_validate(service.create_step(recipe_id, payload))
 
 
 @router.put("/recipe-steps/{step_id}", response_model=RecipeStepPublic)
 def update_recipe_step(
     step_id: int,
     payload: RecipeStepUpdateRequest,
-    _admin: User = Depends(get_current_admin),
-    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_household_admin),
+    service: CatalogService = Depends(get_catalog_service),
 ) -> RecipeStepPublic:
-    return RecipeStepPublic.model_validate(CatalogService(db).update_step(step_id, payload))
+    return RecipeStepPublic.model_validate(service.update_step(step_id, payload))
 
 
 @router.delete("/recipe-steps/{step_id}", status_code=204)
 def delete_recipe_step(
     step_id: int,
-    _admin: User = Depends(get_current_admin),
-    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_household_admin),
+    service: CatalogService = Depends(get_catalog_service),
 ) -> None:
-    CatalogService(db).delete_step(step_id)
+    service.delete_step(step_id)
 
 
 @router.get("/recipes/{recipe_id}/ingredients", response_model=list[RecipeIngredientPublic])
 def list_recipe_ingredients(
     recipe_id: int,
     _user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    service: CatalogService = Depends(get_catalog_service),
 ) -> list[RecipeIngredientPublic]:
     return [
         RecipeIngredientPublic.model_validate(item)
-        for item in CatalogService(db).list_recipe_ingredients(recipe_id)
+        for item in service.list_recipe_ingredients(recipe_id)
     ]
 
 
@@ -423,11 +422,11 @@ def list_recipe_ingredients(
 def add_recipe_ingredient(
     recipe_id: int,
     payload: RecipeIngredientCreateRequest,
-    _admin: User = Depends(get_current_admin),
-    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_household_admin),
+    service: CatalogService = Depends(get_catalog_service),
 ) -> RecipeIngredientPublic:
     return RecipeIngredientPublic.model_validate(
-        CatalogService(db).add_recipe_ingredient(recipe_id, payload)
+        service.add_recipe_ingredient(recipe_id, payload)
     )
 
 
@@ -435,18 +434,18 @@ def add_recipe_ingredient(
 def update_recipe_ingredient(
     item_id: int,
     payload: RecipeIngredientUpdateRequest,
-    _admin: User = Depends(get_current_admin),
-    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_household_admin),
+    service: CatalogService = Depends(get_catalog_service),
 ) -> RecipeIngredientPublic:
     return RecipeIngredientPublic.model_validate(
-        CatalogService(db).update_recipe_ingredient(item_id, payload)
+        service.update_recipe_ingredient(item_id, payload)
     )
 
 
 @router.delete("/recipe-ingredients/{item_id}", status_code=204)
 def delete_recipe_ingredient(
     item_id: int,
-    _admin: User = Depends(get_current_admin),
-    db: Session = Depends(get_db),
+    _admin: User = Depends(get_current_household_admin),
+    service: CatalogService = Depends(get_catalog_service),
 ) -> None:
-    CatalogService(db).delete_recipe_ingredient(item_id)
+    service.delete_recipe_ingredient(item_id)

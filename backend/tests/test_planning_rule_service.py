@@ -1,13 +1,14 @@
 import pytest
 
 from mealroulette.data.default_planning_rules import DEFAULT_PLANNING_RULES_JSON
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID
 from mealroulette.schemas.scheduler import PlanningRuleUpdateRequest, PlanningRulesConfig
 from mealroulette.services.planning_rule_service import PlanningRuleService
 
 
 @pytest.mark.integration
 def test_active_planning_rules_seeded(db_session, scheduler_seed):
-    public = PlanningRuleService(db_session).get_active_public()
+    public = PlanningRuleService(db_session, household_id=DEFAULT_HOUSEHOLD_ID).get_active_public()
 
     assert public.name == "default"
     assert public.active is True
@@ -19,7 +20,7 @@ def test_active_planning_rules_seeded(db_session, scheduler_seed):
 
 @pytest.mark.integration
 def test_update_active_planning_rules(db_session, scheduler_seed):
-    service = PlanningRuleService(db_session)
+    service = PlanningRuleService(db_session, household_id=DEFAULT_HOUSEHOLD_ID)
     updated = service.update_active(
         PlanningRuleUpdateRequest(
             rules=PlanningRulesConfig(

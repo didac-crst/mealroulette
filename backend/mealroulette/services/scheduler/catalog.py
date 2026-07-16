@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 from datetime import date, timedelta
+from uuid import UUID
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from mealroulette.models.catalog import Dish, Ingredient, Recipe, RecipeIngredient, Unit
 from mealroulette.models.enums import DishStatus, MealComposition, MealPlanItemStatus, SeasonalityMode
-from mealroulette.models.planning import MealPlanItem, MealRating
+from mealroulette.models.planning import MealPlan, MealPlanItem, MealReview
 from mealroulette.schemas.scheduler import PlanningRulesConfig
 from mealroulette.services.recipe_traits import compute_recipe_traits_now
 from mealroulette.services.quantities import UnitInfo
@@ -27,17 +28,22 @@ def load_reference_units(db: Session) -> tuple[UnitInfo, UnitInfo]:
     return unit_info_from_model(gram), unit_info_from_model(milliliter)
 
 
-def load_average_ratings(db: Session) -> dict[int, float]:
-    rows = db.execute(select(MealRating.dish_id, func.avg(MealRating.rating)).group_by(MealRating.dish_id))
+def load_average_ratings(db: Session, *, household_id: UUID) -> dict[int, float]:
+    rows = db.execute(
+        select(MealReview.dish_id, func.avg(MealReview.rating))
+        .join(Dish, MealReview.dish_id == Dish.id)
+        .where(Dish.household_id == household_id)
+        .group_by(MealReview.dish_id)
+    )
     return {dish_id: float(avg) for dish_id, avg in rows.all() if avg is not None}
 
 
-def load_dish_candidates(db: Session, *, rules: PlanningRulesConfig) -> list[DishCandidate]:
+def load_dish_candidates(db: Session, *, rules: PlanningRulesConfig, household_id: UUID) -> list[DishCandidate]:
     gram_unit, ml_unit = load_reference_units(db)
-    ratings = load_average_ratings(db)
+    ratings = load_average_ratings(db, household_id=household_id)
     dishes = db.scalars(
         select(Dish)
-        .where(Dish.status == DishStatus.active)
+        .where(Dish.status == DishStatus.active, Dish.household_id == household_id)
         .options(
             selectinload(Dish.tags),
             selectinload(Dish.seasonality),
@@ -122,12 +128,15 @@ def load_eaten_meal_snapshots(
     before_date: date,
     window_days: int,
     rules: PlanningRulesConfig,
+    household_id: UUID,
 ) -> list[EatenMealSnapshot]:
     gram_unit, ml_unit = load_reference_units(db)
     earliest = before_date - timedelta(days=window_days)
     items = db.scalars(
         select(MealPlanItem)
+        .join(MealPlan, MealPlanItem.meal_plan_id == MealPlan.id)
         .where(
+            MealPlan.household_id == household_id,
             MealPlanItem.status == MealPlanItemStatus.eaten,
             MealPlanItem.date >= earliest,
             MealPlanItem.date < before_date,

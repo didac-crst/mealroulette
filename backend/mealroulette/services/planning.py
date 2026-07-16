@@ -1,5 +1,6 @@
 from datetime import date, datetime, timedelta, timezone
 from dataclasses import dataclass
+from uuid import UUID
 
 from fastapi import HTTPException, status
 from sqlalchemy import select
@@ -16,7 +17,8 @@ from mealroulette.models.enums import (
     MealPlanStatus,
     MealSlot,
 )
-from mealroulette.models.planning import MealPlan, MealPlanItem, MealPlanItemDish, MealRating
+from mealroulette.models.planning import MealPlan, MealPlanItem, MealPlanItemDish, MealReview
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID
 from mealroulette.services.household_time import household_local_today
 from mealroulette.services.meal_plan_lines import (
     compute_meal_title,
@@ -70,8 +72,9 @@ class _MealPackageSnapshot:
 
 
 class PlanningService:
-    def __init__(self, db: Session) -> None:
+    def __init__(self, db: Session, household_id: UUID = DEFAULT_HOUSEHOLD_ID) -> None:
         self.db = db
+        self.household_id = household_id
 
     @staticmethod
     def _meal_plan_item_trait_options() -> tuple:
@@ -178,7 +181,7 @@ class PlanningService:
         *,
         reference_date: date | None = None,
     ) -> bool:
-        effective_date = reference_date or household_local_today(self.db)
+        effective_date = reference_date or household_local_today(self.db, self.household_id)
         current_week_start = self.week_start_for(effective_date)
         return (
             clear_stale_reroll_history(
@@ -205,7 +208,7 @@ class PlanningService:
     def _load_plan(self, plan_id: int) -> MealPlan:
         plan = self.db.scalar(
             select(MealPlan)
-            .where(MealPlan.id == plan_id)
+            .where(MealPlan.id == plan_id, MealPlan.household_id == self.household_id)
             .options(
                 selectinload(MealPlan.items).options(*self._meal_plan_item_trait_options()),
             )
@@ -219,10 +222,10 @@ class PlanningService:
     def _load_item(self, item_id: int) -> MealPlanItem:
         item = self.db.scalar(
             select(MealPlanItem)
-            .where(MealPlanItem.id == item_id)
+            .join(MealPlan, MealPlanItem.meal_plan_id == MealPlan.id)
+            .where(MealPlanItem.id == item_id, MealPlan.household_id == self.household_id)
             .options(
                 *self._meal_plan_item_trait_options(),
-                selectinload(MealPlanItem.meal_rating),
             )
         )
         if item is None:
@@ -259,7 +262,10 @@ class PlanningService:
     def _load_plan_by_week_start(self, week_start: date) -> MealPlan | None:
         return self.db.scalar(
             select(MealPlan)
-            .where(MealPlan.week_start_date == week_start)
+            .where(
+                MealPlan.week_start_date == week_start,
+                MealPlan.household_id == self.household_id,
+            )
             .options(
                 selectinload(MealPlan.items).options(*self._meal_plan_item_trait_options()),
             )
@@ -273,7 +279,11 @@ class PlanningService:
                 self.db.commit()
             return plan
 
-        plan = MealPlan(week_start_date=normalized, status=status)
+        plan = MealPlan(
+            week_start_date=normalized,
+            status=status,
+            household_id=self.household_id,
+        )
         self.db.add(plan)
         self.db.flush()
         self._scaffold_items(plan, normalized)
@@ -288,7 +298,7 @@ class PlanningService:
         return self._load_plan(plan.id)
 
     def get_current_plan(self) -> MealPlanPublic:
-        plan = self.get_or_create_plan(household_local_today(self.db))
+        plan = self.get_or_create_plan(household_local_today(self.db, self.household_id))
         return self.to_plan_public(plan)
 
     def get_plan_by_week(self, week_start: date) -> MealPlanPublic:
@@ -297,10 +307,19 @@ class PlanningService:
 
     def create_plan(self, payload: MealPlanCreateRequest) -> MealPlanPublic:
         normalized = self.week_start_for(payload.week_start_date)
-        existing = self.db.scalar(select(MealPlan).where(MealPlan.week_start_date == normalized))
+        existing = self.db.scalar(
+            select(MealPlan).where(
+                MealPlan.week_start_date == normalized,
+                MealPlan.household_id == self.household_id,
+            )
+        )
         if existing is not None:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Meal plan for this week already exists")
-        plan = MealPlan(week_start_date=normalized, status=payload.status)
+        plan = MealPlan(
+            week_start_date=normalized,
+            status=payload.status,
+            household_id=self.household_id,
+        )
         self.db.add(plan)
         self.db.flush()
         self._scaffold_items(plan, normalized)
@@ -315,6 +334,9 @@ class PlanningService:
         return self.to_plan_public(self._load_plan(plan.id))
 
     def _resolve_recipe_for_dish(self, dish_id: int, recipe_id: int | None) -> int | None:
+        dish = self.db.get(Dish, dish_id)
+        if dish is None or dish.household_id != self.household_id:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dish not found")
         if recipe_id is not None:
             recipe = self.db.get(Recipe, recipe_id)
             if recipe is None or recipe.dish_id != dish_id:
@@ -366,7 +388,7 @@ class PlanningService:
         position: int | None = None,
     ) -> MealPlanItemDish:
         dish = self.db.get(Dish, dish_id)
-        if dish is None:
+        if dish is None or dish.household_id != self.household_id:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dish not found")
         resolved_recipe_id = self._resolve_recipe_for_dish(dish_id, recipe_id)
         resolved_position = self._resolve_line_position(item, position)
@@ -531,7 +553,11 @@ class PlanningService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="A meal cannot be its own leftover source",
             )
-        source = self.db.get(MealPlanItem, source_id)
+        source = self.db.scalar(
+            select(MealPlanItem)
+            .join(MealPlan, MealPlanItem.meal_plan_id == MealPlan.id)
+            .where(MealPlanItem.id == source_id, MealPlan.household_id == self.household_id)
+        )
         if source is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Leftover source meal not found")
         if not is_leftover_source_candidate(
@@ -625,7 +651,7 @@ class PlanningService:
         self.db.commit()
         return self.to_item_public(self._load_item(item.id))
 
-    def reset_status_to_planned(self, item_id: int) -> MealPlanItemPublic:
+    def reset_status_to_planned(self, item_id: int, *, user_id: UUID) -> MealPlanItemPublic:
         item = self._load_item(item_id)
         if item.status == MealPlanItemStatus.planned:
             return self.to_item_public(item)
@@ -635,22 +661,36 @@ class PlanningService:
         item.skip_reason = None
         item.skip_comment = None
         item.review_saved_at = None
-        rating = self.db.scalar(select(MealRating).where(MealRating.meal_plan_item_id == item.id))
+        rating = self.db.scalar(
+            select(MealReview).where(
+                MealReview.meal_plan_item_id == item.id,
+                MealReview.user_id == user_id,
+            )
+        )
         if rating is not None:
             self.db.delete(rating)
         self.db.commit()
         return self.to_item_public(self._load_item(item.id))
 
-    def get_meal_rating(self, item_id: int) -> MealRatingPublic | None:
+    def get_meal_rating(self, item_id: int, *, user_id: UUID) -> MealRatingPublic | None:
         item = self._load_item(item_id)
-        if item.meal_rating is None:
-            rating = self.db.scalar(select(MealRating).where(MealRating.meal_plan_item_id == item.id))
-            if rating is None:
-                return None
-            return MealRatingPublic.model_validate(rating)
-        return MealRatingPublic.model_validate(item.meal_rating)
+        rating = self.db.scalar(
+            select(MealReview).where(
+                MealReview.meal_plan_item_id == item.id,
+                MealReview.user_id == user_id,
+            )
+        )
+        if rating is None:
+            return None
+        return MealRatingPublic.model_validate(rating)
 
-    def upsert_meal_rating(self, item_id: int, payload: MealRatingCreateRequest) -> MealRatingUpsertResponse:
+    def upsert_meal_rating(
+        self,
+        item_id: int,
+        payload: MealRatingCreateRequest,
+        *,
+        user_id: UUID,
+    ) -> MealRatingUpsertResponse:
         item = self._load_item(item_id)
         self._assert_can_execute(item)
         if item.status not in _EATEN_STATUSES:
@@ -663,10 +703,17 @@ class PlanningService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Cannot rate a meal without a dish",
             )
-        rating = self.db.scalar(select(MealRating).where(MealRating.meal_plan_item_id == item.id))
+        rating = self.db.scalar(
+            select(MealReview).where(
+                MealReview.meal_plan_item_id == item.id,
+                MealReview.user_id == user_id,
+            )
+        )
         if rating is None:
-            rating = MealRating(
+            rating = MealReview(
+                household_id=self.household_id,
                 meal_plan_item_id=item.id,
+                user_id=user_id,
                 dish_id=item.dish_id,
                 recipe_id=item.recipe_id,
                 rating=payload.rating,
@@ -690,14 +737,16 @@ class PlanningService:
         gram_unit, ml_unit = load_reference_units(self.db)
         items = self.db.scalars(
             select(MealPlanItem)
+            .join(MealPlan, MealPlanItem.meal_plan_id == MealPlan.id)
             .where(
+                MealPlan.household_id == self.household_id,
                 MealPlanItem.status.in_(
                     [
                         MealPlanItemStatus.eaten,
                         MealPlanItemStatus.skipped,
                         MealPlanItemStatus.ate_leftovers,
                     ]
-                )
+                ),
             )
             .options(*self._meal_plan_item_trait_options())
             .order_by(MealPlanItem.date.desc(), MealPlanItem.meal_slot.desc())
@@ -771,7 +820,7 @@ class PlanningService:
                 detail="Cannot swap a meal with itself",
             )
 
-        reference_date = household_local_today(self.db)
+        reference_date = household_local_today(self.db, self.household_id)
         for item in (source, target):
             if item.is_locked:
                 raise HTTPException(
@@ -809,7 +858,7 @@ class PlanningService:
         recipe_id: int | None = None,
         mode: str = "replace_all",
     ) -> MealPlanItemPublic:
-        reference_date = household_local_today(self.db)
+        reference_date = household_local_today(self.db, self.household_id)
         if meal_date < reference_date:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -942,7 +991,9 @@ class PlanningService:
     def _load_line(self, line_id: int) -> MealPlanItemDish:
         line = self.db.scalar(
             select(MealPlanItemDish)
-            .where(MealPlanItemDish.id == line_id)
+            .join(MealPlanItem, MealPlanItemDish.meal_plan_item_id == MealPlanItem.id)
+            .join(MealPlan, MealPlanItem.meal_plan_id == MealPlan.id)
+            .where(MealPlanItemDish.id == line_id, MealPlan.household_id == self.household_id)
             .options(
                 selectinload(MealPlanItemDish.meal_plan_item).options(*self._meal_plan_item_trait_options()),
                 selectinload(MealPlanItemDish.dish),

@@ -2,11 +2,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
+from uuid import UUID
 
 from fastapi import HTTPException
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from mealroulette.core.config import get_settings
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID
+from mealroulette.models.planning import MealPlan, MealPlanItem
 from mealroulette.schemas.telegram import TelegramSendResult
 from mealroulette.services.planning import PlanningService
 from mealroulette.services.scheduler_settings import SchedulerSettingsService
@@ -27,23 +31,32 @@ class ScheduledRouletteResult:
 
 
 class ScheduledRouletteService:
-    def __init__(self, db: Session, client: TelegramClient | None = None) -> None:
+    def __init__(
+        self,
+        db: Session,
+        client: TelegramClient | None = None,
+        household_id: UUID = DEFAULT_HOUSEHOLD_ID,
+    ) -> None:
         self.db = db
+        self.household_id = household_id
         self.settings_service = SchedulerSettingsService(db)
-        self.planning_service = PlanningService(db)
-        self.scheduler_service = SchedulerService(db)
+        self.planning_service = PlanningService(db, household_id=household_id)
+        self.scheduler_service = SchedulerService(db, household_id=household_id)
         self.client = client or TelegramClient()
         self.on_demand_service = TelegramOnDemandService(db, self.client)
         self.telegram_settings_service = TelegramSettingsService(db)
 
     def run_scheduled(self, now: datetime | None = None) -> ScheduledRouletteResult | None:
-        settings_row = self.settings_service.get_row()
+        settings_row = self.settings_service.get_row(self.household_id)
         if not self.settings_service.should_run_scheduled(settings_row, now=now):
             return None
         return self._execute(settings_row)
 
-    def run_now(self) -> ScheduledRouletteResult:
-        return self._execute(self.settings_service.get_row())
+    def run_now(self, household_id: UUID | None = None) -> ScheduledRouletteResult:
+        if household_id is not None and household_id != self.household_id:
+            scoped = ScheduledRouletteService(self.db, client=self.client, household_id=household_id)
+            return scoped.run_now()
+        return self._execute(self.settings_service.get_row(self.household_id))
 
     def _execute(self, settings_row) -> ScheduledRouletteResult:
         telegram_settings = self.telegram_settings_service.get_row()
@@ -83,6 +96,8 @@ class ScheduledRouletteService:
         if not TelegramSettingsService.bot_token_configured():
             return None
 
+        # TelegramSubscriber remains installation-global in this Phase 15B slice.
+        # Household-scoped recipients land in a later Telegram tenancy slice.
         chat_ids = self.telegram_settings_service.subscribers.list_chat_ids()
         if not chat_ids:
             return None
@@ -91,9 +106,22 @@ class ScheduledRouletteService:
         days = settings_row.notify_planning_days
         from_date = week_start
         to_date = week_start + timedelta(days=days - 1)
-        items = self.on_demand_service.list_planning_items(from_date, to_date)
+        items = list(
+            self.db.scalars(
+                select(MealPlanItem)
+                .join(MealPlan, MealPlanItem.meal_plan_id == MealPlan.id)
+                .where(
+                    MealPlan.household_id == self.household_id,
+                    MealPlanItem.date >= from_date,
+                    MealPlanItem.date <= to_date,
+                )
+                .options(*PlanningService._meal_plan_item_trait_options())
+                .order_by(MealPlanItem.date, MealPlanItem.meal_slot)
+            )
+        )
+        public_items = [self.planning_service.to_item_public(item) for item in items]
         message = format_planning_message_html(
-            items,
+            public_items,
             from_date=from_date,
             to_date=to_date,
             days=days,

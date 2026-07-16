@@ -10,6 +10,7 @@ from mealroulette.services.public_keys import (
 )
 from mealroulette.services.scheduler.catalog import load_dish_candidates
 from mealroulette.data.default_planning_rules import DEFAULT_PLANNING_RULES_JSON
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID
 from mealroulette.models.scheduler import PlanningRule, SchedulerSettings, DEFAULT_PLANNING_RULE_ID, SCHEDULER_SETTINGS_ID
 from mealroulette.schemas.scheduler import PlanningRulesConfig
 
@@ -137,6 +138,7 @@ def test_meal_plan_item_effective_traits(client, catalog_seed, admin_headers, us
 @pytest.mark.integration
 def test_scheduler_candidate_includes_traits(db_session, catalog_seed, scheduler_seed):
     dish = Dish(
+        household_id=DEFAULT_HOUSEHOLD_ID,
         public_key=generate_dish_public_key("Scheduler Traits"),
         name="Scheduler Traits",
         course=DishCourse.main,
@@ -160,17 +162,18 @@ def test_scheduler_candidate_includes_traits(db_session, catalog_seed, scheduler
         db_session.add(
             PlanningRule(
                 id=DEFAULT_PLANNING_RULE_ID,
+                household_id=DEFAULT_HOUSEHOLD_ID,
                 name="default",
                 active=True,
                 rules_json=DEFAULT_PLANNING_RULES_JSON,
             )
         )
     if db_session.get(SchedulerSettings, SCHEDULER_SETTINGS_ID) is None:
-        db_session.add(SchedulerSettings(id=SCHEDULER_SETTINGS_ID))
+        db_session.add(SchedulerSettings(id=SCHEDULER_SETTINGS_ID, household_id=DEFAULT_HOUSEHOLD_ID))
     db_session.commit()
 
     rules = PlanningRulesConfig.model_validate(DEFAULT_PLANNING_RULES_JSON)
-    candidates = load_dish_candidates(db_session, rules=rules)
+    candidates = load_dish_candidates(db_session, rules=rules, household_id=DEFAULT_HOUSEHOLD_ID)
     match = next(candidate for candidate in candidates if candidate.dish_id == dish.id)
     assert match.computed_traits_json is not None
     assert match.computed_traits_json["vegan"] is True

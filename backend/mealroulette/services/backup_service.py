@@ -73,7 +73,7 @@ TABLE_SPECS: list[tuple[str, type]] = [
     ("recipe_ingredients", RecipeIngredient),
     ("meal_plans", MealPlan),
     ("meal_plan_items", MealPlanItem),
-    ("meal_ratings", MealRating),
+    ("meal_reviews", MealRating),
     ("shopping_lists", ShoppingList),
     ("shopping_list_items", ShoppingListItem),
     ("telegram_settings", TelegramSettings),
@@ -106,7 +106,7 @@ FK_CHECKS: dict[str, list[tuple[str, str, str]]] = {
         ("recipe_id", "recipes", "id"),
         ("leftover_source_item_id", "meal_plan_items", "id"),
     ],
-    "meal_ratings": [("meal_plan_item_id", "meal_plan_items", "id"), ("dish_id", "dishes", "id")],
+    "meal_reviews": [("meal_plan_item_id", "meal_plan_items", "id"), ("dish_id", "dishes", "id")],
     "shopping_list_items": [("shopping_list_id", "shopping_lists", "id"), ("ingredient_id", "ingredients", "id")],
     "cooking_timer_alerts": [
         ("user_id", "users", "id"),

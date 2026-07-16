@@ -2,14 +2,15 @@ from datetime import UTC, datetime, time
 
 import pytest
 
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID
 from mealroulette.models.scheduler import SCHEDULER_SETTINGS_ID, SchedulerSettings
 from mealroulette.schemas.scheduler import SchedulerSettingsUpdateRequest
 from mealroulette.services.scheduler_settings import SchedulerSettingsService
 
 
 @pytest.mark.integration
-def test_scheduler_settings_defaults(db_session):
-    public = SchedulerSettingsService(db_session).get_public()
+def test_scheduler_settings_defaults(db_session, default_household):
+    public = SchedulerSettingsService(db_session).get_public(DEFAULT_HOUSEHOLD_ID)
 
     assert public.enabled is False
     assert public.run_weekday == 4
@@ -20,15 +21,16 @@ def test_scheduler_settings_defaults(db_session):
 
 
 @pytest.mark.integration
-def test_scheduler_settings_update(db_session):
+def test_scheduler_settings_update(db_session, default_household):
     public = SchedulerSettingsService(db_session).update(
+        DEFAULT_HOUSEHOLD_ID,
         SchedulerSettingsUpdateRequest(
             enabled=True,
             run_weekday=4,
             run_time=time(9, 30),
             target_week_offset=1,
             notify_planning_days=5,
-        )
+        ),
     )
 
     assert public.enabled is True
@@ -37,9 +39,9 @@ def test_scheduler_settings_update(db_session):
 
 
 @pytest.mark.integration
-def test_should_run_scheduled_once_per_local_day(db_session):
+def test_should_run_scheduled_once_per_local_day(db_session, default_household):
     service = SchedulerSettingsService(db_session)
-    row = service.get_row()
+    row = service.get_row(DEFAULT_HOUSEHOLD_ID)
     row.enabled = True
     row.run_weekday = 4
     row.run_time = time(18, 0)
@@ -57,9 +59,9 @@ def test_should_run_scheduled_once_per_local_day(db_session):
 
 
 @pytest.mark.integration
-def test_should_run_scheduled_after_run_time_same_day(db_session):
+def test_should_run_scheduled_after_run_time_same_day(db_session, default_household):
     service = SchedulerSettingsService(db_session)
-    row = service.get_row()
+    row = service.get_row(DEFAULT_HOUSEHOLD_ID)
     row.enabled = True
     row.run_weekday = 4
     row.run_time = time(18, 0)
@@ -75,9 +77,9 @@ def test_should_run_scheduled_after_run_time_same_day(db_session):
 
 
 @pytest.mark.integration
-def test_record_roulette_success_clears_error(db_session):
+def test_record_roulette_success_clears_error(db_session, default_household):
     service = SchedulerSettingsService(db_session)
-    row = service.get_row()
+    row = service.get_row(DEFAULT_HOUSEHOLD_ID)
     row.last_error = "previous failure"
     db_session.commit()
 

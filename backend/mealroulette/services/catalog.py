@@ -1,11 +1,11 @@
 from decimal import Decimal
+from uuid import UUID
 
 from fastapi import HTTPException, status
 from sqlalchemy import func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
-from mealroulette.data.seed_taxonomy import resolve_family_fields
 from mealroulette.models.catalog import (
     Dish,
     DishSeasonality,
@@ -18,6 +18,8 @@ from mealroulette.models.catalog import (
     Tag,
     Unit,
 )
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID
+from mealroulette.data.seed_taxonomy import resolve_family_fields
 from mealroulette.models.enums import (
     AggregationStrategy,
     ConversionSource,
@@ -81,15 +83,20 @@ class CatalogService:
         }
     )
 
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, household_id: UUID = DEFAULT_HOUSEHOLD_ID):
         self.db = db
+        self.household_id = household_id
+
+    def _assert_dish_in_household(self, dish: Dish) -> None:
+        if dish.household_id != self.household_id:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dish not found")
 
     @staticmethod
     def _validate_dish_meal_composition(dish: Dish) -> None:
         try:
             validate_meal_composition_fields(dish.meal_composition, dish.simple_dish_part)
         except ValueError as exc:
-            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(exc)) from exc
 
     @staticmethod
     def _main_recipe(dish: Dish) -> Recipe | None:
@@ -111,6 +118,8 @@ class CatalogService:
     def _generate_unique_dish_public_key(self, name: str) -> str:
         for _ in range(20):
             public_key = generate_dish_public_key(name)
+            # Dish public keys remain globally unique: recipe keys are derived from them
+            # and recipes keep a global unique index.
             if self.db.scalar(select(Dish.id).where(Dish.public_key == public_key)) is None:
                 return public_key
         raise HTTPException(
@@ -410,7 +419,7 @@ class CatalogService:
 
         if action in {IngredientConfirmAction.map, IngredientConfirmAction.alias}:
             if ingredient_id is None:
-                raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="ingredient_id is required")
+                raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="ingredient_id is required")
             ingredient = self.get_ingredient(ingredient_id)
             if self.db.scalar(select(IngredientAlias).where(func.lower(IngredientAlias.alias) == normalized)):
                 raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Alias already exists")
@@ -419,7 +428,7 @@ class CatalogService:
             self.db.refresh(ingredient)
             return ingredient
 
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid confirm action")
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Invalid confirm action")
 
     def _sync_ingredient_family(self, ingredient: Ingredient) -> None:
         if not ingredient.family:
@@ -432,7 +441,7 @@ class CatalogService:
                 family_id=ingredient.family_id,
             )
         except ValueError as exc:
-            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(exc)) from exc
         ingredient.family = family_id
         ingredient.family_id = family_id
         if food_group_id and not ingredient.food_group:
@@ -680,24 +689,34 @@ class CatalogService:
         )
 
     def list_dishes(self, active_only: bool = False) -> list[Dish]:
-        query = select(Dish).options(*self._dish_query_options()).order_by(Dish.name)
+        query = (
+            select(Dish)
+            .where(Dish.household_id == self.household_id)
+            .options(*self._dish_query_options())
+            .order_by(Dish.name)
+        )
         if active_only:
             query = query.where(Dish.status == DishStatus.active)
         return list(self.db.scalars(query))
 
     def get_dish(self, dish_id: int) -> Dish:
         dish = self.db.scalar(
-            select(Dish).options(*self._dish_query_options()).where(Dish.id == dish_id)
+            select(Dish)
+            .where(Dish.id == dish_id, Dish.household_id == self.household_id)
+            .options(*self._dish_query_options())
         )
         if dish is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dish not found")
         return dish
 
     def create_dish(self, payload: DishCreateRequest) -> Dish:
-        if self.db.scalar(select(Dish).where(Dish.name == payload.name)):
+        if self.db.scalar(
+            select(Dish).where(Dish.name == payload.name, Dish.household_id == self.household_id)
+        ):
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Dish already exists")
         for attempt in range(5):
             dish = Dish(
+                household_id=self.household_id,
                 public_key=self._generate_unique_dish_public_key(payload.name),
                 name=payload.name,
                 description=payload.description,
@@ -749,7 +768,7 @@ class CatalogService:
         if "simple_dish_part" in payload.model_fields_set and payload.simple_dish_part is None:
             if dish.meal_composition == MealComposition.simple_dish:
                 raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                     detail="simple_dish_part is required when meal_composition is simple_dish",
                 )
         self._validate_dish_meal_composition(dish)
@@ -787,13 +806,21 @@ class CatalogService:
         )
 
     def get_recipe(self, recipe_id: int) -> Recipe:
-        recipe = self.db.get(Recipe, recipe_id)
+        recipe = self.db.scalar(
+            select(Recipe)
+            .join(Dish, Recipe.dish_id == Dish.id)
+            .where(Recipe.id == recipe_id, Dish.household_id == self.household_id)
+        )
         if recipe is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recipe not found")
         return recipe
 
     def get_recipe_by_public_key(self, public_key: str) -> Recipe:
-        recipe = self.db.scalar(select(Recipe).where(Recipe.public_key == public_key))
+        recipe = self.db.scalar(
+            select(Recipe)
+            .join(Dish, Recipe.dish_id == Dish.id)
+            .where(Recipe.public_key == public_key, Dish.household_id == self.household_id)
+        )
         if recipe is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recipe not found")
         return recipe
@@ -867,7 +894,7 @@ class CatalogService:
                 )
                 if not others:
                     raise HTTPException(
-                        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                         detail="Cannot unset main recipe when it is the only variant",
                     )
                 recipe.is_main = False
@@ -910,6 +937,7 @@ class CatalogService:
         step = self.db.get(RecipeStep, step_id)
         if step is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recipe step not found")
+        self.get_recipe(step.recipe_id)
         for field, value in payload.model_dump(exclude_unset=True).items():
             setattr(step, field, value)
         self.db.commit()
@@ -920,6 +948,7 @@ class CatalogService:
         step = self.db.get(RecipeStep, step_id)
         if step is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recipe step not found")
+        self.get_recipe(step.recipe_id)
         self.db.delete(step)
         self.db.commit()
 
@@ -929,7 +958,7 @@ class CatalogService:
             return ingredient_id
         if proposed_name is None:
             raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail="ingredient_id or proposed_name is required",
             )
         resolved = self.resolve_ingredient(proposed_name)

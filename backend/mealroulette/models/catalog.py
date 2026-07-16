@@ -1,5 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
+from uuid import UUID
 
 from sqlalchemy import (
     Boolean,
@@ -16,8 +17,10 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.types import Uuid
 
 from mealroulette.db.base import Base
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID
 from mealroulette.models.enums import (
     AggregationStrategy,
     ConversionConfidence,
@@ -165,10 +168,20 @@ class IngredientUnitConversion(Base):
 
 class Dish(Base):
     __tablename__ = "dishes"
+    __table_args__ = (
+        UniqueConstraint("household_id", "name", name="uq_dishes_household_name"),
+        UniqueConstraint("public_key", name="uq_dishes_public_key"),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    public_key: Mapped[str] = mapped_column(String(32), unique=True, index=True)
-    name: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    household_id: Mapped[UUID] = mapped_column(
+        Uuid,
+        ForeignKey("households.id", ondelete="CASCADE"),
+        index=True,
+        default=DEFAULT_HOUSEHOLD_ID,
+    )
+    public_key: Mapped[str] = mapped_column(String(32), index=True)
+    name: Mapped[str] = mapped_column(String(255), index=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     default_servings: Mapped[int | None] = mapped_column(Integer, nullable=True)
     default_prep_time_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)

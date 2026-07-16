@@ -3,12 +3,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date, timedelta
 from typing import Literal
+from uuid import UUID
 
 from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from mealroulette.models.planning import MealPlan, MealPlanItem
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID
 from mealroulette.services.household_time import household_local_today
 from mealroulette.services.meal_plan_lines import sync_legacy_mirror
 from mealroulette.services.planning import PlanningService
@@ -43,10 +45,11 @@ class RerollItemResult:
 
 
 class SchedulerService:
-    def __init__(self, db: Session) -> None:
+    def __init__(self, db: Session, household_id: UUID = DEFAULT_HOUSEHOLD_ID) -> None:
         self.db = db
-        self.rules_service = PlanningRuleService(db)
-        self.planning_service = PlanningService(db)
+        self.household_id = household_id
+        self.rules_service = PlanningRuleService(db, household_id=household_id)
+        self.planning_service = PlanningService(db, household_id=household_id)
 
     def generate_week(
         self,
@@ -54,7 +57,7 @@ class SchedulerService:
         *,
         today: date | None = None,
     ) -> tuple[WeekGenerationResult, dict]:
-        reference_date = today or household_local_today(self.db)
+        reference_date = today or household_local_today(self.db, self.household_id)
         rules = self.rules_service.get_active_rules()
         plan = self._load_plan_for_update(meal_plan_id)
         self.planning_service._maybe_clear_stale_reroll_history(plan, reference_date=reference_date)
@@ -105,7 +108,7 @@ class SchedulerService:
         *,
         today: date | None = None,
     ) -> RerollItemResult:
-        reference_date = today or household_local_today(self.db)
+        reference_date = today or household_local_today(self.db, self.household_id)
         rules = self.rules_service.get_active_rules()
         item = self._load_item(item_id)
         if not self._slot_can_reroll(item, reference_date=reference_date):
@@ -164,7 +167,7 @@ class SchedulerService:
         return RerollItemResult(status="success", result=result, variety=variety)
 
     def start_over_reroll(self, item_id: int, *, today: date | None = None) -> None:
-        reference_date = today or household_local_today(self.db)
+        reference_date = today or household_local_today(self.db, self.household_id)
         item = self._load_item(item_id)
         if not self._slot_can_reroll(item, reference_date=reference_date):
             raise HTTPException(
@@ -202,7 +205,7 @@ class SchedulerService:
         return item_has_roulette_lines(item) or not item.lines
 
     def _load_candidates(self, rules):
-        candidates = load_dish_candidates(self.db, rules=rules)
+        candidates = load_dish_candidates(self.db, rules=rules, household_id=self.household_id)
         if not candidates:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -245,6 +248,7 @@ class SchedulerService:
             before_date=latest_slot_date + timedelta(days=1),
             window_days=max(rules.history_window_days, rules.avoid_same_dish_within_days),
             rules=rules,
+            household_id=self.household_id,
         )
 
     def _build_variety(self, result, candidates, eaten_meals, fixed_assignments, fixed_dates_by_item, plan):
@@ -277,7 +281,7 @@ class SchedulerService:
     def _load_plan_for_update(self, meal_plan_id: int) -> MealPlan:
         plan = self.db.scalar(
             select(MealPlan)
-            .where(MealPlan.id == meal_plan_id)
+            .where(MealPlan.id == meal_plan_id, MealPlan.household_id == self.household_id)
             .options(selectinload(MealPlan.items).selectinload(MealPlanItem.lines))
             .with_for_update()
         )
@@ -286,10 +290,10 @@ class SchedulerService:
         return plan
 
     def _load_plan(self, meal_plan_id: int) -> MealPlan:
-        plan = self.db.get(
-            MealPlan,
-            meal_plan_id,
-            options=(selectinload(MealPlan.items).selectinload(MealPlanItem.lines),),
+        plan = self.db.scalar(
+            select(MealPlan)
+            .where(MealPlan.id == meal_plan_id, MealPlan.household_id == self.household_id)
+            .options(selectinload(MealPlan.items).selectinload(MealPlanItem.lines)),
         )
         if plan is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Meal plan not found")
@@ -298,7 +302,8 @@ class SchedulerService:
     def _load_item(self, item_id: int) -> MealPlanItem:
         item = self.db.scalar(
             select(MealPlanItem)
-            .where(MealPlanItem.id == item_id)
+            .join(MealPlan, MealPlanItem.meal_plan_id == MealPlan.id)
+            .where(MealPlanItem.id == item_id, MealPlan.household_id == self.household_id)
             .options(selectinload(MealPlanItem.lines))
         )
         if item is None:

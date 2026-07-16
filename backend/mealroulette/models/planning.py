@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from uuid import UUID
 
 from sqlalchemy import (
     Boolean,
@@ -14,6 +15,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.types import Uuid
 
 from mealroulette.db.base import Base
 from mealroulette.models.catalog import Dish, Recipe
@@ -29,9 +31,16 @@ from mealroulette.models.enums import (
 
 class MealPlan(Base):
     __tablename__ = "meal_plans"
-    __table_args__ = (UniqueConstraint("week_start_date", name="uq_meal_plans_week_start"),)
+    __table_args__ = (
+        UniqueConstraint("household_id", "week_start_date", name="uq_meal_plans_household_week"),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    household_id: Mapped[UUID] = mapped_column(
+        Uuid,
+        ForeignKey("households.id", ondelete="CASCADE"),
+        index=True,
+    )
     week_start_date: Mapped[date] = mapped_column(Date, index=True)
     status: Mapped[MealPlanStatus] = mapped_column(
         Enum(MealPlanStatus, name="meal_plan_status"), default=MealPlanStatus.active
@@ -88,7 +97,10 @@ class MealPlanItem(Base):
         cascade="all, delete-orphan",
         order_by="MealPlanItemDish.position",
     )
-    meal_rating: Mapped["MealRating | None"] = relationship(back_populates="meal_plan_item", uselist=False)
+    meal_reviews: Mapped[list["MealReview"]] = relationship(
+        back_populates="meal_plan_item",
+        cascade="all, delete-orphan",
+    )
 
 
 class MealPlanItemDish(Base):
@@ -119,13 +131,24 @@ class MealPlanItemDish(Base):
     recipe: Mapped[Recipe | None] = relationship()
 
 
-class MealRating(Base):
-    __tablename__ = "meal_ratings"
-    __table_args__ = (UniqueConstraint("meal_plan_item_id", name="uq_meal_ratings_meal_plan_item"),)
+class MealReview(Base):
+    __tablename__ = "meal_reviews"
+    __table_args__ = (UniqueConstraint("meal_plan_item_id", "user_id", name="uq_meal_ratings_item_user"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    household_id: Mapped[UUID] = mapped_column(
+        Uuid,
+        ForeignKey("households.id", ondelete="CASCADE"),
+        index=True,
+    )
     meal_plan_item_id: Mapped[int] = mapped_column(
         ForeignKey("meal_plan_items.id", ondelete="CASCADE"), index=True
+    )
+    user_id: Mapped[UUID | None] = mapped_column(
+        Uuid,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
     )
     dish_id: Mapped[int] = mapped_column(ForeignKey("dishes.id", ondelete="CASCADE"), index=True)
     recipe_id: Mapped[int | None] = mapped_column(ForeignKey("recipes.id", ondelete="SET NULL"), nullable=True)
@@ -133,6 +156,10 @@ class MealRating(Base):
     comment: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
-    meal_plan_item: Mapped[MealPlanItem] = relationship(back_populates="meal_rating")
+    meal_plan_item: Mapped[MealPlanItem] = relationship(back_populates="meal_reviews")
     dish: Mapped[Dish] = relationship()
     recipe: Mapped[Recipe | None] = relationship()
+
+
+# Backward-compatible alias used by backup export and legacy imports.
+MealRating = MealReview
