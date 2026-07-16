@@ -2,7 +2,7 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 from fastapi import HTTPException, status
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from mealroulette.auth.dependencies import parse_token_user_id, utcnow
@@ -116,8 +116,21 @@ class UserService:
         self.household_service = HouseholdService(db)
 
     def _active_platform_admin_count(self) -> int:
-        active_users = self.db.scalars(select(User).where(User.active.is_(True)))
-        return sum(1 for user in active_users if user_is_platform_admin(self.db, user))
+        stmt = (
+            select(func.count(User.id))
+            .where(
+                User.active.is_(True),
+                (User.role == UserRole.admin)
+                | (
+                    User.id.in_(
+                        select(UserPlatformRole.user_id).where(
+                            UserPlatformRole.role == PlatformRole.platform_admin
+                        )
+                    )
+                ),
+            )
+        )
+        return self.db.scalar(stmt) or 0
 
     def _ensure_not_last_active_admin(self, user: User) -> None:
         if user.active and user_is_platform_admin(self.db, user) and self._active_platform_admin_count() <= 1:
@@ -208,9 +221,9 @@ class UserService:
             )
 
     def to_public(self, user: User) -> UserPublic:
-        platform_roles = [role.value for role in self.household_service.list_platform_roles(user.id)]
-        if user.role == UserRole.admin and PlatformRole.platform_admin.value not in platform_roles:
-            platform_roles.append(PlatformRole.platform_admin.value)
+        platform_roles = self.household_service.list_platform_roles(user.id)
+        if user.role == UserRole.admin and PlatformRole.platform_admin not in platform_roles:
+            platform_roles = [*platform_roles, PlatformRole.platform_admin]
         membership = self.household_service.active_household_membership(user.id)
         return UserPublic(
             id=user.id,
@@ -219,7 +232,7 @@ class UserService:
             role=user.role,
             platform_roles=platform_roles,
             active_household_id=membership.household_id if membership is not None else None,
-            household_role=membership.role.value if membership is not None else None,
+            household_role=membership.role if membership is not None else None,
             active=user.active,
             created_at=user.created_at,
             updated_at=user.updated_at,

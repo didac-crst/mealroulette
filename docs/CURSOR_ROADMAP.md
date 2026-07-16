@@ -953,7 +953,7 @@ Acceptance criteria:
 - A household admin can invite users for their household.
 - Normal household users cannot mutate canonical ingredients, food groups, units, or global taxonomy.
 - Telegram subscriptions are linked to a user and household.
-- Public signup does not grant household access without approval.
+- Public signup may create a new household; joining an existing household requires an invitation.
 
 ### Phase 16 - LLM-Assisted Entry & Localization
 

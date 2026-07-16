@@ -39,9 +39,9 @@ def test_regular_user_gets_household_member_role(regular_user, db_session):
 def test_user_public_includes_tenancy_fields(admin_user, db_session):
     payload = UserService(db_session).to_public(admin_user)
 
-    assert payload.platform_roles == [PlatformRole.platform_admin.value]
+    assert payload.platform_roles == [PlatformRole.platform_admin]
     assert payload.active_household_id == DEFAULT_HOUSEHOLD_ID
-    assert payload.household_role == HouseholdRole.household_admin.value
+    assert payload.household_role == HouseholdRole.household_admin
 
 
 def test_create_user_provisions_default_household_membership(admin_user, admin_token, client, db_session):

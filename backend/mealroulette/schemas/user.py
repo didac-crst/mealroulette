@@ -3,6 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
+from mealroulette.models.household import HouseholdRole, PlatformRole
 from mealroulette.models.user import UserRole
 
 
@@ -34,9 +35,9 @@ class UserPublic(BaseModel):
     username: str
     email: EmailStr
     role: UserRole
-    platform_roles: list[str] = Field(default_factory=list)
+    platform_roles: list[PlatformRole] = Field(default_factory=list)
     active_household_id: UUID | None = None
-    household_role: str | None = None
+    household_role: HouseholdRole | None = None
     active: bool
     created_at: datetime
     updated_at: datetime
