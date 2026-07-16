@@ -13,12 +13,12 @@ function isCookingModePath(pathname: string): boolean {
 }
 
 export function AppShell() {
-  const { user, logout, isPlatformAdmin, isHouseholdAdmin, accessToken } = useAuth();
+  const { user, logout, isPlatformAdmin, isHouseholdAdmin, hasHousehold, accessToken } = useAuth();
   const location = useLocation();
   const username = user?.username ?? "";
   const reviewAttention = useReviewAttentionCount(accessToken);
   const cookingMode = isCookingModePath(location.pathname);
-  const canAccessSettings = isPlatformAdmin || isHouseholdAdmin;
+  const canAccessSettings = isPlatformAdmin || isHouseholdAdmin || hasHousehold;
 
   return (
     <>

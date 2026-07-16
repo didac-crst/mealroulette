@@ -18,11 +18,18 @@ from mealroulette.schemas.household import (
     HouseholdInvitationPublic,
     HouseholdMemberPublic,
     HouseholdPublic,
+    NotificationSubscriptionPublic,
+    NotificationSubscriptionUpdateRequest,
+    TelegramLinkTokenPublic,
+    TelegramUserLinkPublic,
     UpdateHouseholdRequest,
     UpdateMemberRoleRequest,
 )
+from mealroulette.schemas.telegram import TelegramSendResult
 from mealroulette.services.household import HouseholdService
 from mealroulette.services.household_membership import HouseholdMembershipService
+from mealroulette.services.telegram_link import TelegramLinkService, build_telegram_link_deep_url
+from mealroulette.services.telegram_reminder import TelegramReminderService
 
 router = APIRouter(prefix="/household", tags=["household"])
 
@@ -35,6 +42,18 @@ def _member_public(membership: HouseholdMembership) -> HouseholdMemberPublic:
         email=membership.user.email,
         role=membership.role,
         joined_at=membership.joined_at,
+    )
+
+
+def _subscription_public(row) -> NotificationSubscriptionPublic:
+    return NotificationSubscriptionPublic(
+        notify_daily_reminder=row.notify_daily_reminder,
+        notify_shopping=row.notify_shopping,
+        notify_roulette=row.notify_roulette,
+        daily_reminder_time=row.daily_reminder_time,
+        shopping_window_days=row.shopping_window_days,
+        timezone=row.timezone,
+        last_reminder_sent_at=row.last_reminder_sent_at,
     )
 
 
@@ -132,3 +151,83 @@ def accept_household_invitation(
     db: Session = Depends(get_db),
 ) -> None:
     HouseholdMembershipService(db).accept_invitation_for_user(payload.token, current_user)
+
+
+@router.post("/telegram/link-token", response_model=TelegramLinkTokenPublic)
+def create_telegram_link_token(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> TelegramLinkTokenPublic:
+    row, token = TelegramLinkService(db).create_link_token(current_user.id)
+    return TelegramLinkTokenPublic(
+        token=token,
+        expires_at=row.expires_at,
+        deep_link_url=build_telegram_link_deep_url(token),
+    )
+
+
+@router.get("/telegram/link", response_model=TelegramUserLinkPublic)
+def get_telegram_link(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> TelegramUserLinkPublic:
+    link = TelegramLinkService(db).get_link_for_user(current_user.id)
+    if link is None:
+        return TelegramUserLinkPublic(linked=False)
+    return TelegramUserLinkPublic(
+        linked=True,
+        username=link.username,
+        display_name=link.display_name,
+        linked_at=link.linked_at,
+    )
+
+
+@router.delete("/telegram/link", status_code=204)
+def unlink_telegram(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> None:
+    TelegramLinkService(db).unlink_user(current_user.id)
+
+
+@router.get("/notification-subscription", response_model=NotificationSubscriptionPublic)
+def get_notification_subscription(
+    scope: HouseholdScope = Depends(get_current_household_scope),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> NotificationSubscriptionPublic:
+    row = HouseholdMembershipService(db).ensure_notification_subscription(current_user.id, scope.household_id)
+    return _subscription_public(row)
+
+
+@router.put("/notification-subscription", response_model=NotificationSubscriptionPublic)
+def update_notification_subscription(
+    payload: NotificationSubscriptionUpdateRequest,
+    scope: HouseholdScope = Depends(get_current_household_scope),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> NotificationSubscriptionPublic:
+    row = HouseholdMembershipService(db).ensure_notification_subscription(current_user.id, scope.household_id)
+    for field, value in payload.model_dump(exclude_unset=True).items():
+        setattr(row, field, value)
+    db.commit()
+    db.refresh(row)
+    return _subscription_public(row)
+
+
+@router.post("/telegram/test", response_model=TelegramSendResult)
+def send_personal_telegram_test(
+    scope: HouseholdScope = Depends(get_current_household_scope),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> TelegramSendResult:
+    return TelegramReminderService(db).send_personal_test_message(current_user.id, scope.household_id)
+
+
+@router.post("/telegram/send-daily-reminder", response_model=TelegramSendResult)
+def send_personal_daily_reminder(
+    scope: HouseholdScope = Depends(get_current_household_scope),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> TelegramSendResult:
+    return TelegramReminderService(db).send_personal_daily_reminder(current_user.id, scope.household_id)

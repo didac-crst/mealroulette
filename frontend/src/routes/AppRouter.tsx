@@ -21,6 +21,7 @@ import { TodayPage } from "../features/planning/TodayPage";
 import { ShoppingPage } from "../features/shopping/ShoppingPage";
 import { BackupSettingsPage } from "../features/settings/BackupSettingsPage";
 import { TelegramSettingsPage } from "../features/settings/TelegramSettingsPage";
+import { PersonalTelegramSettingsPage } from "../features/settings/PersonalTelegramSettingsPage";
 import { SchedulerSettingsPage } from "../features/settings/SchedulerSettingsPage";
 import { AdminSettingsPage } from "../features/settings/AdminSettingsPage";
 import { HouseholdMembersPage } from "../features/settings/HouseholdMembersPage";
@@ -53,16 +54,17 @@ export function AppRouter() {
               <Route path="ingredients/taxonomy" element={<IngredientTaxonomyPage />} />
               <Route path="ingredients/:ingredientId" element={<IngredientDetailPage />} />
               <Route path="settings" element={<AdminSettingsPage />} />
+              <Route path="settings/telegram" element={<PersonalTelegramSettingsPage />} />
               <Route element={<AdminRoute />}>
                 <Route path="ingredients/new" element={<IngredientEditPage />} />
                 <Route path="ingredients/:ingredientId/edit" element={<IngredientEditPage />} />
-                <Route path="settings/telegram" element={<TelegramSettingsPage />} />
                 <Route path="settings/backups" element={<BackupSettingsPage />} />
               </Route>
               <Route element={<HouseholdAdminRoute />}>
                 <Route path="settings/members" element={<HouseholdMembersPage />} />
                 <Route path="settings/targets" element={<PlanningTargetsPage />} />
                 <Route path="settings/scheduler" element={<SchedulerSettingsPage />} />
+                <Route path="settings/telegram/household" element={<TelegramSettingsPage />} />
                 <Route path="dishes/new" element={<DishEditPage />} />
                 <Route path="dishes/:dishId/edit" element={<DishEditPage />} />
                 <Route path="dishes/:dishId/recipes/new" element={<RecipeEditPage />} />

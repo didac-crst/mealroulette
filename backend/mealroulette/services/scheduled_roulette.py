@@ -43,7 +43,7 @@ class ScheduledRouletteService:
         self.planning_service = PlanningService(db, household_id=household_id)
         self.scheduler_service = SchedulerService(db, household_id=household_id)
         self.client = client or TelegramClient()
-        self.on_demand_service = TelegramOnDemandService(db, self.client)
+        self.on_demand_service = TelegramOnDemandService(db, self.client, household_id=household_id)
         self.telegram_settings_service = TelegramSettingsService(db)
 
     def run_scheduled(self, now: datetime | None = None) -> ScheduledRouletteResult | None:
@@ -59,7 +59,7 @@ class ScheduledRouletteService:
         return self._execute(self.settings_service.get_row(self.household_id))
 
     def _execute(self, settings_row) -> ScheduledRouletteResult:
-        telegram_settings = self.telegram_settings_service.get_row()
+        telegram_settings = self.telegram_settings_service.get_row(self.household_id)
         reference_today = local_today(telegram_settings)
         week_start = self.target_week_start(reference_today, settings_row.target_week_offset)
         plan = self.planning_service.get_or_create_plan(week_start)
@@ -96,9 +96,7 @@ class ScheduledRouletteService:
         if not TelegramSettingsService.bot_token_configured():
             return None
 
-        # TelegramSubscriber remains installation-global in this Phase 15B slice.
-        # Household-scoped recipients land in a later Telegram tenancy slice.
-        chat_ids = self.telegram_settings_service.subscribers.list_chat_ids()
+        chat_ids = self.telegram_settings_service.links.list_roulette_chat_ids(self.household_id)
         if not chat_ids:
             return None
 
@@ -129,7 +127,7 @@ class ScheduledRouletteService:
             heading="New roulette",
         )
 
-        telegram_row = self.telegram_settings_service.get_row()
+        telegram_row = self.telegram_settings_service.get_row(self.household_id)
         failures: list[str] = []
         sent_count = 0
         for chat_id in chat_ids:
@@ -144,7 +142,7 @@ class ScheduledRouletteService:
             self.telegram_settings_service.record_send_failure(telegram_row, error)
             return TelegramSendResult(sent=False, detail=error, recipient_count=0)
 
-        detail = f"Sent to {sent_count} subscriber(s)"
+        detail = f"Sent to {sent_count} recipient(s)"
         if failures:
             detail += f"; {len(failures)} failed"
         self.telegram_settings_service.record_send_success(telegram_row)

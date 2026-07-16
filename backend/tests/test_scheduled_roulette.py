@@ -75,7 +75,14 @@ def test_run_now_records_failure_when_no_dishes(db_session, catalog_seed, schedu
     assert refreshed.last_error is not None
 
 
-def test_notify_telegram_sends_new_roulette_heading(db_session, catalog_seed, scheduler_seed, monkeypatch):
+def test_notify_telegram_sends_new_roulette_heading(
+    db_session, catalog_seed, scheduler_seed, monkeypatch, admin_user
+):
+    from uuid import uuid4
+
+    from mealroulette.models.telegram import TelegramUserLink
+    from mealroulette.services.household_membership import HouseholdMembershipService
+
     _seed(db_session)
     mock_client = MagicMock()
     service = ScheduledRouletteService(db_session, client=mock_client)
@@ -84,10 +91,18 @@ def test_notify_telegram_sends_new_roulette_heading(db_session, catalog_seed, sc
     row.notify_planning_days = 7
     db_session.commit()
 
-    from mealroulette.models.telegram import TelegramSubscriber
-    from mealroulette.services.telegram_settings import TelegramSettingsService
-
-    db_session.add(TelegramSubscriber(chat_id="12345", telegram_user_id="99", username="tester"))
+    db_session.add(
+        TelegramUserLink(
+            id=uuid4(),
+            user_id=admin_user.id,
+            chat_id="12345",
+            telegram_user_id="99",
+            username="tester",
+        )
+    )
+    HouseholdMembershipService(db_session).ensure_notification_subscription(
+        admin_user.id, DEFAULT_HOUSEHOLD_ID
+    )
     db_session.commit()
 
     reference_today = date(2026, 7, 1)

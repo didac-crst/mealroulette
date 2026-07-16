@@ -1,13 +1,19 @@
 from __future__ import annotations
 
 import logging
-
 from collections.abc import Callable
+from uuid import UUID
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from mealroulette.core.config import get_settings
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID, Household
+from mealroulette.models.telegram import TelegramUserLink
+from mealroulette.services.household import HouseholdService
 from mealroulette.services.telegram_client import TelegramApiError, TelegramClient
+from mealroulette.services.telegram_html_utils import esc
+from mealroulette.services.telegram_link import TelegramLinkService
 from mealroulette.services.telegram_on_demand import (
     MAX_ON_DEMAND_DAYS,
     TelegramOnDemandService,
@@ -15,23 +21,26 @@ from mealroulette.services.telegram_on_demand import (
 )
 from mealroulette.services.telegram_recipe import parse_recipe_start_payload
 from mealroulette.services.telegram_settings import TelegramSettingsService
-from mealroulette.services.telegram_subscribers import TelegramSubscriberService
 
 logger = logging.getLogger(__name__)
 
-# v0.4 has a single distribution list; more lists can be added when new message types ship.
-DISTRIBUTION_LISTS: dict[str, str] = {
-    "shopping": "daily shopping reminders",
-}
-DEFAULT_LIST_KEY = "shopping"
+MIGRATE_SUBSCRIBE_MESSAGE = (
+    "MealRoulette no longer uses /subscribe.\n"
+    "Link your account from Settings → Telegram in the app."
+)
+MIGRATE_UNSUBSCRIBE_MESSAGE = (
+    "MealRoulette no longer uses /unsubscribe.\n"
+    "Unlink Telegram or turn off notifications in Settings → Telegram."
+)
 
-SUBSCRIBE_COMMANDS = {"/subscribe", "/start"}
-UNSUBSCRIBE_COMMANDS = {"/unsubscribe", "/stop"}
 HELP_COMMANDS = {"/help"}
 PLANNING_COMMANDS = {"/planning"}
 REMINDER_COMMANDS = {"/reminder"}
 SHOPPING_COMMANDS = {"/shopping"}
 RECIPE_COMMANDS = {"/recipe"}
+START_COMMANDS = {"/start"}
+SUBSCRIBE_COMMANDS = {"/subscribe"}
+UNSUBSCRIBE_COMMANDS = {"/unsubscribe", "/stop"}
 
 
 def _normalize_command(text: str) -> str:
@@ -61,29 +70,20 @@ def _start_payload(text: str) -> str | None:
     return parts[1].strip()
 
 
-def _list_label(list_key: str) -> str:
-    return DISTRIBUTION_LISTS.get(list_key, list_key)
-
-
-def _available_lists_text() -> str:
-    lines = [f"• {key} — {label}" for key, label in DISTRIBUTION_LISTS.items()]
-    return "\n".join(lines)
-
-
 class TelegramUpdateService:
     def __init__(self, db: Session, client: TelegramClient | None = None) -> None:
         self.db = db
         self.client = client or TelegramClient()
         self.settings_service = TelegramSettingsService(db)
-        self.subscriber_service = TelegramSubscriberService(db)
-        self.on_demand_service = TelegramOnDemandService(db)
+        self.link_service = TelegramLinkService(db)
 
     def poll_once(self) -> int:
         token = (get_settings().telegram_bot_token or "").strip()
         if not token:
             return 0
 
-        row = self.settings_service.get_row()
+        # Install-global poll cursor hosted on the default household settings row.
+        row = self.settings_service.get_row(DEFAULT_HOUSEHOLD_ID)
         offset = row.last_update_id + 1 if row.last_update_id is not None else None
         try:
             updates = self.client.get_updates(token, offset=offset)
@@ -132,11 +132,8 @@ class TelegramUpdateService:
                 token,
                 chat_id,
                 "MealRoulette bot\n\n"
-                "Distribution lists:\n"
-                f"{_available_lists_text()}\n\n"
                 "Commands:\n"
-                "• /subscribe [list] — join a list (default: shopping)\n"
-                "• /unsubscribe [list] — leave a list\n"
+                "• Link your account from Settings → Telegram in the app\n"
                 "• /planning [days] — planned meals (default: 3 days)\n"
                 "• /reminder [days] — planning + ingredients (default: 3 days)\n"
                 "• /shopping [days] — shopping totals only (default: 3 days)\n"
@@ -145,33 +142,28 @@ class TelegramUpdateService:
             )
             return True
 
-        if command in SUBSCRIBE_COMMANDS:
-            recipe_id = parse_recipe_start_payload(_start_payload(text) or "")
+        if command in START_COMMANDS:
+            start_payload = _start_payload(text) or ""
+            recipe_id = parse_recipe_start_payload(start_payload)
             if recipe_id is not None:
-                return self._send_recipe_message(token, chat_id, recipe_id)
-
-            list_key = self._resolve_list_key(_command_args(text), chat_id=chat_id, token=token)
-            if list_key is None:
-                return True
-            _, created = self.subscriber_service.subscribe(
-                chat_id=chat_id,
-                telegram_user_id=telegram_user_id,
-                username=username if isinstance(username, str) else None,
-                display_name=display_name,
-            )
-            label = _list_label(list_key)
-            if created:
-                reply = (
-                    f"You are now subscribed to MealRoulette {label}.\n"
-                    "Send /unsubscribe to leave this list."
+                return self._send_recipe_message(token, chat_id, recipe_id, household_id=None)
+            if start_payload.startswith("link_"):
+                return self._handle_link_token(
+                    token,
+                    chat_id,
+                    start_payload.removeprefix("link_"),
+                    telegram_user_id=telegram_user_id,
+                    username=username if isinstance(username, str) else None,
+                    display_name=display_name,
                 )
-            else:
-                reply = (
-                    f"You are already subscribed to MealRoulette {label}.\n"
-                    "Send /unsubscribe to leave this list."
-                )
-            self.client.send_message(token, chat_id, reply)
+            self.client.send_message(token, chat_id, MIGRATE_SUBSCRIBE_MESSAGE)
             return True
+
+        if command in SUBSCRIBE_COMMANDS:
+            self.client.send_message(token, chat_id, MIGRATE_SUBSCRIBE_MESSAGE)
+            return True
+
+        household_id = self._household_id_for_chat(chat_id)
 
         if command in PLANNING_COMMANDS:
             return self._handle_days_command(
@@ -179,7 +171,8 @@ class TelegramUpdateService:
                 chat_id,
                 text,
                 command_name="planning",
-                builder=self.on_demand_service.build_planning_message,
+                household_id=household_id,
+                builder_name="build_planning_message",
             )
 
         if command in REMINDER_COMMANDS:
@@ -188,7 +181,8 @@ class TelegramUpdateService:
                 chat_id,
                 text,
                 command_name="reminder",
-                builder=self.on_demand_service.build_reminder_message,
+                household_id=household_id,
+                builder_name="build_reminder_message",
             )
 
         if command in SHOPPING_COMMANDS:
@@ -197,7 +191,8 @@ class TelegramUpdateService:
                 chat_id,
                 text,
                 command_name="shopping",
-                builder=self.on_demand_service.build_shopping_message,
+                household_id=household_id,
+                builder_name="build_shopping_message",
             )
 
         if command in RECIPE_COMMANDS:
@@ -205,25 +200,66 @@ class TelegramUpdateService:
             if not raw_args or not raw_args[0].isdigit():
                 self.client.send_message(token, chat_id, "Usage: /recipe <recipe id>")
                 return True
-            return self._send_recipe_message(token, chat_id, int(raw_args[0]))
+            return self._send_recipe_message(token, chat_id, int(raw_args[0]), household_id=household_id)
 
         if command in UNSUBSCRIBE_COMMANDS:
-            list_key = self._resolve_list_key(_command_args(text), chat_id=chat_id, token=token, required=False)
-            if list_key is None:
-                return True
-            removed = self.subscriber_service.unsubscribe(chat_id)
-            label = _list_label(list_key)
-            if removed:
-                self.client.send_message(token, chat_id, f"You have been unsubscribed from MealRoulette {label}.")
-            else:
-                self.client.send_message(
-                    token,
-                    chat_id,
-                    f"You were not subscribed to MealRoulette {label}.\nSend /subscribe to join.",
-                )
+            self.client.send_message(token, chat_id, MIGRATE_UNSUBSCRIBE_MESSAGE)
             return True
 
         return False
+
+    def _household_id_for_chat(self, chat_id: str) -> UUID | None:
+        links = list(
+            self.db.scalars(select(TelegramUserLink).where(TelegramUserLink.chat_id == chat_id))
+        )
+        if not links:
+            return None
+        # Prefer the active membership of the first linked user that still has one.
+        for link in links:
+            membership = HouseholdService(self.db).active_household_membership(link.user_id)
+            if membership is not None:
+                return membership.household_id
+        return None
+
+    def _handle_link_token(
+        self,
+        token: str,
+        chat_id: str,
+        link_token: str,
+        *,
+        telegram_user_id: str | None,
+        username: str | None,
+        display_name: str | None,
+    ) -> bool:
+        try:
+            link = self.link_service.link_chat(
+                link_token,
+                chat_id=chat_id,
+                telegram_user_id=telegram_user_id,
+                username=username,
+                display_name=display_name,
+            )
+        except ValueError:
+            self.client.send_message(
+                token,
+                chat_id,
+                "That link is invalid or expired. Create a new one in Settings → Telegram.",
+            )
+            return True
+
+        membership = HouseholdService(self.db).active_household_membership(link.user_id)
+        lines = ["Telegram linked to your MealRoulette account."]
+        if membership is not None:
+            from mealroulette.services.household_membership import HouseholdMembershipService
+
+            HouseholdMembershipService(self.db).ensure_notification_subscription(
+                link.user_id, membership.household_id
+            )
+            household = self.db.get(Household, membership.household_id)
+            household_name = household.name if household is not None else "your household"
+            lines.append(f"Household <b>{esc(household_name)}</b>")
+        self.client.send_message(token, chat_id, "\n".join(lines), parse_mode="HTML")
+        return True
 
     def _handle_days_command(
         self,
@@ -232,8 +268,16 @@ class TelegramUpdateService:
         text: str,
         *,
         command_name: str,
-        builder: Callable[[int], str],
+        household_id: UUID | None,
+        builder_name: str,
     ) -> bool:
+        if household_id is None:
+            self.client.send_message(
+                token,
+                chat_id,
+                "Link your MealRoulette account from Settings → Telegram before using this command.",
+            )
+            return True
         days = parse_days_arg(_command_args(text))
         if days is None:
             self.client.send_message(
@@ -242,36 +286,26 @@ class TelegramUpdateService:
                 f"Days must be a number between 1 and {MAX_ON_DEMAND_DAYS}. Example: /{command_name} 3",
             )
             return True
+        on_demand = TelegramOnDemandService(self.db, self.client, household_id=household_id)
+        builder: Callable[[int], str] = getattr(on_demand, builder_name)
         message = builder(days)
         self.client.send_message(token, chat_id, message, parse_mode="HTML")
         return True
 
-    def _send_recipe_message(self, token: str, chat_id: str, recipe_id: int) -> bool:
-        message = self.on_demand_service.build_recipe_message(recipe_id)
+    def _send_recipe_message(
+        self,
+        token: str,
+        chat_id: str,
+        recipe_id: int,
+        *,
+        household_id: UUID | None,
+    ) -> bool:
+        # Recipe content is global catalogue; household_id is unused but kept for call-site clarity.
+        _ = household_id
+        on_demand = TelegramOnDemandService(self.db, self.client)
+        message = on_demand.build_recipe_message(recipe_id)
         if message is None:
             self.client.send_message(token, chat_id, "Recipe not found.")
             return True
         self.client.send_message(token, chat_id, message, parse_mode="HTML")
         return True
-
-    def _resolve_list_key(
-        self,
-        args: list[str],
-        *,
-        chat_id: str,
-        token: str,
-        required: bool = True,
-    ) -> str | None:
-        if not args:
-            return DEFAULT_LIST_KEY
-        list_key = args[0]
-        if list_key in DISTRIBUTION_LISTS:
-            return list_key
-        self.client.send_message(
-            token,
-            chat_id,
-            "Unknown list. Available lists:\n"
-            f"{_available_lists_text()}\n\n"
-            f"Example: /subscribe {DEFAULT_LIST_KEY}",
-        )
-        return None if required else DEFAULT_LIST_KEY

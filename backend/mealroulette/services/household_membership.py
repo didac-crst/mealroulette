@@ -10,7 +10,13 @@ from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session
 
 from mealroulette.auth.security import hash_password
-from mealroulette.models.household import Household, HouseholdInvitation, HouseholdMembership, HouseholdRole
+from mealroulette.models.household import (
+    Household,
+    HouseholdInvitation,
+    HouseholdMembership,
+    HouseholdNotificationSubscription,
+    HouseholdRole,
+)
 from mealroulette.models.user import User, UserRole
 from mealroulette.services.household import HouseholdService
 
@@ -25,6 +31,22 @@ class HouseholdMembershipService:
     def __init__(self, db: Session) -> None:
         self.db = db
         self.household_service = HouseholdService(db)
+
+    def ensure_notification_subscription(
+        self, user_id: UUID, household_id: UUID
+    ) -> HouseholdNotificationSubscription:
+        row = self.db.scalar(
+            select(HouseholdNotificationSubscription).where(
+                HouseholdNotificationSubscription.user_id == user_id,
+                HouseholdNotificationSubscription.household_id == household_id,
+            )
+        )
+        if row is None:
+            row = HouseholdNotificationSubscription(user_id=user_id, household_id=household_id)
+            self.db.add(row)
+            self.db.commit()
+            self.db.refresh(row)
+        return row
 
     def count_active_admins(self, household_id: UUID) -> int:
         return int(
@@ -222,6 +244,7 @@ class HouseholdMembershipService:
         invitation.accepted_by_user_id = user.id
         self.db.commit()
         self.db.refresh(membership)
+        self.ensure_notification_subscription(membership.user_id, membership.household_id)
         return membership
 
     def register_with_invitation(
@@ -254,6 +277,7 @@ class HouseholdMembershipService:
         invitation.accepted_by_user_id = user.id
         self.db.commit()
         self.db.refresh(user)
+        self.ensure_notification_subscription(user.id, invitation.household_id)
         return user
 
     def register_new_household(
@@ -286,6 +310,7 @@ class HouseholdMembershipService:
         )
         self.db.commit()
         self.db.refresh(user)
+        self.ensure_notification_subscription(user.id, household.id)
         return user
 
     def list_invitations(self, household_id: UUID) -> list[HouseholdInvitation]:

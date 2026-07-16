@@ -23,7 +23,7 @@ function timeInputValue(value: string): string {
 }
 
 export function TelegramSettingsPage() {
-  const { accessToken, isAdmin } = useAuth();
+  const { accessToken, isHouseholdAdmin } = useAuth();
   const navigate = useNavigate();
   const [settings, setSettings] = useState<TelegramSettings | null>(null);
   const [subscribers, setSubscribers] = useState<TelegramSubscriber[]>([]);
@@ -44,10 +44,10 @@ export function TelegramSettingsPage() {
   const [refreshWarning, setRefreshWarning] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isAdmin) {
-      navigate("/review");
+    if (!isHouseholdAdmin) {
+      navigate("/settings/telegram", { replace: true });
     }
-  }, [isAdmin, navigate]);
+  }, [isHouseholdAdmin, navigate]);
 
   const reload = async () => {
     if (!accessToken) {
@@ -156,10 +156,10 @@ export function TelegramSettingsPage() {
   }
 
   return (
-    <SettingsPageShell title="Telegram" subtitle="Daily reminders and on-demand bot commands.">
+    <SettingsPageShell title="Household Telegram" subtitle="Household defaults for reminders and shopping format.">
       <p className="muted admin-notice">
-        Set <code>TELEGRAM_BOT_TOKEN</code> in <code>.env</code>, restart Docker, then message your bot with{" "}
-        <strong>/subscribe</strong> in Telegram. Use <strong>/unsubscribe</strong> to stop.
+        Members link their own Telegram accounts under Settings → Telegram. This page controls whether the household
+        sends notifications and how shopping lists are formatted.
       </p>
 
       {settings?.has_bot_token ? (
@@ -182,16 +182,16 @@ export function TelegramSettingsPage() {
       {notice ? <p className="muted admin-notice">{notice}</p> : null}
       {refreshWarning ? <p className="muted">Saved, but refresh failed: {refreshWarning}</p> : null}
 
-      <FormSection title={`Subscribers (${subscribers.length})`}>
+      <FormSection title={`Linked recipients (${subscribers.length})`}>
         {subscribers.length === 0 ? (
           <EmptyState
-            title="No subscribers yet"
-            description="Send /subscribe to the bot in Telegram."
+            title="No linked members yet"
+            description="Household members link Telegram from Settings → Telegram."
           />
         ) : (
           <ul className="admin-subscriber-list">
             {subscribers.map((subscriber) => (
-              <li key={subscriber.id} className="admin-subscriber-item">
+              <li key={`${subscriber.chat_id}-${subscriber.username ?? ""}`} className="admin-subscriber-item">
                 {subscriber.display_name ?? subscriber.username ?? subscriber.chat_id}
                 {subscriber.username ? <span className="muted"> @{subscriber.username}</span> : null}
                 <span className="muted"> · chat {subscriber.chat_id}</span>
@@ -202,18 +202,18 @@ export function TelegramSettingsPage() {
       </FormSection>
 
       <form onSubmit={(event) => void handleSubmit(event)} className="admin-form">
-        <FormSection title="Daily reminders" description="Send a daily shopping reminder through the household bot.">
+        <FormSection title="Household notifications" description="Enable sending and set default shopping format for this household.">
           <div className="settings-section-header-trailing-only">
             <Switch
               checked={form.enabled ?? false}
               onChange={(event) => setForm({ ...form, enabled: event.target.checked })}
-              label="Enable daily reminders"
+              label="Enable household Telegram notifications"
             />
           </div>
 
           <div className="grid-2">
             <label>
-              Daily reminder time
+              Default reminder time
               <input
                 type="time"
                 value={form.daily_reminder_time ?? "08:00"}
@@ -239,13 +239,13 @@ export function TelegramSettingsPage() {
           />
           <p className="muted admin-field-hint">
             Includes today and the following {Math.max(0, (form.shopping_window_days ?? 3) - 1)} day
-            {(form.shopping_window_days ?? 3) - 1 === 1 ? "" : "s"}.
+            {(form.shopping_window_days ?? 3) - 1 === 1 ? "" : "s"}. Used for household broadcast reminders.
           </p>
 
           <Switch
             checked={Boolean(form.group_by_category)}
             onChange={(event) => setForm({ ...form, group_by_category: event.target.checked })}
-            label="Group ingredients by category when sending a saved shopping list via API"
+            label="Group ingredients by category when sending a saved shopping list"
           />
         </FormSection>
 

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import enum
-from datetime import datetime
+from datetime import datetime, time
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
-from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, String, UniqueConstraint, func
+from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Integer, String, Time, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import Uuid
 
@@ -100,3 +100,31 @@ class UserPlatformRole(Base):
     granted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     user: Mapped["User"] = relationship(back_populates="platform_roles")
+
+
+class HouseholdNotificationSubscription(Base):
+    __tablename__ = "household_notification_subscriptions"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id",
+            "household_id",
+            name="uq_household_notification_subscriptions_user_household",
+        ),
+    )
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    household_id: Mapped[UUID] = mapped_column(ForeignKey("households.id", ondelete="CASCADE"), index=True)
+    notify_daily_reminder: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    notify_shopping: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    notify_roulette: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    daily_reminder_time: Mapped[time] = mapped_column(Time, nullable=False, default=time(8, 0))
+    shopping_window_days: Mapped[int] = mapped_column(Integer, nullable=False, default=3)
+    timezone: Mapped[str] = mapped_column(String(64), nullable=False, default="Europe/Paris")
+    last_reminder_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+    )

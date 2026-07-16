@@ -21,6 +21,15 @@ type SettingsTileConfig = {
   icon: ReactNode;
 };
 
+const PERSONAL_TILES: SettingsTileConfig[] = [
+  {
+    to: "/settings/telegram",
+    title: "Telegram",
+    description: "Link your account, notification preferences, and daily reminders.",
+    icon: <SettingsTelegramIcon />,
+  },
+];
+
 const PLANNING_TILES: SettingsTileConfig[] = [
   {
     to: "/settings/targets",
@@ -43,15 +52,15 @@ const HOUSEHOLD_TILES: SettingsTileConfig[] = [
     description: "Name, invite links, members, and roles.",
     icon: <SettingsHouseholdIcon />,
   },
+  {
+    to: "/settings/telegram/household",
+    title: "Household Telegram",
+    description: "Enable notifications and shopping-list format for the household.",
+    icon: <SettingsTelegramIcon />,
+  },
 ];
 
 const INTEGRATION_TILES: SettingsTileConfig[] = [
-  {
-    to: "/settings/telegram",
-    title: "Telegram",
-    description: "Daily reminders, bot commands, subscribers.",
-    icon: <SettingsTelegramIcon />,
-  },
   {
     to: "/settings/backups",
     title: "Backups",
@@ -85,9 +94,9 @@ function SettingsGroup({ heading, tiles }: { heading: string; tiles: SettingsTil
 }
 
 export function AdminSettingsPage() {
-  const { isPlatformAdmin, isHouseholdAdmin, loading } = useAuth();
+  const { isPlatformAdmin, isHouseholdAdmin, hasHousehold, loading } = useAuth();
   const navigate = useNavigate();
-  const canAccessSettings = isPlatformAdmin || isHouseholdAdmin;
+  const canAccessSettings = isPlatformAdmin || isHouseholdAdmin || hasHousehold;
 
   useEffect(() => {
     if (!loading && !canAccessSettings) {
@@ -112,12 +121,15 @@ export function AdminSettingsPage() {
       ? "Household and platform admin — members, meal rules, catalog, and integrations."
       : isHouseholdAdmin
         ? "Household admin — members, meal rules, and automation."
-        : "Platform admin — installation catalog and integrations.";
+        : isPlatformAdmin
+          ? "Platform admin — installation catalog and integrations."
+          : "Your account — Telegram linking and notification preferences.";
 
   return (
     <div className="admin-page">
       <PageShell title="Settings" subtitle={subtitle}>
         <HouseholdClock />
+        {hasHousehold ? <SettingsGroup heading="Personal" tiles={PERSONAL_TILES} /> : null}
         {isHouseholdAdmin ? <SettingsGroup heading="Household" tiles={HOUSEHOLD_TILES} /> : null}
         {isHouseholdAdmin ? <SettingsGroup heading="Meal planning" tiles={PLANNING_TILES} /> : null}
         {isPlatformAdmin ? <SettingsGroup heading="Integrations" tiles={INTEGRATION_TILES} /> : null}
