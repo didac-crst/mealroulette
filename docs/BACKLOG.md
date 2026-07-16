@@ -25,13 +25,22 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Next focus — household users and memberships architecture.**
+**Phase 15 complete on `main` — prepare `v0.12.0` release after this cleanup PR merges and CI is green.**
 
-`v0.9.0` shipped documentation harmonization, UI/UX design-system reconciliation, and live computed traits. See [releases/v0.9.0.md](releases/v0.9.0.md).
+Phase 15 shipped as stacked PRs:
 
-`v0.10.0` shipped multi-dish meal slots, `Do not plan`, simple-dish fixture import, stricter canonical ingredient validation, faster roulette pair generation, and parallel backend CI. Release notes: [releases/v0.10.0.md](releases/v0.10.0.md).
+| Slice | Theme | PR |
+| --- | --- | --- |
+| **15A** | Identity and tenancy foundation | [#17](https://github.com/didac-crst/mealroulette/pull/17) |
+| **15B** | Household domain scoping | [#18](https://github.com/didac-crst/mealroulette/pull/18) |
+| **15C** | Household membership API | [#19](https://github.com/didac-crst/mealroulette/pull/19) |
+| **15D** | Household UX and frontend tenancy wiring | [#20](https://github.com/didac-crst/mealroulette/pull/20) |
+| **15E** | Telegram tenancy and notification subscriptions | [#21](https://github.com/didac-crst/mealroulette/pull/21) |
+| **15F** | Final hardening, docs, release prep | this PR |
 
-`v0.11.0` shipped pair compatibility, reroll memory, structure-first generation, and package-level swap fixes. Release notes: [releases/v0.11.0.md](releases/v0.11.0.md).
+Architecture: [ADR 003](adr/003-household-tenancy-and-authorization.md). Draft release notes: [releases/v0.12.0.md](releases/v0.12.0.md) (tag only after merge + green `main`).
+
+`v0.11.0` and earlier remain the prior product line. See [releases/](releases/).
 
 ---
 
@@ -69,6 +78,13 @@ Use one branch per milestone, then merge via pull request:
 - `phase-12/ui-ux-design-system` — documentation harmonization, UI/UX reconciliation, live computed traits (merged in PR #12 and PR #13, `v0.9.0`)
 - `phase-13/composable-fixtures-scheduler-ci` — composable meal slots, simple dishes, scheduler performance, parallel CI (PR #14, release target `v0.10.0`)
 - `phase-14/pair-compatibility-reroll` — pair compatibility, reroll memory, structure-first generation, package swap fixes (merged in PR #15, `v0.11.0`)
+- `phase-15a-identity-tenancy-foundation` — UUID users/households/platform roles (merged in PR #17)
+- `phase-15b-household-domain-scoping` — household-owned content + isolation (merged in PR #18)
+- `phase-15c-household-membership-api` — signup, invitations, membership APIs (merged in PR #19)
+- `phase-15d-household-ux-and-tenancy-wiring` — signup/join/members UI + role-gated settings (merged in PR #20)
+- `phase-15e-telegram-tenancy` — user Telegram links, subscriptions, household-scoped delivery (merged in PR #21)
+- `phase-15f-final-hardening-docs-release` — Phase 15 closeout: tests, docs, release notes
+- `phase-15/household-users-and-memberships` — **umbrella only**; do not merge. Used to inventory deferred extras (OTP, password settings, ingredient proposals, public catalog).
 
 ---
 
@@ -89,7 +105,8 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.9** | UI/UX design system + live recipe traits — shared shell, visual QA, fresh trait reads | **Done** ([`v0.9.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.9.0), merge `9647509`, PR #12/#13) |
 | **v0.10** | Composable meals — multi-dish slots, simple dishes, do-not-plan, faster roulette | **Done** ([`v0.10.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.10.0), merge `a2e29de`, PR #14) |
 | **v0.11** | Pair compatibility and reroll memory — prevent bad simple-dish pairs and reroll cycles | **Done** ([`v0.11.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.11.0), merge `82f20de`, PR #15) |
-| **Future** | Household users and memberships — user creation, household scoping, Telegram linking | Architecture accepted |
+| **v0.12** | Household users and memberships — tenancy, invitations, household UX, Telegram linking | **Done on `main`** (PRs #17–#21, merge `1d959c5`); tag `v0.12.0` after 15F |
+| **Future** | Public catalog, ingredient proposals, Telegram OTP login, password settings | Not started (deferred past Phase 15) |
 | **Future** | LLM-assisted entry — draft enrichment, review before save | Not started |
 | **v1.0** | Stable home version — backups, auth hardening, scheduler reliability | Not started |
 
@@ -325,30 +342,44 @@ When `meal_composition = simple_dish`, **`simple_dish_part`** is required: `cent
 - [x] Add explicit reroll exhaustion behavior.
 - [x] Add table-driven tests for the bad screenshot examples and good expected pairs.
 
-### Future — Household Users and Memberships
+### v0.12 — Household Users and Memberships
 
-**Status:** Architecture accepted for first implementation — see [ADR 003](adr/003-household-tenancy-and-authorization.md).
+**Status:** Done on `main` via Phase 15A–E (PRs [#17](https://github.com/didac-crst/mealroulette/pull/17)–[#21](https://github.com/didac-crst/mealroulette/pull/21), tip `1d959c5`). Architecture: [ADR 003](adr/003-household-tenancy-and-authorization.md). Release notes: [releases/v0.12.0.md](releases/v0.12.0.md) (tag after 15F).
 
-Use **household** or **workspace** as the product concept, not "entity".
+| Slice | Delivered |
+| --- | --- |
+| **15A** | UUID users/households/memberships/platform roles; default-household upgrade path |
+| **15B** | Household ownership on plans/dishes/settings; meal reviews; tenant isolation |
+| **15C** | Atomic household signup, invitations, membership APIs, last-admin protection |
+| **15D** | Signup/join/members UI; platform vs household admin settings boundaries |
+| **15E** | User Telegram deep-link linking; per-membership notification subscriptions; household-scoped delivery |
 
-Recommended staged model:
+**Shipped checklist:**
 
-- [ ] Use UUID primary keys for users, households, memberships, invitations, Telegram links, and platform-role assignments.
-- [ ] Keep existing integer primary keys for catalog, planning, shopping, and scheduler content unless an external/public identifier is needed.
-- [ ] Single default household migration for current installations.
-- [ ] `households` table.
-- [ ] `household_memberships` table with household-level roles.
-- [ ] Atomic signup creates user, household, and first household-admin membership.
-- [ ] User creation/invitation UI for household admins; invitations join as normal members first.
-- [ ] Telegram subscriptions linked to `{user, household}`.
-- [ ] Household-scoped plans, dishes, recipes, planning settings, ratings, and notifications.
-- [ ] Ratings support both user-level recipe preference and user-level meal-slot review context.
-- [ ] System-level canonical ingredients, food groups, units, and taxonomy restricted to `platform_admin`.
-- [ ] Household admins can manage household recipes/dishes but cannot mutate global canonical taxonomy.
-- [ ] Treat whole-database backup/restore as a platform operation; defer household-level portable export/import.
-- [ ] Defer public recipe sharing, localization tables, and cross-household copy/adopt workflows until after tenant isolation is stable.
+- [x] UUID identity for users, households, memberships, invitations, Telegram links, platform roles
+- [x] Integer PKs retained for catalog/planning/shopping content
+- [x] Default household migration for existing installs; greenfield signup creates a new household
+- [x] `households` + `household_memberships` with household roles
+- [x] Atomic signup (user + household + household-admin membership)
+- [x] Invitation create/accept/revoke; join as `household_member`; last-admin protection
+- [x] Household-scoped plans, dishes, recipes, planning settings, shopping, scheduler, meal reviews
+- [x] Global taxonomy mutation restricted to `platform_admin`; household admins manage household content
+- [x] User-level Telegram link + household notification defaults + per-user subscriptions
+- [x] Cooking timer alerts go to the starter’s linked Telegram user
+- [x] One active household membership per user (initial product constraint)
 
-Initial role direction:
+**Deferred past Phase 15 (not blockers):**
+
+- [ ] User-level recipe/dish preference API/UI (`recipe_ratings`) — meal-slot reviews shipped as `meal_reviews`
+- [ ] Ingredient proposal workflow for missing catalogue entries
+- [ ] Public dish catalog / publication / subscriptions
+- [ ] Telegram OTP / passwordless bot login
+- [ ] Password / account settings page
+- [ ] Household-level portable export/import
+- [ ] Localization tables and cross-household copy/adopt
+- [ ] Multi-household membership (users may hold at most one active membership today)
+
+Roles (as shipped):
 
 | Scope | Role | Capability |
 | --- | --- | --- |
@@ -356,14 +387,12 @@ Initial role direction:
 | Household | `household_admin` | Manage household members, invitations, recipes, dishes, planning settings |
 | Household | `household_member` | Plan, shop, cook, review, reroll, collaborate on household recipes |
 
-Initial UI may assume one active household per session even though the model supports multiple memberships. Do not add public discovery of households; joining an existing household requires an invitation.
-
 ### v1.0 — Stable Home Version
 
 - [ ] Usable mobile UI
 - [ ] Stable API
 - [x] Backup / restore
-- [ ] Auth and roles
+- [x] Auth and roles (Phase 15 — platform vs household roles)
 - [ ] Scheduler reliable enough for real use
 - [x] Telegram reminders
 - [x] Recipe cooking mode (Phase 10, PR #10)
@@ -392,8 +421,8 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 12 | UI/UX design system and live traits | v0.9 | Done (PR #12/#13, `v0.9.0`) |
 | 13 | Composable meals and simple dishes | v0.10 | Done (PR #14, `v0.10.0`) |
 | 14 | Pair compatibility and reroll memory | v0.11 | Done (PR #15, `v0.11.0`) |
-| 15 | Household users and memberships | Future | Architecture accepted (ADR 003) |
-| 16 | LLM-assisted entry & localization | Future | Not started |
+| 15 | Household users and memberships | v0.12 | Done (PRs #17–#21, `1d959c5`; 15F closeout) |
+| 16 | LLM-assisted entry & localization | Future | Not started (also absorbs public-catalog / OTP / proposals later) |
 | 17 | v1 hardening | v1.0 | Not started |
 
 ### Phase 0 — Project bootstrap ✅
@@ -595,9 +624,24 @@ Deferred (not first pass): Thermomix layout, persistent sessions, Telegram entry
 
 Addressed in PR #10 commit `cee1ae0`: Telegram schedule/cancel race, today Review without dish, timer label helper, BACKLOG wording, timer tick side effects, test mocks.
 
-### Phases 11–13
+### Phases 11–14
 
 See [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) for full deliverables and acceptance criteria per phase.
+
+### Phase 15 — Household users and memberships ✅
+
+Shipped as stacked PRs on `main` (tip of feature work: `1d959c5`). Closeout docs/tests in 15F.
+
+| Slice | Branch | PR | Focus |
+| --- | --- | --- | --- |
+| 15A | `phase-15a-identity-tenancy-foundation` | [#17](https://github.com/didac-crst/mealroulette/pull/17) | UUID identity, households, platform roles |
+| 15B | `phase-15b-household-domain-scoping` | [#18](https://github.com/didac-crst/mealroulette/pull/18) | Household-owned domain data + isolation |
+| 15C | `phase-15c-household-membership-api` | [#19](https://github.com/didac-crst/mealroulette/pull/19) | Signup / invitations / membership APIs |
+| 15D | `phase-15d-household-ux-and-tenancy-wiring` | [#20](https://github.com/didac-crst/mealroulette/pull/20) | Signup/join/members UI + role-gated settings |
+| 15E | `phase-15e-telegram-tenancy` | [#21](https://github.com/didac-crst/mealroulette/pull/21) | Telegram user links + notification subscriptions |
+| 15F | `phase-15f-final-hardening-docs-release` | this PR | Docs/status reconciliation + release prep |
+
+Umbrella branch `phase-15/household-users-and-memberships` is **not** mergeable source of truth. Deferred extras found there (Telegram OTP, password settings UI, ingredient proposals, public catalog drafts) stay Phase 16 / future work.
 
 ---
 

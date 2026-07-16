@@ -151,7 +151,7 @@ The default commit hook should fail if tests fail. Lint/format hooks may run in 
 
 ## Implementation Phases
 
-Phases 0–14 shipped through **`v0.11.0`**. Later phases continue from the pair-compatibility and reroll-memory work shipped in `v0.11.0`.
+Phases 0–15 shipped through **household tenancy on `main`** (release target **`v0.12.0`**). Phases 0–14 remain tagged through `v0.11.0`.
 
 | Phase | Name | Target version |
 | --- | --- | --- |
@@ -161,7 +161,7 @@ Phases 0–14 shipped through **`v0.11.0`**. Later phases continue from the pair
 | 12 | UI/UX design system and live traits | v0.9 |
 | 13 | Composable meals and simple dishes | v0.10 |
 | 14 | Pair compatibility and reroll memory | v0.11 |
-| 15 | Household users and memberships | Future |
+| 15 | Household users and memberships | v0.12 |
 | 16 | LLM-assisted entry & localization | Future |
 | 17 | v1 hardening | v1.0 |
 
@@ -934,26 +934,35 @@ Acceptance criteria:
 
 Architecture spec: [ADR 003 — Household tenancy and authorization](adr/003-household-tenancy-and-authorization.md). Shipment status: [BACKLOG.md](BACKLOG.md).
 
-Deliverables:
+**Shipped as stacked slices (do not treat the umbrella branch as mergeable):**
 
-- Decide final product name: recommended `household` or `workspace`, not `entity`.
-- Use UUID primary keys for users, households, memberships, invitations, Telegram links, and platform-role assignments.
-- Keep existing integer IDs for content tables unless an external/public identifier is needed.
-- Single default household migration for existing installations.
-- Household membership model and per-household roles.
-- Atomic user+household signup and invitation-based join flow.
-- Household-scoped plan, dish, recipe, settings, rating, and Telegram subscription behavior.
-- Separate user-level recipe ratings from meal-slot reviews; both are user-contextual.
-- Platform-level role for canonical ingredient/taxonomy maintenance and whole-database backup/restore.
-- Defer public recipe sharing, localization tables, and household-level portable export/import.
+| Slice | PR | Deliverables |
+| --- | --- | --- |
+| **15A** | [#17](https://github.com/didac-crst/mealroulette/pull/17) | UUID users/households/memberships/platform roles; default-household upgrade path; tenancy fields on auth responses |
+| **15B** | [#18](https://github.com/didac-crst/mealroulette/pull/18) | `household_id` on household aggregates; meal reviews; service/route scoping; tenant isolation tests |
+| **15C** | [#19](https://github.com/didac-crst/mealroulette/pull/19) | Atomic signup; invitation create/accept/revoke; membership management APIs; last-admin protection |
+| **15D** | [#20](https://github.com/didac-crst/mealroulette/pull/20) | Signup/join/members UI; platform vs household admin settings boundaries |
+| **15E** | [#21](https://github.com/didac-crst/mealroulette/pull/21) | User Telegram deep-link linking; household notification defaults; per-membership subscriptions; scoped delivery |
+| **15F** | closeout | Docs/status reconciliation, deferred hardening tests, release notes for `v0.12.0` |
 
-Acceptance criteria:
+Acceptance criteria (met):
 
 - Existing installations migrate into one default household without losing access.
 - A household admin can invite users for their household.
 - Normal household users cannot mutate canonical ingredients, food groups, units, or global taxonomy.
-- Telegram subscriptions are linked to a user and household.
+- Telegram links are user-scoped; household notifications respect active membership + subscription toggles.
 - Public signup may create a new household; joining an existing household requires an invitation.
+
+**Intentionally deferred (not Phase 15 blockers):**
+
+- Public dish catalog / publication / subscriptions
+- Ingredient proposal workflow
+- Telegram OTP / bot login
+- Password / account settings page
+- User-level recipe preference API/UI (`recipe_ratings`)
+- Multi-household membership
+- Household-level portable export/import
+- Localization tables and cross-household copy/adopt
 
 ### Phase 16 - LLM-Assisted Entry & Localization
 
