@@ -1,10 +1,26 @@
 from datetime import datetime
+from typing import Annotated
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import AfterValidator, BaseModel, ConfigDict, EmailStr, Field
 
 from mealroulette.models.household import HouseholdRole, PlatformRole
 from mealroulette.models.user import UserRole
+
+BCRYPT_MAX_PASSWORD_BYTES = 72
+
+
+def _validate_password_utf8_bytes(value: str) -> str:
+    if len(value.encode("utf-8")) > BCRYPT_MAX_PASSWORD_BYTES:
+        raise ValueError(f"Password must be at most {BCRYPT_MAX_PASSWORD_BYTES} bytes")
+    return value
+
+
+PasswordStr = Annotated[
+    str,
+    Field(min_length=8, max_length=128),
+    AfterValidator(_validate_password_utf8_bytes),
+]
 
 
 class TokenResponse(BaseModel):
@@ -15,7 +31,7 @@ class TokenResponse(BaseModel):
 
 class LoginRequest(BaseModel):
     username: str = Field(min_length=1, max_length=64)
-    password: str = Field(min_length=8, max_length=128)
+    password: PasswordStr
 
 
 class RefreshRequest(BaseModel):
@@ -26,6 +42,11 @@ class RefreshRequest(BaseModel):
 
 class LogoutRequest(BaseModel):
     refresh_token: str
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: PasswordStr
+    new_password: PasswordStr
 
 
 class UserPublic(BaseModel):
@@ -47,13 +68,13 @@ class UserPublic(BaseModel):
 class UserCreateRequest(BaseModel):
     username: str = Field(min_length=1, max_length=64)
     email: EmailStr
-    password: str = Field(min_length=8, max_length=128)
+    password: PasswordStr
     role: UserRole = UserRole.user
     active: bool = True
 
 
 class UserUpdateRequest(BaseModel):
     email: EmailStr | None = None
-    password: str | None = Field(default=None, min_length=8, max_length=128)
+    password: PasswordStr | None = None
     role: UserRole | None = None
     active: bool | None = None

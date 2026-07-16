@@ -57,6 +57,7 @@ describe("AdminSettingsPage access boundary", () => {
     expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Personal" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Telegram/i })).toHaveAttribute("href", "/settings/telegram");
+    expect(screen.getByRole("link", { name: /^Password/i })).toHaveAttribute("href", "/settings/password");
     expect(screen.queryByRole("heading", { name: "Household" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Meal planning" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Integrations" })).not.toBeInTheDocument();

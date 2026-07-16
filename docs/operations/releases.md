@@ -26,7 +26,7 @@ Git tags mark **product versions** users can run. We do not tag individual imple
 | `v0.9.0` | UI/UX design system, documentation harmonization, and live computed traits — **released** — [release notes](../releases/v0.9.0.md) |
 | `v0.10.0` | Composable meal slots, simple dishes, fixture hardening, scheduler performance, parallel CI — **released** — [release notes](../releases/v0.10.0.md) |
 | `v0.11.0` | Pair compatibility, reroll memory, structure-first roulette, and package swap fixes — **released** — [release notes](../releases/v0.11.0.md) |
-| `v0.12.0` | Household users and memberships (Phase 15A–E) — **tag after 15F merges and green `main`** — [release notes](../releases/v0.12.0.md) |
+| `v0.12.0` | Household users and memberships (Phase 15A–E) — **draft; tag only after green `main` + human user testing** — [release notes](../releases/v0.12.0.md) |
 
 Use [semantic versioning](https://semver.org/) at the product-version level: `vMAJOR.MINOR.PATCH`. Patch bumps are for fixes on an already-released version line.
 

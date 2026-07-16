@@ -9,6 +9,7 @@ import {
   SettingsBackupIcon,
   SettingsHouseholdIcon,
   SettingsIngredientsIcon,
+  SettingsPasswordIcon,
   SettingsSchedulerIcon,
   SettingsTargetsIcon,
   SettingsTelegramIcon,
@@ -27,6 +28,12 @@ const PERSONAL_TILES: SettingsTileConfig[] = [
     title: "Telegram",
     description: "Link your account, notification preferences, and daily reminders.",
     icon: <SettingsTelegramIcon />,
+  },
+  {
+    to: "/settings/password",
+    title: "Password",
+    description: "Change the password for your MealRoulette account.",
+    icon: <SettingsPasswordIcon />,
   },
 ];
 
@@ -123,7 +130,7 @@ export function AdminSettingsPage() {
         ? "Household admin — members, meal rules, and automation."
         : isPlatformAdmin
           ? "Platform admin — installation catalog and integrations."
-          : "Your account — Telegram linking and notification preferences.";
+          : "Your account — Telegram linking, notifications, and password.";
 
   return (
     <div className="admin-page">

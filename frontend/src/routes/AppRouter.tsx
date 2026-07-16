@@ -25,6 +25,7 @@ import { PersonalTelegramSettingsPage } from "../features/settings/PersonalTeleg
 import { SchedulerSettingsPage } from "../features/settings/SchedulerSettingsPage";
 import { AdminSettingsPage } from "../features/settings/AdminSettingsPage";
 import { HouseholdMembersPage } from "../features/settings/HouseholdMembersPage";
+import { PasswordSettingsPage } from "../features/settings/PasswordSettingsPage";
 import { PlanningTargetsPage } from "../features/settings/PlanningTargetsPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { AdminRoute } from "./AdminRoute";
@@ -55,6 +56,7 @@ export function AppRouter() {
               <Route path="ingredients/:ingredientId" element={<IngredientDetailPage />} />
               <Route path="settings" element={<AdminSettingsPage />} />
               <Route path="settings/telegram" element={<PersonalTelegramSettingsPage />} />
+              <Route path="settings/password" element={<PasswordSettingsPage />} />
               <Route element={<AdminRoute />}>
                 <Route path="ingredients/new" element={<IngredientEditPage />} />
                 <Route path="ingredients/:ingredientId/edit" element={<IngredientEditPage />} />
