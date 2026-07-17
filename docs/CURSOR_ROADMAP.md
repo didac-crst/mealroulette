@@ -151,7 +151,7 @@ The default commit hook should fail if tests fail. Lint/format hooks may run in 
 
 ## Implementation Phases
 
-Phases 0–15 shipped through **household tenancy on `main`** (release target **`v0.12.0`**). Phases 0–14 remain tagged through `v0.11.0`.
+Phases 0–16B shipped through **household tenancy, account settings, Telegram OTP, and catalog UI parity on `main`** (released as **`v0.12.0`**). Phases 0–14 remain tagged through `v0.11.0`.
 
 | Phase | Name | Target version |
 | --- | --- | --- |
@@ -965,50 +965,119 @@ Acceptance criteria (met):
 - Household-level portable export/import
 - Localization tables and cross-household copy/adopt
 
-### Phase 16 - Deferred umbrella slices, then LLM & Localization
+### Phase 16 - Proposals, Drafts, LLM Authoring, And Localization
 
 Shipment status: [BACKLOG.md](BACKLOG.md).
 
-Phase 16 starts by landing deferred umbrella items as reviewable slices before LLM/localization:
+Phase 16 lands the remaining umbrella work and then builds the recipe-ingestion architecture in reviewable slices. Architecture: [ADR 004](adr/004-draft-first-recipe-authoring-and-external-identifiers.md).
 
 | Slice | Theme |
 | --- | --- |
 | **16A** | Password / account settings (done) |
 | **16B** | Umbrella UI parity (shell, filters, ingredients, OTP) (done) |
-| **16C** | Ingredient proposals |
+| **16C** | Ingredient proposal foundation |
 | **16D** | Public catalog / public dishes |
 | **16E** | Recipe ratings UI |
+| **16F** | Recipe draft/import foundation |
+| **16G** | LLM-assisted recipe authoring experiment |
+| **16H** | Localization foundation |
+| **16I** | LLM-assisted translation |
 
-Then continue with LLM-assisted entry and localization foundation:
+#### Phase 16C — Ingredient proposal foundation
+
+Design spec: [features/ingredient-proposals.md](features/ingredient-proposals.md).
+
+Deliverables:
+
+- `ingredient_proposals` model and migration.
+- Household-user proposal creation and "my proposals" listing.
+- Platform-admin review queue.
+- Resolution actions: map existing, add alias, approve new canonical, reject, request information, withdraw.
+- Proposal deduplication against pending proposals, ingredients, and aliases.
+- Source locale, culinary context, source type, optional source reference, reviewer audit fields.
+- Authorization and tenant-isolation tests.
+
+Acceptance criteria:
+
+- Household users can propose missing ingredients without creating catalog rows.
+- Platform admins decide whether a proposal becomes a canonical ingredient, alias, duplicate mapping, rejection, or needs-information item.
+- Active recipes still require approved canonical ingredient IDs.
+- Review actions are audited and taxonomy validation remains authoritative.
+
+#### Phase 16F — Recipe draft/import foundation
+
+Design spec: [features/recipe-import-drafts.md](features/recipe-import-drafts.md).
+
+Deliverables:
+
+- Recipe import sessions and recipe draft persistence.
+- Draft ingredients with `resolved`, `ambiguous`, `missing`, and `ignored` states.
+- Draft steps with duration/timer metadata.
+- Deterministic draft validation.
+- Explicit commit workflow into trusted dish/recipe tables.
+- Reference servings and contextual serving scaling model.
+- Optional proposal link from missing draft ingredients.
+
+Acceptance criteria:
+
+- Drafts can be created, edited, validated, cancelled, and committed without any LLM provider.
+- Drafts with unresolved required ingredients cannot commit.
+- Planning and shopping never read uncommitted drafts.
+- Commit requires explicit user confirmation and household ownership.
+
+#### Phase 16G — LLM-assisted recipe authoring experiment
+
+Deliverables:
+
+- Provider abstraction.
+- Platform-configured provider credentials.
+- One supported provider.
+- Structured extraction for free-text recipe descriptions.
+- Ingredient resolver tool use against application services.
+- Quality-review pass.
+- Usage tracking: provider, model, prompt version, schema version, token usage, latency, raw response, parsed result, validation result.
+- Feature flag.
+
+Acceptance criteria:
+
+- LLM endpoints require authentication and rate limits.
+- LLM output mutates only drafts.
+- The model has no direct trusted-data CRUD or SQL access.
+- Free-text recipe description can produce a reviewable draft.
+- Deterministic validation remains authoritative.
+
+#### Phase 16H — Localization foundation
 
 Design spec: [features/localization.md](features/localization.md).
 
 Deliverables:
 
-- Provider abstraction
-- LLM settings
-- Enrich dish endpoint
-- Suggest ingredients endpoint
-- Suggest tags endpoint
-- Normalize ingredients endpoint
-- Draft review UI
 - **Localization foundation:** `translations` table with `status`, `source_text_hash`, review metadata; `default_locale` on dish/recipe/ingredient
+- **Locale-aware reads:** `?locale=fr` with fallback chain; UI chrome via frontend i18n (separate from content)
+- Translation identity via `(entity_id, locale)` rows, not localized core recipe rows.
+
+Acceptance criteria:
+
+- Recipe, dish, and ingredient identities are language-independent.
+- Approved translations are served deterministically; stale translations are not shown to normal users.
+- Source text changes mark approved translations as `stale`.
+- Recipe step translation preserves quantities, times, temperatures, units, and appliance terms.
+- Ingredient display translations remain separate from search aliases.
+
+#### Phase 16I — LLM-assisted translation
+
+Deliverables:
+
 - **Localization jobs:** `localization_jobs` + `localization_job_items` for one-click bulk translate
 - **Glossary:** protected terms and consistent culinary vocabulary for LLM prompts
 - **Bulk translate:** field-aware batched `POST /api/admin/localization/jobs` → draft translations → admin approve
-- **Locale-aware reads:** `?locale=fr` with fallback chain; UI chrome via frontend i18n (separate from content)
 - Optional: LLM-suggested ingredient **aliases** per target locale (not a substitute for display translations)
 
 Acceptance criteria:
 
 - LLM endpoints require authentication.
-- LLM output is saved only after explicit user confirmation.
-- Ingredient suggestions still pass through normalization flow.
-- Approved translations are served deterministically; stale translations are not shown to normal users.
+- LLM translation output is saved only as draft until review.
 - Bulk translation is idempotent (unique `entity_type + entity_id + field_name + locale`).
-- Source text changes mark approved translations as `stale`.
-- Recipe step translation preserves quantities, times, temperatures, units, and appliance terms.
-- Ingredient display translations remain separate from search aliases.
 
 ### Phase 17 - v1 Hardening
 

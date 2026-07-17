@@ -43,6 +43,8 @@ Where to look for product truth, feature behaviour, operations, and history.
 | [features/cooking-mode.md](features/cooking-mode.md) | Today home, step-by-step cooking, timers |
 | [features/meal-composition.md](features/meal-composition.md) | Dish `meal_composition` / planner slots |
 | [features/composable-meals.md](features/composable-meals.md) | Multi-dish meal slots, do-not-plan, composable roulette |
+| [features/ingredient-proposals.md](features/ingredient-proposals.md) | Governed missing-ingredient proposal workflow |
+| [features/recipe-import-drafts.md](features/recipe-import-drafts.md) | Draft-first recipe import and AI-assisted authoring architecture |
 | [features/localization.md](features/localization.md) | Multilingual content design (not yet implemented) |
 | [features/ui-ux-design-system.md](features/ui-ux-design-system.md) | Visual design system, tokens, navigation, migration plan |
 
@@ -55,6 +57,7 @@ Implementation detail for taxonomy YAML and validation workflows: [taxonomy/READ
 | [adr/001-ingredient-taxonomy-contract.md](adr/001-ingredient-taxonomy-contract.md) | Ingredient taxonomy contract |
 | [adr/002-canonical-taxonomy-before-backup.md](adr/002-canonical-taxonomy-before-backup.md) | Taxonomy hardening before backup contract |
 | [adr/003-household-tenancy-and-authorization.md](adr/003-household-tenancy-and-authorization.md) | Household tenancy and authorization |
+| [adr/004-draft-first-recipe-authoring-and-external-identifiers.md](adr/004-draft-first-recipe-authoring-and-external-identifiers.md) | Draft-first authoring, proposal workflow, localization identity, serving scaling, external IDs |
 
 ## Operations (runbooks)
 

@@ -16,7 +16,7 @@ Split ingredient taxonomy into declarative files that can support:
 - ingredient seed import
 - recipe computed traits
 - food group and family browsing APIs
-- ingredient resolver APIs for humans and LLM agents
+- ingredient resolver APIs for humans and LLM-assisted workflows
 - top-down ingredient selection when direct alias matching fails
 
 This is intended for Phase 9, but must remain compatible with the current v0.5 app.
@@ -583,7 +583,7 @@ Resolver UI:
 input raw ingredient text -> show exact/suggestions/unknown
 ```
 
-For unknown inputs, offer the same top-down selection used by LLM agents:
+For unknown inputs, offer the same top-down selection used by LLM-assisted workflows:
 
 ```text
 choose food group -> choose family -> choose existing ingredient or draft new ingredient
@@ -604,9 +604,9 @@ Draft-new-ingredient form should prefill:
 
 This UI should not be required to complete all Phase 9 backend work, but the backend/API should be designed so the navigator is straightforward to build.
 
-## LLM Agent Workflow
+## LLM-Assisted Resolver Workflow
 
-Recommended resolver order for agents:
+Recommended resolver order for tool-using authoring assistants:
 
 ```yaml
 selection_guidance:

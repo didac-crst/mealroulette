@@ -16,8 +16,9 @@ Product principles (same as LLM-assisted entry elsewhere):
 - **LLM suggests once** → stored as draft → **human approves** → deterministic forever.
 - **No live translation** on page load or shopping-list generation.
 - **Bulk jobs** are idempotent, auditable, and field-aware.
+- **Entity identity is language-independent**; translations are representations of one dish/recipe/step/ingredient, not separate identities.
 
-See also: [SPECS.md](../../SPECS.md), [CURSOR_ROADMAP.md](../CURSOR_ROADMAP.md) (LLM-assisted entry and localization).
+See also: [SPECS.md](../../SPECS.md), [CURSOR_ROADMAP.md](../CURSOR_ROADMAP.md) (LLM-assisted entry and localization), and [ADR 004](../adr/004-draft-first-recipe-authoring-and-external-identifiers.md).
 
 ---
 
@@ -50,6 +51,49 @@ The **source field value** on the entity remains the canonical text in `default_
 
 ## What is translatable vs stable
 
+Recipe, dish, ingredient, and step identities are language-independent.
+
+Do **not** model core recipes as `(recipe_id, language_id)` rows. The composite key belongs to translation tables, for example:
+
+```text
+recipes
+- id
+- dish_id
+- reference_servings
+- cook_time_minutes
+- recipe_type
+- source_locale
+
+recipe_translations
+- recipe_id
+- locale
+- variant_name
+- description
+- notes
+- status
+- source_text_hash
+PRIMARY KEY (recipe_id, locale)
+
+recipe_step_translations
+- recipe_step_id
+- locale
+- instruction
+- notes
+- status
+- source_text_hash
+PRIMARY KEY (recipe_step_id, locale)
+
+dish_translations
+- dish_id
+- locale
+- name
+- description
+- notes
+PRIMARY KEY (dish_id, locale)
+```
+
+Translations may change wording. They must not change servings, ingredient IDs, quantities, step order, timers, temperatures, or appliance settings.
+
 ### Translate (via `translations` table)
 
 | Entity | Fields | Notes |
@@ -65,6 +109,13 @@ The **source field value** on the entity remains the canonical text in `default_
 
 ### Do not translate
 
+- Recipe, dish, step, ingredient, and unit IDs
+- Canonical ingredient references
+- Quantities and structured numeric values
+- Step ordering
+- Timer durations and temperature values
+- Appliance settings
+- Servings, recipe type, difficulty, source URL
 - `canonical_name` (ingredient slug: `carrot`, `cherry_tomato`)
 - Tag keys (`protein:fish`, `style:soup`)
 - Enum values (`prefer_count`, `draft`, `active`)
@@ -153,6 +204,18 @@ get_localized(entity, field, requested_locale):
 ```
 
 Never return `draft` or `stale` translations to non-admin API consumers.
+
+## Authoritative source language
+
+Each source entity keeps a `source_locale` / `default_locale`.
+
+The source-language fields are authoritative. Translations are derived content.
+
+- Editing the source field marks affected approved translations `stale`.
+- Editing a translation does not modify the source field.
+- Translations cannot alter shared structured recipe facts.
+
+This prevents contradictory localized recipes such as one locale saying "bake 20 minutes" while the shared timer remains 30 minutes.
 
 ---
 
@@ -253,6 +316,8 @@ Prompt must require preserving unchanged:
 - Speeds and appliance settings (Thermomix speed, reverse blade, etc.)
 - Step order
 
+Structured quantities and ingredient identities should be rendered from canonical data and localized ingredient/unit display names. Do not ask the LLM to translate each recipe ingredient line into independent free text that could create separate ingredient identities.
+
 ---
 
 ## Unit labels & shopping display
@@ -267,36 +332,25 @@ Prompt must require preserving unchanged:
 
 | Phase | When | Scope |
 | --- | --- | --- |
-| **A — Foundation** | Phase 11 (with LLM infra) | Migration: `translations`, `localization_jobs`, `default_locale` on dish/recipe/ingredient; `get_localized()`; staleness on write |
-| **B — Review UI** | Phase 11 | Admin side-by-side review; approve/reject; tag & unit labels |
-| **C — Bulk LLM job** | Phase 11 | Field-aware batched translate + glossary; optional alias suggestions |
-| **D — UI locale** | Phase 11–12 | User locale preference; `react-i18next` for chrome only |
-
-### Not now (Phase 6 / v0.3)
-
-- Finish shopping lists, ingredient seed import, ingredient dashboard.
-- French content via **aliases** and French recipe text in source fields is enough until Phase 11.
-- No `translations` table migration until there is a consumer (locale-aware API + review UI).
-
-### Optional early prep (low cost, only if needed before Phase 11)
-
-- Add `default_locale` column with default `'en'` in a migration when touching catalog schema anyway.
-- Do **not** build LLM jobs or review UI until Phase 11.
+| **A — Localization foundation** | Phase 16H | Migration: `translations`, `default_locale` / `source_locale` on dish/recipe/ingredient; `get_localized()`; staleness on write; locale-aware reads |
+| **B — Review UI** | Phase 16H | Side-by-side review; approve/reject; tag & unit labels |
+| **C — Bulk LLM job** | Phase 16I | `localization_jobs`, field-aware batched translate + glossary; optional alias suggestions |
+| **D — UI locale** | Phase 16H–I | User locale preference; frontend chrome i18n remains separate from content |
 
 ---
 
-## API sketch (Phase 11)
+## API sketch (Phase 16H–I)
 
 ```text
 GET  /api/dishes?locale=fr
 GET  /api/recipes/{id}?locale=fr
-POST /api/admin/localization/jobs          { target_locale, source_locale? }
-GET  /api/admin/localization/jobs/{id}
-GET  /api/admin/translations?status=draft&locale=fr
-PUT  /api/admin/translations/{id}          { status, text? }
+POST /api/platform/localization/jobs          { target_locale, source_locale? }
+GET  /api/platform/localization/jobs/{id}
+GET  /api/platform/translations?status=draft&locale=fr
+PUT  /api/platform/translations/{id}          { status, text? }
 ```
 
-All admin localization endpoints require `admin` role.
+Platform localization endpoints require `platform_admin`. Household-owned content translation review may later need a household-admin path, but that is a separate authorization decision.
 
 ---
 
