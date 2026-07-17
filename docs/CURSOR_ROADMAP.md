@@ -1105,6 +1105,8 @@ Acceptance criteria:
 
 Public catalogue contribution rewards remain later strategy, not a Phase 17 blocker — see [strategy/public-catalog-contribution-and-rewards.md](strategy/public-catalog-contribution-and-rewards.md).
 
+Mobile distribution remains future strategy, not a Phase 17 blocker: mobile-first web first, then PWA, then Capacitor if native notifications or share-sheet import become proven bottlenecks — see [strategy/mobile-app-strategy.md](strategy/mobile-app-strategy.md).
+
 ## Cursor Task Rules
 
 When asking Cursor to implement work:

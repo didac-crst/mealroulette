@@ -41,6 +41,7 @@ These documents capture dated business and operating assumptions that may drive 
 | [strategy/hosting-and-public-beta.md](strategy/hosting-and-public-beta.md) | Hosting cost assumptions, beta staging, operational thresholds |
 | [strategy/public-beta-readiness.md](strategy/public-beta-readiness.md) | Go/no-go criteria, success metrics, risk register, public beta gates |
 | [strategy/public-catalog-contribution-and-rewards.md](strategy/public-catalog-contribution-and-rewards.md) | Public recipe contribution incentives, reputation, rewards, anti-fraud |
+| [strategy/mobile-app-strategy.md](strategy/mobile-app-strategy.md) | Mobile-first web, PWA, Capacitor, and future native-client strategy |
 
 ## Feature behaviour (approved semantics)
 
