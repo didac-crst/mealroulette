@@ -63,6 +63,18 @@ class TelegramLinkToken(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
+class TelegramLoginOtp(Base):
+    __tablename__ = "telegram_login_otps"
+    __table_args__ = (UniqueConstraint("user_id", name="uq_telegram_login_otps_user_id"),)
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    user_id: Mapped[UUID] = mapped_column(Uuid, ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    code_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
 class TelegramSubscriber(Base):
     """Legacy installation-global chat list. Not used for household notification delivery."""
 

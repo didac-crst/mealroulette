@@ -3,11 +3,40 @@ from uuid import uuid4
 
 import pytest
 
-from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID
-from mealroulette.models.telegram import TelegramUserLink
+from sqlalchemy import select
+
+from mealroulette.models.household import DEFAULT_HOUSEHOLD_ID, HouseholdNotificationSubscription
+from mealroulette.models.telegram import TelegramSubscriber, TelegramUserLink
 from mealroulette.services.household_membership import HouseholdMembershipService
 from mealroulette.services.telegram_link import TelegramLinkService
 from mealroulette.services.telegram_updates import TelegramUpdateService
+
+
+@pytest.mark.integration
+def test_help_lists_commands_without_deprecated_mentions(db_session):
+    client = MagicMock()
+    service = TelegramUpdateService(db_session, client=client)
+    handled = service._handle_update(
+        "fake-token",
+        {
+            "update_id": 1,
+            "message": {
+                "text": "/help",
+                "chat": {"id": 4242},
+                "from": {"id": 7, "username": "didac"},
+            },
+        },
+    )
+    assert handled is True
+    reply = client.send_message.call_args.args[2]
+    assert "/planning" in reply
+    assert "/reminder" in reply
+    assert "/shopping" in reply
+    assert "link from settings" in reply.lower()
+    assert "days default to 3" in reply.lower()
+    assert "subscribe" not in reply.lower()
+    assert "unsubscribe" not in reply.lower()
+    assert client.send_message.call_args.kwargs.get("parse_mode") == "HTML"
 
 
 @pytest.mark.integration
@@ -27,7 +56,12 @@ def test_subscribe_and_unsubscribe_are_deprecated(db_session):
         },
     )
     assert handled is True
-    assert "no longer uses /subscribe" in client.send_message.call_args[0][2].lower()
+    first_reply = client.send_message.call_args.args[2]
+    assert "no longer uses /subscribe" in first_reply.lower()
+    assert "settings → telegram" in first_reply.lower()
+    assert "qr" in first_reply.lower()
+    assert db_session.query(TelegramUserLink).count() == 0
+    assert db_session.query(TelegramSubscriber).count() == 0
 
     handled = update_service._handle_update(
         "fake-token",
@@ -41,11 +75,35 @@ def test_subscribe_and_unsubscribe_are_deprecated(db_session):
         },
     )
     assert handled is True
-    assert "no longer uses /unsubscribe" in client.send_message.call_args[0][2].lower()
+    second_reply = client.send_message.call_args.args[2]
+    assert "no longer uses /unsubscribe" in second_reply.lower()
+    assert "settings → telegram" in second_reply.lower()
+    assert db_session.query(TelegramSubscriber).count() == 0
 
 
 @pytest.mark.integration
-def test_start_with_link_token_links_user(db_session, admin_user):
+def test_start_without_payload_points_to_app_link(db_session):
+    client = MagicMock()
+    service = TelegramUpdateService(db_session, client=client)
+    handled = service._handle_update(
+        "fake-token",
+        {
+            "update_id": 4,
+            "message": {
+                "text": "/start",
+                "chat": {"id": 99},
+                "from": {"id": 1, "username": "chef"},
+            },
+        },
+    )
+    assert handled is True
+    reply = client.send_message.call_args.args[2]
+    assert "settings → telegram" in reply.lower()
+    assert db_session.query(TelegramSubscriber).count() == 0
+
+
+@pytest.mark.integration
+def test_start_with_link_token_links_user(db_session, admin_user, default_household):
     _, raw_token = TelegramLinkService(db_session).create_link_token(admin_user.id)
     client = MagicMock()
     update_service = TelegramUpdateService(db_session, client=client)
@@ -62,10 +120,51 @@ def test_start_with_link_token_links_user(db_session, admin_user):
         },
     )
     assert handled is True
+    reply = client.send_message.call_args.args[2]
+    assert "Welcome to MealRoulette" in reply
+    assert "You're linked." in reply
+    assert admin_user.username in reply
+    assert default_household.name in reply
+    assert "Notifications follow Settings → Telegram." in reply
+    assert str(admin_user.id) not in reply
+    assert str(default_household.id) not in reply
+    assert client.send_message.call_args.kwargs.get("parse_mode") == "HTML"
+
     link = TelegramLinkService(db_session).get_link_for_user(admin_user.id)
     assert link is not None
     assert link.chat_id == "555"
-    assert "linked" in client.send_message.call_args[0][2].lower()
+    assert db_session.query(TelegramSubscriber).count() == 0
+
+    subscription = db_session.scalar(
+        select(HouseholdNotificationSubscription).where(
+            HouseholdNotificationSubscription.user_id == admin_user.id,
+            HouseholdNotificationSubscription.household_id == DEFAULT_HOUSEHOLD_ID,
+        )
+    )
+    assert subscription is not None
+
+
+@pytest.mark.integration
+def test_start_with_invalid_link_token_does_not_persist(db_session, admin_user):
+    client = MagicMock()
+    update_service = TelegramUpdateService(db_session, client=client)
+
+    handled = update_service._handle_update(
+        "fake-token",
+        {
+            "update_id": 6,
+            "message": {
+                "text": "/start link_not-a-real-token",
+                "chat": {"id": 556},
+                "from": {"id": 9, "username": "admin_tg", "first_name": "Admin"},
+            },
+        },
+    )
+    assert handled is True
+    reply = client.send_message.call_args.args[2]
+    assert "invalid or expired" in reply.lower()
+    assert TelegramLinkService(db_session).get_link_for_user(admin_user.id) is None
+    assert db_session.query(TelegramUserLink).count() == 0
 
 
 @pytest.mark.integration

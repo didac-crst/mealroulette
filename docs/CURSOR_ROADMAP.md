@@ -955,11 +955,12 @@ Acceptance criteria (met):
 
 **Intentionally deferred (not Phase 15 blockers):**
 
-- Public dish catalog / publication / subscriptions
-- Ingredient proposal workflow
-- Telegram OTP / bot login
-- Password / account settings page → **Phase 16A**
-- User-level recipe preference API/UI (`recipe_ratings`) → **Phase 16B**
+- Password / account settings page → **Phase 16A** (done)
+- Umbrella UI parity (shell, dish filters, ingredient read UX, Telegram OTP) → **Phase 16B**
+- Ingredient proposal workflow → **Phase 16C**
+- Public dish catalog / publication / subscriptions → **Phase 16D**
+- User-level recipe preference API/UI (`recipe_ratings`) → **Phase 16E**
+- Multilingual content translations → later Phase 16 / post-16
 - Multi-household membership
 - Household-level portable export/import
 - Localization tables and cross-household copy/adopt
@@ -972,11 +973,11 @@ Phase 16 starts by landing deferred umbrella items as reviewable slices before L
 
 | Slice | Theme |
 | --- | --- |
-| **16A** | Password / account settings |
-| **16B** | Recipe ratings UI |
+| **16A** | Password / account settings (done) |
+| **16B** | Umbrella UI parity (shell, filters, ingredients, OTP) |
 | **16C** | Ingredient proposals |
 | **16D** | Public catalog / public dishes |
-| **16E** | Telegram OTP/login (if still desired) |
+| **16E** | Recipe ratings UI |
 
 Then continue with LLM-assisted entry and localization foundation:
 

@@ -35,11 +35,11 @@ Phase 16 remaining umbrella scope (split for reviewability):
 
 | Slice | Theme | Status |
 | --- | --- | --- |
-| **16A** | Password / account settings | In progress (`phase-16a-account-settings`) |
-| **16B** | Recipe ratings UI | Planned |
+| **16A** | Password / account settings | Done (PR #23) |
+| **16B** | Umbrella UI parity (shell, filters, ingredients, OTP) | In progress (`phase-16b-umbrella-ui-parity`) |
 | **16C** | Ingredient proposals | Planned |
 | **16D** | Public catalog / public dishes | Planned |
-| **16E** | Telegram OTP/login | Planned if still desired |
+| **16E** | Recipe ratings UI | Planned |
 
 Do not merge the umbrella branch `phase-15/household-users-and-memberships`; use it as reference only.
 
@@ -108,7 +108,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.10** | Composable meals — multi-dish slots, simple dishes, do-not-plan, faster roulette | **Done** ([`v0.10.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.10.0), merge `a2e29de`, PR #14) |
 | **v0.11** | Pair compatibility and reroll memory — prevent bad simple-dish pairs and reroll cycles | **Done** ([`v0.11.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.11.0), merge `82f20de`, PR #15) |
 | **v0.12** | Household users and memberships — tenancy, invitations, household UX, Telegram linking | **Done on `main`** (PRs #17–#22); tag `v0.12.0` only after green `main` + human user testing |
-| **Future** | Public catalog, ingredient proposals, Telegram OTP login | Not started (Phase 16B–E) |
+| **Future** | Public catalog, ingredient proposals, recipe ratings UI | Not started (Phase 16C–E) |
 | **Future** | LLM-assisted entry — draft enrichment, review before save | Not started |
 | **v1.0** | Stable home version — backups, auth hardening, scheduler reliability | Not started |
 
@@ -375,8 +375,8 @@ When `meal_composition = simple_dish`, **`simple_dish_part`** is required: `cent
 - [ ] User-level recipe/dish preference API/UI (`recipe_ratings`) — meal-slot reviews shipped as `meal_reviews`
 - [ ] Ingredient proposal workflow for missing catalogue entries
 - [ ] Public dish catalog / publication / subscriptions
-- [ ] Telegram OTP / passwordless bot login
-- [ ] Password / account settings page (Phase 16A — in PR #23)
+- [x] Password / account settings page (Phase 16A)
+- [ ] Telegram OTP / passwordless bot login (Phase 16B — in PR)
 - [ ] Household-level portable export/import
 - [ ] Localization tables and cross-household copy/adopt
 - [ ] Multi-household membership (users may hold at most one active membership today)

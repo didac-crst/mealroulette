@@ -94,6 +94,9 @@ export function resolveBreadcrumbs(
   if (pathname === "/settings") {
     return [settings];
   }
+  if (pathname === "/settings/members") {
+    return [settings, { label: "Household settings" }];
+  }
   if (pathname === "/settings/targets") {
     return [settings, { label: "Weekly targets" }];
   }

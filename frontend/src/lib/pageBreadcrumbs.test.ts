@@ -37,6 +37,11 @@ describe("resolveBreadcrumbs", () => {
       { label: "Password" },
     ]);
 
+    expect(resolveBreadcrumbs("/settings/members")).toEqual([
+      { label: "Settings", to: "/settings" },
+      { label: "Household settings" },
+    ]);
+
     expect(
       resolveBreadcrumbs("/ingredients/12/edit", { ingredientId: "12" }, { ingredientId: 12, ingredientName: "Tomato" }),
     ).toEqual([

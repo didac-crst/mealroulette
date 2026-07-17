@@ -3,7 +3,7 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../features/auth/AuthContext";
 
 export function HomeRedirect() {
-  const { loading, hasHousehold, isPlatformAdmin } = useAuth();
+  const { loading, user, hasHousehold, isPlatformAdmin } = useAuth();
 
   if (loading) {
     return (
@@ -11,6 +11,10 @@ export function HomeRedirect() {
         <p className="muted">Loading session...</p>
       </main>
     );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
   }
 
   if (hasHousehold) {
@@ -21,5 +25,5 @@ export function HomeRedirect() {
     return <Navigate to="/ingredients" replace />;
   }
 
-  return <Navigate to="/login" replace />;
+  return <Navigate to="/settings" replace />;
 }

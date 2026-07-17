@@ -58,6 +58,20 @@ export async function changePassword(
   });
 }
 
+export async function requestTelegramOtp(username: string): Promise<{ detail: string }> {
+  return apiRequest<{ detail: string }>("/api/auth/telegram-otp/request", {
+    method: "POST",
+    body: JSON.stringify({ username }),
+  });
+}
+
+export async function verifyTelegramOtp(username: string, code: string): Promise<TokenResponse> {
+  return apiRequest<TokenResponse>("/api/auth/telegram-otp/verify", {
+    method: "POST",
+    body: JSON.stringify({ username, code }),
+  });
+}
+
 export async function register(payload: {
   username: string;
   email: string;
