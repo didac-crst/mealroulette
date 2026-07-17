@@ -151,3 +151,62 @@ def test_telegram_otp_verify_consumes_atomically(client, admin_user, db_session,
         json={"username": "admin", "code": code},
     )
     assert again.status_code == 401
+
+
+def test_concurrent_first_time_otp_request_does_not_raise_integrity_error(db_engine, monkeypatch):
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+
+    from sqlalchemy.orm import sessionmaker
+
+    from mealroulette.auth.security import hash_password
+    from mealroulette.models.user import User, UserRole
+
+    SessionLocal = sessionmaker(bind=db_engine, autoflush=False, autocommit=False)
+    mock_client = MagicMock()
+    monkeypatch.setattr(
+        "mealroulette.services.telegram_otp.get_settings",
+        lambda: _settings_mock(),
+    )
+
+    with SessionLocal() as setup:
+        user = User(
+            username="otp-race",
+            email="otp-race@example.com",
+            password_hash=hash_password("password123"),
+            role=UserRole.user,
+            active=True,
+        )
+        setup.add(user)
+        setup.flush()
+        setup.add(
+            TelegramUserLink(
+                id=uuid4(),
+                user_id=user.id,
+                chat_id="4242",
+                username="otp_race_tg",
+            )
+        )
+        setup.commit()
+        user_id = user.id
+
+    barrier = Barrier(2)
+
+    def race() -> str:
+        barrier.wait(timeout=5)
+        with SessionLocal() as session:
+            try:
+                TelegramOtpService(session, client=mock_client).request_login_code("otp-race")
+                session.commit()
+                return "ok"
+            except Exception as exc:  # noqa: BLE001 - surface race failures in assertion
+                session.rollback()
+                return f"error:{type(exc).__name__}:{exc}"
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(pool.map(lambda _: race(), range(2)))
+
+    assert results == ["ok", "ok"], results
+    with SessionLocal() as session:
+        rows = list(session.scalars(select(TelegramLoginOtp).where(TelegramLoginOtp.user_id == user_id)))
+        assert len(rows) == 1

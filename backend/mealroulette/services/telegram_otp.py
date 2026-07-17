@@ -8,6 +8,7 @@ from uuid import uuid4
 
 from fastapi import HTTPException, status
 from sqlalchemy import select
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from mealroulette.core.config import get_settings
@@ -38,6 +39,14 @@ class TelegramOtpService:
         self.client = client or TelegramClient()
         self.links = TelegramLinkService(db)
 
+    @staticmethod
+    def _in_request_cooldown(row: TelegramLoginOtp, now: datetime) -> bool:
+        return (
+            row.used_at is None
+            and row.expires_at >= now
+            and (now - row.created_at).total_seconds() < TelegramOtpService.REQUEST_COOLDOWN_SECONDS
+        )
+
     def request_login_code(self, username: str) -> None:
         user = self.db.scalar(select(User).where(User.username == username))
         if user is None or not user.active:
@@ -51,12 +60,7 @@ class TelegramOtpService:
         existing = self.db.scalar(
             select(TelegramLoginOtp).where(TelegramLoginOtp.user_id == user.id).with_for_update()
         )
-        if (
-            existing is not None
-            and existing.used_at is None
-            and existing.expires_at >= now
-            and (now - existing.created_at).total_seconds() < self.REQUEST_COOLDOWN_SECONDS
-        ):
+        if existing is not None and self._in_request_cooldown(existing, now):
             # Keep the existing unused code; do not resend or invalidate.
             self.db.commit()
             return
@@ -64,21 +68,27 @@ class TelegramOtpService:
         code = f"{secrets.randbelow(10**self.OTP_DIGITS):0{self.OTP_DIGITS}d}"
         code_hash = _hash_code(code)
         expires_at = now + timedelta(minutes=self.OTP_TTL_MINUTES)
-        if existing is not None:
-            existing.code_hash = code_hash
-            existing.expires_at = expires_at
-            existing.used_at = None
-            existing.created_at = now
-        else:
-            self.db.add(
-                TelegramLoginOtp(
-                    id=uuid4(),
-                    user_id=user.id,
-                    code_hash=code_hash,
-                    expires_at=expires_at,
-                    created_at=now,
-                )
+        upsert = (
+            insert(TelegramLoginOtp)
+            .values(
+                id=uuid4(),
+                user_id=user.id,
+                code_hash=code_hash,
+                expires_at=expires_at,
+                used_at=None,
+                created_at=now,
             )
+            .on_conflict_do_update(
+                constraint="uq_telegram_login_otps_user_id",
+                set_={
+                    "code_hash": code_hash,
+                    "expires_at": expires_at,
+                    "used_at": None,
+                    "created_at": now,
+                },
+            )
+        )
+        self.db.execute(upsert)
         self.db.commit()
 
         message = (
