@@ -40,6 +40,7 @@ These documents capture dated business and operating assumptions that may drive 
 | [strategy/ai-cost-and-credits.md](strategy/ai-cost-and-credits.md) | AI cost order-of-magnitude, credits, managed-vs-BYO provider strategy |
 | [strategy/hosting-and-public-beta.md](strategy/hosting-and-public-beta.md) | Hosting cost assumptions, beta staging, operational thresholds |
 | [strategy/public-beta-readiness.md](strategy/public-beta-readiness.md) | Go/no-go criteria, success metrics, risk register, public beta gates |
+| [strategy/public-catalog-contribution-and-rewards.md](strategy/public-catalog-contribution-and-rewards.md) | Public recipe contribution incentives, reputation, rewards, anti-fraud |
 
 ## Feature behaviour (approved semantics)
 
@@ -51,6 +52,7 @@ These documents capture dated business and operating assumptions that may drive 
 | [features/scheduler.md](features/scheduler.md) | Family vectors, similarity, weekly targets |
 | [features/pair-compatibility-reroll.md](features/pair-compatibility-reroll.md) | Composable-meal pair scoring and reroll memory |
 | [features/cooking-mode.md](features/cooking-mode.md) | Today home, step-by-step cooking, timers |
+| [features/meal-outcomes-leftovers.md](features/meal-outcomes-leftovers.md) | Meal outcome review, leftover batches, use-soon hints, planning/shopping integration |
 | [features/meal-composition.md](features/meal-composition.md) | Dish `meal_composition` / planner slots |
 | [features/composable-meals.md](features/composable-meals.md) | Multi-dish meal slots, do-not-plan, composable roulette |
 | [features/ingredient-proposals.md](features/ingredient-proposals.md) | Governed missing-ingredient proposal workflow |

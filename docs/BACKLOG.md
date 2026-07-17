@@ -44,6 +44,7 @@ Phase 16 remaining scope (split for reviewability):
 | **16G** | LLM-assisted recipe authoring experiment | Planned |
 | **16H** | Localization foundation | Planned |
 | **16I** | LLM-assisted translation | Planned |
+| **17** | v1 hardening, including meal outcomes and leftover inventory | Planned |
 
 The old umbrella branch `phase-15/household-users-and-memberships` was closed and deleted after its scope landed through reviewable PRs.
 
@@ -385,6 +386,7 @@ When `meal_composition = simple_dish`, **`simple_dish_part`** is required: `cent
 - [ ] LLM-assisted recipe authoring experiment (Phase 16G)
 - [ ] Household-level portable export/import
 - [ ] Localization tables and cross-household copy/adopt (Phase 16H+)
+- [ ] Meal outcomes and leftover inventory (Phase 17; see [features/meal-outcomes-leftovers.md](features/meal-outcomes-leftovers.md))
 - [ ] Multi-household membership (users may hold at most one active membership today)
 
 Roles (as shipped):

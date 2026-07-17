@@ -392,7 +392,7 @@ Implementation notes (v0.3):
 
 ### Later — Leftover inventory (after shopping lists)
 
-Not part of Phase 5. Introduce when shopping-list generation can exclude ingredients for meals made from prepared leftovers.
+Not part of Phase 5. Introduce when shopping-list generation can exclude ingredients for meals made from prepared leftovers. Current future design: [features/meal-outcomes-leftovers.md](features/meal-outcomes-leftovers.md).
 
 Deliverables:
 
@@ -1087,6 +1087,7 @@ Acceptance criteria:
 
 Deliverables:
 
+- Meal outcome and leftover inventory hardening — see [features/meal-outcomes-leftovers.md](features/meal-outcomes-leftovers.md)
 - End-to-end happy path tests
 - API tests for all write endpoints
 - Frontend smoke tests
@@ -1098,8 +1099,11 @@ Deliverables:
 Acceptance criteria:
 
 - A household can use the app for real weekly planning.
+- Confirmed leftovers can be tracked explicitly, planned, reserved, consumed, and excluded from shopping without treating unreviewed meals as eaten.
 - Backup and restore are documented and tested.
 - Scheduler is explainable enough to debug bad plans.
+
+Public catalogue contribution rewards remain later strategy, not a Phase 17 blocker — see [strategy/public-catalog-contribution-and-rewards.md](strategy/public-catalog-contribution-and-rewards.md).
 
 ## Cursor Task Rules
 
