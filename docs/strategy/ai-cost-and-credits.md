@@ -27,6 +27,7 @@ Provider prices, hosting plans, payment fees, and model capabilities change freq
 - Store AI usage events and credit ledger entries from the first managed-AI implementation.
 - Support bring-your-own provider credentials for self-hosted users to avoid MealRoulette carrying variable model cost.
 - Keep manual recipe creation and core roulette/planning free from managed-AI billing.
+- Provider choice should be based on structured output quality, privacy controls, reliability, latency, and operational fit, not only token price.
 
 ## Planning Ranges
 
@@ -169,6 +170,65 @@ maximum provider cost: EUR 0.15
 
 If the budget is exhausted, return the best draft and ask the user to edit manually.
 
+## Spend Policy
+
+Before managed AI is available to public users, define:
+
+- monthly global managed-AI spend ceiling;
+- per-household daily and monthly credit consumption limits;
+- per-user trial credit allowance;
+- rate limits by user, household, and IP;
+- admin controls to pause managed AI globally;
+- behavior when limits are hit.
+
+Suggested behavior:
+
+- if a household limit is hit, manual recipe editing continues;
+- if global spend ceiling is hit, managed AI is temporarily disabled for everyone;
+- if provider errors occur before a usable draft exists, release the reserved credit;
+- if a usable structured draft exists, consume the credit even if the user later edits manually;
+- if a provider outage causes widespread failures, platform admin may grant ledger refunds.
+
+## Provider Selection Criteria
+
+Evaluate providers on:
+
+- schema-constrained structured output;
+- tool/function calling quality;
+- reliability and latency;
+- token and reasoning-token pricing;
+- privacy/data-retention controls;
+- regional/data-processing posture;
+- SDK/API stability;
+- usage reporting;
+- support for prompt/version observability;
+- ability to set hard request limits.
+
+Do not use a premium reasoning model for deterministic ingredient matching when PostgreSQL search and application validators can do the work.
+
+## Privacy And Data Handling
+
+Recipe drafts and prompts may contain private household information.
+
+Before managed AI launches, document:
+
+- what fields are sent to the provider;
+- whether raw model responses are retained;
+- retention period for raw responses and prompts;
+- how users can delete import sessions;
+- whether BYO-key mode changes provider terms and responsibility;
+- whether provider terms are accepted by installation owner, platform admin, or household user;
+- what logs may contain recipe text;
+- whether provider data retention can be disabled.
+
+Default posture:
+
+- send only the minimum context needed;
+- do not send cross-household examples;
+- treat model responses as untrusted input;
+- retain raw responses only for a bounded debugging window;
+- make manual entry available when users do not want managed AI.
+
 ## Risks That Change Cost
 
 - image generation;
@@ -186,3 +246,16 @@ If the budget is exhausted, return the best draft and ask the user to edit manua
 Pricing can change later. Accounting, budgets, and ledgers are difficult to retrofit.
 
 Build usage measurement before managed credits. Decide prices after beta usage shows actual retention, support burden, and provider cost.
+
+## Business Non-Decisions
+
+Not decided yet:
+
+- final credit-pack prices;
+- subscription model;
+- managed-hosting availability;
+- whether translation credits are separate from recipe credits;
+- whether hosted free tier has recipe/image/storage limits;
+- public launch date.
+
+Lowering prices later is easy. Raising prices after users become accustomed to underpriced credits is harder.

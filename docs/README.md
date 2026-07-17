@@ -39,6 +39,7 @@ These documents capture dated business and operating assumptions that may drive 
 | --- | --- |
 | [strategy/ai-cost-and-credits.md](strategy/ai-cost-and-credits.md) | AI cost order-of-magnitude, credits, managed-vs-BYO provider strategy |
 | [strategy/hosting-and-public-beta.md](strategy/hosting-and-public-beta.md) | Hosting cost assumptions, beta staging, operational thresholds |
+| [strategy/public-beta-readiness.md](strategy/public-beta-readiness.md) | Go/no-go criteria, success metrics, risk register, public beta gates |
 
 ## Feature behaviour (approved semantics)
 
