@@ -26,7 +26,7 @@ Git tags mark **product versions** users can run. We do not tag individual imple
 | `v0.9.0` | UI/UX design system, documentation harmonization, and live computed traits — **released** — [release notes](../releases/v0.9.0.md) |
 | `v0.10.0` | Composable meal slots, simple dishes, fixture hardening, scheduler performance, parallel CI — **released** — [release notes](../releases/v0.10.0.md) |
 | `v0.11.0` | Pair compatibility, reroll memory, structure-first roulette, and package swap fixes — **released** — [release notes](../releases/v0.11.0.md) |
-| `v0.12.0` | Household users and memberships (Phase 15A–E) — **draft; tag only after green `main` + human user testing** — [release notes](../releases/v0.12.0.md) |
+| `v0.12.0` | Household users and memberships, account settings, Telegram OTP, catalog UI parity — **released** — [release notes](../releases/v0.12.0.md) |
 
 Use [semantic versioning](https://semver.org/) at the product-version level: `vMAJOR.MINOR.PATCH`. Patch bumps are for fixes on an already-released version line.
 
@@ -60,18 +60,11 @@ git push origin v0.1.0
 | [`v0.9.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.9.0) | [`9647509`](https://github.com/didac-crst/mealroulette/commit/9647509) | 2026-07-14 | Design system reconciliation, documentation harmonization, live computed traits — [release notes](../releases/v0.9.0.md) |
 | [`v0.10.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.10.0) | [`a2e29de`](https://github.com/didac-crst/mealroulette/commit/a2e29de) | 2026-07-14 | Composable meal slots, simple dishes, do-not-plan, faster roulette — [release notes](../releases/v0.10.0.md) |
 | [`v0.11.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.11.0) | [`82f20de`](https://github.com/didac-crst/mealroulette/commit/82f20de) | 2026-07-14 | Pair compatibility, reroll memory, structure-first roulette, package swap fixes — [release notes](../releases/v0.11.0.md) |
-| `v0.12.0` | pending | pending | Household users and memberships (Phase 15A–E) — [release notes](../releases/v0.12.0.md) |
+| [`v0.12.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.12.0) | tag commit | 2026-07-17 | Household users and memberships, account settings, Telegram OTP, catalog UI parity — [release notes](../releases/v0.12.0.md) |
 
 ## Check out a release
 
-Until `v0.12.0` is tagged, use `main` (or an earlier tag such as `v0.11.0`):
-
-```bash
-git checkout main
-docker compose up --build
-```
-
-After `v0.12.0` is published:
+To run `v0.12.0`:
 
 ```bash
 git checkout v0.12.0
