@@ -1027,6 +1027,8 @@ Acceptance criteria:
 
 #### Phase 16G — LLM-assisted recipe authoring experiment
 
+Usage and cost-control spec: [features/ai-usage-accounting.md](features/ai-usage-accounting.md). Strategy context: [strategy/ai-cost-and-credits.md](strategy/ai-cost-and-credits.md).
+
 Deliverables:
 
 - Provider abstraction.
@@ -1037,6 +1039,7 @@ Deliverables:
 - Quality-review pass.
 - Usage tracking: provider, model, prompt version, schema version, token usage, latency, raw response, parsed result, validation result.
 - Feature flag.
+- Usage event storage, credit reservation/consume/release semantics, and hard session budgets for managed AI.
 
 Acceptance criteria:
 
@@ -1045,6 +1048,7 @@ Acceptance criteria:
 - The model has no direct trusted-data CRUD or SQL access.
 - Free-text recipe description can produce a reviewable draft.
 - Deterministic validation remains authoritative.
+- Managed AI calls are auditable and cannot exceed configured per-session budgets.
 
 #### Phase 16H — Localization foundation
 
@@ -1088,6 +1092,7 @@ Deliverables:
 - Frontend smoke tests
 - Raspberry Pi deployment notes
 - Security review of settings and auth flows
+- Email delivery abstraction and email OTP/recovery policy if email login or recovery becomes required — see [features/email-delivery.md](features/email-delivery.md)
 - Error and empty-state polish
 
 Acceptance criteria:

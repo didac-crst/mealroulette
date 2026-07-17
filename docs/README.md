@@ -31,6 +31,15 @@ Where to look for product truth, feature behaviour, operations, and history.
 | [BACKLOG.md](BACKLOG.md) | **Status board** — current focus, phase/version shipment, known debt |
 | [CURSOR_ROADMAP.md](CURSOR_ROADMAP.md) | **Build sequence** — phase deliverables and acceptance criteria (not live status) |
 
+## Strategy / operating assumptions
+
+These documents capture dated business and operating assumptions that may drive later technical decisions. They are not release promises.
+
+| Document | Topic |
+| --- | --- |
+| [strategy/ai-cost-and-credits.md](strategy/ai-cost-and-credits.md) | AI cost order-of-magnitude, credits, managed-vs-BYO provider strategy |
+| [strategy/hosting-and-public-beta.md](strategy/hosting-and-public-beta.md) | Hosting cost assumptions, beta staging, operational thresholds |
+
 ## Feature behaviour (approved semantics)
 
 | Document | Topic |
@@ -45,6 +54,8 @@ Where to look for product truth, feature behaviour, operations, and history.
 | [features/composable-meals.md](features/composable-meals.md) | Multi-dish meal slots, do-not-plan, composable roulette |
 | [features/ingredient-proposals.md](features/ingredient-proposals.md) | Governed missing-ingredient proposal workflow |
 | [features/recipe-import-drafts.md](features/recipe-import-drafts.md) | Draft-first recipe import and AI-assisted authoring architecture |
+| [features/ai-usage-accounting.md](features/ai-usage-accounting.md) | Managed AI usage events, credit ledger, budgets, BYO provider mode |
+| [features/email-delivery.md](features/email-delivery.md) | Transactional email provider abstraction, OTP policy, deliverability |
 | [features/localization.md](features/localization.md) | Multilingual content design (not yet implemented) |
 | [features/ui-ux-design-system.md](features/ui-ux-design-system.md) | Visual design system, tokens, navigation, migration plan |
 
