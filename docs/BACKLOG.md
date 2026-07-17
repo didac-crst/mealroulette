@@ -25,18 +25,18 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Current focus — Phase 16 deferred umbrella slices; do not tag `v0.12.0` yet.**
+**Current focus — Phase 16C ingredient proposals.**
 
-Phase 15 is complete on `main` (PRs #17–#22). Draft release notes: [releases/v0.12.0.md](releases/v0.12.0.md).
+Phase 15 is complete on `main` (PRs #17–#22). Phase 16A–B also landed before the `v0.12.0` tag to restore deferred account, shell, catalog, and Telegram OTP parity. Release notes: [releases/v0.12.0.md](releases/v0.12.0.md).
 
-**`v0.12.0` tagging gate (authoritative):** tag only after (1) green `main`, and (2) human user testing of the full product passes. Phase 16 umbrella slices may land before or after the tag decision; they are not automatic blockers unless user testing finds gaps.
+**`v0.12.0` status:** tagged from green `main` after human approval. Continue Phase 16 slices as reviewable PRs.
 
 Phase 16 remaining umbrella scope (split for reviewability):
 
 | Slice | Theme | Status |
 | --- | --- | --- |
 | **16A** | Password / account settings | Done (PR #23) |
-| **16B** | Umbrella UI parity (shell, filters, ingredients, OTP) | In progress (`phase-16b-umbrella-ui-parity`) |
+| **16B** | Umbrella UI parity (shell, filters, ingredients, OTP) | Done (PR #24) |
 | **16C** | Ingredient proposals | Planned |
 | **16D** | Public catalog / public dishes | Planned |
 | **16E** | Recipe ratings UI | Planned |
@@ -85,7 +85,8 @@ Use one branch per milestone, then merge via pull request:
 - `phase-15d-household-ux-and-tenancy-wiring` — signup/join/members UI + role-gated settings (merged in PR #20)
 - `phase-15e-telegram-tenancy` — user Telegram links, subscriptions, household-scoped delivery (merged in PR #21)
 - `phase-15f-final-hardening-docs-release` — Phase 15 closeout: tests, docs, release notes (merged in PR #22)
-- `phase-16a-account-settings` — password/account settings (in progress)
+- `phase-16a-account-settings` — password/account settings (merged in PR #23)
+- `phase-16b-umbrella-ui-parity` — shell, catalog filters, ingredient read UX, Telegram OTP (merged in PR #24)
 - `phase-15/household-users-and-memberships` — **umbrella only**; do not merge. Reference for deferred extras (OTP, proposals, public catalog).
 
 ---
@@ -107,7 +108,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.9** | UI/UX design system + live recipe traits — shared shell, visual QA, fresh trait reads | **Done** ([`v0.9.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.9.0), merge `9647509`, PR #12/#13) |
 | **v0.10** | Composable meals — multi-dish slots, simple dishes, do-not-plan, faster roulette | **Done** ([`v0.10.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.10.0), merge `a2e29de`, PR #14) |
 | **v0.11** | Pair compatibility and reroll memory — prevent bad simple-dish pairs and reroll cycles | **Done** ([`v0.11.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.11.0), merge `82f20de`, PR #15) |
-| **v0.12** | Household users and memberships — tenancy, invitations, household UX, Telegram linking | **Done on `main`** (PRs #17–#22); tag `v0.12.0` only after green `main` + human user testing |
+| **v0.12** | Household users and memberships — tenancy, invitations, household UX, Telegram linking, account settings, Telegram OTP, catalog UI parity | **Done** ([`v0.12.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.12.0), PRs #17–#24) |
 | **Future** | Public catalog, ingredient proposals, recipe ratings UI | Not started (Phase 16C–E) |
 | **Future** | LLM-assisted entry — draft enrichment, review before save | Not started |
 | **v1.0** | Stable home version — backups, auth hardening, scheduler reliability | Not started |
@@ -346,7 +347,7 @@ When `meal_composition = simple_dish`, **`simple_dish_part`** is required: `cent
 
 ### v0.12 — Household Users and Memberships
 
-**Status:** Done on `main` via Phase 15A–F (PRs [#17](https://github.com/didac-crst/mealroulette/pull/17)–[#22](https://github.com/didac-crst/mealroulette/pull/22)). Architecture: [ADR 003](adr/003-household-tenancy-and-authorization.md). Draft release notes: [releases/v0.12.0.md](releases/v0.12.0.md) — tag only after green `main` + human user testing.
+**Status:** Done on `main` via Phase 15A–F (PRs [#17](https://github.com/didac-crst/mealroulette/pull/17)–[#22](https://github.com/didac-crst/mealroulette/pull/22)). Architecture: [ADR 003](adr/003-household-tenancy-and-authorization.md). Release notes: [releases/v0.12.0.md](releases/v0.12.0.md).
 
 | Slice | Delivered |
 | --- | --- |
@@ -376,7 +377,7 @@ When `meal_composition = simple_dish`, **`simple_dish_part`** is required: `cent
 - [ ] Ingredient proposal workflow for missing catalogue entries
 - [ ] Public dish catalog / publication / subscriptions
 - [x] Password / account settings page (Phase 16A)
-- [ ] Telegram OTP / passwordless bot login (Phase 16B — in PR)
+- [x] Telegram OTP / passwordless bot login (Phase 16B)
 - [ ] Household-level portable export/import
 - [ ] Localization tables and cross-household copy/adopt
 - [ ] Multi-household membership (users may hold at most one active membership today)

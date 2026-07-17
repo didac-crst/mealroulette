@@ -956,7 +956,7 @@ Acceptance criteria (met):
 **Intentionally deferred (not Phase 15 blockers):**
 
 - Password / account settings page → **Phase 16A** (done)
-- Umbrella UI parity (shell, dish filters, ingredient read UX, Telegram OTP) → **Phase 16B**
+- Umbrella UI parity (shell, dish filters, ingredient read UX, Telegram OTP) → **Phase 16B** (done)
 - Ingredient proposal workflow → **Phase 16C**
 - Public dish catalog / publication / subscriptions → **Phase 16D**
 - User-level recipe preference API/UI (`recipe_ratings`) → **Phase 16E**
@@ -974,7 +974,7 @@ Phase 16 starts by landing deferred umbrella items as reviewable slices before L
 | Slice | Theme |
 | --- | --- |
 | **16A** | Password / account settings (done) |
-| **16B** | Umbrella UI parity (shell, filters, ingredients, OTP) |
+| **16B** | Umbrella UI parity (shell, filters, ingredients, OTP) (done) |
 | **16C** | Ingredient proposals |
 | **16D** | Public catalog / public dishes |
 | **16E** | Recipe ratings UI |
