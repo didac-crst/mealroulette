@@ -17,6 +17,7 @@ describe("aggregationStrategy formatters", () => {
   it("formats catalog labels", () => {
     expect(formatCatalogLabel("food_group")).toBe("Food group");
     expect(formatCatalogLabel(null)).toBe("—");
+    expect(formatCatalogLabel(undefined)).toBe("—");
     expect(formatCatalogLabel("  ")).toBe("—");
   });
 });

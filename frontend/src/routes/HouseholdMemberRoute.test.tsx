@@ -77,6 +77,12 @@ describe("HouseholdMemberRoute", () => {
     vi.mocked(useAuth).mockReset();
   });
 
+  it("shows loading state while session resolves", () => {
+    stubAuth({ loading: true });
+    renderMemberRoute();
+    expect(screen.getByText(/Loading session/i)).toBeInTheDocument();
+  });
+
   it("redirects platform admin without household to /ingredients", () => {
     stubAuth({
       user: { ...baseUser, active_household_id: null, active_household_name: null, household_role: null },
@@ -112,11 +118,34 @@ describe("IngredientCatalogRoute", () => {
     vi.mocked(useAuth).mockReset();
   });
 
-  it("allows platform admin through to outlet", () => {
+  it("shows loading state while session resolves", () => {
+    stubAuth({ loading: true });
+    renderIngredientRoute();
+    expect(screen.getByText(/Loading session/i)).toBeInTheDocument();
+  });
+
+  it("allows platform admin with a household through to outlet", () => {
     stubAuth({
       user: { ...baseUser, role: "platform_admin", platform_roles: ["platform_admin"] },
       isPlatformAdmin: true,
       hasHousehold: true,
+    });
+    renderIngredientRoute();
+    expect(screen.getByText("Catalog outlet")).toBeInTheDocument();
+  });
+
+  it("allows platform admin without a household through to outlet", () => {
+    stubAuth({
+      user: {
+        ...baseUser,
+        role: "platform_admin",
+        platform_roles: ["platform_admin"],
+        active_household_id: null,
+        active_household_name: null,
+        household_role: null,
+      },
+      isPlatformAdmin: true,
+      hasHousehold: false,
     });
     renderIngredientRoute();
     expect(screen.getByText("Catalog outlet")).toBeInTheDocument();
