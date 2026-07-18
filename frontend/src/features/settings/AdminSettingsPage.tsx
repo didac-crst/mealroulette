@@ -59,6 +59,12 @@ const HOUSEHOLD_TILES: SettingsTileConfig[] = [
     description: "Name, invite links, members, and roles.",
     icon: <SettingsHouseholdIcon />,
   },
+  {
+    to: "/catalog/requests",
+    title: "Publication requests",
+    description: "Recipes submitted to the public catalog and their review status.",
+    icon: <SettingsIngredientsIcon />,
+  },
 ];
 
 const INTEGRATION_TILES: SettingsTileConfig[] = [
@@ -75,6 +81,12 @@ const CATALOG_TILES: SettingsTileConfig[] = [
     to: "/ingredients",
     title: "Ingredients",
     description: "Catalog, aliases, units, conversions, and proposal review.",
+    icon: <SettingsIngredientsIcon />,
+  },
+  {
+    to: "/catalog/review",
+    title: "Public catalog review",
+    description: "Approve, reject, or delist household publication requests.",
     icon: <SettingsIngredientsIcon />,
   },
 ];

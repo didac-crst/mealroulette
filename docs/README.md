@@ -57,6 +57,7 @@ These documents capture dated business and operating assumptions that may drive 
 | [features/meal-composition.md](features/meal-composition.md) | Dish `meal_composition` / planner slots |
 | [features/composable-meals.md](features/composable-meals.md) | Multi-dish meal slots, do-not-plan, composable roulette |
 | [features/ingredient-proposals.md](features/ingredient-proposals.md) | Governed missing-ingredient proposal workflow |
+| [features/public-catalog.md](features/public-catalog.md) | Authenticated public recipe catalog, snapshots, adoption |
 | [features/recipe-import-drafts.md](features/recipe-import-drafts.md) | Draft-first recipe import and AI-assisted authoring architecture |
 | [features/ai-usage-accounting.md](features/ai-usage-accounting.md) | Managed AI usage events, credit ledger, budgets, BYO provider mode |
 | [features/email-delivery.md](features/email-delivery.md) | Transactional email provider abstraction, OTP policy, deliverability |

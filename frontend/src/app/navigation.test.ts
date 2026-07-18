@@ -11,14 +11,15 @@ import {
 } from "./navigation";
 
 describe("navigation", () => {
-  it("lists Shopping with five primary tabs", () => {
-    expect(PRIMARY_NAV).toHaveLength(5);
+  it("lists Shopping with six primary tabs", () => {
+    expect(PRIMARY_NAV).toHaveLength(6);
     expect(PRIMARY_NAV.map((item) => item.label)).toEqual([
       "Today",
       "Plan",
       "Review",
       "Shopping",
       "Dishes",
+      "Catalog",
     ]);
   });
 
@@ -30,6 +31,7 @@ describe("navigation", () => {
       "Review",
       "Shopping",
       "Dishes",
+      "Catalog",
       "Ingredients",
     ]);
   });
@@ -53,7 +55,7 @@ describe("navigation", () => {
       resolvePrimaryNav({ hasHousehold: true, isPlatformAdmin: false, isHouseholdAdmin: false }).map(
         (item) => item.label,
       ),
-    ).toEqual(["Today", "Plan", "Review", "Shopping", "Dishes", "Ingredients"]);
+    ).toEqual(["Today", "Plan", "Review", "Shopping", "Dishes", "Catalog", "Ingredients"]);
 
     expect(
       resolvePrimaryNav({ hasHousehold: true, isPlatformAdmin: true, isHouseholdAdmin: false }).map(

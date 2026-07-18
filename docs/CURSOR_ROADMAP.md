@@ -1007,6 +1007,26 @@ Acceptance criteria:
 - Active recipes still require approved canonical ingredient IDs.
 - Review actions are audited and taxonomy validation remains authoritative.
 
+#### Phase 16D — Public catalog / public dishes
+
+Design spec: [features/public-catalog.md](features/public-catalog.md). Strategy: [strategy/public-catalog-contribution-and-rewards.md](strategy/public-catalog-contribution-and-rewards.md).
+
+Deliverables:
+
+- `public_recipes` / `public_recipe_versions` with immutable JSON snapshots.
+- Household-admin publish/submit and withdraw; platform approve/reject/delist.
+- Authenticated-public catalog browse and adopt (new Dish+Recipe copy with provenance).
+- Resubmission after rejected/withdrawn via new version numbers; one live approved version in 16D.
+- No rewards, anonymous catalog, or multi-live republish UX.
+
+Acceptance criteria:
+
+- Public catalog is visible only to authenticated household members.
+- Approved snapshots do not change when the originating household edits its recipe.
+- Adoption creates an independent household-owned copy with `derived_from_public_*` provenance.
+- Delisting removes discovery without deleting existing adopted copies.
+- Platform and household role boundaries are enforced.
+
 #### Phase 16F — Recipe draft/import foundation
 
 Design spec: [features/recipe-import-drafts.md](features/recipe-import-drafts.md).

@@ -9,6 +9,7 @@ from mealroulette.api.routes.health import router as health_router
 from mealroulette.api.routes.household import router as household_router
 from mealroulette.api.routes.ingredient_proposals import router as ingredient_proposals_router
 from mealroulette.api.routes.planning import router as planning_router
+from mealroulette.api.routes.public_catalog import router as public_catalog_router
 from mealroulette.api.routes.scheduler import router as scheduler_router
 from mealroulette.api.routes.shopping import router as shopping_router
 from mealroulette.api.routes.taxonomy import router as taxonomy_router
@@ -52,6 +53,7 @@ def create_app() -> FastAPI:
     app.include_router(auth_router, prefix="/api")
     app.include_router(household_router, prefix="/api")
     app.include_router(ingredient_proposals_router, prefix="/api")
+    app.include_router(public_catalog_router, prefix="/api")
     app.include_router(catalog_router, prefix="/api")
     app.include_router(backup_router, prefix="/api")
     app.include_router(cooking_router, prefix="/api")

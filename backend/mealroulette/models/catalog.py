@@ -284,6 +284,28 @@ class Recipe(Base):
     difficulty: Mapped[str | None] = mapped_column(String(32), nullable=True)
     computed_traits_json: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    derived_from_public_recipe_id: Mapped[UUID | None] = mapped_column(
+        Uuid,
+        ForeignKey(
+            "public_recipes.id",
+            ondelete="SET NULL",
+            use_alter=True,
+            name="fk_recipes_derived_from_public_recipe_id",
+        ),
+        nullable=True,
+        index=True,
+    )
+    derived_from_public_version_id: Mapped[UUID | None] = mapped_column(
+        Uuid,
+        ForeignKey(
+            "public_recipe_versions.id",
+            ondelete="SET NULL",
+            use_alter=True,
+            name="fk_recipes_derived_from_public_version_id",
+        ),
+        nullable=True,
+        index=True,
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()

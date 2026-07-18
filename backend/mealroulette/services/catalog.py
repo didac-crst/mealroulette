@@ -732,42 +732,33 @@ class CatalogService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dish not found")
         return dish
 
-    def create_dish(self, payload: DishCreateRequest) -> Dish:
+    def create_dish(self, payload: DishCreateRequest, *, commit: bool = True) -> Dish:
         if self.db.scalar(
             select(Dish).where(Dish.name == payload.name, Dish.household_id == self.household_id)
         ):
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Dish already exists")
         for attempt in range(5):
-            dish = Dish(
-                household_id=self.household_id,
-                public_key=self._generate_unique_dish_public_key(payload.name),
-                name=payload.name,
-                description=payload.description,
-                default_servings=payload.default_servings,
-                course=payload.course,
-                meal_composition=payload.meal_composition,
-                simple_dish_part=payload.simple_dish_part,
-                status=payload.status,
-                image_url=payload.image_url,
-                suitable_for_lunch=payload.suitable_for_lunch,
-                suitable_for_dinner=payload.suitable_for_dinner,
-                weekday_friendly=payload.weekday_friendly,
-                leftovers_possible=payload.leftovers_possible,
-                freezer_friendly=payload.freezer_friendly,
-                kids_friendly=payload.kids_friendly,
-                active=payload.status == DishStatus.active,
-                notes=payload.notes,
-            )
-            self.db.add(dish)
-            self.db.flush()
-            self._apply_tags(dish, payload.tag_ids)
-            self._apply_seasonality(dish, payload.seasonality)
             try:
-                self.db.commit()
+                if commit:
+                    dish = self._new_dish_row(payload)
+                    self.db.add(dish)
+                    self.db.flush()
+                    self._apply_tags(dish, payload.tag_ids)
+                    self._apply_seasonality(dish, payload.seasonality)
+                    self.db.commit()
+                    self.db.refresh(dish)
+                    return self.get_dish(dish.id)
+                with self.db.begin_nested():
+                    dish = self._new_dish_row(payload)
+                    self.db.add(dish)
+                    self.db.flush()
+                    self._apply_tags(dish, payload.tag_ids)
+                    self._apply_seasonality(dish, payload.seasonality)
                 self.db.refresh(dish)
-                return self.get_dish(dish.id)
+                return dish
             except IntegrityError:
-                self.db.rollback()
+                if commit:
+                    self.db.rollback()
                 if attempt == 4:
                     raise HTTPException(
                         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -776,6 +767,28 @@ class CatalogService:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Could not generate unique dish public key",
+        )
+
+    def _new_dish_row(self, payload: DishCreateRequest) -> Dish:
+        return Dish(
+            household_id=self.household_id,
+            public_key=self._generate_unique_dish_public_key(payload.name),
+            name=payload.name,
+            description=payload.description,
+            default_servings=payload.default_servings,
+            course=payload.course,
+            meal_composition=payload.meal_composition,
+            simple_dish_part=payload.simple_dish_part,
+            status=payload.status,
+            image_url=payload.image_url,
+            suitable_for_lunch=payload.suitable_for_lunch,
+            suitable_for_dinner=payload.suitable_for_dinner,
+            weekday_friendly=payload.weekday_friendly,
+            leftovers_possible=payload.leftovers_possible,
+            freezer_friendly=payload.freezer_friendly,
+            kids_friendly=payload.kids_friendly,
+            active=payload.status == DishStatus.active,
+            notes=payload.notes,
         )
 
     def update_dish(self, dish_id: int, payload: DishUpdateRequest) -> Dish:
@@ -809,8 +822,40 @@ class CatalogService:
 
     def delete_dish(self, dish_id: int) -> None:
         dish = self.get_dish(dish_id)
+        self._assert_no_active_public_lineage(dish_id=dish.id)
         self.db.delete(dish)
         self.db.commit()
+
+    def _assert_no_active_public_lineage(
+        self,
+        *,
+        dish_id: int | None = None,
+        recipe_id: int | None = None,
+    ) -> None:
+        from mealroulette.models.public_catalog import PublicRecipe, PublicRecipeStatus
+
+        protected = (
+            PublicRecipeStatus.submitted.value,
+            PublicRecipeStatus.public.value,
+        )
+        query = select(PublicRecipe.id).where(PublicRecipe.status.in_(protected))
+        if recipe_id is not None:
+            query = query.where(PublicRecipe.originating_recipe_id == recipe_id)
+        elif dish_id is not None:
+            query = query.where(PublicRecipe.originating_dish_id == dish_id)
+        else:
+            return
+        blocked = self.db.scalar(query.limit(1))
+        if blocked is None:
+            return
+        target = "recipe" if recipe_id is not None else "dish"
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=(
+                f"Cannot delete {target} while a public catalog request is submitted or public; "
+                "withdraw the request or ask a platform admin to delist it first"
+            ),
+        )
 
     def list_recipes(self, dish_id: int) -> list[Recipe]:
         self.get_dish(dish_id)
@@ -848,7 +893,7 @@ class CatalogService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recipe not found")
         return recipe
 
-    def create_recipe(self, dish_id: int, payload: RecipeCreateRequest) -> Recipe:
+    def create_recipe(self, dish_id: int, payload: RecipeCreateRequest, *, commit: bool = True) -> Recipe:
         dish = self.get_dish(dish_id)
         if self.db.scalar(
             select(Recipe).where(Recipe.dish_id == dish_id, Recipe.variant_name == payload.variant_name)
@@ -859,29 +904,51 @@ class CatalogService:
         recipe_type = self._resolve_recipe_type(payload.recipe_type, payload.is_thermomix)
 
         for attempt in range(5):
-            if is_main:
-                for existing in dish.recipes:
-                    existing.is_main = False
-            sequence_number = self._next_recipe_sequence_number(dish_id)
-            recipe = Recipe(
-                dish_id=dish_id,
-                public_key=self._recipe_public_key(dish, sequence_number),
-                sequence_number=sequence_number,
-                is_main=is_main,
-                computed_traits_json={},
-                **data,
-            )
-            self._apply_recipe_type(recipe, recipe_type)
-            self.db.add(recipe)
             try:
+                if not commit:
+                    with self.db.begin_nested():
+                        if is_main:
+                            for existing in dish.recipes:
+                                existing.is_main = False
+                        sequence_number = self._next_recipe_sequence_number(dish_id)
+                        recipe = Recipe(
+                            dish_id=dish_id,
+                            public_key=self._recipe_public_key(dish, sequence_number),
+                            sequence_number=sequence_number,
+                            is_main=is_main,
+                            computed_traits_json={},
+                            **data,
+                        )
+                        self._apply_recipe_type(recipe, recipe_type)
+                        self.db.add(recipe)
+                        self.db.flush()
+                        self._refresh_recipe_traits(recipe)
+                    self.db.refresh(recipe)
+                    return recipe
+
+                if is_main:
+                    for existing in dish.recipes:
+                        existing.is_main = False
+                sequence_number = self._next_recipe_sequence_number(dish_id)
+                recipe = Recipe(
+                    dish_id=dish_id,
+                    public_key=self._recipe_public_key(dish, sequence_number),
+                    sequence_number=sequence_number,
+                    is_main=is_main,
+                    computed_traits_json={},
+                    **data,
+                )
+                self._apply_recipe_type(recipe, recipe_type)
+                self.db.add(recipe)
                 self.db.flush()
                 self._refresh_recipe_traits(recipe)
                 self.db.commit()
                 self.db.refresh(recipe)
                 return recipe
             except IntegrityError:
-                self.db.rollback()
-                dish = self.get_dish(dish_id)
+                if commit:
+                    self.db.rollback()
+                    dish = self.get_dish(dish_id)
                 if attempt == 4:
                     raise HTTPException(
                         status_code=status.HTTP_409_CONFLICT,
@@ -928,6 +995,7 @@ class CatalogService:
 
     def delete_recipe(self, recipe_id: int) -> None:
         recipe = self.get_recipe(recipe_id)
+        self._assert_no_active_public_lineage(recipe_id=recipe.id)
         dish_id = recipe.dish_id
         was_main = recipe.is_main
         self.db.delete(recipe)
@@ -948,11 +1016,15 @@ class CatalogService:
             )
         )
 
-    def create_step(self, recipe_id: int, payload: RecipeStepCreateRequest) -> RecipeStep:
+    def create_step(
+        self, recipe_id: int, payload: RecipeStepCreateRequest, *, commit: bool = True
+    ) -> RecipeStep:
         self.get_recipe(recipe_id)
         step = RecipeStep(recipe_id=recipe_id, **payload.model_dump())
         self.db.add(step)
-        self.db.commit()
+        self.db.flush()
+        if commit:
+            self.db.commit()
         self.db.refresh(step)
         return step
 
@@ -996,7 +1068,13 @@ class CatalogService:
         self.get_recipe(recipe_id)
         return list(self.db.scalars(select(RecipeIngredient).where(RecipeIngredient.recipe_id == recipe_id)))
 
-    def add_recipe_ingredient(self, recipe_id: int, payload: RecipeIngredientCreateRequest) -> RecipeIngredient:
+    def add_recipe_ingredient(
+        self,
+        recipe_id: int,
+        payload: RecipeIngredientCreateRequest,
+        *,
+        commit: bool = True,
+    ) -> RecipeIngredient:
         self.get_recipe(recipe_id)
         ingredient_id = self._resolve_ingredient_id(payload.ingredient_id, payload.proposed_name)
         if payload.unit_id is not None:
@@ -1012,7 +1090,8 @@ class CatalogService:
         self.db.add(item)
         self.db.flush()
         self._refresh_recipe_traits(self.get_recipe(recipe_id))
-        self.db.commit()
+        if commit:
+            self.db.commit()
         self.db.refresh(item)
         return item
 

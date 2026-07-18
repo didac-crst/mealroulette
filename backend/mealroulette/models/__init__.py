@@ -20,6 +20,11 @@ from mealroulette.models.ingredient_proposals import (
     IngredientProposalSourceType,
     TERMINAL_PROPOSAL_STATUSES,
 )
+from mealroulette.models.public_catalog import (
+    PublicRecipe,
+    PublicRecipeStatus,
+    PublicRecipeVersion,
+)
 from mealroulette.models.household import (
     DEFAULT_HOUSEHOLD_ID,
     DEFAULT_HOUSEHOLD_NAME,
@@ -101,6 +106,9 @@ __all__ = [
     "MealSlot",
     "MealRating",
     "PlanningRule",
+    "PublicRecipe",
+    "PublicRecipeStatus",
+    "PublicRecipeVersion",
     "Recipe",
     "RecipeIngredient",
     "RecipeStep",

@@ -11,6 +11,13 @@ import { DishListPage } from "../features/dishes/DishListPage";
 import { RecipeCookingPage } from "../features/dishes/RecipeCookingPage";
 import { RecipeDetailPage } from "../features/dishes/RecipeDetailPage";
 import { RecipeEditPage } from "../features/dishes/RecipeEditPage";
+import { PublicCatalogPage } from "../features/catalog/PublicCatalogPage";
+import { PublicRecipeDetailPage } from "../features/catalog/PublicRecipeDetailPage";
+import { HouseholdPublicationRequestsPage } from "../features/catalog/HouseholdPublicationRequestsPage";
+import {
+  PublicCatalogReviewDetailPage,
+  PublicCatalogReviewQueuePage,
+} from "../features/catalog/PublicCatalogReviewPage";
 import { IngredientTaxonomyPage } from "../features/ingredients/IngredientTaxonomyPage";
 import { IngredientDetailPage } from "../features/ingredients/IngredientDetailPage";
 import { IngredientEditPage } from "../features/ingredients/IngredientEditPage";
@@ -68,6 +75,8 @@ export function AppRouter() {
                   path="ingredients/proposal-review/:proposalId"
                   element={<IngredientProposalReviewDetailPage />}
                 />
+                <Route path="catalog/review" element={<PublicCatalogReviewQueuePage />} />
+                <Route path="catalog/review/:publicRecipeId" element={<PublicCatalogReviewDetailPage />} />
                 <Route path="settings/backups" element={<BackupSettingsPage />} />
                 <Route
                   path="settings/ingredient-proposals"
@@ -94,11 +103,14 @@ export function AppRouter() {
                 <Route path="dishes/:dishId" element={<DishDetailPage />} />
                 <Route path="dishes/:dishId/recipes/:recipeId" element={<RecipeDetailPage />} />
                 <Route path="recipes/:recipeId/cook" element={<RecipeCookingPage />} />
+                <Route path="catalog" element={<PublicCatalogPage />} />
+                <Route path="catalog/recipes/:publicRecipeId" element={<PublicRecipeDetailPage />} />
                 <Route element={<HouseholdAdminRoute />}>
                   <Route path="dishes/new" element={<DishEditPage />} />
                   <Route path="dishes/:dishId/edit" element={<DishEditPage />} />
                   <Route path="dishes/:dishId/recipes/new" element={<RecipeEditPage />} />
                   <Route path="dishes/:dishId/recipes/:recipeId/edit" element={<RecipeEditPage />} />
+                  <Route path="catalog/requests" element={<HouseholdPublicationRequestsPage />} />
                 </Route>
               </Route>
               <Route element={<HouseholdAdminRoute />}>

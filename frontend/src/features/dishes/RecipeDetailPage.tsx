@@ -17,8 +17,9 @@ import {
   type Unit,
 } from "../../api/catalog";
 import { ApiError } from "../../api/client";
+import { submitPublishRequest } from "../../api/publicCatalog";
 import { ButtonLink } from "../../components/ButtonLink";
-import { Card, EmptyState, MetadataList, PageShell } from "../../components/ui";
+import { Button, Card, EmptyState, MetadataList, PageShell, TechnicalValue } from "../../components/ui";
 import { CookingIngredientList } from "./CookingIngredientList";
 import { useAuth } from "../auth/AuthContext";
 import { RECIPE_TYPE_OPTIONS, formatOptionLabel } from "./classification";
@@ -30,7 +31,6 @@ import {
 import { RecipeCompositionChart } from "./RecipeCompositionChart";
 import { formatStepTimerLabel, stepTimerDurationSeconds } from "./recipeCooking";
 import { buildInferredTraitItems } from "./InferredTraitsSummary";
-import { TechnicalValue } from "../../components/ui";
 
 export function RecipeDetailPage() {
   const { dishId, recipeId } = useParams();
@@ -46,6 +46,8 @@ export function RecipeDetailPage() {
   const [units, setUnits] = useState<Unit[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [publishing, setPublishing] = useState(false);
+  const [publishMessage, setPublishMessage] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!accessToken || !dishIdNum || !recipeIdNum) {
@@ -84,6 +86,22 @@ export function RecipeDetailPage() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  async function handlePublish() {
+    if (!accessToken || !recipeIdNum) {
+      return;
+    }
+    setPublishing(true);
+    setPublishMessage(null);
+    try {
+      await submitPublishRequest(accessToken, recipeIdNum);
+      setPublishMessage("Publication request submitted for platform review.");
+    } catch (err) {
+      setPublishMessage(err instanceof ApiError ? err.message : "Failed to submit publication request");
+    } finally {
+      setPublishing(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -136,10 +154,16 @@ export function RecipeDetailPage() {
             {isHouseholdAdmin ? (
               <ButtonLink to={`/dishes/${dish.id}/recipes/${recipe.id}/edit`}>Edit recipe</ButtonLink>
             ) : null}
+            {isHouseholdAdmin ? (
+              <Button variant="secondary" disabled={publishing} onClick={() => void handlePublish()}>
+                {publishing ? "Submitting…" : "Request publication"}
+              </Button>
+            ) : null}
           </div>
         }
       />
 
+      {publishMessage ? <p className="muted">{publishMessage}</p> : null}
       <Card density="comfortable">
         <TechnicalValue label="Public key" value={recipe.public_key} />
       </Card>

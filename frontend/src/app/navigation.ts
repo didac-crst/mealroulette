@@ -4,6 +4,7 @@ export type NavIconName =
   | "review"
   | "shopping"
   | "dishes"
+  | "catalog"
   | "ingredients"
   | "settings";
 
@@ -21,6 +22,7 @@ export const PRIMARY_NAV: AppNavItem[] = [
   { to: "/review", label: "Review", icon: "review", end: false },
   { to: "/shopping", label: "Shopping", icon: "shopping", end: false },
   { to: "/dishes", label: "Dishes", icon: "dishes", end: false },
+  { to: "/catalog", label: "Catalog", icon: "catalog", end: false },
 ];
 
 /** Household members and admins may browse the global ingredient catalog (read-only for non-platform). */
