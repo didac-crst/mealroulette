@@ -99,10 +99,10 @@ export function resolveBreadcrumbs(
     return [catalog, { label: "Publication requests" }];
   }
   if (pathname === "/catalog/review") {
-    return [catalog, { label: "Review" }];
+    return [catalog, { label: "Recipe review" }];
   }
   if (pathname.startsWith("/catalog/review/")) {
-    return [catalog, { label: "Review", to: "/catalog/review" }, { label: "Request" }];
+    return [catalog, { label: "Recipe review", to: "/catalog/review" }, { label: "Request" }];
   }
   if (pathname.startsWith("/catalog/recipes/")) {
     return [catalog, { label: "Recipe" }];

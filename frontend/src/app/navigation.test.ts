@@ -36,8 +36,8 @@ describe("navigation", () => {
     ]);
   });
 
-  it("exposes platform-only ingredients nav", () => {
-    expect(PLATFORM_NAV.map((item) => item.label)).toEqual(["Ingredients"]);
+  it("exposes platform-only ingredients and recipe review nav", () => {
+    expect(PLATFORM_NAV.map((item) => item.label)).toEqual(["Ingredients", "Recipe review"]);
   });
 
   it("resolves primary nav by household and role", () => {
@@ -45,7 +45,7 @@ describe("navigation", () => {
       resolvePrimaryNav({ hasHousehold: false, isPlatformAdmin: true, isHouseholdAdmin: false }).map(
         (item) => item.label,
       ),
-    ).toEqual(["Ingredients"]);
+    ).toEqual(["Ingredients", "Recipe review"]);
 
     expect(
       resolvePrimaryNav({ hasHousehold: false, isPlatformAdmin: false, isHouseholdAdmin: false }),
@@ -61,7 +61,16 @@ describe("navigation", () => {
       resolvePrimaryNav({ hasHousehold: true, isPlatformAdmin: true, isHouseholdAdmin: false }).map(
         (item) => item.label,
       ),
-    ).toContain("Ingredients");
+    ).toEqual([
+      "Today",
+      "Plan",
+      "Review",
+      "Shopping",
+      "Dishes",
+      "Catalog",
+      "Ingredients",
+      "Recipe review",
+    ]);
 
     expect(
       resolvePrimaryNav({ hasHousehold: true, isPlatformAdmin: false, isHouseholdAdmin: true }).map(
@@ -78,5 +87,8 @@ describe("navigation", () => {
     expect(isNavActive("/dishes/42", "/dishes")).toBe(true);
     expect(isNavActive("/plan", "/plan")).toBe(true);
     expect(isNavActive("/review", "/plan")).toBe(false);
+    expect(isNavActive("/catalog/review", "/catalog")).toBe(false);
+    expect(isNavActive("/catalog/recipes/abc", "/catalog")).toBe(true);
+    expect(isNavActive("/catalog/review", "/catalog/review")).toBe(true);
   });
 });

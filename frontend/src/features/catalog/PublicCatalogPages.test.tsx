@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -11,6 +11,8 @@ import {
   PublicCatalogReviewQueuePage,
 } from "./PublicCatalogReviewPage";
 import { useAuth } from "../auth/AuthContext";
+import { resolvePrimaryNav } from "../../app/navigation";
+import { AdminRoute } from "../../routes/AdminRoute";
 
 const listPublicRecipes = vi.fn();
 const getPublicRecipe = vi.fn();
@@ -69,8 +71,110 @@ const sampleMember = {
     created_at: "2026-01-01T00:00:00Z",
   },
   snapshot: {
+    dish: {
+      meal_composition: "main_dish",
+      course: "main",
+    },
+    recipe: {
+      recipe_type: "standard",
+      servings: 4,
+    },
     ingredients: [{ ingredient_display_name: "Pasta", quantity: "200", unit_symbol: "g" }],
     steps: [{ step_number: 1, instruction: "Boil water" }],
+  },
+  created_at: "2026-01-01T00:00:00Z",
+  updated_at: "2026-01-01T00:00:00Z",
+};
+
+const sampleSide = {
+  id: "pub-2",
+  status: "public" as const,
+  title: "Green Salad",
+  description: "Fresh greens",
+  current_version: {
+    id: "ver-2",
+    version_number: 1,
+    published_at: "2026-01-01T00:00:00Z",
+    superseded_at: null,
+    created_at: "2026-01-01T00:00:00Z",
+  },
+  snapshot: {
+    dish: {
+      meal_composition: "simple_dish",
+      simple_dish_part: "sidedish",
+    },
+    recipe: {
+      servings: 2,
+    },
+  },
+  created_at: "2026-01-01T00:00:00Z",
+  updated_at: "2026-01-01T00:00:00Z",
+};
+
+const reviewDetailPayload = {
+  id: "req-1",
+  status: "submitted" as const,
+  originating_household_id: "hh-1",
+  originating_dish_id: 11,
+  originating_recipe_id: 22,
+  current_version_id: null,
+  submitted_by_user_id: "user-1",
+  reviewed_by_user_id: null,
+  reviewed_at: null,
+  review_note: null,
+  title: "Review Detail",
+  description: "Outer description",
+  latest_version: {
+    id: "ver-1",
+    version_number: 2,
+    published_at: null,
+    superseded_at: null,
+    created_at: "2026-01-01T00:00:00Z",
+  },
+  current_version: null,
+  snapshot: {
+    dish: {
+      name: "Snapshot Pasta",
+      description: "Dish description",
+      meal_composition: "main_dish",
+      simple_dish_part: null,
+      course: "main",
+      suitable_for_lunch: true,
+      suitable_for_dinner: true,
+      notes: "Dish notes",
+    },
+    recipe: {
+      variant_name: "Main",
+      description: "Recipe description",
+      recipe_type: "standard",
+      servings: 4,
+      prep_time_minutes: 10,
+      cook_time_minutes: 20,
+      difficulty: "easy",
+      source_url: "https://example.com/pasta",
+      notes: "Recipe notes",
+      is_main: true,
+      is_thermomix: false,
+    },
+    ingredients: [
+      {
+        ingredient_display_name: "Spaghetti",
+        quantity: "400",
+        unit_symbol: "g",
+        optional: false,
+        notes: "Dry",
+      },
+      {
+        ingredient_display_name: "Parmesan",
+        quantity: "50",
+        unit_symbol: "g",
+        optional: true,
+      },
+    ],
+    steps: [
+      { step_number: 2, instruction: "Drain pasta" },
+      { step_number: 1, instruction: "Boil water", timer_seconds: 60 },
+    ],
   },
   created_at: "2026-01-01T00:00:00Z",
   updated_at: "2026-01-01T00:00:00Z",
@@ -86,7 +190,7 @@ describe("public catalog frontend smoke", () => {
     getPlatformPublicRecipe.mockReset();
   });
 
-  it("lists public recipes and links to detail", async () => {
+  it("lists public recipes as dish-style cards with snapshot metadata", async () => {
     stubAuth({ accessToken: "token", hasHousehold: true });
     listPublicRecipes.mockResolvedValue([sampleMember]);
 
@@ -99,10 +203,94 @@ describe("public catalog frontend smoke", () => {
     await waitFor(() => {
       expect(listPublicRecipes).toHaveBeenCalledWith("token");
     });
+    expect(screen.getByRole("heading", { name: "Public Pasta" })).toBeInTheDocument();
+    expect(screen.getByText(/Main · Main · Standard/i)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Public Pasta/i })).toHaveAttribute(
       "href",
       "/catalog/recipes/pub-1",
     );
+  });
+
+  it("filters public recipes by title and description text", async () => {
+    stubAuth({ accessToken: "token", hasHousehold: true });
+    listPublicRecipes.mockResolvedValue([sampleMember, sampleSide]);
+
+    render(
+      <MemoryRouter>
+        <PublicCatalogPage />
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByRole("heading", { name: "Public Pasta" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Green Salad" })).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("Search public recipes"), {
+      target: { value: "greens" },
+    });
+
+    expect(screen.queryByRole("heading", { name: "Public Pasta" })).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Green Salad" })).toBeInTheDocument();
+  });
+
+  it("shows Recipe review action on catalog for platform admins", async () => {
+    stubAuth({
+      accessToken: "token",
+      hasHousehold: true,
+      isPlatformAdmin: true,
+    });
+    listPublicRecipes.mockResolvedValue([]);
+
+    render(
+      <MemoryRouter>
+        <PublicCatalogPage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(listPublicRecipes).toHaveBeenCalled();
+    });
+    expect(screen.getByRole("link", { name: "Recipe review" })).toHaveAttribute(
+      "href",
+      "/catalog/review",
+    );
+  });
+
+  it("hides Recipe review action for non-platform household members", async () => {
+    stubAuth({
+      accessToken: "token",
+      hasHousehold: true,
+      isPlatformAdmin: false,
+      isHouseholdAdmin: false,
+    });
+    listPublicRecipes.mockResolvedValue([]);
+
+    render(
+      <MemoryRouter>
+        <PublicCatalogPage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(listPublicRecipes).toHaveBeenCalled();
+    });
+    expect(screen.queryByRole("link", { name: "Recipe review" })).not.toBeInTheDocument();
+  });
+
+  it("includes Recipe review in platform primary nav", () => {
+    expect(
+      resolvePrimaryNav({
+        hasHousehold: true,
+        isPlatformAdmin: true,
+        isHouseholdAdmin: false,
+      }).map((item) => item.label),
+    ).toContain("Recipe review");
+    expect(
+      resolvePrimaryNav({
+        hasHousehold: true,
+        isPlatformAdmin: false,
+        isHouseholdAdmin: true,
+      }).map((item) => item.label),
+    ).not.toContain("Recipe review");
   });
 
   it("adopts from public recipe detail", async () => {
@@ -175,7 +363,7 @@ describe("public catalog frontend smoke", () => {
     expect(screen.getByRole("button", { name: "Withdraw" })).toBeInTheDocument();
   });
 
-  it("loads platform review queue", async () => {
+  it("loads recipe review queue with renamed title", async () => {
     stubAuth({ accessToken: "token", isPlatformAdmin: true });
     listPlatformPublicRecipes.mockResolvedValue([
       {
@@ -208,39 +396,16 @@ describe("public catalog frontend smoke", () => {
     await waitFor(() => {
       expect(listPlatformPublicRecipes).toHaveBeenCalledWith("token", "submitted");
     });
+    expect(screen.getByRole("heading", { name: "Recipe review" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Review Me/i })).toHaveAttribute(
       "href",
       "/catalog/review/req-1",
     );
   });
 
-  it("loads platform review detail actions for submitted items", async () => {
+  it("renders snapshot ingredients and steps on recipe review detail", async () => {
     stubAuth({ accessToken: "token", isPlatformAdmin: true });
-    getPlatformPublicRecipe.mockResolvedValue({
-      id: "req-1",
-      status: "submitted",
-      originating_household_id: "hh-1",
-      originating_dish_id: 1,
-      originating_recipe_id: 2,
-      current_version_id: null,
-      submitted_by_user_id: "user-1",
-      reviewed_by_user_id: null,
-      reviewed_at: null,
-      review_note: null,
-      title: "Review Detail",
-      description: "Notes",
-      latest_version: {
-        id: "ver-1",
-        version_number: 1,
-        published_at: null,
-        superseded_at: null,
-        created_at: "2026-01-01T00:00:00Z",
-      },
-      current_version: null,
-      snapshot: null,
-      created_at: "2026-01-01T00:00:00Z",
-      updated_at: "2026-01-01T00:00:00Z",
-    });
+    getPlatformPublicRecipe.mockResolvedValue(reviewDetailPayload);
 
     render(
       <MemoryRouter initialEntries={["/catalog/review/req-1"]}>
@@ -253,7 +418,44 @@ describe("public catalog frontend smoke", () => {
     await waitFor(() => {
       expect(getPlatformPublicRecipe).toHaveBeenCalledWith("token", "req-1");
     });
+
+    expect(screen.getByRole("heading", { name: "Snapshot Pasta" })).toBeInTheDocument();
+    expect(screen.getByText("Dish description")).toBeInTheDocument();
+    expect(screen.getByText(/400 g Spaghetti/)).toBeInTheDocument();
+    expect(screen.getByText(/50 g Parmesan \(optional\)/)).toBeInTheDocument();
+    expect(screen.getByText("Boil water")).toBeInTheDocument();
+    expect(screen.getByText("Drain pasta")).toBeInTheDocument();
+    expect(screen.getByText("https://example.com/pasta")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Approve" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Reject" })).toBeInTheDocument();
+
+    const technical = screen.getByRole("heading", { name: "Technical metadata" }).closest("section,div");
+    expect(technical).toBeTruthy();
+    expect(within(technical as HTMLElement).getByText("hh-1")).toBeInTheDocument();
+    expect(within(technical as HTMLElement).getByText("11")).toBeInTheDocument();
+    expect(within(technical as HTMLElement).getByText("22")).toBeInTheDocument();
+  });
+
+  it("blocks non-platform users from recipe review via AdminRoute", () => {
+    stubAuth({
+      user: { id: "2", username: "member" } as ReturnType<typeof useAuth>["user"],
+      accessToken: "token",
+      isPlatformAdmin: false,
+      hasHousehold: true,
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/catalog/review"]}>
+        <Routes>
+          <Route element={<AdminRoute />}>
+            <Route path="/catalog/review" element={<p>Review queue</p>} />
+          </Route>
+          <Route path="/today" element={<p>Today</p>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("Today")).toBeInTheDocument();
+    expect(screen.queryByText("Review queue")).not.toBeInTheDocument();
   });
 });

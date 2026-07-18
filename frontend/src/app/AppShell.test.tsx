@@ -105,7 +105,7 @@ describe("AppShell", () => {
     expect(sidebar).toHaveTextContent("Ingredients");
   });
 
-  it("shows Ingredients for platform admin with household", async () => {
+  it("shows Ingredients and Recipe review for platform admin with household", async () => {
     vi.mocked(authApi.fetchMe).mockResolvedValue({
       ...memberUser,
       role: "platform_admin",
@@ -117,9 +117,10 @@ describe("AppShell", () => {
     expect(await screen.findByText("Today content")).toBeInTheDocument();
     const sidebar = screen.getByRole("complementary", { name: "Application navigation" });
     expect(sidebar).toHaveTextContent("Ingredients");
+    expect(sidebar).toHaveTextContent("Recipe review");
   });
 
-  it("shows Ingredients only for platform admin without household", async () => {
+  it("shows Ingredients and Recipe review for platform admin without household", async () => {
     vi.mocked(authApi.fetchMe).mockResolvedValue({
       ...memberUser,
       role: "platform_admin",
@@ -133,6 +134,7 @@ describe("AppShell", () => {
     expect(await screen.findByText("Ingredients content")).toBeInTheDocument();
     const sidebar = screen.getByRole("complementary", { name: "Application navigation" });
     expect(sidebar).toHaveTextContent("Ingredients");
+    expect(sidebar).toHaveTextContent("Recipe review");
     expect(sidebar).not.toHaveTextContent("Dishes");
     expect(sidebar).not.toHaveTextContent("Today");
   });

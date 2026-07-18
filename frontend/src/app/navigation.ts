@@ -33,8 +33,16 @@ export const INGREDIENTS_NAV_ITEM: AppNavItem = {
   end: false,
 };
 
-/** Platform operator without household membership — global catalog only. */
-export const PLATFORM_NAV: AppNavItem[] = [INGREDIENTS_NAV_ITEM];
+/** Platform moderation queue for public recipe publication requests. */
+export const RECIPE_REVIEW_NAV_ITEM: AppNavItem = {
+  to: "/catalog/review",
+  label: "Recipe review",
+  icon: "catalog",
+  end: false,
+};
+
+/** Platform operator without household membership — global catalog surfaces. */
+export const PLATFORM_NAV: AppNavItem[] = [INGREDIENTS_NAV_ITEM, RECIPE_REVIEW_NAV_ITEM];
 
 export function householdPrimaryNav(includeIngredients: boolean): AppNavItem[] {
   if (!includeIngredients) {
@@ -55,7 +63,11 @@ export function resolvePrimaryNav({
   if (!hasHousehold) {
     return isPlatformAdmin ? PLATFORM_NAV : [];
   }
-  return householdPrimaryNav(true);
+  const nav = householdPrimaryNav(true);
+  if (isPlatformAdmin) {
+    return [...nav, RECIPE_REVIEW_NAV_ITEM];
+  }
+  return nav;
 }
 
 export const PLATFORM_ADMIN_NAV: AppNavItem[] = [
@@ -72,6 +84,14 @@ export const ADMIN_NAV: AppNavItem[] = SETTINGS_NAV;
 export function isNavActive(pathname: string, to: string, end = false): boolean {
   if (end) {
     return pathname === to;
+  }
+  // Keep Catalog inactive on /catalog/review* so Recipe review can own that surface.
+  if (to === "/catalog") {
+    return (
+      pathname === "/catalog" ||
+      pathname.startsWith("/catalog/recipes/") ||
+      pathname.startsWith("/catalog/requests")
+    );
   }
   return pathname === to || pathname.startsWith(`${to}/`);
 }

@@ -15,6 +15,8 @@ The **MealRoulette public catalog** is **authenticated-public**: any signed-in h
 
 It is **not** anonymous web-public. Open web discovery is a later phase.
 
+The first user-facing entry point is the household **Dishes** area: the public catalog should feel like a way to find dishes for an empty or growing household library, not like a settings workflow.
+
 ## Product model
 
 ```text
@@ -85,6 +87,18 @@ While a lineage is `submitted` or `public`, deleting the originating dish or rec
 
 Public member DTOs expose snapshot title/description and version metadata only. Originating household/user identifiers are not shown to members.
 
+## Discovery UI
+
+Phase 16D ships the foundation plus lightweight discovery polish:
+
+- a **Browse public catalog** entry point from the Dishes page;
+- a prominent empty-state action from an empty household dish library;
+- a public catalog list that visually follows the Dishes list/card pattern;
+- a simple real-time text filter over public recipe title/description;
+- optional lightweight filters based on existing snapshot metadata, such as All / Main / Centerpieces / Sides / Desserts.
+
+These filters are intentionally shallow. They must use metadata already present in the public snapshot and must not introduce new taxonomy, recommendation, or batch-adoption semantics.
+
 ## Authorization
 
 - Household admin: submit, list own publication requests, withdraw while `submitted`
@@ -98,5 +112,12 @@ Public member DTOs expose snapshot title/description and version metadata only. 
 - LLM moderation
 - Recipe drafts / localization
 - Attach adopt to an existing dish
+- Multi-select import/adopt
+- Starter packs or recommendations
+- Rich dietary/taxonomy filters such as meat, vegetable, carbohydrate, vegan
 - Multi-live-version republish UX
 - Public comments/reviews
+
+## Future Discovery Work
+
+Later public-catalog discovery may add richer filters, starter packs, multi-select adoption/import, and guided empty-household onboarding. That is a separate product slice because it affects duplicate handling, batch error handling, adoption progress, ranking/recommendation semantics, and possibly snapshot metadata contracts.

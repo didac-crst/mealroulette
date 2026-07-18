@@ -1016,6 +1016,8 @@ Deliverables:
 - `public_recipes` / `public_recipe_versions` with immutable JSON snapshots.
 - Household-admin publish/submit and withdraw; platform approve/reject/delist.
 - Authenticated-public catalog browse and adopt (new Dish+Recipe copy with provenance).
+- Dishes page entry point and empty-library call to action for browsing the public catalog.
+- Lightweight public catalog discovery: Dishes-like list, real-time text filter, and optional snapshot-metadata filters.
 - Resubmission after rejected/withdrawn via new version numbers; one live approved version in 16D.
 - No rewards, anonymous catalog, or multi-live republish UX.
 
@@ -1026,6 +1028,7 @@ Acceptance criteria:
 - Adoption creates an independent household-owned copy with `derived_from_public_*` provenance.
 - Delisting removes discovery without deleting existing adopted copies.
 - Platform and household role boundaries are enforced.
+- Rich filters, starter packs, and multi-select adoption are deferred to a later public-catalog discovery slice.
 
 #### Phase 16F — Recipe draft/import foundation
 

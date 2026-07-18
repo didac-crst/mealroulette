@@ -91,6 +91,15 @@ export function DishListPage() {
     ? undefined
     : `${dishes.length} dish${dishes.length === 1 ? "" : "es"}`;
 
+  const headerActions = (
+    <div className="catalog-detail-actions">
+      <ButtonLink to="/catalog" variant="secondary">
+        Browse public catalog
+      </ButtonLink>
+      {isHouseholdAdmin ? <ButtonLink to="/dishes/new">Add dish</ButtonLink> : null}
+    </div>
+  );
+
   return (
     <div className="catalog-page">
       <PageShell
@@ -98,7 +107,7 @@ export function DishListPage() {
         subtitle={subtitle}
         loading={loading}
         loadingMessage="Loading dishes…"
-        actions={isHouseholdAdmin ? <ButtonLink to="/dishes/new">Add dish</ButtonLink> : undefined}
+        actions={headerActions}
       >
         {error ? (
           <p className="error" role="alert">
@@ -106,7 +115,7 @@ export function DishListPage() {
           </p>
         ) : null}
 
-        {!loading && !error ? (
+        {!loading && !error && dishes.length > 0 ? (
           <Card density="comfortable" className="catalog-search-card">
             <label className="catalog-search-label">
               Search dishes
@@ -139,8 +148,17 @@ export function DishListPage() {
         {!loading && !error && dishes.length === 0 ? (
           <EmptyState
             title="No dishes yet"
-            description="Add your first dish to start building your library."
-            action={isHouseholdAdmin ? <ButtonLink to="/dishes/new">Add dish</ButtonLink> : undefined}
+            description="Browse the public catalog to adopt recipes, or add your first dish."
+            action={
+              <div className="catalog-detail-actions">
+                <ButtonLink to="/catalog">Browse public catalog</ButtonLink>
+                {isHouseholdAdmin ? (
+                  <ButtonLink to="/dishes/new" variant="secondary">
+                    Add dish
+                  </ButtonLink>
+                ) : null}
+              </div>
+            }
           />
         ) : null}
 

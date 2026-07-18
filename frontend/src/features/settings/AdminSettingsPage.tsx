@@ -85,8 +85,8 @@ const CATALOG_TILES: SettingsTileConfig[] = [
   },
   {
     to: "/catalog/review",
-    title: "Public catalog review",
-    description: "Approve, reject, or delist household publication requests.",
+    title: "Recipe review",
+    description: "Inspect publication snapshots and approve, reject, or delist requests.",
     icon: <SettingsIngredientsIcon />,
   },
 ];
