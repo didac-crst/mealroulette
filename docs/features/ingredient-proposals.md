@@ -4,7 +4,7 @@
 
 - **Purpose:** Governed missing-ingredient proposal workflow for household users, recipe drafts, imports, and platform catalog review.
 - **Authority:** Feature specification for Phase 16C; architecture in [ADR 004](../adr/004-draft-first-recipe-authoring-and-external-identifiers.md).
-- **Status:** Accepted design — implementation not started.
+- **Status:** Implemented — Phase 16C foundation.
 - **Update when:** Proposal states, review outcomes, authorization, or integration with recipe drafts changes.
 
 ---
@@ -152,6 +152,17 @@ Platform admins:
 - review and resolve proposals;
 - create canonical ingredients, aliases, or mappings as explicit review actions.
 
+Primary UI surfaces:
+
+- `/ingredients` — single **Ingredient proposals** entry for household users; **Proposal review** for platform admins;
+- `/ingredients/proposals` — Propose / My proposals tabs;
+- `/ingredients/proposal-review` — platform review queue.
+
+Canonical names are internal snake_case slugs (e.g. `torch_ginger_flower`). Members submit free-text proposed names.
+Rejected proposals are immutable history and do **not** reserve or ban a name; only an existing `ingredients.canonical_name` blocks approve-new.
+
+Review actions that mutate the catalog (`add-alias`, `approve-new`) apply the catalog write and the proposal review fields in a **single database transaction**. Catalog helpers flush without committing when called from proposal review so a failed review update cannot leave an orphan alias or ingredient.
+
 Platform admin access to proposals does not imply unrestricted access to private household recipe drafts. Proposal fields must contain enough review context without exposing full private recipe content unless a future audited support flow is designed.
 
 ## Deduplication
@@ -179,7 +190,28 @@ POST /api/platform/ingredient-proposals/{proposal_id}/add-alias
 POST /api/platform/ingredient-proposals/{proposal_id}/approve-new
 POST /api/platform/ingredient-proposals/{proposal_id}/reject
 POST /api/platform/ingredient-proposals/{proposal_id}/request-information
+POST /api/platform/ingredient-proposals/{proposal_id}/mark-duplicate
+POST /api/ingredient-proposals/{proposal_id}/provide-information
 ```
+
+`mark-duplicate` is the explicit platform action for `resolution_status=duplicate`.
+`provide-information` lets the submitter return a `needs_information` proposal to `pending`.
+`reject`, `request-information`, and `mark-duplicate` require a non-empty `review_note` so submitters always see why the status changed and what to do next.
+
+## Future Evidence Trail And AI Triage
+
+Rejected and duplicate proposals are immutable review history, not permanent name bans. A later proposal with better evidence may be submitted and reviewed independently.
+
+Future proposal workflows should preserve enough evidence for AI-assisted triage and fast platform review:
+
+- original proposed name, locale, description, and culinary context;
+- possible existing ingredient and alias matches;
+- platform review notes and resolution reason;
+- submitter clarification after `needs_information`;
+- duplicate/rejection context where it helps future reviewers;
+- suggested taxonomy family or signal that a new family may be needed.
+
+The future LLM moderation assistant may recommend mapping, aliasing, approval, rejection, duplicate handling, clarification questions, or a new-family need. It must not mutate canonical ingredients, aliases, families, units, or conversions without platform-admin confirmation.
 
 ## Acceptance Criteria
 

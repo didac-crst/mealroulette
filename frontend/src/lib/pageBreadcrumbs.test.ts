@@ -42,10 +42,19 @@ describe("resolveBreadcrumbs", () => {
       { label: "Household settings" },
     ]);
 
+    expect(resolveBreadcrumbs("/ingredients")).toEqual([{ label: "Ingredients", to: "/ingredients" }]);
+    expect(resolveBreadcrumbs("/ingredients/proposals")).toEqual([
+      { label: "Ingredients", to: "/ingredients" },
+      { label: "Proposals" },
+    ]);
+    expect(resolveBreadcrumbs("/ingredients/proposal-review")).toEqual([
+      { label: "Ingredients", to: "/ingredients" },
+      { label: "Proposal review" },
+    ]);
+
     expect(
       resolveBreadcrumbs("/ingredients/12/edit", { ingredientId: "12" }, { ingredientId: 12, ingredientName: "Tomato" }),
     ).toEqual([
-      { label: "Settings", to: "/settings" },
       { label: "Ingredients", to: "/ingredients" },
       { label: "Tomato", to: "/ingredients/12" },
       { label: "Edit" },

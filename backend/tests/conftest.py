@@ -205,5 +205,8 @@ def clear_settings_cache(monkeypatch):
     monkeypatch.setenv("SECRET_KEY", "test-secret-key-for-hs256-at-least-32-bytes")
     monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "123456:TEST-BOT-TOKEN")
     get_settings.cache_clear()
+    test_settings = get_settings()
+    monkeypatch.setattr("mealroulette.core.config.settings", test_settings)
+    monkeypatch.setattr("mealroulette.auth.security.settings", test_settings)
     yield
     get_settings.cache_clear()

@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useParams } from "react-router-dom";
 
 import { AppShell } from "../app/AppShell";
 import { AuthProvider } from "../features/auth/AuthContext";
@@ -15,6 +15,11 @@ import { IngredientTaxonomyPage } from "../features/ingredients/IngredientTaxono
 import { IngredientDetailPage } from "../features/ingredients/IngredientDetailPage";
 import { IngredientEditPage } from "../features/ingredients/IngredientEditPage";
 import { IngredientListPage } from "../features/ingredients/IngredientListPage";
+import { MyIngredientProposalsPage } from "../features/ingredients/MyIngredientProposalsPage";
+import {
+  IngredientProposalReviewDetailPage,
+  IngredientProposalReviewQueuePage,
+} from "../features/ingredients/IngredientProposalReviewPage";
 import { PlanWeekPage } from "../features/planning/PlanWeekPage";
 import { ReviewWeekPage } from "../features/planning/ReviewWeekPage";
 import { TodayPage } from "../features/planning/TodayPage";
@@ -33,6 +38,11 @@ import { HouseholdAdminRoute } from "./HouseholdAdminRoute";
 import { HouseholdMemberRoute } from "./HouseholdMemberRoute";
 import { IngredientCatalogRoute } from "./IngredientCatalogRoute";
 
+function LegacyProposalReviewRedirect() {
+  const { proposalId } = useParams();
+  return <Navigate to={`/ingredients/proposal-review/${proposalId}`} replace />;
+}
+
 export function AppRouter() {
   return (
     <BrowserRouter>
@@ -47,16 +57,34 @@ export function AppRouter() {
               <Route element={<IngredientCatalogRoute />}>
                 <Route path="ingredients" element={<IngredientListPage />} />
                 <Route path="ingredients/taxonomy" element={<IngredientTaxonomyPage />} />
+                <Route path="ingredients/proposals" element={<MyIngredientProposalsPage />} />
                 <Route path="ingredients/:ingredientId" element={<IngredientDetailPage />} />
               </Route>
               <Route element={<AdminRoute />}>
                 <Route path="ingredients/new" element={<IngredientEditPage />} />
                 <Route path="ingredients/:ingredientId/edit" element={<IngredientEditPage />} />
+                <Route path="ingredients/proposal-review" element={<IngredientProposalReviewQueuePage />} />
+                <Route
+                  path="ingredients/proposal-review/:proposalId"
+                  element={<IngredientProposalReviewDetailPage />}
+                />
                 <Route path="settings/backups" element={<BackupSettingsPage />} />
+                <Route
+                  path="settings/ingredient-proposals"
+                  element={<Navigate to="/ingredients/proposal-review" replace />}
+                />
+                <Route
+                  path="settings/ingredient-proposals/:proposalId"
+                  element={<LegacyProposalReviewRedirect />}
+                />
               </Route>
               <Route path="settings" element={<AdminSettingsPage />} />
               <Route path="settings/telegram" element={<PersonalTelegramSettingsPage />} />
               <Route path="settings/password" element={<PasswordSettingsPage />} />
+              <Route
+                path="settings/my-ingredient-proposals"
+                element={<Navigate to="/ingredients/proposals" replace />}
+              />
               <Route element={<HouseholdMemberRoute />}>
                 <Route path="today" element={<TodayPage />} />
                 <Route path="plan" element={<PlanWeekPage />} />

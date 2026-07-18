@@ -37,7 +37,7 @@ Phase 16 remaining scope (split for reviewability):
 | --- | --- | --- |
 | **16A** | Password / account settings | Done (PR #23) |
 | **16B** | Umbrella UI parity (shell, filters, ingredients, OTP) | Done (PR #24) |
-| **16C** | Ingredient proposal foundation | Planned |
+| **16C** | Ingredient proposal foundation | In progress |
 | **16D** | Public catalog / public dishes | Planned |
 | **16E** | Recipe ratings UI | Planned |
 | **16F** | Recipe draft/import foundation | Planned |
@@ -394,6 +394,7 @@ When `meal_composition = simple_dish`, **`simple_dish_part`** is required: `cent
 - [x] Telegram OTP / passwordless bot login (Phase 16B)
 - [ ] Recipe draft/import foundation (Phase 16F; see [features/recipe-import-drafts.md](features/recipe-import-drafts.md))
 - [ ] LLM-assisted recipe authoring experiment (Phase 16G)
+- [ ] AI-assisted ingredient proposal triage: use proposal evidence, user clarification, candidate matches, and taxonomy context to suggest moderation actions; final catalog mutation stays platform-admin confirmed
 - [ ] Household-level portable export/import
 - [ ] Localization tables and cross-household copy/adopt (Phase 16H+)
 - [ ] Meal outcomes and leftover inventory (Phase 17; see [features/meal-outcomes-leftovers.md](features/meal-outcomes-leftovers.md))

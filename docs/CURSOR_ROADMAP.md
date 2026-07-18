@@ -994,6 +994,7 @@ Deliverables:
 - Platform-admin review queue.
 - Resolution actions: map existing, add alias, approve new canonical, reject, request information, withdraw.
 - Proposal deduplication against pending proposals, ingredients, and aliases.
+- Proposal evidence trail suitable for later AI-assisted triage: review notes, submitter clarification, duplicate/rejection context, and candidate match context without leaking private provenance.
 - Source locale, culinary context, source type, optional source reference, reviewer audit fields.
 - Authorization and tenant-isolation tests.
 
@@ -1017,6 +1018,7 @@ Deliverables:
 - Explicit commit workflow into trusted dish/recipe tables.
 - Reference servings and contextual serving scaling model.
 - Optional proposal link from missing draft ingredients.
+- Users can continue editing a draft while an ingredient proposal is pending; unresolved required ingredients block commit, not draft editing.
 
 Acceptance criteria:
 
@@ -1037,6 +1039,7 @@ Deliverables:
 - Structured extraction for free-text recipe descriptions.
 - Ingredient resolver tool use against application services.
 - Quality-review pass.
+- AI-assisted ingredient proposal triage: suggest existing mappings, aliases, taxonomy fields, clarification questions, duplicate/rejection reasons, and possible new-family needs.
 - Usage tracking: provider, model, prompt version, schema version, token usage, latency, raw response, parsed result, validation result.
 - Feature flag.
 - Usage event storage, credit reservation/consume/release semantics, and hard session budgets for managed AI.
@@ -1045,6 +1048,7 @@ Acceptance criteria:
 
 - LLM endpoints require authentication and rate limits.
 - LLM output mutates only drafts.
+- LLM proposal triage may suggest actions and draft review notes, but canonical catalog mutation remains platform-admin confirmed.
 - The model has no direct trusted-data CRUD or SQL access.
 - Free-text recipe description can produce a reviewable draft.
 - Deterministic validation remains authoritative.

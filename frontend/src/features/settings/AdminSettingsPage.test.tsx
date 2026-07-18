@@ -49,6 +49,7 @@ describe("AdminSettingsPage access boundary", () => {
       user: { id: "u1", username: "member" },
       isPlatformAdmin: false,
       isHouseholdAdmin: false,
+      hasHousehold: true,
       loading: false,
     });
 
@@ -58,6 +59,7 @@ describe("AdminSettingsPage access boundary", () => {
     expect(screen.getByRole("heading", { name: "Personal" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Telegram/i })).toHaveAttribute("href", "/settings/telegram");
     expect(screen.getByRole("link", { name: /^Password/i })).toHaveAttribute("href", "/settings/password");
+    expect(screen.queryByRole("heading", { name: "Catalog requests" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Household" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Meal planning" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Integrations" })).not.toBeInTheDocument();
@@ -69,6 +71,7 @@ describe("AdminSettingsPage access boundary", () => {
       user: { id: "u1", username: "hadmin" },
       isPlatformAdmin: false,
       isHouseholdAdmin: true,
+      hasHousehold: true,
       loading: false,
     });
 
@@ -88,6 +91,7 @@ describe("AdminSettingsPage access boundary", () => {
       user: { id: "u1", username: "padmin" },
       isPlatformAdmin: true,
       isHouseholdAdmin: false,
+      hasHousehold: false,
       loading: false,
     });
 
@@ -96,6 +100,7 @@ describe("AdminSettingsPage access boundary", () => {
     expect(screen.getByRole("heading", { name: "Personal" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Integrations" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Catalog" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Ingredients/i })).toHaveAttribute("href", "/ingredients");
     expect(screen.queryByRole("heading", { name: "Household" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Meal planning" })).not.toBeInTheDocument();
   });
@@ -105,6 +110,7 @@ describe("AdminSettingsPage access boundary", () => {
       user: { id: "u1", username: "dual" },
       isPlatformAdmin: true,
       isHouseholdAdmin: true,
+      hasHousehold: true,
       loading: false,
     });
 

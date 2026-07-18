@@ -199,6 +199,10 @@ Future AI quality warnings must be labeled separately from deterministic validat
 
 LLM-assisted authoring is a later phase. It may populate or revise drafts, but cannot commit trusted data.
 
+Recipe drafts are the user-continuation mechanism when ingredient resolution is not yet complete. A user may continue editing metadata, quantities, steps, timers, and notes while a draft ingredient remains `missing` or linked to a pending ingredient proposal. The draft must not become an active trusted recipe until required ingredients are resolved to approved canonical ingredient IDs.
+
+This keeps recipe authoring responsive without letting unresolved proposal text leak into planning, shopping, or active recipe tables.
+
 Provider calls must return schema-constrained structured output and store:
 
 - provider;

@@ -161,7 +161,7 @@ describe("IngredientCatalogRoute", () => {
     expect(screen.getByText("Catalog outlet")).toBeInTheDocument();
   });
 
-  it("redirects household members to /today", () => {
+  it("allows household members through to outlet", () => {
     stubAuth({
       user: baseUser,
       hasHousehold: true,
@@ -169,7 +169,18 @@ describe("IngredientCatalogRoute", () => {
       isPlatformAdmin: false,
     });
     renderIngredientRoute();
-    expect(screen.getByText("Today page")).toBeInTheDocument();
+    expect(screen.getByText("Catalog outlet")).toBeInTheDocument();
+  });
+
+  it("redirects users without household or platform admin to /login", () => {
+    stubAuth({
+      user: { ...baseUser, active_household_id: null, active_household_name: null, household_role: null },
+      hasHousehold: false,
+      isHouseholdAdmin: false,
+      isPlatformAdmin: false,
+    });
+    renderIngredientRoute();
+    expect(screen.getByText("Login page")).toBeInTheDocument();
   });
 
   it("redirects unauthenticated users to /login", () => {
