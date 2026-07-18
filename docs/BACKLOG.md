@@ -75,6 +75,7 @@ Track these as opportunistic refactors, not a standalone rewrite. Prefer tacklin
 - [ ] Split `frontend/src/styles/app.css` into feature-level or component-level style files once UI changes become frequent.
 - [ ] Strengthen frontend coverage around edit forms, planning flows, and shopping list behavior.
 - [ ] Public catalog discovery and batch adoption: richer filters, starter packs, multi-select adopt/import, and empty-household onboarding after Phase 16D foundation is user-tested.
+- [ ] Public recipe update / republish workflow: request update while v1 stays live; approve switches `current_version_id` to v2 and supersedes v1; reject keeps v1 live (see [features/public-catalog.md](features/public-catalog.md)).
 
 ---
 

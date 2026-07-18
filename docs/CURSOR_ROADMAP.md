@@ -1020,6 +1020,7 @@ Deliverables:
 - Lightweight public catalog discovery: Dishes-like list, real-time text filter, and optional snapshot-metadata filters.
 - Resubmission after rejected/withdrawn via new version numbers; one live approved version in 16D.
 - No rewards, anonymous catalog, or multi-live republish UX.
+- Submit while `status=public` remains **409** with a clear user-facing message that updating an existing public recipe is not supported yet.
 
 Acceptance criteria:
 
@@ -1029,6 +1030,7 @@ Acceptance criteria:
 - Delisting removes discovery without deleting existing adopted copies.
 - Platform and household role boundaries are enforced.
 - Rich filters, starter packs, and multi-select adoption are deferred to a later public-catalog discovery slice.
+- Public recipe update / republish (v1 stays live while v2 is submitted; approve switches `current_version_id` and supersedes v1; reject keeps v1 live) is deferred — see [features/public-catalog.md](features/public-catalog.md).
 
 #### Phase 16F — Recipe draft/import foundation
 

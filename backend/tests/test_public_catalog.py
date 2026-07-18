@@ -207,6 +207,9 @@ def test_platform_approve_reject_delist_and_resubmit(
         headers=admin_headers,
     )
     assert conflict.status_code == 409
+    assert conflict.json()["error"]["message"] == (
+        "This recipe is already public. Updating an existing public recipe is not supported yet."
+    )
 
     delisted = client.post(
         f"/api/platform/public-recipes/{public_id}/delist",

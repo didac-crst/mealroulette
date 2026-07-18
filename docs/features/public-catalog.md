@@ -51,6 +51,8 @@ Unique lineage per `originating_recipe_id`:
 - `rejected` or `withdrawn` → resubmit creates a **new immutable version number** under the same `public_recipes` row; status returns to `submitted`; `current_version_id` stays null until approval
 - `delisted` → new submit returns **409** in Phase 16D (republish UX later)
 
+When status is already `public`, the conflict detail is user-facing: *This recipe is already public. Updating an existing public recipe is not supported yet.*
+
 Phase 16D supports **one live approved version** at a time.
 
 ## Versions and timestamps
@@ -115,9 +117,31 @@ These filters are intentionally shallow. They must use metadata already present 
 - Multi-select import/adopt
 - Starter packs or recommendations
 - Rich dietary/taxonomy filters such as meat, vegetable, carbohydrate, vegan
-- Multi-live-version republish UX
+- Multi-live-version republish UX / public recipe update workflow
 - Public comments/reviews
 
 ## Future Discovery Work
 
 Later public-catalog discovery may add richer filters, starter packs, multi-select adoption/import, and guided empty-household onboarding. That is a separate product slice because it affects duplicate handling, batch error handling, adoption progress, ranking/recommendation semantics, and possibly snapshot metadata contracts.
+
+## Future: public recipe update / republish
+
+Deferred after Phase 16D. Intended lifecycle when a household wants to publish edits to an already-public recipe:
+
+```text
+public v1 is live
+  -> household edits private recipe
+  -> household admin requests update
+  -> public_recipe_versions v2 created as submitted
+  -> platform reviews v2
+  -> if approved: current_version_id -> v2; v1.superseded_at set
+  -> if rejected: v1 remains live
+```
+
+Rules for that future slice:
+
+- Public catalog continues showing **v1** while **v2** is pending review.
+- Adopters after approval get **v2**; existing adopters keep their copied recipe unchanged.
+- Platform review UI must clearly show an update request for an existing public recipe.
+- Rejecting **v2** must **not** delist **v1**.
+- Delist still hides the lineage from discovery.

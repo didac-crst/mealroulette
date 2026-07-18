@@ -316,6 +316,14 @@ class PublicCatalogService:
             return self.get_public_recipe(public_recipe.id)
 
         if existing.status in _BLOCKING_SUBMIT_STATUSES:
+            if existing.status == PublicRecipeStatus.public.value:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail=(
+                        "This recipe is already public. "
+                        "Updating an existing public recipe is not supported yet."
+                    ),
+                )
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"Cannot submit publication request in status {existing.status}",
