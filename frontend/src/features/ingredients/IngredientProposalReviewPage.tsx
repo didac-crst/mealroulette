@@ -205,6 +205,7 @@ export function IngredientProposalReviewDetailPage() {
         setUnits(nextUnits);
         setFoodGroups(nextFoodGroups);
         setIngredients(nextIngredients);
+        setOptionsError(null);
       })
       .catch((err) => {
         if (!cancelled) {
@@ -239,6 +240,7 @@ export function IngredientProposalReviewDetailPage() {
       .then((data) => {
         if (!cancelled && requestedGroup === foodGroup) {
           setFamilies(data);
+          setOptionsError(null);
         }
       })
       .catch((err) => {
@@ -494,7 +496,14 @@ export function IngredientProposalReviewDetailPage() {
                   </label>
                   <label>
                     Food group
-                    <select value={foodGroup} onChange={(event) => setFoodGroup(event.target.value)} required>
+                    <select
+                      value={foodGroup}
+                      onChange={(event) => {
+                        setFoodGroup(event.target.value);
+                        setFamily("");
+                      }}
+                      required
+                    >
                       <option value="">Select food group</option>
                       {foodGroups.map((group) => (
                         <option key={group.id} value={group.id}>

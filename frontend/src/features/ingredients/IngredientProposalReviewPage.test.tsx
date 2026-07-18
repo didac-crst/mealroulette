@@ -438,4 +438,33 @@ describe("Ingredient proposal review", () => {
     expect(screen.queryByRole("option", { name: "Family A" })).not.toBeInTheDocument();
     expect(screen.getByRole("option", { name: "Family B" })).toBeInTheDocument();
   });
+
+  it("clears selected family when the food group changes", async () => {
+    fetchFoodGroups.mockResolvedValue([
+      { id: "group-a", label: "Group A" },
+      { id: "group-b", label: "Group B" },
+    ]);
+    fetchFoodGroupFamilies.mockImplementation((_token: string, groupId: string) => {
+      if (groupId === "group-a") {
+        return Promise.resolve([{ id: "family-a", label: "Family A" }]);
+      }
+      return Promise.resolve([{ id: "family-b", label: "Family B" }]);
+    });
+
+    renderDetailPage();
+
+    expect(await screen.findByLabelText("Food group")).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Food group"), { target: { value: "group-a" } });
+    await waitFor(() => {
+      expect(screen.getByRole("option", { name: "Family A" })).toBeInTheDocument();
+    });
+    fireEvent.change(screen.getByLabelText("Family"), { target: { value: "family-a" } });
+    expect(screen.getByLabelText("Family")).toHaveValue("family-a");
+
+    fireEvent.change(screen.getByLabelText("Food group"), { target: { value: "group-b" } });
+    expect(screen.getByLabelText("Family")).toHaveValue("");
+    await waitFor(() => {
+      expect(screen.getByRole("option", { name: "Family B" })).toBeInTheDocument();
+    });
+  });
 });

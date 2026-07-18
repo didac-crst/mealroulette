@@ -654,6 +654,43 @@ def test_create_rejects_whitespace_only_fields(client, user_headers, catalog_see
     assert response.status_code == 422
 
 
+def test_schema_trims_before_length_constraints():
+    from mealroulette.schemas.ingredient_proposals import (
+        IngredientProposalAddAliasRequest,
+        IngredientProposalApproveNewRequest,
+        IngredientProposalCreateRequest,
+        IngredientProposalMarkDuplicateRequest,
+        IngredientProposalReviewNoteRequest,
+    )
+
+    name = "n" * 128
+    created = IngredientProposalCreateRequest(proposed_name=f"  {name}  ", source_locale="  en ")
+    assert created.proposed_name == name
+    assert created.source_locale == "en"
+
+    # Surrounding whitespace would exceed max_length if validated before trim.
+    padded = IngredientProposalCreateRequest.model_validate(
+        {"proposed_name": f"  {'x' * 128}  ", "source_locale": "en"}
+    )
+    assert padded.proposed_name == "x" * 128
+
+    alias = IngredientProposalAddAliasRequest(ingredient_id=1, alias="  yuzu zest  ", language="  en ")
+    assert alias.alias == "yuzu zest"
+    assert alias.language == "en"
+
+    approve = IngredientProposalApproveNewRequest(
+        display_name=f"  {'d' * 128}  ",
+        canonical_name=f"  {'c' * 128}  ",
+    )
+    assert approve.display_name == "d" * 128
+    assert approve.canonical_name == "c" * 128
+
+    note = IngredientProposalReviewNoteRequest(review_note="  needs clarification  ")
+    assert note.review_note == "needs clarification"
+    duplicate = IngredientProposalMarkDuplicateRequest(review_note="  already exists  ")
+    assert duplicate.review_note == "already exists"
+
+
 @pytest.mark.integration
 def test_add_alias_and_approve_new_trim_whitespace_fields(
     client,
@@ -819,4 +856,3 @@ def test_concurrent_review_claims_proposal_once(db_engine):
         assert proposal is not None
         assert proposal.resolution_status == "approved"
         assert proposal.resolved_ingredient_id == ingredient_id
-

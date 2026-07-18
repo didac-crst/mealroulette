@@ -39,11 +39,22 @@ class IngredientProposalMatchKind(str, Enum):
     pending_proposal = "pending_proposal"
 
 
-def _require_trimmed_nonblank(value: str, *, field_name: str) -> str:
+def _require_trimmed_nonblank(value: object, *, field_name: str) -> str:
+    if not isinstance(value, str):
+        raise ValueError(f"{field_name} must be a string")
     cleaned = value.strip()
     if not cleaned:
         raise ValueError(f"{field_name} must not be blank")
     return cleaned
+
+
+def _trim_optional_text(value: object) -> str | None:
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        raise ValueError("value must be a string")
+    cleaned = value.strip()
+    return cleaned or None
 
 
 class IngredientProposalCreateRequest(BaseModel):
@@ -59,9 +70,9 @@ class IngredientProposalCreateRequest(BaseModel):
     suggested_product_form: str | None = Field(default=None, max_length=32)
     suggested_preservation: str | None = Field(default=None, max_length=32)
 
-    @field_validator("proposed_name", "source_locale")
+    @field_validator("proposed_name", "source_locale", mode="before")
     @classmethod
-    def trim_required_text(cls, value: str, info: ValidationInfo) -> str:
+    def trim_required_text(cls, value: object, info: ValidationInfo) -> str:
         return _require_trimmed_nonblank(value, field_name=info.field_name)
 
 
@@ -136,9 +147,9 @@ class IngredientProposalReviewNoteRequest(BaseModel):
 
     review_note: str = Field(..., min_length=1, max_length=4000)
 
-    @field_validator("review_note")
+    @field_validator("review_note", mode="before")
     @classmethod
-    def review_note_must_be_non_blank(cls, value: str) -> str:
+    def review_note_must_be_non_blank(cls, value: object) -> str:
         return _require_trimmed_nonblank(value, field_name="review_note")
 
 
@@ -153,20 +164,17 @@ class IngredientProposalAddAliasRequest(BaseModel):
     language: str | None = Field(default=None, max_length=16)
     review_note: str | None = Field(default=None, max_length=4000)
 
-    @field_validator("alias")
+    @field_validator("alias", mode="before")
     @classmethod
-    def trim_alias(cls, value: str | None) -> str | None:
+    def trim_alias(cls, value: object) -> str | None:
         if value is None:
             return None
         return _require_trimmed_nonblank(value, field_name="alias")
 
-    @field_validator("language")
+    @field_validator("language", mode="before")
     @classmethod
-    def trim_language(cls, value: str | None) -> str | None:
-        if value is None:
-            return None
-        cleaned = value.strip()
-        return cleaned or None
+    def trim_language(cls, value: object) -> str | None:
+        return _trim_optional_text(value)
 
 
 class IngredientProposalApproveNewRequest(BaseModel):
@@ -186,9 +194,9 @@ class IngredientProposalApproveNewRequest(BaseModel):
     aliases: list[str] = Field(default_factory=list)
     review_note: str | None = Field(default=None, max_length=4000)
 
-    @field_validator("canonical_name", "display_name")
+    @field_validator("canonical_name", "display_name", mode="before")
     @classmethod
-    def trim_optional_names(cls, value: str | None, info: ValidationInfo) -> str | None:
+    def trim_optional_names(cls, value: object, info: ValidationInfo) -> str | None:
         if value is None:
             return None
         return _require_trimmed_nonblank(value, field_name=info.field_name)
@@ -198,7 +206,7 @@ class IngredientProposalMarkDuplicateRequest(BaseModel):
     ingredient_id: int | None = None
     review_note: str = Field(..., min_length=1, max_length=4000)
 
-    @field_validator("review_note")
+    @field_validator("review_note", mode="before")
     @classmethod
-    def review_note_must_be_non_blank(cls, value: str) -> str:
+    def review_note_must_be_non_blank(cls, value: object) -> str:
         return _require_trimmed_nonblank(value, field_name="review_note")
