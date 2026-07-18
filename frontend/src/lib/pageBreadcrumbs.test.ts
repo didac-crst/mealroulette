@@ -52,6 +52,44 @@ describe("resolveBreadcrumbs", () => {
       { label: "Proposal review" },
     ]);
 
+    expect(resolveBreadcrumbs("/settings/my-ingredient-proposals")).toEqual([
+      { label: "Ingredients", to: "/ingredients" },
+      { label: "Ingredient proposals", to: "/ingredients/proposals" },
+    ]);
+
+    expect(resolveBreadcrumbs("/settings/ingredient-proposals")).toEqual([
+      { label: "Ingredients", to: "/ingredients" },
+      { label: "Proposal review", to: "/ingredients/proposal-review" },
+    ]);
+
+    expect(resolveBreadcrumbs("/settings/ingredient-proposals/abc")).toEqual([
+      { label: "Ingredients", to: "/ingredients" },
+      { label: "Proposal review", to: "/ingredients/proposal-review" },
+    ]);
+
+    expect(resolveBreadcrumbs("/ingredients/proposal-review/p1")).toEqual([
+      { label: "Ingredients", to: "/ingredients" },
+      { label: "Proposal review", to: "/ingredients/proposal-review" },
+      { label: "Proposal" },
+    ]);
+
+    expect(resolveBreadcrumbs("/ingredients/taxonomy")).toEqual([
+      { label: "Ingredients", to: "/ingredients" },
+      { label: "Taxonomy" },
+    ]);
+
+    expect(resolveBreadcrumbs("/ingredients/new")).toEqual([
+      { label: "Ingredients", to: "/ingredients" },
+      { label: "New ingredient" },
+    ]);
+
+    expect(
+      resolveBreadcrumbs("/ingredients/12", { ingredientId: "12" }, { ingredientId: 12, ingredientName: "Tomato" }),
+    ).toEqual([
+      { label: "Ingredients", to: "/ingredients" },
+      { label: "Tomato" },
+    ]);
+
     expect(
       resolveBreadcrumbs("/ingredients/12/edit", { ingredientId: "12" }, { ingredientId: 12, ingredientName: "Tomato" }),
     ).toEqual([

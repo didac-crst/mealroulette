@@ -101,7 +101,6 @@ export function MyIngredientProposalsPage() {
         source_locale: sourceLocale,
         description: description || undefined,
         culinary_context: culinaryContext || undefined,
-        source_type: "manual",
       });
       setProposedName("");
       setDescription("");
@@ -149,8 +148,8 @@ export function MyIngredientProposalsPage() {
     setError(null);
     try {
       await proposalsApi.provideIngredientProposalInformation(accessToken, respondingId, {
-        description: responseDescription || undefined,
-        culinary_context: responseContext || undefined,
+        description: responseDescription,
+        culinary_context: responseContext,
         review_response: responseNote || undefined,
       });
       setRespondingId(null);

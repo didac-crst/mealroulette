@@ -13,6 +13,7 @@ from mealroulette.models.ingredient_proposals import (
     IngredientProposal,
     IngredientProposalResolutionStatus,
     IngredientProposalResolutionType,
+    IngredientProposalSourceType,
 )
 from mealroulette.models.taxonomy import FoodGroup, IngredientFamily
 from mealroulette.models.user import User
@@ -110,7 +111,10 @@ class IngredientProposalService:
                 )
             )
 
-        statuses = [IngredientProposalResolutionStatus.pending.value]
+        statuses = [
+            IngredientProposalResolutionStatus.pending.value,
+            IngredientProposalResolutionStatus.needs_information.value,
+        ]
         if include_terminal_proposals:
             statuses.extend(
                 [
@@ -118,7 +122,6 @@ class IngredientProposalService:
                     IngredientProposalResolutionStatus.withdrawn.value,
                     IngredientProposalResolutionStatus.duplicate.value,
                     IngredientProposalResolutionStatus.approved.value,
-                    IngredientProposalResolutionStatus.needs_information.value,
                 ]
             )
         pending_query = select(IngredientProposal).where(
@@ -192,9 +195,10 @@ class IngredientProposalService:
             resolution_status=IngredientProposalResolutionStatus.pending.value,
             proposed_by_user_id=user.id,
             household_id=household_id,
-            source_type=payload.source_type.value,
-            source_reference_type=payload.source_reference_type,
-            source_reference_id=payload.source_reference_id,
+            # Member endpoint provenance is always server-derived.
+            source_type=IngredientProposalSourceType.manual.value,
+            source_reference_type=None,
+            source_reference_id=None,
         )
         self.db.add(proposal)
         self.db.commit()
@@ -223,8 +227,11 @@ class IngredientProposalService:
             query = query.where(IngredientProposal.resolution_status == resolution_status)
         return list(self.db.scalars(query))
 
-    def get_proposal(self, proposal_id: UUID) -> IngredientProposal:
-        proposal = self.db.get(IngredientProposal, proposal_id)
+    def get_proposal(self, proposal_id: UUID, *, for_update: bool = False) -> IngredientProposal:
+        query = select(IngredientProposal).where(IngredientProposal.id == proposal_id)
+        if for_update:
+            query = query.with_for_update()
+        proposal = self.db.scalar(query)
         if proposal is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proposal not found")
         return proposal
@@ -494,7 +501,7 @@ class IngredientProposalService:
         *,
         allow_needs_information: bool = True,
     ) -> IngredientProposal:
-        proposal = self.get_proposal(proposal_id)
+        proposal = self.get_proposal(proposal_id, for_update=True)
         current = IngredientProposalResolutionStatus(proposal.resolution_status)
         if current in TERMINAL_PROPOSAL_STATUSES:
             raise HTTPException(

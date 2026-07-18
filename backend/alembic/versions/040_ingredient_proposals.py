@@ -18,15 +18,51 @@ down_revision: Union[str, Sequence[str], None] = "039_telegram_login_otp"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
+_PHASE_16C_REQUIRED_COLUMNS = frozenset(
+    {
+        "normalized_name",
+        "resolution_status",
+        "proposed_name",
+        "source_locale",
+        "proposed_by_user_id",
+    }
+)
 
-def _has_column(inspector: sa.Inspector, table: str, column: str) -> bool:
-    return any(col["name"] == column for col in inspector.get_columns(table))
+
+def _column_names(inspector: sa.Inspector, table: str) -> set[str]:
+    return {col["name"] for col in inspector.get_columns(table)}
+
+
+def _has_pg_type(bind, typname: str) -> bool:
+    return (
+        bind.execute(
+            text("SELECT 1 FROM pg_type WHERE typname = :typname"),
+            {"typname": typname},
+        ).scalar()
+        is not None
+    )
+
+
+def _is_phase_16c_shape(columns: set[str]) -> bool:
+    return _PHASE_16C_REQUIRED_COLUMNS.issubset(columns)
+
+
+def _is_known_legacy_umbrella_shape(bind, columns: set[str]) -> bool:
+    """Detect the never-shipped local-only umbrella table.
+
+    That shape lacked ``normalized_name`` / ``resolution_status`` and used the
+    ``ingredient_proposal_status`` Postgres enum (often exposed as ``status``).
+    """
+    if "normalized_name" in columns or "resolution_status" in columns:
+        return False
+    if _has_pg_type(bind, "ingredient_proposal_status"):
+        return True
+    return "status" in columns and "proposed_name" in columns
 
 
 def _drop_legacy_umbrella_table(bind) -> None:
     """Remove the deferred umbrella schema if present (never shipped on main)."""
     op.drop_table("ingredient_proposals")
-    # Old umbrella used a Postgres enum; drop it if nothing else references it.
     bind.execute(text("DROP TYPE IF EXISTS ingredient_proposal_status"))
 
 
@@ -56,12 +92,21 @@ def upgrade() -> None:
     inspector = inspect(bind)
 
     if inspector.has_table("ingredient_proposals"):
-        if _has_column(inspector, "ingredient_proposals", "normalized_name"):
+        columns = _column_names(inspector, "ingredient_proposals")
+        if _is_phase_16c_shape(columns):
             # Local volumes may already have the Phase 16C table.
             _create_indexes()
             return
-        # Local volumes may still have the deferred umbrella table shape.
-        _drop_legacy_umbrella_table(bind)
+        if _is_known_legacy_umbrella_shape(bind, columns):
+            _drop_legacy_umbrella_table(bind)
+        else:
+            raise RuntimeError(
+                "Refusing to modify ingredient_proposals: table exists with an unknown schema. "
+                "Expected either the Phase 16C shape (normalized_name + resolution_status) or the "
+                "known local-only umbrella shape (status enum / no normalized_name). "
+                f"Found columns: {sorted(columns)}. Inspect the table and migrate or rename it "
+                "manually before re-running this revision."
+            )
 
     op.create_table(
         "ingredient_proposals",

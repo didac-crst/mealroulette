@@ -70,7 +70,6 @@ export type IngredientProposalCreatePayload = {
   culinary_context?: string;
   suggested_food_group_id?: string;
   suggested_family_id?: string;
-  source_type?: IngredientProposalSourceType;
 };
 
 export function createIngredientProposal(token: string, payload: IngredientProposalCreatePayload) {

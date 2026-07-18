@@ -579,3 +579,244 @@ def test_approve_new_and_proposal_review_commit_atomically(
         )
         is None
     )
+
+
+@pytest.mark.integration
+def test_member_create_ignores_client_provenance_fields(client, user_headers, catalog_seed):
+    response = client.post(
+        "/api/ingredient-proposals",
+        headers=user_headers,
+        json={
+            "proposed_name": "server derived provenance",
+            "source_locale": "en",
+            "source_type": "platform_admin",
+            "source_reference_type": "draft",
+            "source_reference_id": "should-not-stick",
+        },
+    )
+    assert response.status_code == 201, response.text
+    proposal = response.json()["proposal"]
+    assert proposal["source_type"] == "manual"
+    assert proposal["source_reference_type"] is None
+    assert proposal["source_reference_id"] is None
+
+
+@pytest.mark.integration
+def test_provide_information_requires_meaningful_content(
+    client,
+    user_headers,
+    admin_headers,
+    catalog_seed,
+):
+    created = _create_proposal(client, user_headers, name="needs content")
+    proposal_id = created.json()["proposal"]["id"]
+    requested = client.post(
+        f"/api/platform/ingredient-proposals/{proposal_id}/request-information",
+        headers=admin_headers,
+        json={"review_note": "Please clarify"},
+    )
+    assert requested.status_code == 200
+
+    for payload in ({}, {"description": ""}, {"description": "   ", "culinary_context": "  "}):
+        response = client.post(
+            f"/api/ingredient-proposals/{proposal_id}/provide-information",
+            headers=user_headers,
+            json=payload,
+        )
+        assert response.status_code == 422, (payload, response.text)
+
+    cleared = client.post(
+        f"/api/ingredient-proposals/{proposal_id}/provide-information",
+        headers=user_headers,
+        json={
+            "description": "",
+            "culinary_context": "updated context",
+            "review_response": "here is more detail",
+        },
+    )
+    assert cleared.status_code == 200, cleared.text
+    body = cleared.json()
+    assert body["resolution_status"] == "pending"
+    assert body["description"] == ""
+    assert body["culinary_context"] == "updated context"
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    ("payload", "path"),
+    [
+        ({"proposed_name": "   ", "source_locale": "en"}, "/api/ingredient-proposals"),
+        ({"proposed_name": "ok", "source_locale": "  "}, "/api/ingredient-proposals"),
+    ],
+)
+def test_create_rejects_whitespace_only_fields(client, user_headers, catalog_seed, payload, path):
+    response = client.post(path, headers=user_headers, json=payload)
+    assert response.status_code == 422
+
+
+@pytest.mark.integration
+def test_add_alias_and_approve_new_trim_whitespace_fields(
+    client,
+    user_headers,
+    admin_headers,
+    catalog_seed,
+):
+    ingredient = _create_ingredient(client, admin_headers, name="Trim Base")
+    created = _create_proposal(client, user_headers, name="trim alias candidate")
+    proposal_id = created.json()["proposal"]["id"]
+
+    blank_alias = client.post(
+        f"/api/platform/ingredient-proposals/{proposal_id}/add-alias",
+        headers=admin_headers,
+        json={"ingredient_id": ingredient["id"], "alias": "   "},
+    )
+    assert blank_alias.status_code == 422
+
+    created_new = _create_proposal(client, user_headers, name="trim approve candidate")
+    approve_blank = client.post(
+        f"/api/platform/ingredient-proposals/{created_new.json()['proposal']['id']}/approve-new",
+        headers=admin_headers,
+        json={
+            "display_name": "   ",
+            "canonical_name": "   ",
+            "food_group": "vegetable",
+            "family": "tomato_family",
+        },
+    )
+    assert approve_blank.status_code == 422
+
+
+@pytest.mark.integration
+def test_matching_includes_needs_information_by_default(
+    client,
+    user_headers,
+    second_household_headers,
+    admin_headers,
+    catalog_seed,
+):
+    first = _create_proposal(client, user_headers, name="shared clarifying name")
+    proposal_id = first.json()["proposal"]["id"]
+    requested = client.post(
+        f"/api/platform/ingredient-proposals/{proposal_id}/request-information",
+        headers=admin_headers,
+        json={"review_note": "Which variety?"},
+    )
+    assert requested.status_code == 200
+    assert requested.json()["resolution_status"] == "needs_information"
+
+    second = _create_proposal(client, second_household_headers, name="shared clarifying name")
+    assert second.status_code == 201
+    pending = [match for match in second.json()["matches"] if match["kind"] == "pending_proposal"]
+    assert pending
+    assert any(match["label"] == "Similar pending proposal exists" for match in pending)
+
+
+@pytest.mark.integration
+def test_concurrent_review_claims_proposal_once(db_engine):
+    from concurrent.futures import ThreadPoolExecutor
+    from uuid import uuid4
+
+    from fastapi import HTTPException
+    from sqlalchemy.orm import sessionmaker
+
+    from mealroulette.auth.security import hash_password
+    from mealroulette.data.seed_taxonomy import seed_taxonomy_data
+    from mealroulette.models.household import Household, HouseholdMembership, HouseholdRole
+    from mealroulette.models.ingredient_proposals import (
+        IngredientProposal,
+        IngredientProposalResolutionStatus,
+        IngredientProposalSourceType,
+    )
+    from mealroulette.models.user import User, UserRole
+    from mealroulette.schemas.catalog import IngredientCreateRequest
+    from mealroulette.schemas.ingredient_proposals import IngredientProposalMapExistingRequest
+    from mealroulette.services.catalog import CatalogService
+    from mealroulette.services.ingredient_proposals import IngredientProposalService
+
+    SessionLocal = sessionmaker(bind=db_engine, autoflush=False, autocommit=False)
+    household_id = uuid4()
+    with SessionLocal() as setup:
+        seed_taxonomy_data(setup, commit=False)
+        household = Household(id=household_id, name="Proposal Race Household")
+        member = User(
+            username=f"race-member-{household_id.hex[:8]}",
+            email=f"race-member-{household_id.hex[:8]}@example.com",
+            password_hash=hash_password("memberpassword"),
+            role=UserRole.user,
+            active=True,
+        )
+        admin_a = User(
+            username=f"race-admin-a-{household_id.hex[:8]}",
+            email=f"race-admin-a-{household_id.hex[:8]}@example.com",
+            password_hash=hash_password("adminpassword"),
+            role=UserRole.admin,
+            active=True,
+        )
+        admin_b = User(
+            username=f"race-admin-b-{household_id.hex[:8]}",
+            email=f"race-admin-b-{household_id.hex[:8]}@example.com",
+            password_hash=hash_password("adminpassword"),
+            role=UserRole.admin,
+            active=True,
+        )
+        setup.add_all([household, member, admin_a, admin_b])
+        setup.flush()
+        setup.add(
+            HouseholdMembership(
+                household_id=household_id,
+                user_id=member.id,
+                role=HouseholdRole.household_member,
+                active=True,
+            )
+        )
+        ingredient = CatalogService(setup).create_ingredient(
+            IngredientCreateRequest(
+                canonical_name="race_map_target",
+                display_name="Race Map Target",
+                food_group="vegetable",
+                family="tomato_family",
+            )
+        )
+        proposal = IngredientProposal(
+            proposed_name="race proposal",
+            normalized_name="race proposal",
+            source_locale="en",
+            resolution_status=IngredientProposalResolutionStatus.pending.value,
+            proposed_by_user_id=member.id,
+            household_id=household_id,
+            source_type=IngredientProposalSourceType.manual.value,
+        )
+        setup.add(proposal)
+        setup.commit()
+        proposal_id = proposal.id
+        ingredient_id = ingredient.id
+        admin_a_id = admin_a.id
+        admin_b_id = admin_b.id
+
+    barrier = __import__("threading").Barrier(2)
+
+    def race(admin_id):
+        barrier.wait(timeout=5)
+        with SessionLocal() as session:
+            admin = session.get(User, admin_id)
+            assert admin is not None
+            try:
+                IngredientProposalService(session).map_existing(
+                    proposal_id=proposal_id,
+                    reviewer=admin,
+                    payload=IngredientProposalMapExistingRequest(ingredient_id=ingredient_id),
+                )
+                return 200
+            except HTTPException as exc:
+                return exc.status_code
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(pool.map(race, (admin_a_id, admin_b_id)))
+
+    assert sorted(results) == [200, 409]
+    with SessionLocal() as verify:
+        proposal = verify.get(IngredientProposal, proposal_id)
+        assert proposal is not None
+        assert proposal.resolution_status == "approved"
+        assert proposal.resolved_ingredient_id == ingredient_id
+

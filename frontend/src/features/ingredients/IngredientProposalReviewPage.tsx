@@ -52,6 +52,8 @@ export function IngredientProposalReviewQueuePage() {
     }
     let cancelled = false;
     setLoading(true);
+    setProposals([]);
+    setError(null);
     proposalsApi
       .listPlatformIngredientProposals(accessToken, statusFilter || undefined)
       .then((data) => {
@@ -62,6 +64,7 @@ export function IngredientProposalReviewQueuePage() {
       })
       .catch((err) => {
         if (!cancelled) {
+          setProposals([]);
           setError(err instanceof ApiError ? err.message : "Failed to load proposals");
         }
       })
@@ -149,6 +152,7 @@ export function IngredientProposalReviewDetailPage() {
   const [shoppingUnitId, setShoppingUnitId] = useState("");
   const [conversionNotes, setConversionNotes] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [optionsError, setOptionsError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -187,15 +191,32 @@ export function IngredientProposalReviewDetailPage() {
     if (!accessToken) {
       return;
     }
-    fetchUnits(accessToken)
-      .then(setUnits)
-      .catch(() => setUnits([]));
-    fetchFoodGroups(accessToken)
-      .then(setFoodGroups)
-      .catch(() => setFoodGroups([]));
-    fetchIngredients(accessToken)
-      .then(setIngredients)
-      .catch(() => setIngredients([]));
+    let cancelled = false;
+    setOptionsError(null);
+    Promise.all([
+      fetchUnits(accessToken),
+      fetchFoodGroups(accessToken),
+      fetchIngredients(accessToken),
+    ])
+      .then(([nextUnits, nextFoodGroups, nextIngredients]) => {
+        if (cancelled) {
+          return;
+        }
+        setUnits(nextUnits);
+        setFoodGroups(nextFoodGroups);
+        setIngredients(nextIngredients);
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setUnits([]);
+          setFoodGroups([]);
+          setIngredients([]);
+          setOptionsError(err instanceof ApiError ? err.message : "Failed to load review options");
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [accessToken]);
 
   const ingredientOptions = useMemo(
@@ -208,13 +229,27 @@ export function IngredientProposalReviewDetailPage() {
   );
 
   useEffect(() => {
+    setFamilies([]);
     if (!accessToken || !foodGroup) {
-      setFamilies([]);
       return;
     }
-    fetchFoodGroupFamilies(accessToken, foodGroup)
-      .then(setFamilies)
-      .catch(() => setFamilies([]));
+    let cancelled = false;
+    const requestedGroup = foodGroup;
+    fetchFoodGroupFamilies(accessToken, requestedGroup)
+      .then((data) => {
+        if (!cancelled && requestedGroup === foodGroup) {
+          setFamilies(data);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled && requestedGroup === foodGroup) {
+          setFamilies([]);
+          setOptionsError(err instanceof ApiError ? err.message : "Failed to load families");
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [accessToken, foodGroup]);
 
   async function runAction(action: () => Promise<IngredientProposal>) {
@@ -364,6 +399,11 @@ export function IngredientProposalReviewDetailPage() {
             {error ? (
               <p className="form-error" role="alert">
                 {error}
+              </p>
+            ) : null}
+            {optionsError ? (
+              <p className="form-error" role="alert">
+                {optionsError}
               </p>
             ) : null}
             {success ? (

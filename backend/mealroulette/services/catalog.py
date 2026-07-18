@@ -479,14 +479,21 @@ class CatalogService:
         if payload.family:
             self._sync_ingredient_family(ingredient)
         self.db.add(ingredient)
-        self.db.flush()
-        aliases = {canonical, *(normalize_name(alias) for alias in payload.aliases)}
-        for alias in aliases:
-            self.db.add(IngredientAlias(ingredient_id=ingredient.id, alias=alias))
-        if commit:
-            self.db.commit()
-        else:
+        try:
             self.db.flush()
+            aliases = {canonical, *(normalize_name(alias) for alias in payload.aliases)}
+            for alias in aliases:
+                self.db.add(IngredientAlias(ingredient_id=ingredient.id, alias=alias))
+            if commit:
+                self.db.commit()
+            else:
+                self.db.flush()
+        except IntegrityError:
+            self.db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Ingredient or alias already exists",
+            ) from None
         self.db.refresh(ingredient)
         return ingredient
 
@@ -548,10 +555,14 @@ class CatalogService:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Alias already exists")
         alias = IngredientAlias(ingredient_id=ingredient.id, alias=normalized, language=payload.language)
         self.db.add(alias)
-        if commit:
-            self.db.commit()
-        else:
-            self.db.flush()
+        try:
+            if commit:
+                self.db.commit()
+            else:
+                self.db.flush()
+        except IntegrityError:
+            self.db.rollback()
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Alias already exists") from None
         self.db.refresh(alias)
         return alias
 

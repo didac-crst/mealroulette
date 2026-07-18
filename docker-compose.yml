@@ -25,7 +25,7 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-mealroulette}:${POSTGRES_PASSWORD:-mealroulette}@db:5432/${POSTGRES_DB:-mealroulette}
       DEBUG: ${DEBUG:-false}
-      SECRET_KEY: ${SECRET_KEY:-change-me-in-production-use-a-long-random-secret}
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set to a strong non-placeholder value}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       TELEGRAM_BOT_USERNAME: ${TELEGRAM_BOT_USERNAME:-}
     depends_on:
@@ -46,7 +46,7 @@ services:
     command: ["python", "-m", "mealroulette.worker"]
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-mealroulette}:${POSTGRES_PASSWORD:-mealroulette}@db:5432/${POSTGRES_DB:-mealroulette}
-      SECRET_KEY: ${SECRET_KEY:-change-me-in-production-use-a-long-random-secret}
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set to a strong non-placeholder value}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       TELEGRAM_BOT_USERNAME: ${TELEGRAM_BOT_USERNAME:-}
       RUN_MIGRATIONS: "false"
