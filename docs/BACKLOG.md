@@ -48,6 +48,16 @@ Phase 16 remaining scope (split for reviewability):
 
 The old umbrella branch `phase-15/household-users-and-memberships` was closed and deleted after its scope landed through reviewable PRs.
 
+Strategic but unscheduled constraints:
+
+| Area | Strategy doc | Scheduling |
+| --- | --- | --- |
+| Public beta readiness | [strategy/public-beta-readiness.md](strategy/public-beta-readiness.md) | Gate before public signup |
+| Hosting/public beta | [strategy/hosting-and-public-beta.md](strategy/hosting-and-public-beta.md) | Revisit before beta deployment |
+| Managed AI credits | [strategy/ai-cost-and-credits.md](strategy/ai-cost-and-credits.md) | Gate before managed AI launch |
+| Public catalogue rewards | [strategy/public-catalog-contribution-and-rewards.md](strategy/public-catalog-contribution-and-rewards.md) | After public catalog and real usage data |
+| Mobile/PWA/native | [strategy/mobile-app-strategy.md](strategy/mobile-app-strategy.md) | After mobile usage proves a bottleneck |
+
 ---
 
 ## Technical debt watchlist

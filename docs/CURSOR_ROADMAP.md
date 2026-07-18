@@ -1107,6 +1107,19 @@ Public catalogue contribution rewards remain later strategy, not a Phase 17 bloc
 
 Mobile distribution remains future strategy, not a Phase 17 blocker: mobile-first web first, then PWA, then Capacitor if native notifications or share-sheet import become proven bottlenecks — see [strategy/mobile-app-strategy.md](strategy/mobile-app-strategy.md).
 
+### Strategy Gates
+
+Strategy documents are not implementation phases by themselves. They become implementation work only when a phase explicitly references them.
+
+Use these gates:
+
+- Before public signup: satisfy [strategy/public-beta-readiness.md](strategy/public-beta-readiness.md).
+- Before beta deployment: revisit [strategy/hosting-and-public-beta.md](strategy/hosting-and-public-beta.md).
+- Before managed AI launch: implement [features/ai-usage-accounting.md](features/ai-usage-accounting.md) and refresh [strategy/ai-cost-and-credits.md](strategy/ai-cost-and-credits.md).
+- Before email OTP or recovery: implement [features/email-delivery.md](features/email-delivery.md).
+- Before public contribution rewards: public catalog must exist and [strategy/public-catalog-contribution-and-rewards.md](strategy/public-catalog-contribution-and-rewards.md) must be reviewed against real usage data.
+- Before native app work: validate [strategy/mobile-app-strategy.md](strategy/mobile-app-strategy.md) triggers with usage evidence.
+
 ## Cursor Task Rules
 
 When asking Cursor to implement work:

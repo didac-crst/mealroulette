@@ -376,6 +376,28 @@ when they do not materially affect product behaviour or architecture.
 
 ## Pull-request review workflow
 
+### Branch size and review checkpoints
+
+When a branch reaches roughly **40-50 modified files**, pause before expanding
+
+the scope further.
+
+At that point, prefer one of these actions:
+
+- split the remaining work into a follow-up branch;
+
+- open a pull request for external review, even if it will not be merged
+
+  immediately;
+
+- ask the human owner whether the current scope should continue as one PR.
+
+This is a reviewability checkpoint, not a hard merge requirement. Do not create
+
+artificially tiny or incoherent slices just to satisfy a file count, and do not
+
+merge incomplete work merely because a PR was opened.
+
 Unless the current request clearly states otherwise, phrases such as:
 
 - “read the review”;
