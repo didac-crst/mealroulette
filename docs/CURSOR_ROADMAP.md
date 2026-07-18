@@ -1119,6 +1119,7 @@ Strategy documents are not implementation phases by themselves. They become impl
 
 Use these gates:
 
+- Before public rename, onboarding redesign, pricing test, or launch copy: review [strategy/product-positioning-and-go-to-market.md](strategy/product-positioning-and-go-to-market.md).
 - Before public signup: satisfy [strategy/public-beta-readiness.md](strategy/public-beta-readiness.md).
 - Before beta deployment: revisit [strategy/hosting-and-public-beta.md](strategy/hosting-and-public-beta.md).
 - Before managed AI launch: implement [features/ai-usage-accounting.md](features/ai-usage-accounting.md) and refresh [strategy/ai-cost-and-credits.md](strategy/ai-cost-and-credits.md).

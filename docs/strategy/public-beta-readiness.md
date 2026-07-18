@@ -13,6 +13,8 @@
 
 MealRoulette can be developed as a multi-household product, but it should not be treated as a business or guaranteed hosted service yet.
 
+Public positioning and commercial validation context: [product-positioning-and-go-to-market.md](product-positioning-and-go-to-market.md).
+
 The next product objective is:
 
 ```text
@@ -48,8 +50,11 @@ Minimum technical gates:
 Minimum product gates:
 
 - a nontechnical household can create or import enough recipes to generate a week;
+- a household can reach a credible first plan in roughly 10-15 minutes through starter catalogue adoption and a few imports;
+- the public/starter catalogue is large and reliable enough to avoid empty-catalogue onboarding failure;
 - household invitation and role flows are understandable;
 - dish vs recipe vs recipe variant does not block onboarding;
+- generated plans keep at least 70% of planned slots in early user tests, excluding intentional manual edits;
 - shopping list output is trusted by testers;
 - at least one recovery path exists when Telegram/email is unavailable.
 
@@ -87,6 +92,7 @@ Success signals:
 | --- | ---: |
 | Four-week household retention | >= 40% |
 | Active households generating a plan weekly | >= 50% |
+| Planned slots retained without replacement | >= 70% |
 | Active households opening shopping list | >= 40% |
 | Median usable recipes per active household | >= 15 |
 | Support burden | <= 5 hours/week |

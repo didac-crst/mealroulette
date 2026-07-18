@@ -37,6 +37,7 @@ These documents capture dated business and operating assumptions that may drive 
 
 | Document | Topic |
 | --- | --- |
+| [strategy/product-positioning-and-go-to-market.md](strategy/product-positioning-and-go-to-market.md) | Public positioning, PlaCalma brand direction, audience, onboarding, pricing hypotheses, competitive posture |
 | [strategy/ai-cost-and-credits.md](strategy/ai-cost-and-credits.md) | AI cost order-of-magnitude, credits, managed-vs-BYO provider strategy |
 | [strategy/hosting-and-public-beta.md](strategy/hosting-and-public-beta.md) | Hosting cost assumptions, beta staging, operational thresholds |
 | [strategy/public-beta-readiness.md](strategy/public-beta-readiness.md) | Go/no-go criteria, success metrics, risk register, public beta gates |
