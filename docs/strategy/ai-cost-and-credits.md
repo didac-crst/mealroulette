@@ -121,6 +121,8 @@ The initial commercial model should be:
 - small free managed-AI trial;
 - prepaid managed AI recipe-credit packs.
 
+Product positioning and broader hosted-pricing assumptions live in [product-positioning-and-go-to-market.md](product-positioning-and-go-to-market.md). AI credits are a cost-control and usage-packaging mechanism, not the only plausible business model.
+
 Potential beta offer:
 
 | Package | Included operations | Hypothesis price |

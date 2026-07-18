@@ -52,6 +52,7 @@ Strategic but unscheduled constraints:
 
 | Area | Strategy doc | Scheduling |
 | --- | --- | --- |
+| Product positioning / go-to-market | [strategy/product-positioning-and-go-to-market.md](strategy/product-positioning-and-go-to-market.md) | Review before public-facing rename, onboarding redesign, pricing test, or public launch |
 | Public beta readiness | [strategy/public-beta-readiness.md](strategy/public-beta-readiness.md) | Gate before public signup |
 | Hosting/public beta | [strategy/hosting-and-public-beta.md](strategy/hosting-and-public-beta.md) | Revisit before beta deployment |
 | Managed AI credits | [strategy/ai-cost-and-credits.md](strategy/ai-cost-and-credits.md) | Gate before managed AI launch |
