@@ -74,7 +74,7 @@ const CATALOG_TILES: SettingsTileConfig[] = [
   {
     to: "/ingredients",
     title: "Ingredients",
-    description: "Catalog, aliases, units, and conversions.",
+    description: "Catalog, aliases, units, conversions, and proposal review.",
     icon: <SettingsIngredientsIcon />,
   },
 ];

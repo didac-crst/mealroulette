@@ -447,7 +447,7 @@ class CatalogService:
         if food_group_id and not ingredient.food_group:
             ingredient.food_group = food_group_id
 
-    def create_ingredient(self, payload: IngredientCreateRequest) -> Ingredient:
+    def create_ingredient(self, payload: IngredientCreateRequest, *, commit: bool = True) -> Ingredient:
         canonical = normalize_name(payload.canonical_name)
         if self.db.scalar(select(Ingredient).where(func.lower(Ingredient.canonical_name) == canonical)):
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Ingredient already exists")
@@ -479,11 +479,21 @@ class CatalogService:
         if payload.family:
             self._sync_ingredient_family(ingredient)
         self.db.add(ingredient)
-        self.db.flush()
-        aliases = {canonical, *(normalize_name(alias) for alias in payload.aliases)}
-        for alias in aliases:
-            self.db.add(IngredientAlias(ingredient_id=ingredient.id, alias=alias))
-        self.db.commit()
+        try:
+            self.db.flush()
+            aliases = {canonical, *(normalize_name(alias) for alias in payload.aliases)}
+            for alias in aliases:
+                self.db.add(IngredientAlias(ingredient_id=ingredient.id, alias=alias))
+            if commit:
+                self.db.commit()
+            else:
+                self.db.flush()
+        except IntegrityError:
+            self.db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Ingredient or alias already exists",
+            ) from None
         self.db.refresh(ingredient)
         return ingredient
 
@@ -532,14 +542,27 @@ class CatalogService:
             )
         )
 
-    def create_alias(self, ingredient_id: int, payload: IngredientAliasCreateRequest) -> IngredientAlias:
+    def create_alias(
+        self,
+        ingredient_id: int,
+        payload: IngredientAliasCreateRequest,
+        *,
+        commit: bool = True,
+    ) -> IngredientAlias:
         ingredient = self.get_ingredient(ingredient_id)
         normalized = normalize_name(payload.alias)
         if self.db.scalar(select(IngredientAlias).where(func.lower(IngredientAlias.alias) == normalized)):
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Alias already exists")
         alias = IngredientAlias(ingredient_id=ingredient.id, alias=normalized, language=payload.language)
         self.db.add(alias)
-        self.db.commit()
+        try:
+            if commit:
+                self.db.commit()
+            else:
+                self.db.flush()
+        except IntegrityError:
+            self.db.rollback()
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Alias already exists") from None
         self.db.refresh(alias)
         return alias
 

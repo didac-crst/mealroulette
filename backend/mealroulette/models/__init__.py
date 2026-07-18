@@ -13,6 +13,13 @@ from mealroulette.models.catalog import (
     Unit,
 )
 from mealroulette.models.cooking import CookingTimerAlert, CookingTimerAlertStatus
+from mealroulette.models.ingredient_proposals import (
+    IngredientProposal,
+    IngredientProposalResolutionStatus,
+    IngredientProposalResolutionType,
+    IngredientProposalSourceType,
+    TERMINAL_PROPOSAL_STATUSES,
+)
 from mealroulette.models.household import (
     DEFAULT_HOUSEHOLD_ID,
     DEFAULT_HOUSEHOLD_NAME,
@@ -77,7 +84,12 @@ __all__ = [
     "Ingredient",
     "IngredientFamily",
     "IngredientAlias",
+    "IngredientProposal",
+    "IngredientProposalResolutionStatus",
+    "IngredientProposalResolutionType",
+    "IngredientProposalSourceType",
     "IngredientUnitConversion",
+    "TERMINAL_PROPOSAL_STATUSES",
     "MealPlan",
     "MealPlanItem",
     "MealPlanItemDish",

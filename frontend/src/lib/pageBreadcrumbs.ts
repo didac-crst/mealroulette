@@ -112,21 +112,40 @@ export function resolveBreadcrumbs(
   if (pathname === "/settings/backups") {
     return [settings, { label: "Backups" }];
   }
+  if (pathname === "/settings/my-ingredient-proposals") {
+    return [ingredients, { label: "Ingredient proposals", to: "/ingredients/proposals" }];
+  }
+  if (pathname === "/settings/ingredient-proposals" || pathname.startsWith("/settings/ingredient-proposals/")) {
+    return [ingredients, { label: "Proposal review", to: "/ingredients/proposal-review" }];
+  }
 
   if (pathname === "/ingredients") {
-    return [settings, ingredients];
+    return [ingredients];
   }
   if (pathname === "/ingredients/taxonomy") {
-    return [settings, ingredients, { label: "Taxonomy" }];
+    return [ingredients, { label: "Taxonomy" }];
+  }
+  if (pathname === "/ingredients/proposals") {
+    return [ingredients, { label: "Proposals" }];
+  }
+  if (pathname === "/ingredients/proposal-review") {
+    return [ingredients, { label: "Proposal review" }];
+  }
+  if (pathname.startsWith("/ingredients/proposal-review/")) {
+    return [
+      ingredients,
+      { label: "Proposal review", to: "/ingredients/proposal-review" },
+      { label: "Proposal" },
+    ];
   }
   if (pathname === "/ingredients/new") {
-    return [settings, ingredients, { label: "New ingredient" }];
+    return [ingredients, { label: "New ingredient" }];
   }
   if (pathname === `/ingredients/${params.ingredientId}/edit`) {
-    return [settings, ingredients, ingredientCrumb(labels, params.ingredientId), { label: "Edit" }];
+    return [ingredients, ingredientCrumb(labels, params.ingredientId), { label: "Edit" }];
   }
   if (pathname === `/ingredients/${params.ingredientId}`) {
-    return [settings, ingredients, { label: labels.ingredientName?.trim() || "Ingredient" }];
+    return [ingredients, { label: labels.ingredientName?.trim() || "Ingredient" }];
   }
 
   return [];

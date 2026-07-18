@@ -22,7 +22,7 @@ describe("navigation", () => {
     ]);
   });
 
-  it("adds Ingredients for household admins", () => {
+  it("adds Ingredients for household members and admins", () => {
     expect(householdPrimaryNav(false)).toEqual(PRIMARY_NAV);
     expect(householdPrimaryNav(true).map((item) => item.label)).toEqual([
       "Today",
@@ -53,7 +53,7 @@ describe("navigation", () => {
       resolvePrimaryNav({ hasHousehold: true, isPlatformAdmin: false, isHouseholdAdmin: false }).map(
         (item) => item.label,
       ),
-    ).toEqual(["Today", "Plan", "Review", "Shopping", "Dishes"]);
+    ).toEqual(["Today", "Plan", "Review", "Shopping", "Dishes", "Ingredients"]);
 
     expect(
       resolvePrimaryNav({ hasHousehold: true, isPlatformAdmin: true, isHouseholdAdmin: false }).map(

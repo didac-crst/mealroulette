@@ -23,7 +23,7 @@ export const PRIMARY_NAV: AppNavItem[] = [
   { to: "/dishes", label: "Dishes", icon: "dishes", end: false },
 ];
 
-/** Household admins may browse the global ingredient catalog (read-only). */
+/** Household members and admins may browse the global ingredient catalog (read-only for non-platform). */
 export const INGREDIENTS_NAV_ITEM: AppNavItem = {
   to: "/ingredients",
   label: "Ingredients",
@@ -44,7 +44,7 @@ export function householdPrimaryNav(includeIngredients: boolean): AppNavItem[] {
 export function resolvePrimaryNav({
   hasHousehold,
   isPlatformAdmin,
-  isHouseholdAdmin,
+  isHouseholdAdmin: _isHouseholdAdmin,
 }: {
   hasHousehold: boolean;
   isPlatformAdmin: boolean;
@@ -53,7 +53,7 @@ export function resolvePrimaryNav({
   if (!hasHousehold) {
     return isPlatformAdmin ? PLATFORM_NAV : [];
   }
-  return householdPrimaryNav(isPlatformAdmin || isHouseholdAdmin);
+  return householdPrimaryNav(true);
 }
 
 export const PLATFORM_ADMIN_NAV: AppNavItem[] = [

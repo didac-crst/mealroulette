@@ -96,13 +96,13 @@ describe("AppShell", () => {
     expect(screen.queryByRole("navigation", { name: "Primary navigation" })).not.toBeInTheDocument();
   });
 
-  it("does not show Ingredients for household members", async () => {
+  it("shows Ingredients for household members", async () => {
     renderShell();
 
     expect(await screen.findByText("Today content")).toBeInTheDocument();
     const sidebar = screen.getByRole("complementary", { name: "Application navigation" });
     expect(sidebar).toHaveTextContent("Dishes");
-    expect(sidebar).not.toHaveTextContent("Ingredients");
+    expect(sidebar).toHaveTextContent("Ingredients");
   });
 
   it("shows Ingredients for platform admin with household", async () => {

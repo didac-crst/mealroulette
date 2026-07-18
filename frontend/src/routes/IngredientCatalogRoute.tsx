@@ -2,9 +2,9 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 import { useAuth } from "../features/auth/AuthContext";
 
-/** Platform admins (write later) and household admins (read) may browse the global ingredient catalog. */
+/** Platform admins and household members may browse the global ingredient catalog. */
 export function IngredientCatalogRoute() {
-  const { user, loading, isPlatformAdmin, isHouseholdAdmin, hasHousehold } = useAuth();
+  const { user, loading, isPlatformAdmin, hasHousehold } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -19,8 +19,8 @@ export function IngredientCatalogRoute() {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  if (!isPlatformAdmin && !isHouseholdAdmin) {
-    return <Navigate to={hasHousehold ? "/today" : "/login"} replace />;
+  if (!isPlatformAdmin && !hasHousehold) {
+    return <Navigate to="/login" replace />;
   }
 
   return <Outlet />;

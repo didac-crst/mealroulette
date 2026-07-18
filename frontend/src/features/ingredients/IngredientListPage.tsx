@@ -11,7 +11,7 @@ import { formatAggregationStrategy, formatCatalogLabel } from "./aggregationStra
 const SEARCH_DEBOUNCE_MS = 200;
 
 export function IngredientListPage() {
-  const { accessToken, isPlatformAdmin, isHouseholdAdmin } = useAuth();
+  const { accessToken, isPlatformAdmin, isHouseholdAdmin, hasHousehold } = useAuth();
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
   const [search, setSearch] = useState("");
@@ -72,22 +72,32 @@ export function IngredientListPage() {
         title="Ingredients"
         subtitle={
           isPlatformAdmin
-            ? "Canonical ingredient catalog with aliases and unit conversions."
-            : "Browse available ingredients used in recipes and shopping."
+            ? "Canonical ingredient catalog with aliases, conversions, and proposal review."
+            : "Browse available ingredients and propose missing catalog entries."
         }
         loading={loading && ingredients.length === 0}
         loadingMessage="Loading ingredients…"
         actions={
-          canBrowseTaxonomy || isPlatformAdmin ? (
-            <div className="catalog-detail-actions">
-              {canBrowseTaxonomy ? (
-                <ButtonLink to="/ingredients/taxonomy" variant="secondary">
-                  Taxonomy
+          <div className="catalog-detail-actions">
+            {hasHousehold ? (
+              <ButtonLink to="/ingredients/proposals" variant="secondary">
+                Ingredient proposals
+              </ButtonLink>
+            ) : null}
+            {canBrowseTaxonomy ? (
+              <ButtonLink to="/ingredients/taxonomy" variant="secondary">
+                Taxonomy
+              </ButtonLink>
+            ) : null}
+            {isPlatformAdmin ? (
+              <>
+                <ButtonLink to="/ingredients/proposal-review" variant="secondary">
+                  Proposal review
                 </ButtonLink>
-              ) : null}
-              {isPlatformAdmin ? <ButtonLink to="/ingredients/new">Add ingredient</ButtonLink> : null}
-            </div>
-          ) : undefined
+                <ButtonLink to="/ingredients/new">Add ingredient</ButtonLink>
+              </>
+            ) : null}
+          </div>
         }
       >
         <Card density="comfortable" className="catalog-search-card">
