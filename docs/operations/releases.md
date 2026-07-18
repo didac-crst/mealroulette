@@ -27,6 +27,7 @@ Git tags mark **product versions** users can run. We do not tag individual imple
 | `v0.10.0` | Composable meal slots, simple dishes, fixture hardening, scheduler performance, parallel CI — **released** — [release notes](../releases/v0.10.0.md) |
 | `v0.11.0` | Pair compatibility, reroll memory, structure-first roulette, and package swap fixes — **released** — [release notes](../releases/v0.11.0.md) |
 | `v0.12.0` | Household users and memberships, account settings, Telegram OTP, catalog UI parity — **released** — [release notes](../releases/v0.12.0.md) |
+| `v0.13.0` | Ingredient proposals, platform review, catalog mutation controls — **released** — [release notes](../releases/v0.13.0.md) |
 
 Use [semantic versioning](https://semver.org/) at the product-version level: `vMAJOR.MINOR.PATCH`. Patch bumps are for fixes on an already-released version line.
 
@@ -61,12 +62,13 @@ git push origin v0.1.0
 | [`v0.10.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.10.0) | [`a2e29de`](https://github.com/didac-crst/mealroulette/commit/a2e29de) | 2026-07-14 | Composable meal slots, simple dishes, do-not-plan, faster roulette — [release notes](../releases/v0.10.0.md) |
 | [`v0.11.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.11.0) | [`82f20de`](https://github.com/didac-crst/mealroulette/commit/82f20de) | 2026-07-14 | Pair compatibility, reroll memory, structure-first roulette, package swap fixes — [release notes](../releases/v0.11.0.md) |
 | [`v0.12.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.12.0) | tag commit | 2026-07-17 | Household users and memberships, account settings, Telegram OTP, catalog UI parity — [release notes](../releases/v0.12.0.md) |
+| [`v0.13.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.13.0) | [`fc281b9`](https://github.com/didac-crst/mealroulette/commit/fc281b9) | 2026-07-18 | Ingredient proposals, platform review, catalog mutation controls — [release notes](../releases/v0.13.0.md) |
 
 ## Check out a release
 
-To run `v0.12.0`:
+To run `v0.13.0`:
 
 ```bash
-git checkout v0.12.0
+git checkout v0.13.0
 docker compose up --build
 ```

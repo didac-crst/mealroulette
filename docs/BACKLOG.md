@@ -25,11 +25,11 @@ Update this file when a phase or version milestone lands.
 
 ## Current focus
 
-**Current focus — Phase 16C ingredient proposals.**
+**Current focus — Phase 16D public catalog / public dishes.**
 
-Phase 15 is complete on `main` (PRs #17–#22). Phase 16A–B also landed before the `v0.12.0` tag to restore deferred account, shell, catalog, and Telegram OTP parity. Release notes: [releases/v0.12.0.md](releases/v0.12.0.md).
+Phase 15 is complete on `main` (PRs #17–#22). Phase 16A–B also landed before the `v0.12.0` tag to restore deferred account, shell, catalog, and Telegram OTP parity. Phase 16C shipped the governed ingredient proposal workflow in `v0.13.0`.
 
-**`v0.12.0` status:** tagged from green `main` after human approval. Continue Phase 16 slices as reviewable PRs.
+**`v0.13.0` status:** tagged from green `main` after human approval. Continue Phase 16 slices as reviewable PRs.
 
 Phase 16 remaining scope (split for reviewability):
 
@@ -37,7 +37,7 @@ Phase 16 remaining scope (split for reviewability):
 | --- | --- | --- |
 | **16A** | Password / account settings | Done (PR #23) |
 | **16B** | Umbrella UI parity (shell, filters, ingredients, OTP) | Done (PR #24) |
-| **16C** | Ingredient proposal foundation | In progress |
+| **16C** | Ingredient proposal foundation | Done (PR #25, `v0.13.0`) |
 | **16D** | Public catalog / public dishes | Planned |
 | **16E** | Recipe ratings UI | Planned |
 | **16F** | Recipe draft/import foundation | Planned |
@@ -102,6 +102,7 @@ Use one branch per milestone, then merge via pull request:
 - `phase-15f-final-hardening-docs-release` — Phase 15 closeout: tests, docs, release notes (merged in PR #22)
 - `phase-16a-account-settings` — password/account settings (merged in PR #23)
 - `phase-16b-umbrella-ui-parity` — shell, catalog filters, ingredient read UX, Telegram OTP (merged in PR #24)
+- `phase-16c-ingredient-proposals` — governed missing-ingredient proposals and platform review (merged in PR #25, `v0.13.0`)
 
 ---
 
@@ -123,7 +124,8 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.10** | Composable meals — multi-dish slots, simple dishes, do-not-plan, faster roulette | **Done** ([`v0.10.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.10.0), merge `a2e29de`, PR #14) |
 | **v0.11** | Pair compatibility and reroll memory — prevent bad simple-dish pairs and reroll cycles | **Done** ([`v0.11.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.11.0), merge `82f20de`, PR #15) |
 | **v0.12** | Household users and memberships — tenancy, invitations, household UX, Telegram linking, account settings, Telegram OTP, catalog UI parity | **Done** ([`v0.12.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.12.0), PRs #17–#24) |
-| **Future** | Ingredient proposals, public catalog, recipe ratings UI | Not started (Phase 16C–E) |
+| **v0.13** | Ingredient proposals — governed missing-catalog workflow and platform review | **Done** ([`v0.13.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.13.0), merge `fc281b9`, PR #25) |
+| **Future** | Public catalog, recipe ratings UI | Not started (Phase 16D–E) |
 | **Future** | Recipe drafts, LLM-assisted entry, localization | Not started (Phase 16F–I) |
 | **v1.0** | Stable home version — backups, auth hardening, scheduler reliability | Not started |
 
@@ -388,7 +390,7 @@ When `meal_composition = simple_dish`, **`simple_dish_part`** is required: `cent
 **Deferred past Phase 15 (not blockers):**
 
 - [ ] User-level recipe/dish preference API/UI (`recipe_ratings`) — meal-slot reviews shipped as `meal_reviews`
-- [ ] Ingredient proposal workflow for missing catalogue entries (Phase 16C; see [features/ingredient-proposals.md](features/ingredient-proposals.md))
+- [x] Ingredient proposal workflow for missing catalogue entries (Phase 16C; see [features/ingredient-proposals.md](features/ingredient-proposals.md))
 - [ ] Public dish catalog / publication / subscriptions
 - [x] Password / account settings page (Phase 16A)
 - [x] Telegram OTP / passwordless bot login (Phase 16B)
@@ -443,7 +445,7 @@ From [docs/CURSOR_ROADMAP.md](CURSOR_ROADMAP.md). Phases describe *how we build*
 | 13 | Composable meals and simple dishes | v0.10 | Done (PR #14, `v0.10.0`) |
 | 14 | Pair compatibility and reroll memory | v0.11 | Done (PR #15, `v0.11.0`) |
 | 15 | Household users and memberships | v0.12 | Done (PRs #17–#22) |
-| 16 | Deferred umbrella + LLM/localization | Future | 16A account settings in progress; LLM later |
+| 16 | Deferred umbrella + LLM/localization | v0.13+ | 16A–C done; 16D next |
 | 17 | v1 hardening | v1.0 | Not started |
 
 ### Phase 0 — Project bootstrap ✅

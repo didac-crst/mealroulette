@@ -151,7 +151,7 @@ The default commit hook should fail if tests fail. Lint/format hooks may run in 
 
 ## Implementation Phases
 
-Phases 0–16B shipped through **household tenancy, account settings, Telegram OTP, and catalog UI parity on `main`** (released as **`v0.12.0`**). Phases 0–14 remain tagged through `v0.11.0`.
+Phases 0–16C shipped through **household tenancy, account settings, Telegram OTP, catalog UI parity, and ingredient proposals on `main`** (released through **`v0.13.0`**). Phases 0–14 remain tagged through `v0.11.0`.
 
 | Phase | Name | Target version |
 | --- | --- | --- |
@@ -162,7 +162,7 @@ Phases 0–16B shipped through **household tenancy, account settings, Telegram O
 | 13 | Composable meals and simple dishes | v0.10 |
 | 14 | Pair compatibility and reroll memory | v0.11 |
 | 15 | Household users and memberships | v0.12 |
-| 16 | LLM-assisted entry & localization | Future |
+| 16 | Proposals, public catalog, LLM-assisted entry & localization | v0.13+ |
 | 17 | v1 hardening | v1.0 |
 
 ### Phase 0 - Project Bootstrap
@@ -957,7 +957,7 @@ Acceptance criteria (met):
 
 - Password / account settings page → **Phase 16A** (done)
 - Umbrella UI parity (shell, dish filters, ingredient read UX, Telegram OTP) → **Phase 16B** (done)
-- Ingredient proposal workflow → **Phase 16C**
+- Ingredient proposal workflow → **Phase 16C** (done in PR #25, `v0.13.0`)
 - Public dish catalog / publication / subscriptions → **Phase 16D**
 - User-level recipe preference API/UI (`recipe_ratings`) → **Phase 16E**
 - Multilingual content translations → later Phase 16 / post-16
@@ -975,7 +975,7 @@ Phase 16 lands the remaining umbrella work and then builds the recipe-ingestion 
 | --- | --- |
 | **16A** | Password / account settings (done) |
 | **16B** | Umbrella UI parity (shell, filters, ingredients, OTP) (done) |
-| **16C** | Ingredient proposal foundation |
+| **16C** | Ingredient proposal foundation (done in PR #25, `v0.13.0`) |
 | **16D** | Public catalog / public dishes |
 | **16E** | Recipe ratings UI |
 | **16F** | Recipe draft/import foundation |
@@ -986,6 +986,8 @@ Phase 16 lands the remaining umbrella work and then builds the recipe-ingestion 
 #### Phase 16C — Ingredient proposal foundation
 
 Design spec: [features/ingredient-proposals.md](features/ingredient-proposals.md).
+
+Status: shipped in PR [#25](https://github.com/didac-crst/mealroulette/pull/25), released as `v0.13.0`.
 
 Deliverables:
 
