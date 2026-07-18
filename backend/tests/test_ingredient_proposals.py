@@ -749,8 +749,9 @@ def test_matching_includes_needs_information_by_default(
 
 
 @pytest.mark.integration
-def test_concurrent_review_claims_proposal_once(db_engine):
+def test_concurrent_review_claims_proposal_once(db_engine, monkeypatch):
     from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
     from uuid import uuid4
 
     from fastapi import HTTPException
@@ -830,10 +831,21 @@ def test_concurrent_review_claims_proposal_once(db_engine):
         admin_a_id = admin_a.id
         admin_b_id = admin_b.id
 
-    barrier = __import__("threading").Barrier(2)
+    # Align both workers immediately before the contested FOR UPDATE claim.
+    claim_barrier = Barrier(2)
+    original_require_reviewable = IngredientProposalService._require_reviewable
+
+    def synchronized_require_reviewable(self, *args, **kwargs):
+        claim_barrier.wait(timeout=5)
+        return original_require_reviewable(self, *args, **kwargs)
+
+    monkeypatch.setattr(
+        IngredientProposalService,
+        "_require_reviewable",
+        synchronized_require_reviewable,
+    )
 
     def race(admin_id):
-        barrier.wait(timeout=5)
         with SessionLocal() as session:
             admin = session.get(User, admin_id)
             assert admin is not None
