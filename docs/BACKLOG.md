@@ -38,7 +38,7 @@ Phase 16 remaining scope (split for reviewability):
 | **16A** | Password / account settings | Done (PR #23) |
 | **16B** | Umbrella UI parity (shell, filters, ingredients, OTP) | Done (PR #24) |
 | **16C** | Ingredient proposal foundation | Done (PR #25, `v0.13.0`) |
-| **16D** | Public catalog / public dishes | Planned |
+| **16D** | Public catalog / public dishes | In progress |
 | **16E** | Recipe ratings UI | Planned |
 | **16F** | Recipe draft/import foundation | Planned |
 | **16G** | LLM-assisted recipe authoring experiment | Planned |
@@ -75,6 +75,8 @@ Track these as opportunistic refactors, not a standalone rewrite. Prefer tacklin
   - `backend/mealroulette/services/shopping.py`
 - [ ] Split `frontend/src/styles/app.css` into feature-level or component-level style files once UI changes become frequent.
 - [ ] Strengthen frontend coverage around edit forms, planning flows, and shopping list behavior.
+- [ ] Public catalog discovery and batch adoption: richer filters, starter packs, multi-select adopt/import, and empty-household onboarding after Phase 16D foundation is user-tested.
+- [ ] Public recipe update / republish workflow: request update while v1 stays live; approve switches `current_version_id` to v2 and supersedes v1; reject keeps v1 live (see [features/public-catalog.md](features/public-catalog.md)).
 
 ---
 
@@ -126,7 +128,7 @@ From [SPECS.md §17](../SPECS.md#17-mvp-roadmap). **Versions** describe what use
 | **v0.11** | Pair compatibility and reroll memory — prevent bad simple-dish pairs and reroll cycles | **Done** ([`v0.11.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.11.0), merge `82f20de`, PR #15) |
 | **v0.12** | Household users and memberships — tenancy, invitations, household UX, Telegram linking, account settings, Telegram OTP, catalog UI parity | **Done** ([`v0.12.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.12.0), PRs #17–#24) |
 | **v0.13** | Ingredient proposals — governed missing-catalog workflow and platform review | **Done** ([`v0.13.0`](https://github.com/didac-crst/mealroulette/releases/tag/v0.13.0), merge `fc281b9`, PR #25) |
-| **Future** | Public catalog, recipe ratings UI | Not started (Phase 16D–E) |
+| **Future** | Recipe ratings UI | Not started (Phase 16E) |
 | **Future** | Recipe drafts, LLM-assisted entry, localization | Not started (Phase 16F–I) |
 | **v1.0** | Stable home version — backups, auth hardening, scheduler reliability | Not started |
 

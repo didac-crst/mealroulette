@@ -91,6 +91,23 @@ export function resolveBreadcrumbs(
     return [dishes, dishCrumb(labels), { label: "Cook" }];
   }
 
+  const catalog = { label: "Catalog", to: "/catalog" };
+  if (pathname === "/catalog") {
+    return [catalog];
+  }
+  if (pathname === "/catalog/requests") {
+    return [catalog, { label: "Publication requests" }];
+  }
+  if (pathname === "/catalog/review") {
+    return [catalog, { label: "Recipe review" }];
+  }
+  if (pathname.startsWith("/catalog/review/")) {
+    return [catalog, { label: "Recipe review", to: "/catalog/review" }, { label: "Request" }];
+  }
+  if (pathname.startsWith("/catalog/recipes/")) {
+    return [catalog, { label: "Recipe" }];
+  }
+
   if (pathname === "/settings") {
     return [settings];
   }

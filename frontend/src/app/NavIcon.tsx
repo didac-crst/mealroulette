@@ -60,6 +60,13 @@ export function NavIcon({ name }: NavIconProps) {
           <path d="M7.5 20h9" />
         </svg>
       );
+    case "catalog":
+      return (
+        <svg {...common}>
+          <path d="M5 4h10a2 2 0 0 1 2 2v14l-4-2-4 2V6a2 2 0 0 0-2-2H5Z" />
+          <path d="M9 8h6M9 12h6" />
+        </svg>
+      );
     case "ingredients":
       return (
         <svg {...common}>
