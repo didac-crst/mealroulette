@@ -548,6 +548,42 @@ describe("public catalog frontend smoke", () => {
     });
   });
 
+  it("disables Reject and Delist when the review note is empty", async () => {
+    const user = userEvent.setup();
+    stubAuth({ accessToken: "token", isPlatformAdmin: true });
+    getPlatformPublicRecipe.mockResolvedValue(reviewDetailPayload);
+
+    const { unmount } = render(
+      <MemoryRouter initialEntries={["/catalog/review/req-1"]}>
+        <Routes>
+          <Route path="/catalog/review/:publicRecipeId" element={<PublicCatalogReviewDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Reject" })).toBeDisabled();
+    });
+    await user.click(screen.getByRole("button", { name: "Reject" }));
+    expect(rejectPublicRecipe).not.toHaveBeenCalled();
+    unmount();
+
+    getPlatformPublicRecipe.mockResolvedValue({ ...reviewDetailPayload, status: "public" });
+    render(
+      <MemoryRouter initialEntries={["/catalog/review/req-1"]}>
+        <Routes>
+          <Route path="/catalog/review/:publicRecipeId" element={<PublicCatalogReviewDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Delist" })).toBeDisabled();
+    });
+    await user.click(screen.getByRole("button", { name: "Delist" }));
+    expect(delistPublicRecipe).not.toHaveBeenCalled();
+  });
+
   it("rejects a submitted request with a required note", async () => {
     const user = userEvent.setup();
     stubAuth({ accessToken: "token", isPlatformAdmin: true });
