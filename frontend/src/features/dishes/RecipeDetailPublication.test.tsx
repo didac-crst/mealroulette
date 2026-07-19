@@ -1,7 +1,9 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { ApiError } from "../../api/client";
+import * as publicCatalogApi from "../../api/publicCatalog";
 import { RecipeDetailPage } from "./RecipeDetailPage";
 import { useAuth } from "../auth/AuthContext";
 
@@ -113,5 +115,55 @@ describe("RecipeDetailPage publication action", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Request publication" })).toBeInTheDocument();
     });
+  });
+
+  it("submits a publication request successfully", async () => {
+    stubAuth({ isHouseholdAdmin: true });
+    vi.mocked(publicCatalogApi.submitPublishRequest).mockResolvedValue({
+      id: "req-1",
+      status: "submitted",
+      originating_dish_id: 1,
+      originating_recipe_id: 2,
+      current_version_id: null,
+      title: "Pasta",
+      description: null,
+      review_note: null,
+      reviewed_at: null,
+      latest_version: null,
+      created_at: "2026-01-01T00:00:00Z",
+      updated_at: "2026-01-01T00:00:00Z",
+    });
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Request publication" })).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Request publication" }));
+    expect(screen.getByRole("button", { name: "Submitting…" })).toBeDisabled();
+    await waitFor(() => {
+      expect(publicCatalogApi.submitPublishRequest).toHaveBeenCalledWith("token", 2);
+    });
+    expect(
+      await screen.findByText("Publication request submitted for platform review."),
+    ).toBeInTheDocument();
+  });
+
+  it("shows API errors including already-public conflicts", async () => {
+    stubAuth({ isHouseholdAdmin: true });
+    vi.mocked(publicCatalogApi.submitPublishRequest).mockRejectedValue(
+      new ApiError(
+        "This recipe is already public. Updating an existing public recipe is not supported yet.",
+        409,
+      ),
+    );
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Request publication" })).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Request publication" }));
+    expect(
+      await screen.findByText(
+        "This recipe is already public. Updating an existing public recipe is not supported yet.",
+      ),
+    ).toBeInTheDocument();
   });
 });

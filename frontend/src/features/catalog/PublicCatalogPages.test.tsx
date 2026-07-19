@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { ApiError } from "../../api/client";
 import { PublicCatalogPage } from "./PublicCatalogPage";
 import { PublicRecipeDetailPage } from "./PublicRecipeDetailPage";
 import { HouseholdPublicationRequestsPage } from "./HouseholdPublicationRequestsPage";
@@ -20,6 +21,10 @@ const adoptPublicRecipe = vi.fn();
 const listHouseholdPublicationRequests = vi.fn();
 const listPlatformPublicRecipes = vi.fn();
 const getPlatformPublicRecipe = vi.fn();
+const withdrawPublicationRequest = vi.fn();
+const approvePublicRecipe = vi.fn();
+const rejectPublicRecipe = vi.fn();
+const delistPublicRecipe = vi.fn();
 
 vi.mock("../../api/publicCatalog", () => ({
   listPublicRecipes: (...args: unknown[]) => listPublicRecipes(...args),
@@ -29,10 +34,10 @@ vi.mock("../../api/publicCatalog", () => ({
     listHouseholdPublicationRequests(...args),
   listPlatformPublicRecipes: (...args: unknown[]) => listPlatformPublicRecipes(...args),
   getPlatformPublicRecipe: (...args: unknown[]) => getPlatformPublicRecipe(...args),
-  withdrawPublicationRequest: vi.fn(),
-  approvePublicRecipe: vi.fn(),
-  rejectPublicRecipe: vi.fn(),
-  delistPublicRecipe: vi.fn(),
+  withdrawPublicationRequest: (...args: unknown[]) => withdrawPublicationRequest(...args),
+  approvePublicRecipe: (...args: unknown[]) => approvePublicRecipe(...args),
+  rejectPublicRecipe: (...args: unknown[]) => rejectPublicRecipe(...args),
+  delistPublicRecipe: (...args: unknown[]) => delistPublicRecipe(...args),
 }));
 
 vi.mock("../auth/AuthContext", () => ({
@@ -363,6 +368,87 @@ describe("public catalog frontend smoke", () => {
     expect(screen.getByRole("button", { name: "Withdraw" })).toBeInTheDocument();
   });
 
+  it("withdraws a submitted publication request", async () => {
+    const user = userEvent.setup();
+    stubAuth({ accessToken: "token", hasHousehold: true, isHouseholdAdmin: true });
+    listHouseholdPublicationRequests
+      .mockResolvedValueOnce([
+        {
+          id: "req-1",
+          status: "submitted",
+          originating_dish_id: 1,
+          originating_recipe_id: 2,
+          current_version_id: null,
+          title: "Pending Pasta",
+          description: null,
+          review_note: null,
+          reviewed_at: null,
+          latest_version: {
+            id: "ver-1",
+            version_number: 1,
+            published_at: null,
+            superseded_at: null,
+            created_at: "2026-01-01T00:00:00Z",
+          },
+          created_at: "2026-01-01T00:00:00Z",
+          updated_at: "2026-01-01T00:00:00Z",
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          id: "req-1",
+          status: "withdrawn",
+          originating_dish_id: 1,
+          originating_recipe_id: 2,
+          current_version_id: null,
+          title: "Pending Pasta",
+          description: null,
+          review_note: null,
+          reviewed_at: null,
+          latest_version: {
+            id: "ver-1",
+            version_number: 1,
+            published_at: null,
+            superseded_at: null,
+            created_at: "2026-01-01T00:00:00Z",
+          },
+          created_at: "2026-01-01T00:00:00Z",
+          updated_at: "2026-01-01T00:00:00Z",
+        },
+      ]);
+    withdrawPublicationRequest.mockResolvedValue({
+      id: "req-1",
+      status: "withdrawn",
+      originating_dish_id: 1,
+      originating_recipe_id: 2,
+      current_version_id: null,
+      title: "Pending Pasta",
+      description: null,
+      review_note: null,
+      reviewed_at: null,
+      latest_version: null,
+      created_at: "2026-01-01T00:00:00Z",
+      updated_at: "2026-01-01T00:00:00Z",
+    });
+
+    render(
+      <MemoryRouter>
+        <HouseholdPublicationRequestsPage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Withdraw" })).toBeInTheDocument();
+    });
+    await user.click(screen.getByRole("button", { name: "Withdraw" }));
+    await waitFor(() => {
+      expect(withdrawPublicationRequest).toHaveBeenCalledWith("token", "req-1");
+    });
+    await waitFor(() => {
+      expect(screen.queryByRole("button", { name: "Withdraw" })).not.toBeInTheDocument();
+    });
+  });
+
   it("loads recipe review queue with renamed title", async () => {
     stubAuth({ accessToken: "token", isPlatformAdmin: true });
     listPlatformPublicRecipes.mockResolvedValue([
@@ -434,6 +520,105 @@ describe("public catalog frontend smoke", () => {
     expect(within(technical as HTMLElement).getByText("hh-1")).toBeInTheDocument();
     expect(within(technical as HTMLElement).getByText("11")).toBeInTheDocument();
     expect(within(technical as HTMLElement).getByText("22")).toBeInTheDocument();
+  });
+
+  it("approves a submitted request with an optional note", async () => {
+    const user = userEvent.setup();
+    stubAuth({ accessToken: "token", isPlatformAdmin: true });
+    getPlatformPublicRecipe
+      .mockResolvedValueOnce(reviewDetailPayload)
+      .mockResolvedValueOnce({ ...reviewDetailPayload, status: "public" });
+    approvePublicRecipe.mockResolvedValue({ ...reviewDetailPayload, status: "public" });
+
+    render(
+      <MemoryRouter initialEntries={["/catalog/review/req-1"]}>
+        <Routes>
+          <Route path="/catalog/review/:publicRecipeId" element={<PublicCatalogReviewDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Approve" })).toBeInTheDocument();
+    });
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Looks good" } });
+    await user.click(screen.getByRole("button", { name: "Approve" }));
+    await waitFor(() => {
+      expect(approvePublicRecipe).toHaveBeenCalledWith("token", "req-1", "Looks good");
+    });
+  });
+
+  it("rejects a submitted request with a required note", async () => {
+    const user = userEvent.setup();
+    stubAuth({ accessToken: "token", isPlatformAdmin: true });
+    getPlatformPublicRecipe
+      .mockResolvedValueOnce(reviewDetailPayload)
+      .mockResolvedValueOnce({ ...reviewDetailPayload, status: "rejected" });
+    rejectPublicRecipe.mockResolvedValue({ ...reviewDetailPayload, status: "rejected" });
+
+    render(
+      <MemoryRouter initialEntries={["/catalog/review/req-1"]}>
+        <Routes>
+          <Route path="/catalog/review/:publicRecipeId" element={<PublicCatalogReviewDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Reject" })).toBeInTheDocument();
+    });
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Needs work" } });
+    await user.click(screen.getByRole("button", { name: "Reject" }));
+    await waitFor(() => {
+      expect(rejectPublicRecipe).toHaveBeenCalledWith("token", "req-1", "Needs work");
+    });
+  });
+
+  it("delists a public recipe with a required note", async () => {
+    const user = userEvent.setup();
+    stubAuth({ accessToken: "token", isPlatformAdmin: true });
+    getPlatformPublicRecipe
+      .mockResolvedValueOnce({ ...reviewDetailPayload, status: "public" })
+      .mockResolvedValueOnce({ ...reviewDetailPayload, status: "delisted" });
+    delistPublicRecipe.mockResolvedValue({ ...reviewDetailPayload, status: "delisted" });
+
+    render(
+      <MemoryRouter initialEntries={["/catalog/review/req-1"]}>
+        <Routes>
+          <Route path="/catalog/review/:publicRecipeId" element={<PublicCatalogReviewDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Delist" })).toBeInTheDocument();
+    });
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "Retired" } });
+    await user.click(screen.getByRole("button", { name: "Delist" }));
+    await waitFor(() => {
+      expect(delistPublicRecipe).toHaveBeenCalledWith("token", "req-1", "Retired");
+    });
+  });
+
+  it("shows review action failures", async () => {
+    const user = userEvent.setup();
+    stubAuth({ accessToken: "token", isPlatformAdmin: true });
+    getPlatformPublicRecipe.mockResolvedValue(reviewDetailPayload);
+    approvePublicRecipe.mockRejectedValue(new ApiError("Review note required", 422));
+
+    render(
+      <MemoryRouter initialEntries={["/catalog/review/req-1"]}>
+        <Routes>
+          <Route path="/catalog/review/:publicRecipeId" element={<PublicCatalogReviewDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Approve" })).toBeInTheDocument();
+    });
+    await user.click(screen.getByRole("button", { name: "Approve" }));
+    expect(await screen.findByText("Review note required")).toBeInTheDocument();
   });
 
   it("blocks non-platform users from recipe review via AdminRoute", () => {

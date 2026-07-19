@@ -13,6 +13,11 @@ describe("public catalog breadcrumbs", () => {
       { label: "Catalog", to: "/catalog" },
       { label: "Recipe review" },
     ]);
+    expect(resolveBreadcrumbs("/catalog/review/req-1")).toEqual([
+      { label: "Catalog", to: "/catalog" },
+      { label: "Recipe review", to: "/catalog/review" },
+      { label: "Request" },
+    ]);
     expect(resolveBreadcrumbs("/catalog/recipes/abc")).toEqual([
       { label: "Catalog", to: "/catalog" },
       { label: "Recipe" },

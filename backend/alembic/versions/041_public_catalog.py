@@ -65,16 +65,21 @@ def upgrade() -> None:
             "version_number",
             name="uq_public_recipe_versions_recipe_version",
         ),
+        # Candidate key so current_version / adoption provenance can require ownership.
+        sa.UniqueConstraint(
+            "public_recipe_id",
+            "id",
+            name="uq_public_recipe_versions_id_recipe",
+        ),
     )
     op.create_index("ix_public_recipe_versions_public_recipe_id", "public_recipe_versions", ["public_recipe_id"])
 
     op.create_foreign_key(
-        "fk_public_recipes_current_version_id",
+        "fk_public_recipes_current_version_ownership",
         "public_recipes",
         "public_recipe_versions",
-        ["current_version_id"],
-        ["id"],
-        ondelete="SET NULL",
+        ["id", "current_version_id"],
+        ["public_recipe_id", "id"],
     )
 
     op.add_column(
@@ -86,20 +91,17 @@ def upgrade() -> None:
         sa.Column("derived_from_public_version_id", postgresql.UUID(as_uuid=True), nullable=True),
     )
     op.create_foreign_key(
-        "fk_recipes_derived_from_public_recipe_id",
-        "recipes",
-        "public_recipes",
-        ["derived_from_public_recipe_id"],
-        ["id"],
-        ondelete="SET NULL",
-    )
-    op.create_foreign_key(
-        "fk_recipes_derived_from_public_version_id",
+        "fk_recipes_derived_from_public_version_ownership",
         "recipes",
         "public_recipe_versions",
-        ["derived_from_public_version_id"],
-        ["id"],
+        ["derived_from_public_recipe_id", "derived_from_public_version_id"],
+        ["public_recipe_id", "id"],
         ondelete="SET NULL",
+    )
+    op.create_check_constraint(
+        "ck_recipes_derived_from_public_pair",
+        "recipes",
+        "(derived_from_public_recipe_id IS NULL) = (derived_from_public_version_id IS NULL)",
     )
     op.create_index(
         "ix_recipes_derived_from_public_recipe_id",
@@ -116,12 +118,20 @@ def upgrade() -> None:
 def downgrade() -> None:
     op.drop_index("ix_recipes_derived_from_public_version_id", table_name="recipes")
     op.drop_index("ix_recipes_derived_from_public_recipe_id", table_name="recipes")
-    op.drop_constraint("fk_recipes_derived_from_public_version_id", "recipes", type_="foreignkey")
-    op.drop_constraint("fk_recipes_derived_from_public_recipe_id", "recipes", type_="foreignkey")
+    op.drop_constraint("ck_recipes_derived_from_public_pair", "recipes", type_="check")
+    op.drop_constraint(
+        "fk_recipes_derived_from_public_version_ownership",
+        "recipes",
+        type_="foreignkey",
+    )
     op.drop_column("recipes", "derived_from_public_version_id")
     op.drop_column("recipes", "derived_from_public_recipe_id")
 
-    op.drop_constraint("fk_public_recipes_current_version_id", "public_recipes", type_="foreignkey")
+    op.drop_constraint(
+        "fk_public_recipes_current_version_ownership",
+        "public_recipes",
+        type_="foreignkey",
+    )
     op.drop_index("ix_public_recipe_versions_public_recipe_id", table_name="public_recipe_versions")
     op.drop_table("public_recipe_versions")
     op.drop_index("ix_public_recipes_status", table_name="public_recipes")

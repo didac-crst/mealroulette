@@ -152,7 +152,7 @@ export function PublicCatalogReviewQueuePage() {
           </select>
         </label>
         {error ? <p className="form-error">{error}</p> : null}
-        {!loading && items.length === 0 ? (
+        {!loading && !error && items.length === 0 ? (
           <EmptyState title="No items" description="No publication requests match this filter." />
         ) : null}
         <ul className="catalog-list">
@@ -199,25 +199,55 @@ export function PublicCatalogReviewDetailPage() {
   }, [accessToken, publicRecipeId]);
 
   useEffect(() => {
-    void load();
-  }, [load]);
-
-  async function runAction(action: "approve" | "reject" | "delist") {
+    let cancelled = false;
     if (!accessToken || !publicRecipeId) {
+      setLoading(false);
       return;
     }
+    setLoading(true);
+    setItem(null);
+    void (async () => {
+      try {
+        const data = await catalogApi.getPlatformPublicRecipe(accessToken, publicRecipeId);
+        if (!cancelled) {
+          setItem(data);
+          setError(null);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setItem(null);
+          setError(err instanceof ApiError ? err.message : "Failed to load publication request");
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [accessToken, publicRecipeId]);
+
+  async function runAction(action: "approve" | "reject" | "delist") {
+    if (!accessToken || !item) {
+      return;
+    }
+    const targetId = item.id;
     setSubmitting(true);
     setError(null);
     try {
       if (action === "approve") {
-        await catalogApi.approvePublicRecipe(accessToken, publicRecipeId, reviewNote || undefined);
+        await catalogApi.approvePublicRecipe(accessToken, targetId, reviewNote || undefined);
       } else if (action === "reject") {
-        await catalogApi.rejectPublicRecipe(accessToken, publicRecipeId, reviewNote);
+        await catalogApi.rejectPublicRecipe(accessToken, targetId, reviewNote);
       } else {
-        await catalogApi.delistPublicRecipe(accessToken, publicRecipeId, reviewNote);
+        await catalogApi.delistPublicRecipe(accessToken, targetId, reviewNote);
       }
       setReviewNote("");
-      await load();
+      if (publicRecipeId === targetId) {
+        await load();
+      }
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Review action failed");
     } finally {

@@ -7,6 +7,7 @@ from uuid import UUID
 
 from fastapi import HTTPException, status
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
 from mealroulette.models.catalog import Dish, Ingredient, Recipe, RecipeIngredient, RecipeStep, Tag, Unit
@@ -156,8 +157,14 @@ class PublicCatalogService:
             updated_at=public_recipe.updated_at,
         )
 
-    def _load_source_recipe(self, recipe_id: int, *, household_id: UUID) -> Recipe:
-        recipe = self.db.scalar(
+    def _load_source_recipe(
+        self,
+        recipe_id: int,
+        *,
+        household_id: UUID,
+        for_update: bool = False,
+    ) -> Recipe:
+        query = (
             select(Recipe)
             .join(Dish, Recipe.dish_id == Dish.id)
             .where(Recipe.id == recipe_id, Dish.household_id == household_id)
@@ -168,9 +175,39 @@ class PublicCatalogService:
                 selectinload(Recipe.steps),
             )
         )
+        if for_update:
+            query = query.with_for_update(of=Recipe)
+        recipe = self.db.scalar(query)
         if recipe is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recipe not found")
         return recipe
+
+    def _raise_submit_conflict(self, existing: PublicRecipe) -> None:
+        if existing.status == PublicRecipeStatus.public.value:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=(
+                    "This recipe is already public. "
+                    "Updating an existing public recipe is not supported yet."
+                ),
+            )
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Cannot submit publication request in status {existing.status}",
+        )
+
+    def _commit_submit_or_conflict(self, *, recipe_id: int) -> None:
+        try:
+            self.db.commit()
+        except IntegrityError:
+            self.db.rollback()
+            existing = self._get_lineage_for_recipe(recipe_id)
+            if existing is not None:
+                self._raise_submit_conflict(existing)
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="A publication request already exists for this recipe",
+            ) from None
 
     def build_snapshot(self, recipe: Recipe) -> dict[str, Any]:
         dish = recipe.dish
@@ -276,7 +313,9 @@ class PublicCatalogService:
         household_id: UUID,
         recipe_id: int,
     ) -> PublicRecipe:
-        recipe = self._load_source_recipe(recipe_id, household_id=household_id)
+        # Lock the source recipe before lineage checks so concurrent first
+        # submissions and submit-versus-delete cannot race past the guards.
+        recipe = self._load_source_recipe(recipe_id, household_id=household_id, for_update=True)
         if not recipe.ingredients:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
@@ -312,27 +351,13 @@ class PublicCatalogService:
                 created_by_user_id=user.id,
             )
             self.db.add(version)
-            self.db.commit()
+            self._commit_submit_or_conflict(recipe_id=recipe_id)
             return self.get_public_recipe(public_recipe.id)
 
         if existing.status in _BLOCKING_SUBMIT_STATUSES:
-            if existing.status == PublicRecipeStatus.public.value:
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail=(
-                        "This recipe is already public. "
-                        "Updating an existing public recipe is not supported yet."
-                    ),
-                )
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=f"Cannot submit publication request in status {existing.status}",
-            )
+            self._raise_submit_conflict(existing)
         if existing.status not in _RESUBMIT_STATUSES:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=f"Cannot submit publication request in status {existing.status}",
-            )
+            self._raise_submit_conflict(existing)
 
         latest = self._latest_version(existing)
         next_number = (latest.version_number if latest else 0) + 1
@@ -351,7 +376,7 @@ class PublicCatalogService:
         existing.reviewed_at = None
         existing.review_note = None
         existing.current_version_id = None
-        self.db.commit()
+        self._commit_submit_or_conflict(recipe_id=recipe_id)
         return self.get_public_recipe(existing.id)
 
     def list_household_requests(self, *, household_id: UUID) -> list[PublicRecipe]:
@@ -491,10 +516,12 @@ class PublicCatalogService:
         return self.get_public_recipe(public_recipe.id)
 
     def _unique_adopt_dish_name(self, catalog: CatalogService, base_name: str) -> str:
-        candidates = [base_name, f"{base_name} (adopted)"]
-        short = base_name[:200]
-        for suffix in range(2, 20):
-            candidates.append(f"{short} (adopted {suffix})")
+        suffixes = [""]
+        suffixes.append(" (adopted)")
+        suffixes.extend(f" (adopted {number})" for number in range(2, 20))
+        candidates = [
+            f"{base_name[: max(0, 255 - len(suffix))]}{suffix}" for suffix in suffixes
+        ]
         for name in candidates:
             exists = self.db.scalar(
                 select(Dish.id).where(Dish.name == name, Dish.household_id == catalog.household_id)

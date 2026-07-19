@@ -76,7 +76,7 @@ export function HouseholdPublicationRequestsPage() {
         loadingMessage="Loading requests…"
       >
         {error ? <p className="form-error">{error}</p> : null}
-        {!loading && items.length === 0 ? (
+        {!loading && !error && items.length === 0 ? (
           <EmptyState
             title="No publication requests"
             description="Submit a recipe from its detail page to request public catalog publication."

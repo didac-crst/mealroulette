@@ -776,6 +776,9 @@ class CatalogService:
             name=payload.name,
             description=payload.description,
             default_servings=payload.default_servings,
+            default_prep_time_minutes=payload.default_prep_time_minutes,
+            default_cook_time_minutes=payload.default_cook_time_minutes,
+            default_difficulty=payload.default_difficulty,
             course=payload.course,
             meal_composition=payload.meal_composition,
             simple_dish_part=payload.simple_dish_part,
@@ -822,6 +825,16 @@ class CatalogService:
 
     def delete_dish(self, dish_id: int) -> None:
         dish = self.get_dish(dish_id)
+        # Lock source recipes deterministically before the lineage check so a
+        # concurrent publish cannot race past this guard.
+        list(
+            self.db.scalars(
+                select(Recipe.id)
+                .where(Recipe.dish_id == dish.id)
+                .order_by(Recipe.id)
+                .with_for_update()
+            )
+        )
         self._assert_no_active_public_lineage(dish_id=dish.id)
         self.db.delete(dish)
         self.db.commit()
@@ -995,6 +1008,7 @@ class CatalogService:
 
     def delete_recipe(self, recipe_id: int) -> None:
         recipe = self.get_recipe(recipe_id)
+        self.db.scalar(select(Recipe.id).where(Recipe.id == recipe.id).with_for_update())
         self._assert_no_active_public_lineage(recipe_id=recipe.id)
         dish_id = recipe.dish_id
         was_main = recipe.is_main

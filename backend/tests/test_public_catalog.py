@@ -15,11 +15,20 @@ from mealroulette.models.public_catalog import PublicRecipe, PublicRecipeStatus
 from mealroulette.models.user import User, UserRole
 
 
-def _create_dish_with_recipe(client: TestClient, headers: dict[str, str], name: str) -> tuple[dict, dict]:
+def _create_dish_with_recipe(
+    client: TestClient,
+    headers: dict[str, str],
+    name: str,
+    *,
+    dish_extras: dict | None = None,
+) -> tuple[dict, dict]:
+    payload = {"name": name, "status": "active", "description": f"{name} description"}
+    if dish_extras:
+        payload.update(dish_extras)
     dish = client.post(
         "/api/dishes",
         headers=headers,
-        json={"name": name, "status": "active", "description": f"{name} description"},
+        json=payload,
     )
     assert dish.status_code == 201, dish.text
     dish_body = dish.json()
@@ -276,7 +285,22 @@ def test_adopt_creates_independent_copy_with_provenance(
     catalog_seed,
     db_session: Session,
 ):
-    dish, recipe = _create_dish_with_recipe(client, admin_headers, "Adopt Source")
+    dish, recipe = _create_dish_with_recipe(
+        client,
+        admin_headers,
+        "Adopt Source",
+        dish_extras={
+            "default_prep_time_minutes": 15,
+            "default_cook_time_minutes": 30,
+            "default_difficulty": "easy",
+        },
+    )
+    source_dish = db_session.get(Dish, dish["id"])
+    assert source_dish is not None
+    assert source_dish.default_prep_time_minutes == 15
+    assert source_dish.default_cook_time_minutes == 30
+    assert source_dish.default_difficulty == "easy"
+
     _add_ingredient_and_step(client, admin_headers, recipe["id"])
     submitted = client.post(
         f"/api/recipes/{recipe['id']}/publish-request",
@@ -308,6 +332,9 @@ def test_adopt_creates_independent_copy_with_provenance(
     adopted_dish = db_session.get(Dish, body["dish_id"])
     assert adopted_dish is not None
     assert adopted_dish.name.startswith("Adopt Source")
+    assert adopted_dish.default_prep_time_minutes == 15
+    assert adopted_dish.default_cook_time_minutes == 30
+    assert adopted_dish.default_difficulty == "easy"
 
     renamed = client.put(
         f"/api/dishes/{dish['id']}",
@@ -469,4 +496,321 @@ def test_adopt_rolls_back_when_ingredient_copy_fails(
 
 
 def test_migration_tables_exist(db_session: Session, catalog_seed):
+    from sqlalchemy import inspect
+
     assert db_session.execute(select(PublicRecipe).limit(1)).all() == []
+
+    insp = inspect(db_session.get_bind())
+    assert "public_recipes" in insp.get_table_names()
+    assert "public_recipe_versions" in insp.get_table_names()
+
+    recipe_columns = {column["name"] for column in insp.get_columns("recipes")}
+    assert "derived_from_public_recipe_id" in recipe_columns
+    assert "derived_from_public_version_id" in recipe_columns
+
+    version_uniques = {
+        tuple(constraint["column_names"])
+        for constraint in insp.get_unique_constraints("public_recipe_versions")
+    }
+    assert ("public_recipe_id", "version_number") in version_uniques
+    assert ("public_recipe_id", "id") in version_uniques
+
+    public_recipe_fks = {
+        (tuple(fk["constrained_columns"]), tuple(fk["referred_columns"]), fk["referred_table"])
+        for fk in insp.get_foreign_keys("public_recipes")
+    }
+    assert (
+        ("id", "current_version_id"),
+        ("public_recipe_id", "id"),
+        "public_recipe_versions",
+    ) in public_recipe_fks
+
+    recipe_fks = {
+        (tuple(fk["constrained_columns"]), tuple(fk["referred_columns"]), fk["referred_table"])
+        for fk in insp.get_foreign_keys("recipes")
+    }
+    assert (
+        ("derived_from_public_recipe_id", "derived_from_public_version_id"),
+        ("public_recipe_id", "id"),
+        "public_recipe_versions",
+    ) in recipe_fks
+
+    check_names = {constraint["name"] for constraint in insp.get_check_constraints("recipes")}
+    assert "ck_recipes_derived_from_public_pair" in check_names
+
+
+def test_create_dish_persists_default_timing_fields(client, admin_headers, catalog_seed, db_session: Session):
+    created = client.post(
+        "/api/dishes",
+        headers=admin_headers,
+        json={
+            "name": "Timed Defaults Dish",
+            "default_prep_time_minutes": 12,
+            "default_cook_time_minutes": 24,
+            "default_difficulty": "medium",
+        },
+    )
+    assert created.status_code == 201, created.text
+    dish = db_session.get(Dish, created.json()["id"])
+    assert dish is not None
+    assert dish.default_prep_time_minutes == 12
+    assert dish.default_cook_time_minutes == 24
+    assert dish.default_difficulty == "medium"
+
+
+def test_adopt_truncates_long_dish_name_collisions(
+    client,
+    admin_headers,
+    second_household_headers,
+    catalog_seed,
+    db_session: Session,
+):
+    long_name = "A" * 255
+    dish, recipe = _create_dish_with_recipe(client, admin_headers, long_name)
+    _add_ingredient_and_step(client, admin_headers, recipe["id"])
+    public_id = client.post(
+        f"/api/recipes/{recipe['id']}/publish-request",
+        headers=admin_headers,
+    ).json()["id"]
+    client.post(
+        f"/api/platform/public-recipes/{public_id}/approve",
+        headers=admin_headers,
+        json={},
+    )
+
+    # Occupying the truncated base name forces the “(adopted)” candidate path.
+    occupy = client.post(
+        "/api/dishes",
+        headers=second_household_headers,
+        json={"name": long_name},
+    )
+    assert occupy.status_code == 201, occupy.text
+
+    adopted = client.post(
+        f"/api/public-recipes/{public_id}/adopt",
+        headers=second_household_headers,
+    )
+    assert adopted.status_code == 201, adopted.text
+    adopted_dish = db_session.get(Dish, adopted.json()["dish_id"])
+    assert adopted_dish is not None
+    assert len(adopted_dish.name) <= 255
+    assert adopted_dish.name.endswith("(adopted)")
+
+
+def test_concurrent_first_submission_claims_lineage_once(db_engine):
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+
+    from fastapi import HTTPException
+    from sqlalchemy.orm import sessionmaker
+
+    from mealroulette.auth.security import hash_password
+    from mealroulette.data.seed_catalog import seed_catalog_data
+    from mealroulette.data.seed_taxonomy import seed_taxonomy_data
+    from mealroulette.models.household import Household, HouseholdMembership, HouseholdRole
+    from mealroulette.models.user import User, UserRole
+    from mealroulette.schemas.catalog import (
+        DishCreateRequest,
+        IngredientCreateRequest,
+        RecipeCreateRequest,
+        RecipeIngredientCreateRequest,
+        RecipeStepCreateRequest,
+    )
+    from mealroulette.services.catalog import CatalogService
+    from mealroulette.services.public_catalog import PublicCatalogService
+
+    SessionLocal = sessionmaker(bind=db_engine, autoflush=False, autocommit=False)
+    household_id = uuid.uuid4()
+    with SessionLocal() as setup:
+        seed_catalog_data(setup)
+        seed_taxonomy_data(setup, commit=False)
+        household = Household(id=household_id, name="Submit Race Household")
+        admin = User(
+            username=f"submit-race-{household_id.hex[:8]}",
+            email=f"submit-race-{household_id.hex[:8]}@example.com",
+            password_hash=hash_password("adminpassword"),
+            role=UserRole.admin,
+            active=True,
+        )
+        setup.add_all([household, admin])
+        setup.flush()
+        setup.add(
+            HouseholdMembership(
+                household_id=household_id,
+                user_id=admin.id,
+                role=HouseholdRole.household_admin,
+                active=True,
+            )
+        )
+        catalog = CatalogService(setup, household_id=household_id)
+        ingredient = catalog.create_ingredient(
+            IngredientCreateRequest(
+                canonical_name="submit_race_spice",
+                display_name="Submit Race Spice",
+                food_group="vegetable",
+                family="tomato_family",
+            )
+        )
+        dish = catalog.create_dish(DishCreateRequest(name="Submit Race Dish"))
+        recipe = catalog.create_recipe(
+            dish.id,
+            RecipeCreateRequest(variant_name="Main", is_main=True),
+        )
+        catalog.add_recipe_ingredient(
+            recipe.id,
+            RecipeIngredientCreateRequest(ingredient_id=ingredient.id, quantity="1"),
+        )
+        catalog.create_step(
+            recipe.id,
+            RecipeStepCreateRequest(step_number=1, instruction="Cook"),
+        )
+        setup.commit()
+        recipe_id = recipe.id
+        admin_id = admin.id
+
+    start = Barrier(2)
+
+    def race(_unused):
+        start.wait(timeout=5)
+        with SessionLocal() as session:
+            user = session.get(User, admin_id)
+            assert user is not None
+            try:
+                PublicCatalogService(session).submit_publish_request(
+                    user=user,
+                    household_id=household_id,
+                    recipe_id=recipe_id,
+                )
+                return 201
+            except HTTPException as exc:
+                return exc.status_code
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(pool.map(race, (1, 2)))
+
+    assert sorted(results) == [201, 409]
+    with SessionLocal() as verify:
+        lineages = list(
+            verify.scalars(select(PublicRecipe).where(PublicRecipe.originating_recipe_id == recipe_id))
+        )
+        assert len(lineages) == 1
+        assert lineages[0].status == PublicRecipeStatus.submitted.value
+
+
+def test_concurrent_submit_versus_delete_serializes(db_engine):
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+
+    from fastapi import HTTPException
+    from sqlalchemy.orm import sessionmaker
+
+    from mealroulette.auth.security import hash_password
+    from mealroulette.data.seed_catalog import seed_catalog_data
+    from mealroulette.data.seed_taxonomy import seed_taxonomy_data
+    from mealroulette.models.household import Household, HouseholdMembership, HouseholdRole
+    from mealroulette.models.user import User, UserRole
+    from mealroulette.schemas.catalog import (
+        DishCreateRequest,
+        IngredientCreateRequest,
+        RecipeCreateRequest,
+        RecipeIngredientCreateRequest,
+        RecipeStepCreateRequest,
+    )
+    from mealroulette.services.catalog import CatalogService
+    from mealroulette.services.public_catalog import PublicCatalogService
+
+    SessionLocal = sessionmaker(bind=db_engine, autoflush=False, autocommit=False)
+    household_id = uuid.uuid4()
+    with SessionLocal() as setup:
+        seed_catalog_data(setup)
+        seed_taxonomy_data(setup, commit=False)
+        household = Household(id=household_id, name="Submit Delete Race")
+        admin = User(
+            username=f"submit-delete-{household_id.hex[:8]}",
+            email=f"submit-delete-{household_id.hex[:8]}@example.com",
+            password_hash=hash_password("adminpassword"),
+            role=UserRole.admin,
+            active=True,
+        )
+        setup.add_all([household, admin])
+        setup.flush()
+        setup.add(
+            HouseholdMembership(
+                household_id=household_id,
+                user_id=admin.id,
+                role=HouseholdRole.household_admin,
+                active=True,
+            )
+        )
+        catalog = CatalogService(setup, household_id=household_id)
+        ingredient = catalog.create_ingredient(
+            IngredientCreateRequest(
+                canonical_name="submit_delete_spice",
+                display_name="Submit Delete Spice",
+                food_group="vegetable",
+                family="tomato_family",
+            )
+        )
+        dish = catalog.create_dish(DishCreateRequest(name="Submit Delete Dish"))
+        recipe = catalog.create_recipe(
+            dish.id,
+            RecipeCreateRequest(variant_name="Main", is_main=True),
+        )
+        catalog.add_recipe_ingredient(
+            recipe.id,
+            RecipeIngredientCreateRequest(ingredient_id=ingredient.id, quantity="1"),
+        )
+        catalog.create_step(
+            recipe.id,
+            RecipeStepCreateRequest(step_number=1, instruction="Cook"),
+        )
+        setup.commit()
+        recipe_id = recipe.id
+        admin_id = admin.id
+
+    barrier = Barrier(2)
+
+    def submit_worker():
+        with SessionLocal() as session:
+            user = session.get(User, admin_id)
+            assert user is not None
+            barrier.wait(timeout=5)
+            try:
+                PublicCatalogService(session).submit_publish_request(
+                    user=user,
+                    household_id=household_id,
+                    recipe_id=recipe_id,
+                )
+                return "submit-ok"
+            except HTTPException as exc:
+                return f"submit-{exc.status_code}"
+
+    def delete_worker():
+        with SessionLocal() as session:
+            barrier.wait(timeout=5)
+            try:
+                CatalogService(session, household_id=household_id).delete_recipe(recipe_id)
+                return "delete-ok"
+            except HTTPException as exc:
+                return f"delete-{exc.status_code}"
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        submit_future = pool.submit(submit_worker)
+        delete_future = pool.submit(delete_worker)
+        results = sorted([submit_future.result(timeout=10), delete_future.result(timeout=10)])
+
+    assert results in (
+        ["delete-409", "submit-ok"],
+        ["delete-ok", "submit-404"],
+    )
+    with SessionLocal() as verify:
+        lineages = list(
+            verify.scalars(select(PublicRecipe).where(PublicRecipe.originating_recipe_id == recipe_id))
+        )
+        recipe_row = verify.get(Recipe, recipe_id)
+        if "submit-ok" in results:
+            assert len(lineages) == 1
+            assert recipe_row is not None
+        else:
+            assert lineages == []
+            assert recipe_row is None

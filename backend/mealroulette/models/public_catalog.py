@@ -5,7 +5,16 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any
 from uuid import UUID, uuid4
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, func
+from sqlalchemy import (
+    DateTime,
+    ForeignKey,
+    ForeignKeyConstraint,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import Uuid
@@ -30,6 +39,12 @@ class PublicRecipe(Base):
     __tablename__ = "public_recipes"
     __table_args__ = (
         UniqueConstraint("originating_recipe_id", name="uq_public_recipes_originating_recipe_id"),
+        ForeignKeyConstraint(
+            ["id", "current_version_id"],
+            ["public_recipe_versions.public_recipe_id", "public_recipe_versions.id"],
+            use_alter=True,
+            name="fk_public_recipes_current_version_ownership",
+        ),
     )
 
     id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
@@ -42,16 +57,7 @@ class PublicRecipe(Base):
     originating_recipe_id: Mapped[int] = mapped_column(
         ForeignKey("recipes.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    current_version_id: Mapped[UUID | None] = mapped_column(
-        Uuid,
-        ForeignKey(
-            "public_recipe_versions.id",
-            ondelete="SET NULL",
-            use_alter=True,
-            name="fk_public_recipes_current_version_id",
-        ),
-        nullable=True,
-    )
+    current_version_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
     status: Mapped[str] = mapped_column(
         String(32), nullable=False, default=PublicRecipeStatus.submitted.value, index=True
     )
@@ -94,6 +100,11 @@ class PublicRecipeVersion(Base):
             "public_recipe_id",
             "version_number",
             name="uq_public_recipe_versions_recipe_version",
+        ),
+        UniqueConstraint(
+            "public_recipe_id",
+            "id",
+            name="uq_public_recipe_versions_id_recipe",
         ),
     )
 

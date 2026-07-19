@@ -4,9 +4,11 @@ from uuid import UUID
 
 from sqlalchemy import (
     Boolean,
+    CheckConstraint,
     DateTime,
     Enum,
     ForeignKey,
+    ForeignKeyConstraint,
     Integer,
     JSON,
     Numeric,
@@ -263,6 +265,17 @@ class Recipe(Base):
     __table_args__ = (
         UniqueConstraint("dish_id", "variant_name", name="uq_recipes_dish_variant"),
         UniqueConstraint("dish_id", "sequence_number", name="uq_recipes_dish_sequence"),
+        ForeignKeyConstraint(
+            ["derived_from_public_recipe_id", "derived_from_public_version_id"],
+            ["public_recipe_versions.public_recipe_id", "public_recipe_versions.id"],
+            ondelete="SET NULL",
+            use_alter=True,
+            name="fk_recipes_derived_from_public_version_ownership",
+        ),
+        CheckConstraint(
+            "(derived_from_public_recipe_id IS NULL) = (derived_from_public_version_id IS NULL)",
+            name="ck_recipes_derived_from_public_pair",
+        ),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -284,28 +297,8 @@ class Recipe(Base):
     difficulty: Mapped[str | None] = mapped_column(String(32), nullable=True)
     computed_traits_json: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
-    derived_from_public_recipe_id: Mapped[UUID | None] = mapped_column(
-        Uuid,
-        ForeignKey(
-            "public_recipes.id",
-            ondelete="SET NULL",
-            use_alter=True,
-            name="fk_recipes_derived_from_public_recipe_id",
-        ),
-        nullable=True,
-        index=True,
-    )
-    derived_from_public_version_id: Mapped[UUID | None] = mapped_column(
-        Uuid,
-        ForeignKey(
-            "public_recipe_versions.id",
-            ondelete="SET NULL",
-            use_alter=True,
-            name="fk_recipes_derived_from_public_version_id",
-        ),
-        nullable=True,
-        index=True,
-    )
+    derived_from_public_recipe_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True, index=True)
+    derived_from_public_version_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()

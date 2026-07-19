@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { ApiError } from "../../api/client";
@@ -30,36 +30,46 @@ export function PublicRecipeDetailPage() {
   const [loading, setLoading] = useState(true);
   const [adopting, setAdopting] = useState(false);
 
-  const load = useCallback(async () => {
+  useEffect(() => {
+    let cancelled = false;
     if (!accessToken || !publicRecipeId || !hasHousehold) {
       setLoading(false);
       return;
     }
     setLoading(true);
-    try {
-      const data = await catalogApi.getPublicRecipe(accessToken, publicRecipeId);
-      setItem(data);
-      setError(null);
-    } catch (err) {
-      setItem(null);
-      setError(err instanceof ApiError ? err.message : "Failed to load public recipe");
-    } finally {
-      setLoading(false);
-    }
+    setItem(null);
+    void (async () => {
+      try {
+        const data = await catalogApi.getPublicRecipe(accessToken, publicRecipeId);
+        if (!cancelled) {
+          setItem(data);
+          setError(null);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setItem(null);
+          setError(err instanceof ApiError ? err.message : "Failed to load public recipe");
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [accessToken, hasHousehold, publicRecipeId]);
 
-  useEffect(() => {
-    void load();
-  }, [load]);
-
   async function handleAdopt() {
-    if (!accessToken || !publicRecipeId) {
+    if (!accessToken || !item) {
       return;
     }
+    const targetId = item.id;
     setAdopting(true);
     setError(null);
     try {
-      const result = await catalogApi.adoptPublicRecipe(accessToken, publicRecipeId);
+      const result = await catalogApi.adoptPublicRecipe(accessToken, targetId);
       navigate(`/dishes/${result.dish_id}/recipes/${result.recipe_id}`);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Failed to adopt recipe");

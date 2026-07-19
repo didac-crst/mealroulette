@@ -43,12 +43,18 @@ def settings() -> Settings:
 @pytest.fixture
 def db_engine(settings: Settings):
     engine = create_engine(settings.test_database_url, pool_pre_ping=True)
-    Base.metadata.drop_all(engine)
+    # Schema cascade is more reliable than metadata.drop_all with circular
+    # use_alter foreign keys (public recipe ownership constraints).
+    with engine.begin() as connection:
+        connection.execute(text("DROP SCHEMA public CASCADE"))
+        connection.execute(text("CREATE SCHEMA public"))
     Base.metadata.create_all(engine)
     with engine.connect() as connection:
         connection.execute(text("SELECT 1"))
     yield engine
-    Base.metadata.drop_all(engine)
+    with engine.begin() as connection:
+        connection.execute(text("DROP SCHEMA public CASCADE"))
+        connection.execute(text("CREATE SCHEMA public"))
     engine.dispose()
 
 

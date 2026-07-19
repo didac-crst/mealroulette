@@ -89,6 +89,7 @@ describe("navigation", () => {
     expect(isNavActive("/review", "/plan")).toBe(false);
     expect(isNavActive("/catalog/review", "/catalog")).toBe(false);
     expect(isNavActive("/catalog/recipes/abc", "/catalog")).toBe(true);
+    expect(isNavActive("/catalog/requests", "/catalog")).toBe(true);
     expect(isNavActive("/catalog/review", "/catalog/review")).toBe(true);
   });
 });
